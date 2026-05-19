@@ -1,34 +1,30 @@
 import { create } from "zustand";
 
-type LayoutStore = 
-{
+type LayoutState = {
+  isSidebarCollapsed: boolean;
   isMobileSidebarOpen: boolean;
-  openMenus: string[];
 
-  openMobileSidebar: () => void;
-  closeMobileSidebar: () => void;
+  toggleSidebar: () => void;
   toggleMobileSidebar: () => void;
-
-  toggleMenu: (title: string) => void;
+  closeMobileSidebar: () => void;
 };
 
-export const useLayoutStore = create<LayoutStore>((set) => ({
+export const useLayoutStore = create<LayoutState>((set) => ({
+  isSidebarCollapsed: false,
   isMobileSidebarOpen: false,
-  openMenus: ["User Management"],
 
-  openMobileSidebar: () => set({ isMobileSidebarOpen: true }),
-
-  closeMobileSidebar: () => set({ isMobileSidebarOpen: false }),
+  toggleSidebar: () =>
+    set((state) => ({
+      isSidebarCollapsed: !state.isSidebarCollapsed,
+    })),
 
   toggleMobileSidebar: () =>
     set((state) => ({
       isMobileSidebarOpen: !state.isMobileSidebarOpen,
     })),
 
-  toggleMenu: (title) =>
-    set((state) => ({
-      openMenus: state.openMenus.includes(title)
-        ? state.openMenus.filter((item) => item !== title)
-        : [...state.openMenus, title],
-    })),
+  closeMobileSidebar: () =>
+    set({
+      isMobileSidebarOpen: false,
+    }),
 }));

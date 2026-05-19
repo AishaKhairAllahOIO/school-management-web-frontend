@@ -1,85 +1,59 @@
-import { ChevronDown } from "lucide-react";
 import { NavLink } from "react-router-dom";
-
 import { sidebarItems } from "../config/sidebarItems";
-import { useLayoutStore } from "../store/layoutStore";
 
-export function SidebarMenu() {
-  const openMenus = useLayoutStore((state) => state.openMenus);
-  const toggleMenu = useLayoutStore((state) => state.toggleMenu);
-  const closeMobileSidebar = useLayoutStore((state) => state.closeMobileSidebar);
+type SidebarMenuProps = {
+  variant: "icons" | "labels";
+};
+
+export function SidebarMenu({ variant }: SidebarMenuProps) {
+  if (variant === "icons") {
+    return (
+      <nav className="flex flex-1 flex-col items-center gap-2 pt-1">
+        {sidebarItems.map((item) => {
+          const Icon = item.icon;
+
+          return (
+            <NavLink
+              key={item.title}
+              to={item.path}
+              end={item.path === "/"}
+              title={item.title}
+              className={({ isActive }) =>
+                [
+                  "relative flex h-9 w-full items-center justify-center text-white/75 transition-all duration-200 hover:text-white",
+                  isActive
+                    ? "before:absolute before:-left-4 before:top-1/2 before:h-6 before:w-[3px] before:-translate-y-1/2 before:rounded-r-full before:bg-white"
+                    : "hover:before:absolute hover:before:-left-4 hover:before:top-1/2 hover:before:h-6 hover:before:w-[3px] hover:before:-translate-y-1/2 hover:before:rounded-r-full hover:before:bg-white/55",
+                ].join(" ")
+              }
+            >
+              <Icon size={16} />
+            </NavLink>
+          );
+        })}
+      </nav>
+    );
+  }
 
   return (
-    <nav className="sidebar-scroll flex-1 space-y-2 overflow-y-auto px-4 py-5">
-      {sidebarItems.map((item) => {
-        const Icon = item.icon;
-        const isOpen = openMenus.includes(item.title);
-
-        if (item.children) {
-          return (
-            <div key={item.title}>
-              <button
-                type="button"
-                onClick={() => toggleMenu(item.title)}
-                className="flex w-full items-center justify-between rounded-2xl px-4 py-3 text-sm font-semibold text-white/80 transition hover:bg-white/10 hover:text-white"
-              >
-                <span className="flex items-center gap-3">
-                  <Icon className="h-5 w-5" />
-                  {item.title}
-                </span>
-
-                <ChevronDown
-                  className={`h-4 w-4 transition-transform ${
-                    isOpen ? "rotate-180" : ""
-                  }`}
-                />
-              </button>
-
-              {isOpen && (
-                <div className="ml-7 mt-1 space-y-1 border-l border-white/15 pl-4">
-                  {item.children.map((child) => (
-                    <NavLink
-                      key={child.path}
-                      to={child.path}
-                      onClick={closeMobileSidebar}
-                      className={({ isActive }) =>
-                        [
-                          "block rounded-xl px-4 py-2 text-sm font-medium transition",
-                          isActive
-                            ? "bg-white/20 text-white"
-                            : "text-white/60 hover:bg-white/10 hover:text-white",
-                        ].join(" ")
-                      }
-                    >
-                      {child.title}
-                    </NavLink>
-                  ))}
-                </div>
-              )}
-            </div>
-          );
-        }
-
-        return (
-          <NavLink
-            key={item.path}
-            to={item.path ?? "/"}
-            end={item.path === "/"}
-            onClick={closeMobileSidebar}
-            className={({ isActive }) =>
-              [
-                "flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold transition",
-                isActive
-                  ? "bg-white/20 text-white"
-                  : "text-white/80 hover:bg-white/10 hover:text-white",
-              ].join(" ")
-            }
-          >
-            <Icon className="h-5 w-5" />
-            {item.title}
-          </NavLink>
-        );
-      })}
+    <nav className="flex flex-col gap-2 pt-1">
+      {sidebarItems.map((item) => (
+        <NavLink
+          key={item.title}
+          to={item.path}
+          end={item.path === "/"}
+          className={({ isActive }) =>
+            [
+              "relative flex h-9 items-center px-3 text-xs font-semibold transition-all duration-200",
+              isActive
+                ? "rounded-l-2xl rounded-r-none bg-background text-primary shadow-sm after:absolute after:-right-3 after:top-0 after:h-full after:w-3 after:bg-background"
+                : "rounded-l-2xl rounded-r-none text-white/80 hover:bg-white/12 hover:text-white hover:after:absolute hover:after:-right-3 hover:after:top-0 hover:after:h-full hover:after:w-3 hover:after:bg-white/12",
+            ].join(" ")
+          }
+        >
+          <span className="relative z-10 truncate">{item.title}</span>
+        </NavLink>
+      ))}
     </nav>
   );
 }

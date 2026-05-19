@@ -1,81 +1,45 @@
-import {BarChart3,Bell,CalendarCheck,CalendarDays,GraduationCap,LayoutDashboard,Settings,Users,Wallet,} from "lucide-react";
-import type { SidebarItem } from "../types/layout.types";
+import {
+  BarChart3,
+  CalendarDays,
+  ClipboardCheck,
+  GraduationCap,
+  LayoutDashboard,
+  LogOut,
+  Settings,
+  Users,
+  Wallet,
+} from "lucide-react";
 
-export const sidebarItems: SidebarItem[] =
-[
+export const sidebarItems = [
   {
     title: "Dashboard",
     path: "/",
     icon: LayoutDashboard,
   },
-
   {
     title: "Users",
+    path: "/users",
     icon: Users,
-    children: 
-    [
-      { title: "Students", path: "/users/students" },
-      { title: "Teachers", path: "/users/teachers" },
-      { title: "Parents", path: "/users/parents" },
-      { title: "Advisors", path: "/users/advisors" },
-      { title: "Staff", path: "/users/staff" },
-    ],
   },
   {
-    title: "Academic Management",
+    title: "Academic",
+    path: "/academics",
     icon: GraduationCap,
-    children: 
-    [
-      { title: "Classes", path: "/academics/classes" },
-      { title: "Sections", path: "/academics/sections" },
-      { title: "Subjects", path: "/academics/subjects" },
-      { title: "Exams", path: "/academics/exams" },
-      { title: "Grades", path: "/academics/grades" },
-      { title: "Promotions", path: "/academics/promotions" },
-    ],
   },
   {
     title: "Attendance",
-    icon: CalendarCheck,
-    children: 
-    [
-      { title: "Students Attendance", path: "/attendance/students" },
-      { title: "Staff Attendance", path: "/attendance/staff" },
-    ],
+    path: "/attendance",
+    icon: ClipboardCheck,
   },
   {
     title: "Scheduling",
+    path: "/scheduling",
     icon: CalendarDays,
-    children: 
-    [
-      { title: "Class Schedules", path: "/scheduling/classes" },
-      { title: "Teacher Schedules", path: "/scheduling/teachers" },
-      { title: "Exam Schedules", path: "/scheduling/exams" },
-      { title: "Holidays", path: "/scheduling/holidays" },
-    ],
   },
   {
     title: "Finance",
+    path: "/finance",
     icon: Wallet,
-    children: 
-    [
-      { title: "Fees", path: "/finance/fees" },
-      { title: "Payments", path: "/finance/payments" },
-      { title: "Installments", path: "/finance/installments" },
-      { title: "Salaries", path: "/finance/salaries" },
-      { title: "Deductions", path: "/finance/deductions" },
-    ],
-  },
-  {
-    title: "Communication",
-    icon: Bell,
-    children: 
-    [
-      { title: "Announcements", path: "/communications/announcements" },
-      { title: "Notifications", path: "/communications/notifications" },
-      { title: "Complaints", path: "/communications/complaints" },
-      { title: "Activities", path: "/communications/activities" },
-    ],
   },
   {
     title: "Reports",
@@ -84,13 +48,12 @@ export const sidebarItems: SidebarItem[] =
   },
   {
     title: "Settings",
+    path: "/settings",
     icon: Settings,
-    children: 
-    [
-      { title: "Roles", path: "/settings/roles" },
-      { title: "Permissions", path: "/settings/permissions" },
-      { title: "School Config", path: "/settings/school-config" },
-      { title: "System Config", path: "/settings/system-config" },
-    ],
+  },
+  {
+    title: "Logout",
+    path: "/logout",
+    icon: LogOut,
   },
 ];

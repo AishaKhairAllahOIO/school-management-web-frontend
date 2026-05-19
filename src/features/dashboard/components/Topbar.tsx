@@ -1,7 +1,6 @@
-import { Bell, Menu, Search } from "lucide-react";
+import { Bell, Menu, Moon, Search } from "lucide-react";
 
 import { useLayoutStore } from "../store/layoutStore";
-import { ThemeToggle } from "./ThemeToggle";
 import { UserMenu } from "./UserMenu";
 
 export function Topbar() {
@@ -10,45 +9,47 @@ export function Topbar() {
   );
 
   return (
-    <header className="sticky top-0 z-40 flex h-20 items-center justify-between border-b bg-card/95 px-4 backdrop-blur md:px-6 lg:h-24 lg:px-10">
-      <div className="flex items-center gap-4">
-        <button
-          type="button"
-          onClick={toggleMobileSidebar}
-          className="flex h-11 w-11 items-center justify-center rounded-2xl border bg-card text-foreground lg:hidden"
-        >
-          <Menu className="h-5 w-5" />
-        </button>
+    <header className="sticky top-0 z-40 border-b border-border/60 bg-background px-4 py-3 md:px-6 lg:px-8">
+      <div className="flex h-10 items-center justify-between">
+        <div className="flex min-w-0 items-center gap-3">
+          <button
+            type="button"
+            onClick={toggleMobileSidebar}
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-foreground transition hover:bg-muted lg:hidden"
+          >
+            <Menu size={18} />
+          </button>
 
-        <div>
-          <h2 className="text-xl font-bold text-foreground md:text-2xl lg:text-3xl">
-            Welcome Back 👋
-          </h2>
-          <p className="mt-1 hidden text-sm text-muted-foreground sm:block lg:text-base">
-            Manage your school operations easily
-          </p>
-        </div>
-      </div>
+          <div className="flex h-9 w-64 items-center gap-2 rounded-2xl bg-card px-3 shadow-sm md:w-72 lg:w-80">
+            <Search size={16} className="shrink-0 text-muted-foreground" />
 
-      <div className="flex items-center gap-3">
-        <div className="hidden h-11 w-64 items-center gap-3 rounded-2xl border bg-background px-4 md:flex lg:w-80">
-          <Search className="h-5 w-5 text-muted-foreground" />
-          <input
-            placeholder="Search..."
-            className="w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground"
-          />
+            <input
+              type="text"
+              placeholder="Search"
+              className="w-full bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
+            />
+          </div>
         </div>
 
-        <ThemeToggle />
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-border/70 bg-card text-foreground transition hover:bg-muted"
+          >
+            <Moon size={17} />
+          </button>
 
-        <button className="relative flex h-11 w-11 items-center justify-center rounded-2xl border bg-card text-foreground transition hover:bg-muted">
-          <Bell className="h-5 w-5" />
-          <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-destructive text-[10px] font-bold text-white">
-            3
-          </span>
-        </button>
+          <button
+            type="button"
+            className="relative flex h-10 w-10 items-center justify-center rounded-full border border-border/70 bg-card text-foreground transition hover:bg-muted"
+          >
+            <Bell size={17} />
 
-        <UserMenu />
+            <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-destructive" />
+          </button>
+
+          <UserMenu />
+        </div>
       </div>
     </header>
   );
