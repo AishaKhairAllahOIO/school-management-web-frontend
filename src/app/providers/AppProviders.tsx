@@ -2,7 +2,10 @@ import { Toaster } from "sonner";
 import { QueryProvider } from "./QueryProvider";
 import { ThemeProvider } from "./ThemeProvider";
 
-type AppProvidersProps = {children: React.ReactNode;};
+type AppProvidersProps = 
+{
+  children: React.ReactNode;
+};
 
 export function AppProviders({ children }: AppProvidersProps)
 {

@@ -6,10 +6,7 @@ import { useForm } from "react-hook-form";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import {
-  loginSchema,
-  type LoginSchema,
-} from "../schemas/login.schema";
+import { loginSchema,  type LoginSchema } from "../schemas/login.schema";
 
 import { useLogin } from "../hooks/use-login";
 
@@ -20,6 +17,8 @@ import { Input } from "@/shared/ui/input";
 import { Label } from "@/shared/ui/label";
 
 import { Checkbox } from "@/shared/ui/checkbox";
+
+import { Link } from "react-router-dom";
 
 export function LoginForm() {
 
@@ -75,8 +74,8 @@ export function LoginForm() {
           <div
             className="
               flex
-              h-12
-              w-12
+              h-14
+              w-14
               items-center
               justify-center
               rounded-2xl
@@ -87,41 +86,25 @@ export function LoginForm() {
               shadow-lg
             "
           >
-            S
+            S  
           </div>
 
           <div>
 
             <h1
               className="
-                text-2xl
+                text-3xl
                 font-bold
                 text-[#1A1A2E]
               "
             >
-              School Desk
+            Welcome to login system   
             </h1>
 
-            <p
-              className="
-                text-sm
-                text-gray-500
-              "
-            >
-              School Management Dashboard
-            </p>
+             
           </div>
         </div>
-
-        <h2
-          className="
-            text-3xl
-            font-bold
-            text-[#1A1A2E]
-          "
-        >
-          Welcome Back 👋
-        </h2>
+ 
 
         <p
           className="
@@ -269,27 +252,27 @@ export function LoginForm() {
             </Label>
           </div>
 
-          <button
-            type="button"
-            className="
-              text-sm
-              font-medium
-              text-[#5B4FC7]
-              transition-colors
-              hover:text-[#4A3FB5]
-              hover:underline
-            "
-          >
-            Forgot Password?
-          </button>
+          <Link
+        to="/forgot-password"
+        className="
+        text-sm
+        font-medium
+        text-[#5B4FC7]
+        transition-colors
+        hover:text-[#4A3FB5]
+         hover:underline "
+>
+         Forgot Password?
+       </Link>
         </div>
+        
 
         {/* Submit */}
         <Button
           type="submit"
           disabled={loginMutation.isPending}
           className="
-            h-12
+            h-13
             w-full
             rounded-xl
             bg-[#5B4FC7]
@@ -324,3 +307,6 @@ export function LoginForm() {
     </div>
   );
 }
+
+
+

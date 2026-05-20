@@ -1,6 +1,6 @@
 export const routesConfig = {
   auth: {
-    login: "/auth/login",
+    login: "/login",
   },
 
   dashboard: "/",

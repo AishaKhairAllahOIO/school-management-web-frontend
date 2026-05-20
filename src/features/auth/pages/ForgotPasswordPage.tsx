@@ -1,8 +1,9 @@
 import { motion } from "framer-motion";
 
-import { LoginForm } from "../components/LoginForm";
+import { ForgotPasswordForm }
+from "../components/ForgotPasswordForm";
 
-export function LoginPage() {
+export function ForgotPasswordPage() {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -10,7 +11,7 @@ export function LoginPage() {
       transition={{ duration: 0.4 }}
       className="w-full max-w-md"
     >
-      <LoginForm />
+      <ForgotPasswordForm />
     </motion.div>
   );
 }
