@@ -11,5 +11,4 @@ export type SidebarItem =
   title: string;
   path?: string;
   icon: LucideIcon;
-  children?: SidebarChildItem[];
 };

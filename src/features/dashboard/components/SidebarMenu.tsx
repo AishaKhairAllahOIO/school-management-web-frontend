@@ -1,15 +1,19 @@
 import { NavLink } from "react-router-dom";
 import { sidebarItems } from "../config/sidebarItems";
 
-type SidebarMenuProps = {
+type SidebarMenuProps =
+{
   variant: "icons" | "labels";
 };
 
-export function SidebarMenu({ variant }: SidebarMenuProps) {
-  if (variant === "icons") {
+export function SidebarMenu({ variant }: SidebarMenuProps) 
+{
+  if (variant === "icons") 
+  {
     return (
       <nav className="flex flex-1 flex-col items-center gap-2 pt-1">
-        {sidebarItems.map((item) => {
+        {sidebarItems.map((item) => 
+        {
           const Icon = item.icon;
 
           return (

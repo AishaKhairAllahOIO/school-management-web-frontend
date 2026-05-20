@@ -218,10 +218,27 @@ button:disabled
 
 :focus-visible 
 {
-  outline: 2px solid var(--ring);
-  outline-offset: 3px;
+  outline: none;
 }
 
+input,
+textarea,
+select 
+{
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+input:focus,
+input:focus-visible,
+textarea:focus,
+textarea:focus-visible,
+select:focus,
+select:focus-visible 
+{
+  outline: none !important;
+  box-shadow: none !important;
+}
 @media (prefers-reduced-motion: reduce) 
 {
   *,
@@ -313,6 +330,148 @@ button:disabled
   }
 
   to 
+  {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+/* ========================================
+   PREMIUM UI ENHANCEMENTS
+======================================== */
+
+body
+{
+  background:
+    linear-gradient(
+      180deg,
+      #f8f9fe 0%,
+      #f3f2ff 100%
+    );
+
+  background-attachment: fixed;
+}
+
+.dark body
+{
+  background:
+    linear-gradient(
+      180deg,
+      #111827 0%,
+      #0f172a 100%
+    );
+
+  background-attachment: fixed;
+}
+
+
+/* ===== Glass Effect ===== */
+
+.glass-card
+{
+  background: color-mix(in srgb, var(--card) 82%, transparent);
+
+  backdrop-filter: blur(18px);
+
+  border: 1px solid
+    color-mix(in srgb, var(--border) 70%, transparent);
+}
+
+
+/* ===== Premium Shadows ===== */
+
+.shadow-soft
+{
+  box-shadow:
+    0 4px 18px rgba(91, 79, 199, 0.06),
+    0 2px 6px rgba(15, 23, 42, 0.04);
+}
+
+.shadow-soft-lg
+{
+  box-shadow:
+    0 10px 30px rgba(91, 79, 199, 0.08),
+    0 4px 12px rgba(15, 23, 42, 0.06);
+}
+
+
+/* ===== Smooth Hover System ===== */
+
+.interactive
+{
+  transition:
+    transform 220ms ease,
+    background-color 220ms ease,
+    border-color 220ms ease,
+    opacity 220ms ease,
+    box-shadow 220ms ease;
+}
+
+.interactive:hover
+{
+  transform: translateY(-1px);
+}
+
+
+/* ===== Page Shell ===== */
+
+.page-shell
+{
+  width: 100%;
+  max-width: 1680px;
+
+  margin-inline: auto;
+}
+
+
+/* ===== Better Cards ===== */
+
+.dashboard-card
+{
+  border-radius: 28px;
+
+  background: var(--card);
+
+  border: 1px solid
+    color-mix(in srgb, var(--border) 65%, transparent);
+
+  box-shadow:
+    0 4px 20px rgba(91, 79, 199, 0.05);
+}
+
+
+/* ===== Elegant Divider ===== */
+
+.soft-divider
+{
+  border-color:
+    color-mix(in srgb, var(--border) 55%, transparent);
+}
+
+
+/* ===== Better Scroll ===== */
+
+.sidebar-scroll::-webkit-scrollbar
+{
+  width: 5px;
+}
+
+
+/* ===== Subtle Animation ===== */
+
+.fade-in
+{
+  animation: fade-in 240ms ease-out;
+}
+
+@keyframes fade-in
+{
+  from
+  {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+
+  to
   {
     opacity: 1;
     transform: translateY(0);

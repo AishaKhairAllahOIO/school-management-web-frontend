@@ -1,16 +1,7 @@
-import {
-  BarChart3,
-  CalendarDays,
-  ClipboardCheck,
-  GraduationCap,
-  LayoutDashboard,
-  LogOut,
-  Settings,
-  Users,
-  Wallet,
-} from "lucide-react";
+import {BarChart3, CalendarDays, ClipboardCheck, GraduationCap, LayoutDashboard, Settings, Users, Wallet} from "lucide-react";
 
-export const sidebarItems = [
+export const sidebarItems = 
+[
   {
     title: "Dashboard",
     path: "/",
@@ -50,10 +41,5 @@ export const sidebarItems = [
     title: "Settings",
     path: "/settings",
     icon: Settings,
-  },
-  {
-    title: "Logout",
-    path: "/logout",
-    icon: LogOut,
   },
 ];

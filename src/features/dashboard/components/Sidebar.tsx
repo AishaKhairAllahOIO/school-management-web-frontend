@@ -5,6 +5,8 @@ import {
   LogOut,
 } from "lucide-react";
 
+import { NavLink } from "react-router-dom";
+
 import { useLayoutStore } from "../store/layoutStore";
 import { SidebarMenu } from "./SidebarMenu";
 
@@ -21,14 +23,16 @@ export function Sidebar() {
           : "w-[218px] grid-cols-[56px_1fr] grid-rows-[76px_1fr_64px]",
       ].join(" ")}
     >
-      <button
-        type="button"
-        onClick={toggleSidebar}
-        aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-        className="absolute -right-[12px] top-[55px] z-[80] flex h-10 w-[12px] items-center justify-center rounded-r-full bg-primary-light/80 text-white shadow-md transition-all duration-300 hover:w-[16px] hover:bg-primary-light"
-      >
-        {isCollapsed ? <ChevronRight size={12} /> : <ChevronLeft size={12} />}
-      </button>
+      {isCollapsed && (
+        <button
+          type="button"
+          onClick={toggleSidebar}
+          aria-label="Expand sidebar"
+          className="absolute left-[62px] top-[24px] z-[80] flex h-8 w-8 items-center justify-center rounded-full bg-card text-primary shadow-soft-lg ring-1 ring-border/70 transition-all duration-300 hover:scale-105 hover:bg-card"
+        >
+          <ChevronRight size={15} />
+        </button>
+      )}
 
       <div className="row-span-3 flex flex-col items-center rounded-r-[28px] bg-primary-light/55">
         <div className="flex h-[76px] items-center justify-center">
@@ -39,31 +43,49 @@ export function Sidebar() {
 
         <div className="flex h-[64px] items-center justify-center">
           {isCollapsed ? (
-            <button
-              type="button"
+            <NavLink
+              to="/logout"
               title="Log Out"
-              className="flex h-9 w-9 items-center justify-center rounded-xl text-white/80 transition hover:bg-white/15 hover:text-white"
+              className="flex h-9 w-9 items-center justify-center rounded-xl text-white/80 transition hover:text-white"
             >
               <LogOut size={17} />
-            </button>
+            </NavLink>
           ) : null}
         </div>
       </div>
 
       {!isCollapsed && (
         <>
-          <div className="flex h-[76px] items-center gap-3 pl-6">
-            <GraduationCap size={18} className="text-white/85" />
-            <h1 className="text-sm font-bold">School</h1>
+          <div className="flex h-[76px] items-center justify-between gap-3 pl-6 pr-4">
+            <div className="flex min-w-0 items-center gap-3">
+              <GraduationCap size={18} className="shrink-0 text-white/85" />
+
+              <h1 className="truncate text-sm font-bold">School</h1>
+            </div>
+
+            <button
+              type="button"
+              onClick={toggleSidebar}
+              aria-label="Collapse sidebar"
+              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/10 text-white/80 transition hover:bg-white/15 hover:text-white"
+            >
+              <ChevronLeft size={15} />
+            </button>
           </div>
 
           <div className="min-h-0 overflow-visible px-3">
             <SidebarMenu variant="labels" />
           </div>
 
-          <div className="flex h-[64px] items-center gap-3 pl-6">
-            <LogOut size={16} className="text-white/80" />
-            <span className="text-xs font-medium text-white/80">Log Out</span>
+          <div className="flex h-[64px] items-center px-3">
+            <NavLink
+              to="/logout"
+              className="flex items-center gap-3 text-xs font-medium text-white/80 transition hover:text-white"
+            >
+              <LogOut size={16} />
+
+              <span>Log Out</span>
+            </NavLink>
           </div>
         </>
       )}
