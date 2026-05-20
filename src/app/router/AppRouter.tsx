@@ -1,4 +1,4 @@
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { Navigate, createBrowserRouter, RouterProvider } from "react-router-dom";
 
 import { DashboardLayout } from "@/app/layouts/DashboardLayout";
 
@@ -22,34 +22,127 @@ const router = createBrowserRouter([
         index: true,
         element: <PlaceholderPage title="Dashboard" />,
       },
+
       {
         path: "users",
-        element: <PlaceholderPage title="Users" />,
+        children: [
+          { index: true, element: <Navigate to="students" replace /> },
+          { path: "students", element: <PlaceholderPage title="Students" /> },
+          { path: "teachers", element: <PlaceholderPage title="Teachers" /> },
+          { path: "parents", element: <PlaceholderPage title="Parents" /> },
+          { path: "advisors", element: <PlaceholderPage title="Advisors" /> },
+          { path: "staff", element: <PlaceholderPage title="Staff" /> },
+        ],
       },
+
       {
         path: "academics",
-        element: <PlaceholderPage title="Academic" />,
+        children: [
+          { index: true, element: <Navigate to="classes" replace /> },
+          { path: "classes", element: <PlaceholderPage title="Classes" /> },
+          { path: "sections", element: <PlaceholderPage title="Sections" /> },
+          { path: "subjects", element: <PlaceholderPage title="Subjects" /> },
+          { path: "exams", element: <PlaceholderPage title="Exams" /> },
+          { path: "grades", element: <PlaceholderPage title="Grades" /> },
+          { path: "promotions", element: <PlaceholderPage title="Promotions" /> },
+        ],
       },
+
       {
         path: "attendance",
-        element: <PlaceholderPage title="Attendance" />,
+        children: [
+          { index: true, element: <Navigate to="students" replace /> },
+          {
+            path: "students",
+            element: <PlaceholderPage title="Students Attendance" />,
+          },
+          {
+            path: "staff",
+            element: <PlaceholderPage title="Staff Attendance" />,
+          },
+        ],
       },
+
       {
         path: "scheduling",
-        element: <PlaceholderPage title="Scheduling" />,
+        children: [
+          { index: true, element: <Navigate to="classes" replace /> },
+          {
+            path: "classes",
+            element: <PlaceholderPage title="Class Schedules" />,
+          },
+          {
+            path: "teachers",
+            element: <PlaceholderPage title="Teacher Schedules" />,
+          },
+          {
+            path: "exams",
+            element: <PlaceholderPage title="Exam Schedules" />,
+          },
+          { path: "holidays", element: <PlaceholderPage title="Holidays" /> },
+        ],
       },
+
       {
         path: "finance",
-        element: <PlaceholderPage title="Finance" />,
+        children: [
+          { index: true, element: <Navigate to="fees" replace /> },
+          { path: "fees", element: <PlaceholderPage title="Fees" /> },
+          { path: "payments", element: <PlaceholderPage title="Payments" /> },
+          {
+            path: "installments",
+            element: <PlaceholderPage title="Installments" />,
+          },
+          { path: "salaries", element: <PlaceholderPage title="Salaries" /> },
+          { path: "deductions", element: <PlaceholderPage title="Deductions" /> },
+        ],
       },
+
+      {
+        path: "communication",
+        children: [
+          { index: true, element: <Navigate to="announcements" replace /> },
+          {
+            path: "announcements",
+            element: <PlaceholderPage title="Announcements" />,
+          },
+          {
+            path: "notifications",
+            element: <PlaceholderPage title="Notifications" />,
+          },
+          {
+            path: "complaints",
+            element: <PlaceholderPage title="Complaints" />,
+          },
+          { path: "activities", element: <PlaceholderPage title="Activities" /> },
+        ],
+      },
+
       {
         path: "reports",
         element: <PlaceholderPage title="Reports" />,
       },
+
       {
         path: "settings",
-        element: <PlaceholderPage title="Settings" />,
+        children: [
+          { index: true, element: <Navigate to="roles" replace /> },
+          { path: "roles", element: <PlaceholderPage title="Roles" /> },
+          {
+            path: "permissions",
+            element: <PlaceholderPage title="Permissions" />,
+          },
+          {
+            path: "school-config",
+            element: <PlaceholderPage title="School Config" />,
+          },
+          {
+            path: "system-config",
+            element: <PlaceholderPage title="System Config" />,
+          },
+        ],
       },
+
       {
         path: "logout",
         element: <PlaceholderPage title="Logout" />,

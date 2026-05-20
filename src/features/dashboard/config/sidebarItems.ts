@@ -1,7 +1,16 @@
-import {BarChart3, CalendarDays, ClipboardCheck, GraduationCap, LayoutDashboard, Settings, Users, Wallet} from "lucide-react";
+import {
+  BarChart3,
+  CalendarDays,
+  ClipboardCheck,
+  GraduationCap,
+  LayoutDashboard,
+  MessageCircle,
+  Settings,
+  Users,
+  Wallet,
+} from "lucide-react";
 
-export const sidebarItems = 
-[
+export const sidebarItems = [
   {
     title: "Dashboard",
     path: "/",
@@ -9,28 +18,33 @@ export const sidebarItems =
   },
   {
     title: "Users",
-    path: "/users",
+    path: "/users/students",
     icon: Users,
   },
   {
     title: "Academic",
-    path: "/academics",
+    path: "/academics/classes",
     icon: GraduationCap,
   },
   {
     title: "Attendance",
-    path: "/attendance",
+    path: "/attendance/students",
     icon: ClipboardCheck,
   },
   {
     title: "Scheduling",
-    path: "/scheduling",
+    path: "/scheduling/classes",
     icon: CalendarDays,
   },
   {
     title: "Finance",
-    path: "/finance",
+    path: "/finance/fees",
     icon: Wallet,
+  },
+  {
+    title: "Communication",
+    path: "/communication/announcements",
+    icon: MessageCircle,
   },
   {
     title: "Reports",
@@ -39,7 +53,7 @@ export const sidebarItems =
   },
   {
     title: "Settings",
-    path: "/settings",
+    path: "/settings/roles",
     icon: Settings,
   },
 ];
