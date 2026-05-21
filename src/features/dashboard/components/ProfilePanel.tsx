@@ -1,13 +1,125 @@
-import { CalendarDays, CheckCircle2, Edit3, X } from "lucide-react";
+import {
+  BadgeCheck,
+  Building2,
+  Edit3,
+  IdCard,
+  KeyRound,
+  LogOut,
+  Mail,
+  MapPin,
+  Phone,
+  ShieldCheck,
+  UserRound,
+  X,
+} from "lucide-react";
 
+import { useCurrentUser } from "../hooks/useCurrentUser";
 import { useLayoutStore } from "../store/layoutStore";
 
-const tasks = [
-  { title: "Programming Language", value: "75%" },
-  { title: "Experimental Statistics", value: "42%" },
+const quickInfo = [
+  {
+    label: "Employee ID",
+    value: "ADM-2026",
+    icon: IdCard,
+  },
+  {
+    label: "Department",
+    value: "Administration",
+    icon: Building2,
+  },
+  {
+    label: "Office",
+    value: "Main Building",
+    icon: MapPin,
+  },
+  {
+    label: "Status",
+    value: "Active",
+    icon: BadgeCheck,
+  },
 ];
 
+const contactInfo = [
+  {
+    label: "Email",
+    value: "admin@school.com",
+    icon: Mail,
+  },
+  {
+    label: "Phone",
+    value: "+40 712 555 888",
+    icon: Phone,
+  },
+];
+
+const accessInfo = [
+  {
+    label: "Role",
+    value: "Super Admin",
+    icon: UserRound,
+  },
+  {
+    label: "Access",
+    value: "Full Access",
+    icon: ShieldCheck,
+  },
+  {
+    label: "Last Login",
+    value: "Today 09:42 AM",
+    icon: KeyRound,
+  },
+];
+
+function InfoSection({
+  title,
+  items,
+}: {
+  title: string;
+  items: {
+    label: string;
+    value: string;
+    icon: typeof IdCard;
+  }[];
+}) {
+  return (
+    <section className="rounded-[24px] bg-background/80 p-4">
+      <h3 className="mb-3 text-xs font-bold uppercase tracking-wide text-muted-foreground">
+        {title}
+      </h3>
+
+      <div className="space-y-3">
+        {items.map((item) => {
+          const Icon = item.icon;
+
+          return (
+            <div
+              key={item.label}
+              className="flex items-center justify-between gap-3"
+            >
+              <div className="flex min-w-0 items-center gap-3">
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-2xl bg-card text-primary shadow-soft">
+                  <Icon size={15} />
+                </span>
+
+                <span className="truncate text-xs text-muted-foreground">
+                  {item.label}
+                </span>
+              </div>
+
+              <span className="max-w-[130px] truncate text-right text-xs font-semibold text-foreground">
+                {item.value}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
 export function ProfilePanel() {
+  const { user } = useCurrentUser();
+
   const isOpen = useLayoutStore((state) => state.isProfilePanelOpen);
 
   const toggleProfilePanel = useLayoutStore(
@@ -40,77 +152,49 @@ export function ProfilePanel() {
       </div>
 
       <div className="flex flex-col items-center text-center">
-        <img
-          src="https://randomuser.me/api/portraits/women/44.jpg"
-          alt="Aisha Khairallah"
-          className="h-20 w-20 rounded-full object-cover"
-        />
+        <div className="relative">
+          <img
+            src={user.avatarUrl}
+            alt={user.fullName}
+            className="h-20 w-20 rounded-full object-cover ring-4 ring-primary/10"
+          />
+
+          <span className="absolute bottom-1 right-1 h-3.5 w-3.5 rounded-full border-2 border-card bg-success" />
+        </div>
 
         <h3 className="mt-4 text-sm font-bold text-foreground">
-          Aisha Khairallah
+          {user.fullName}
         </h3>
 
         <p className="mt-1 text-xs text-muted-foreground">
-          Admin · School Management
+          {user.role} · School Management
         </p>
       </div>
 
-      <div className="mt-8">
-        <div className="mb-4 flex items-center justify-between">
-          <h3 className="text-sm font-bold text-foreground">June 2026</h3>
+      <div className="mt-7 min-h-0 flex-1 space-y-4 overflow-y-auto pr-1">
+        <InfoSection title="Quick Information" items={quickInfo} />
 
-          <CalendarDays size={16} className="text-muted-foreground" />
-        </div>
+        <InfoSection title="Contact Information" items={contactInfo} />
 
-        <div className="grid grid-cols-7 gap-2 text-center text-xs text-muted-foreground">
-          {["S", "M", "T", "W", "T", "F", "S"].map((day) => (
-            <span key={day}>{day}</span>
-          ))}
-
-          {Array.from({ length: 30 }).map((_, index) => (
-            <span
-              key={index}
-              className={[
-                "flex h-8 items-center justify-center rounded-full transition",
-                index === 14 ? "bg-primary text-white" : "hover:bg-muted",
-              ].join(" ")}
-            >
-              {index + 1}
-            </span>
-          ))}
-        </div>
+        <InfoSection title="System Access" items={accessInfo} />
       </div>
 
-      <div className="mt-8 min-h-0 flex-1 overflow-y-auto pr-1">
-        <div className="mb-4 flex items-center justify-between">
-          <h3 className="text-sm font-bold text-foreground">
-            Task Progress
-          </h3>
+      <div className="mt-5 space-y-2">
+        <button
+          type="button"
+          className="flex w-full items-center justify-center gap-2 rounded-2xl bg-primary py-2.5 text-xs font-bold text-white transition hover:bg-primary-dark"
+        >
+          <Edit3 size={15} />
+          Edit Profile
+        </button>
 
-          <button className="text-xs font-semibold text-primary">
-            View all
-          </button>
-        </div>
-
-        <div className="space-y-3">
-          {tasks.map((task) => (
-            <div key={task.title} className="rounded-2xl bg-background p-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <CheckCircle2 size={18} className="text-primary" />
-
-                  <p className="text-xs font-semibold text-foreground">
-                    {task.title}
-                  </p>
-                </div>
-
-                <span className="text-xs font-bold text-primary">
-                  {task.value}
-                </span>
-              </div>
-            </div>
-          ))}
-        </div>
+        <button
+          type="button"
+          className="flex w-full items-center justify-center gap-2 rounded-2xl bg-background py-2.5 text-xs font-bold text-muted-foreground transition hover:bg-muted hover:text-foreground"
+        >
+          <LogOut size={15} />
+          Log Out
+        </button>
       </div>
     </aside>
   );

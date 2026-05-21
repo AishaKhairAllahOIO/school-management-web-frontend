@@ -10,6 +10,10 @@ import { useLayoutStore } from "@/features/dashboard/store/layoutStore";
 export function DashboardLayout() {
   const isCollapsed = useLayoutStore((state) => state.isSidebarCollapsed);
 
+  const isProfilePanelOpen = useLayoutStore(
+    (state) => state.isProfilePanelOpen
+  );
+
   return (
     <div className="min-h-screen bg-background">
       <Sidebar />
@@ -20,6 +24,7 @@ export function DashboardLayout() {
         className={[
           "min-h-screen transition-all duration-300 ease-out",
           isCollapsed ? "lg:pl-[56px]" : "lg:pl-[218px]",
+          isProfilePanelOpen ? "lg:pr-[344px]" : "lg:pr-0",
         ].join(" ")}
       >
         <Topbar />

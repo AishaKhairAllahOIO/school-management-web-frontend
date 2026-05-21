@@ -3,16 +3,14 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "scripts":
-  {
+  "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
     "type-check": "tsc -b"
   },
-  "dependencies":
-  {
+  "dependencies": {
     "@hookform/resolvers": "^5.2.2",
     "@tailwindcss/vite": "^4.2.4",
     "@tanstack/react-query": "^5.100.9",
@@ -33,11 +31,10 @@
     "zod": "^4.4.3",
     "zustand": "^5.0.13"
   },
-  "devDependencies":
-  {
+  "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@types/node": "^24.12.2",
-    "@types/react": "^19.2.14",
+    "@types/react": "^19.2.15",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.1",
     "eslint": "^10.2.1",

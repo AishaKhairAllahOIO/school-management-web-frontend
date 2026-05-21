@@ -2,15 +2,17 @@ import { NavLink, useLocation } from "react-router-dom";
 
 const subNavigationItems = [
   {
-    basePath: "/users",
-    items: [
-      { title: "Students", path: "/users/students" },
-      { title: "Teachers", path: "/users/teachers" },
-      { title: "Parents", path: "/users/parents" },
-      { title: "Advisors", path: "/users/advisors" },
-      { title: "Staff", path: "/users/staff" },
-    ],
-  },
+  basePath: "/users",
+  items: [
+    { title: "Students", path: "/users/students" },
+    { title: "Teachers", path: "/users/teachers" },
+    { title: "Parents", path: "/users/parents" },
+    { title: "Secretaries", path: "/users/secretaries" },
+    { title: "Supervisors", path: "/users/supervisors" },
+    { title: "Counselors", path: "/users/counselors" },
+    { title: "Service Staff", path: "/users/service-staff" },
+  ],
+},
   {
     basePath: "/academics",
     items: [
@@ -78,25 +80,27 @@ export function SubNavigation() {
   if (!currentSection) return null;
 
   return (
-    <div className="border-b border-border/50 bg-background/75 px-4 py-3 backdrop-blur-xl md:px-6 lg:px-8">
-      <nav className="page-shell flex items-center gap-2 overflow-x-auto">
-        {currentSection.items.map((item) => (
-          <NavLink
-            key={item.path}
-            to={item.path}
-            className={({ isActive }) =>
-              [
-                "whitespace-nowrap rounded-full px-4 py-2 text-xs font-semibold transition-all",
-                isActive
-                  ? "bg-primary text-white shadow-soft"
-                  : "bg-card/80 text-muted-foreground hover:bg-muted hover:text-foreground",
-              ].join(" ")
-            }
-          >
-            {item.title}
-          </NavLink>
-        ))}
-      </nav>
+    <div className="px-4 pt-4 md:px-6 lg:px-8">
+      <div className="page-shell">
+        <nav className="inline-flex max-w-full items-center gap-1 overflow-x-auto rounded-[24px] border border-border/60 bg-card/80 p-1.5 shadow-soft backdrop-blur-xl">
+          {currentSection.items.map((item) => (
+            <NavLink
+              key={item.path}
+              to={item.path}
+              className={({ isActive }) =>
+                [
+                  "whitespace-nowrap rounded-[18px] px-4 py-2 text-xs font-semibold transition-all",
+                  isActive
+                    ? "bg-primary text-white shadow-soft"
+                    : "text-muted-foreground hover:bg-background hover:text-foreground",
+                ].join(" ")
+              }
+            >
+              {item.title}
+            </NavLink>
+          ))}
+        </nav>
+      </div>
     </div>
   );
 }

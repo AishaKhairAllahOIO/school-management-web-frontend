@@ -2,8 +2,7 @@
 
 @custom-variant dark (&:is(.dark *));
 
-:root 
-{
+:root {
   color-scheme: light;
 
   --background: #f8f9fe;
@@ -12,7 +11,8 @@
   --card: #ffffff;
   --card-foreground: #1a1a2e;
 
-  --surface: #c8c5e8;
+  --surface: #f3f2ff;
+  --surface-soft: #ede9fe;
 
   --primary: #5b4fc7;
   --primary-foreground: #ffffff;
@@ -45,12 +45,12 @@
 
   --radius: 1rem;
 
-  --sidebar-width: 20rem;
-  --topbar-height: 5rem;
+  --sidebar-width: 13.625rem;
+  --sidebar-collapsed-width: 3.5rem;
+  --topbar-height: 4.25rem;
 }
 
-.dark
-{
+.dark {
   color-scheme: dark;
 
   --background: #111827;
@@ -59,7 +59,8 @@
   --card: #1f2937;
   --card-foreground: #f9fafb;
 
-  --surface: #1a2234;
+  --surface: #182032;
+  --surface-soft: #2b3345;
 
   --primary: #6d5fdb;
   --primary-foreground: #ffffff;
@@ -91,9 +92,7 @@
   --ring: #6d5fdb;
 }
 
-
-@theme inline 
-{
+@theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
 
@@ -101,6 +100,7 @@
   --color-card-foreground: var(--card-foreground);
 
   --color-surface: var(--surface);
+  --color-surface-soft: var(--surface-soft);
 
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
@@ -138,93 +138,78 @@
   --radius-2xl: calc(var(--radius) + 8px);
 }
 
-
 *,
 *::before,
-*::after 
-{
+*::after {
   box-sizing: border-box;
   border-color: var(--border);
 }
 
-html 
-{
+html {
   min-width: 320px;
   scroll-behavior: smooth;
   text-size-adjust: 100%;
 }
 
-body 
-{
+body {
   margin: 0;
   min-height: 100vh;
   overflow-x: hidden;
-
-  background: var(--background);
   color: var(--foreground);
-
-  font-family:
-    Inter,
-    system-ui,
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    sans-serif;
-
+  background:
+    radial-gradient(circle at top left, color-mix(in srgb, var(--primary) 14%, transparent), transparent 34rem),
+    linear-gradient(180deg, var(--background) 0%, var(--surface) 100%);
+  background-attachment: fixed;
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#root 
-{
+.dark body {
+  background:
+    radial-gradient(circle at top left, color-mix(in srgb, var(--primary) 18%, transparent), transparent 34rem),
+    linear-gradient(180deg, var(--background) 0%, #0f172a 100%);
+  background-attachment: fixed;
+}
+
+#root {
   min-height: 100vh;
 }
 
-
-img,picture,video,canvas,svg 
-{
+img,
+picture,
+video,
+canvas,
+svg {
   display: block;
   max-width: 100%;
 }
 
-table 
-{
+table {
   width: 100%;
   border-collapse: collapse;
 }
 
-input,button,textarea,select 
-{
+input,
+button,
+textarea,
+select {
   font: inherit;
 }
 
-button 
-{
+button {
   cursor: pointer;
 }
 
-button:disabled 
-{
+button:disabled {
   cursor: not-allowed;
   opacity: 0.6;
 }
 
-::selection 
-{
-  background: var(--primary);
-  color: var(--primary-foreground);
-}
-
-:focus-visible 
-{
-  outline: none;
-}
-
 input,
 textarea,
-select 
-{
+select {
   outline: none !important;
   box-shadow: none !important;
 }
@@ -234,51 +219,101 @@ input:focus-visible,
 textarea:focus,
 textarea:focus-visible,
 select:focus,
-select:focus-visible 
-{
+select:focus-visible {
   outline: none !important;
   box-shadow: none !important;
 }
-@media (prefers-reduced-motion: reduce) 
-{
-  *,
-  *::before,
-  *::after 
-  {
-    scroll-behavior: auto !important;
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
+
+::selection {
+  background: var(--primary);
+  color: var(--primary-foreground);
 }
 
+:focus-visible {
+  outline: none;
+}
 
-* 
-{
+* {
   scrollbar-width: thin;
-  scrollbar-color: color-mix(in srgb, var(--primary) 35%, transparent) transparent;
+  scrollbar-color: color-mix(in srgb, var(--primary) 38%, transparent) transparent;
 }
 
-::-webkit-scrollbar 
-{
+::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 
-::-webkit-scrollbar-track 
-{
+::-webkit-scrollbar-track {
   background: transparent;
 }
 
-::-webkit-scrollbar-thumb 
-{
-  background: color-mix(in srgb, var(--primary) 35%, transparent);
+::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--primary) 38%, transparent);
   border-radius: 999px;
 }
 
-::-webkit-scrollbar-thumb:hover 
-{
-  background: color-mix(in srgb, var(--primary) 55%, transparent);
+::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--primary) 58%, transparent);
+}
+
+.app-container,
+.page-shell {
+  width: 100%;
+  max-width: 1680px;
+  margin-inline: auto;
+}
+
+.glass-panel,
+.glass-card {
+  background: color-mix(in srgb, var(--card) 84%, transparent);
+  border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.shadow-soft {
+  box-shadow:
+    0 4px 18px rgba(91, 79, 199, 0.06),
+    0 2px 6px rgba(15, 23, 42, 0.04);
+}
+
+.shadow-soft-lg {
+  box-shadow:
+    0 18px 42px rgba(91, 79, 199, 0.1),
+    0 6px 16px rgba(15, 23, 42, 0.08);
+}
+
+.shadow-premium {
+  box-shadow:
+    0 24px 70px rgba(91, 79, 199, 0.14),
+    0 8px 24px rgba(15, 23, 42, 0.08);
+}
+
+.interactive {
+  transition:
+    transform 220ms ease,
+    background-color 220ms ease,
+    border-color 220ms ease,
+    color 220ms ease,
+    opacity 220ms ease,
+    box-shadow 220ms ease;
+}
+
+.interactive:hover {
+  transform: translateY(-1px);
+}
+
+.dashboard-card {
+  border-radius: 30px;
+  background: color-mix(in srgb, var(--card) 94%, transparent);
+  border: 1px solid color-mix(in srgb, var(--border) 68%, transparent);
+  box-shadow:
+    0 4px 22px rgba(91, 79, 199, 0.06),
+    0 2px 8px rgba(15, 23, 42, 0.04);
+}
+
+.soft-divider {
+  border-color: color-mix(in srgb, var(--border) 55%, transparent);
 }
 
 .sidebar-scroll {
@@ -287,7 +322,7 @@ select:focus-visible
 }
 
 .sidebar-scroll::-webkit-scrollbar {
-  width: 4px;
+  width: 5px;
 }
 
 .sidebar-scroll::-webkit-scrollbar-track {
@@ -303,177 +338,30 @@ select:focus-visible
   background: rgba(255, 255, 255, 0.35);
 }
 
-.app-container 
-{
-  width: 100%;
-  max-width: 1440px;
-  margin-inline: auto;
-}
-
-.glass-panel 
-{
-  background: color-mix(in srgb, var(--card) 88%, transparent);
-  backdrop-filter: blur(16px);
-}
-
-.page-transition 
-{
-  animation: page-fade-in 180ms ease-out;
-}
-
-@keyframes page-fade-in 
-{
-  from 
-  {
-    opacity: 0;
-    transform: translateY(6px);
-  }
-
-  to 
-  {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-/* ========================================
-   PREMIUM UI ENHANCEMENTS
-======================================== */
-
-body
-{
-  background:
-    linear-gradient(
-      180deg,
-      #f8f9fe 0%,
-      #f3f2ff 100%
-    );
-
-  background-attachment: fixed;
-}
-
-.dark body
-{
-  background:
-    linear-gradient(
-      180deg,
-      #111827 0%,
-      #0f172a 100%
-    );
-
-  background-attachment: fixed;
-}
-
-
-/* ===== Glass Effect ===== */
-
-.glass-card
-{
-  background: color-mix(in srgb, var(--card) 82%, transparent);
-
-  backdrop-filter: blur(18px);
-
-  border: 1px solid
-    color-mix(in srgb, var(--border) 70%, transparent);
-}
-
-
-/* ===== Premium Shadows ===== */
-
-.shadow-soft
-{
-  box-shadow:
-    0 4px 18px rgba(91, 79, 199, 0.06),
-    0 2px 6px rgba(15, 23, 42, 0.04);
-}
-
-.shadow-soft-lg
-{
-  box-shadow:
-    0 10px 30px rgba(91, 79, 199, 0.08),
-    0 4px 12px rgba(15, 23, 42, 0.06);
-}
-
-
-/* ===== Smooth Hover System ===== */
-
-.interactive
-{
-  transition:
-    transform 220ms ease,
-    background-color 220ms ease,
-    border-color 220ms ease,
-    opacity 220ms ease,
-    box-shadow 220ms ease;
-}
-
-.interactive:hover
-{
-  transform: translateY(-1px);
-}
-
-
-/* ===== Page Shell ===== */
-
-.page-shell
-{
-  width: 100%;
-  max-width: 1680px;
-
-  margin-inline: auto;
-}
-
-
-/* ===== Better Cards ===== */
-
-.dashboard-card
-{
-  border-radius: 28px;
-
-  background: var(--card);
-
-  border: 1px solid
-    color-mix(in srgb, var(--border) 65%, transparent);
-
-  box-shadow:
-    0 4px 20px rgba(91, 79, 199, 0.05);
-}
-
-
-/* ===== Elegant Divider ===== */
-
-.soft-divider
-{
-  border-color:
-    color-mix(in srgb, var(--border) 55%, transparent);
-}
-
-
-/* ===== Better Scroll ===== */
-
-.sidebar-scroll::-webkit-scrollbar
-{
-  width: 5px;
-}
-
-
-/* ===== Subtle Animation ===== */
-
-.fade-in
-{
+.fade-in,
+.page-transition {
   animation: fade-in 240ms ease-out;
 }
 
-@keyframes fade-in
-{
-  from
-  {
+@keyframes fade-in {
+  from {
     opacity: 0;
-    transform: translateY(4px);
+    transform: translateY(5px);
   }
 
-  to
-  {
+  to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }

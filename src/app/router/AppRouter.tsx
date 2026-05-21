@@ -1,6 +1,7 @@
 import { Navigate, createBrowserRouter, RouterProvider } from "react-router-dom";
 
 import { DashboardLayout } from "@/app/layouts/DashboardLayout";
+import { TeachersPage } from "@/features/users/teachers/pages/TeachersPage";
 
 function PlaceholderPage({ title }: { title: string }) {
   return (
@@ -24,16 +25,37 @@ const router = createBrowserRouter([
       },
 
       {
-        path: "users",
-        children: [
-          { index: true, element: <Navigate to="students" replace /> },
-          { path: "students", element: <PlaceholderPage title="Students" /> },
-          { path: "teachers", element: <PlaceholderPage title="Teachers" /> },
-          { path: "parents", element: <PlaceholderPage title="Parents" /> },
-          { path: "advisors", element: <PlaceholderPage title="Advisors" /> },
-          { path: "staff", element: <PlaceholderPage title="Staff" /> },
-        ],
-      },
+  path: "users",
+  children: [
+    { index: true, element: <Navigate to="students" replace /> },
+
+    { path: "students", element: <PlaceholderPage title="Students" /> },
+
+    { path: "teachers", element: <TeachersPage /> },
+
+    { path: "parents", element: <PlaceholderPage title="Parents" /> },
+
+    {
+      path: "secretaries",
+      element: <PlaceholderPage title="Secretaries" />,
+    },
+
+    {
+      path: "supervisors",
+      element: <PlaceholderPage title="Supervisors" />,
+    },
+
+    {
+      path: "counselors",
+      element: <PlaceholderPage title="Counselors" />,
+    },
+
+    {
+      path: "service-staff",
+      element: <PlaceholderPage title="Service Staff" />,
+    },
+  ],
+},
 
       {
         path: "academics",
