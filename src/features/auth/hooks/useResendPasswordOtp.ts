@@ -1,33 +1,24 @@
 import { useMutation }
 from "@tanstack/react-query";
 
-import { useNavigate }
-from "react-router-dom";
-
-import { resetPassword }
-from "../api/auth.api";
-
 import { notify }
 from "@/shared/lib/toast";
 
 import { handleApiError }
 from "@/shared/lib/error-handler";
 
-export function useResetPassword() {
-
-  const navigate = useNavigate();
+import { resendPasswordOtp } from "../api/auth.api";
+export function useResendPasswordOtp() {
 
   return useMutation({
 
-    mutationFn: resetPassword,
+mutationFn: resendPasswordOtp,
 
     onSuccess: () => {
 
       notify.success(
-        "Password changed successfully"
+        "OTP resent successfully"
       );
-
-      navigate("/login");
     },
 
     onError: (error) => {

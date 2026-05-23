@@ -4,35 +4,44 @@ from "@tanstack/react-query";
 import { useNavigate }
 from "react-router-dom";
 
-import { resetPassword }
+import { logout }
 from "../api/auth.api";
+
+import { useAuthStore }
+from "../store/auth.store";
 
 import { notify }
 from "@/shared/lib/toast";
 
-import { handleApiError }
-from "@/shared/lib/error-handler";
-
-export function useResetPassword() {
+export function useLogout() {
 
   const navigate = useNavigate();
 
+  const logoutStore =
+    useAuthStore(
+      (state) => state.logout
+    );
+
   return useMutation({
 
-    mutationFn: resetPassword,
+    mutationFn: logout,
 
     onSuccess: () => {
 
+      logoutStore();
+
       notify.success(
-        "Password changed successfully"
+        "Logged out successfully"
       );
 
       navigate("/login");
     },
 
-    onError: (error) => {
+    onError: () => {
 
-      handleApiError(error);
+      logoutStore();
+
+      navigate("/login");
     },
   });
 }

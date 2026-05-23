@@ -13,16 +13,26 @@ interface AuthState {
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
-  token: localStorage.getItem("access_token"),
-  user: null,
-  permissions: [],
+  token:
+   localStorage.getItem("access_token"),
+  user: 
+   localStorage.getItem("user")
+  ? JSON.parse(localStorage.getItem("user")!)
+  : null,
+  permissions:
+   localStorage.getItem("permissions")
+        ? JSON.parse(
+            localStorage.getItem("permissions")!
+          )
+        : [],
   isAuthenticated: !!localStorage.getItem("access_token"),
 
   setAuth: (token, user, permissions) => {
     localStorage.setItem("access_token", token);
     localStorage.setItem("user", JSON.stringify(user));
     localStorage.setItem("permissions", JSON.stringify(permissions));
-
+    console.log("SET AUTH ROLE:", user?.role);
+    
     set({
       token,
       user,

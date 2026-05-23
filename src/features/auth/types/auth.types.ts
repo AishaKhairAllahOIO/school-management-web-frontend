@@ -6,15 +6,12 @@ export interface LoginPayload {
   rememberMe?: boolean;
 }
 
+export type LoginResponse = null;
+ 
 export interface User {
   id: number;
-  name: string;
   email: string;
   role: UserRole;
-}
-
-export interface LoginResponse {
-  token: string;
-  user: User;
-  permissions: string[];
+  is_active?: boolean;
+  name?: string;
 }

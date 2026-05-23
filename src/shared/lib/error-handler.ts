@@ -1,112 +1,49 @@
 import axios from "axios";
 
-import { notify }
-from "@/shared/lib/toast";
-import { ERROR_MESSAGES }
-from "@/shared/constants/error-messages";
-import { ERROR_CODES }
-from "@/shared/constants/error-codes";
- 
+import { notify } from "./toast";
 
 export const handleApiError = (
   error: unknown
-): void => {
+) => {
 
   if (!axios.isAxiosError(error)) {
 
     notify.error(
-      ERROR_MESSAGES
-        .GENERAL
-        .UNEXPECTED_ERROR
+      "Unexpected error occurred"
     );
 
     return;
   }
 
-  if (!error.response) {
+  const response =
+    error.response?.data;
 
-    notify.error(
-      ERROR_MESSAGES
-        .GENERAL
-        .NETWORK_ERROR
-    );
+  // backend message
+  if (response?.message) {
 
-    return;
-  }
-
-  const status =
-    error.response.status;
-
-  const backendMessage =
-    error.response.data?.message;
-
-  if (backendMessage) {
-
-    notify.error(
-      backendMessage
-    );
+    notify.error(response.message);
 
     return;
   }
 
-  switch (status) {
+  // validation errors
+  if (response?.errors) {
 
-    case ERROR_CODES.BAD_REQUEST:
+    const firstError =
+      Object.values(response.errors)
+        .flat()[0];
 
-      notify.error(
-        ERROR_MESSAGES
-          .GENERAL
-          .DEFAULT
-      );
-
-      break;
-
-    case ERROR_CODES.UNAUTHORIZED:
+    if (firstError) {
 
       notify.error(
-        ERROR_MESSAGES
-          .AUTH
-          .UNAUTHORIZED
+        String(firstError)
       );
 
-      break;
-
-    case ERROR_CODES.FORBIDDEN:
-
-      notify.error(
-        ERROR_MESSAGES
-          .AUTH
-          .ACCESS_DENIED
-      );
-
-      break;
-
-    case ERROR_CODES.NOT_FOUND:
-
-      notify.error(
-        ERROR_MESSAGES
-          .GENERAL
-          .DEFAULT
-      );
-
-      break;
-
-    case ERROR_CODES.SERVER_ERROR:
-
-      notify.error(
-        ERROR_MESSAGES
-          .GENERAL
-          .SERVER_ERROR
-      );
-
-      break;
-
-    default:
-
-      notify.error(
-        ERROR_MESSAGES
-          .GENERAL
-          .DEFAULT
-      );
+      return;
+    }
   }
+
+  notify.error(
+    "Something went wrong"
+  );
 };

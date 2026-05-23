@@ -1,22 +1,22 @@
-import { useState }
-from "react";
+import { useState } from "react";
 
-import { motion }
-from "framer-motion";
+import { motion } from "framer-motion";
 
-import { Eye, EyeOff }
-from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 
-import { useForm }
-from "react-hook-form";
+import { useForm } from "react-hook-form";
 
-import { zodResolver }
-from "@hookform/resolvers/zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+import { useLocation } from "react-router-dom";
 
 import {
   resetPasswordSchema,
   type ResetPasswordSchema,
 } from "../schemas/reset-password.schema";
+
+import { useResetPassword }
+from "../hooks/use-reset-password";
 
 import { Button }
 from "@/shared/ui/button";
@@ -37,12 +37,19 @@ export function ResetPasswordForm() {
     setShowConfirmPassword,
   ] = useState(false);
 
+  const location = useLocation();
+
+  const { email, tempToken } =
+    location.state || {};
+
+  const resetPasswordMutation =
+    useResetPassword();
+
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<ResetPasswordSchema>({
-
     resolver:
       zodResolver(
         resetPasswordSchema
@@ -53,7 +60,17 @@ export function ResetPasswordForm() {
     values: ResetPasswordSchema
   ) {
 
-    console.log(values);
+    resetPasswordMutation.mutate({
+      email,
+
+      password:
+        values.password,
+
+      password_confirmation:
+        values.confirmPassword,
+
+      tempToken,
+    });
   }
 
   return (
@@ -114,7 +131,6 @@ export function ResetPasswordForm() {
         "
       >
 
-        {/* Password */}
         <div className="space-y-2">
 
           <Label>
@@ -177,7 +193,6 @@ export function ResetPasswordForm() {
           )}
         </div>
 
-        {/* Confirm Password */}
         <div className="space-y-2">
 
           <Label>
@@ -241,9 +256,11 @@ export function ResetPasswordForm() {
           )}
         </div>
 
-        {/* Submit */}
         <Button
           type="submit"
+          disabled={
+            resetPasswordMutation.isPending
+          }
           className="
             h-12
             w-full
@@ -253,7 +270,11 @@ export function ResetPasswordForm() {
             hover:bg-[#4A3FB5]
           "
         >
-          Reset Password
+          {
+            resetPasswordMutation.isPending
+              ? "Resetting..."
+              : "Reset Password"
+          }
         </Button>
       </form>
     </motion.div>

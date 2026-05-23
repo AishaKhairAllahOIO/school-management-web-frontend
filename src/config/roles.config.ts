@@ -9,5 +9,7 @@ export const rolesConfig =
   COUNSELOR: "COUNSELOR",
 } as const;
 
-export type UserRole = keyof typeof rolesConfig;
+export type UserRole =
+  (typeof rolesConfig)[keyof typeof rolesConfig];
+
  

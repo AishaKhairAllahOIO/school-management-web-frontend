@@ -15,6 +15,7 @@ import {
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
 import { Label } from "@/shared/ui/label";
+import { useForgotPassword } from "../hooks/use-forgot-password";
 
 export function ForgotPasswordForm() {
 const navigate = useNavigate();
@@ -27,12 +28,17 @@ const navigate = useNavigate();
       zodResolver(forgotPasswordSchema),
   });
 
+  const forgotPasswordMutation =
+  useForgotPassword();
+
   function onSubmit(
-    values: ForgotPasswordSchema
-  ) {
-    console.log(values);
-     navigate("/verify-otp");
-  }
+  values: ForgotPasswordSchema
+    ) {
+
+  forgotPasswordMutation.mutate({
+    email: values.email,
+  });
+}
  
   return (
     <div className="rounded-[32px] border border-white/20 bg-white/80 p-15 shadow-2xl backdrop-blur-xl">
@@ -77,11 +83,25 @@ const navigate = useNavigate();
         </div>
 
         <Button
-          type="submit"
-          className="h-12 w-full rounded-2xl bg-[#5B4FC7] text-white hover:bg-[#4A3FB5]"
-        >
-          Send OTP
-        </Button>
+    type="submit"
+    disabled={
+    forgotPasswordMutation.isPending
+  }
+    className="
+      h-12
+      w-full
+      rounded-2xl
+      bg-[#5B4FC7]
+      text-white
+      hover:bg-[#4A3FB5]
+  "
+>
+  {
+      forgotPasswordMutation.isPending
+        ? "Sending..."
+        : "Send OTP"
+  }
+</Button>  
       </form>
     </div>
   );
