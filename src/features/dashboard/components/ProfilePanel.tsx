@@ -2,11 +2,11 @@ import {
   BadgeCheck,
   Building2,
   Edit3,
+  GraduationCap,
   IdCard,
   KeyRound,
   LogOut,
   Mail,
-  MapPin,
   Phone,
   ShieldCheck,
   UserRound,
@@ -16,71 +16,35 @@ import {
 import { useCurrentUser } from "../hooks/useCurrentUser";
 import { useLayoutStore } from "../store/layoutStore";
 
-const quickInfo = [
-  {
-    label: "Employee ID",
-    value: "ADM-2026",
-    icon: IdCard,
-  },
-  {
-    label: "Department",
-    value: "Administration",
-    icon: Building2,
-  },
-  {
-    label: "Office",
-    value: "Main Building",
-    icon: MapPin,
-  },
-  {
-    label: "Status",
-    value: "Active",
-    icon: BadgeCheck,
-  },
-];
+type InfoItem = {
+  label: string;
+  value: string;
+  icon: typeof IdCard;
+};
 
-const contactInfo = [
-  {
-    label: "Email",
-    value: "admin@school.com",
-    icon: Mail,
-  },
-  {
-    label: "Phone",
-    value: "+40 712 555 888",
-    icon: Phone,
-  },
-];
+function formatValue(value: string | number | null | undefined) {
+  if (value === null || value === undefined || value === "") return "—";
 
-const accessInfo = [
-  {
-    label: "Role",
-    value: "Super Admin",
-    icon: UserRound,
-  },
-  {
-    label: "Access",
-    value: "Full Access",
-    icon: ShieldCheck,
-  },
-  {
-    label: "Last Login",
-    value: "Today 09:42 AM",
-    icon: KeyRound,
-  },
-];
+  return String(value);
+}
 
-function InfoSection({
-  title,
-  items,
-}: {
-  title: string;
-  items: {
-    label: string;
-    value: string;
-    icon: typeof IdCard;
-  }[];
-}) {
+function formatName(firstName: string, lastName: string) {
+  return `${firstName} ${lastName}`.trim();
+}
+
+function formatDegree(degree: string) {
+  const labels: Record<string, string> = {
+    diploma: "Diploma",
+    bachelor: "Bachelor",
+    master: "Master",
+    phd: "PhD",
+    other: "Other",
+  };
+
+  return labels[degree] ?? degree;
+}
+
+function InfoSection({ title, items }: { title: string; items: InfoItem[] }) {
   return (
     <section className="rounded-[24px] bg-background/80 p-4">
       <h3 className="mb-3 text-xs font-bold uppercase tracking-wide text-muted-foreground">
@@ -106,7 +70,7 @@ function InfoSection({
                 </span>
               </div>
 
-              <span className="max-w-[130px] truncate text-right text-xs font-semibold text-foreground">
+              <span className="max-w-[135px] truncate text-right text-xs font-semibold text-foreground">
                 {item.value}
               </span>
             </div>
@@ -127,6 +91,80 @@ export function ProfilePanel() {
   );
 
   if (!isOpen) return null;
+
+  const fullName = formatName(user.firstName, user.lastName);
+
+  const quickInfo: InfoItem[] = [
+    {
+      label: "Code",
+      value: user.superAdminCode,
+      icon: IdCard,
+    },
+    {
+      label: "Category",
+      value: "Super Admin",
+      icon: UserRound,
+    },
+    {
+      label: "Status",
+      value: user.recordStatus,
+      icon: BadgeCheck,
+    },
+  ];
+
+  const contactInfo: InfoItem[] = [
+    {
+      label: "Email",
+      value: user.superAdminEmail,
+      icon: Mail,
+    },
+    {
+      label: "Phone",
+      value: user.phoneNumber,
+      icon: Phone,
+    },
+  ];
+
+  const employmentInfo: InfoItem[] = [
+    {
+      label: "Hire Date",
+      value: user.hireDate,
+      icon: Building2,
+    },
+    {
+      label: "Degree",
+      value: formatDegree(user.degree),
+      icon: GraduationCap,
+    },
+    {
+      label: "University",
+      value: user.university,
+      icon: GraduationCap,
+    },
+    {
+      label: "Graduation",
+      value: formatValue(user.graduationYear),
+      icon: GraduationCap,
+    },
+    {
+      label: "Experience",
+      value: `${formatValue(user.yearsOfExperience)} years`,
+      icon: BadgeCheck,
+    },
+  ];
+
+  const accessInfo: InfoItem[] = [
+    {
+      label: "Access",
+      value: "Full Access",
+      icon: ShieldCheck,
+    },
+    {
+      label: "Account",
+      value: user.accountStatus,
+      icon: KeyRound,
+    },
+  ];
 
   return (
     <aside className="fixed bottom-0 right-0 top-0 z-50 hidden w-[320px] rounded-[30px] border border-border/70 bg-card p-6 shadow-soft-lg lg:flex lg:flex-col">
@@ -154,8 +192,8 @@ export function ProfilePanel() {
       <div className="flex flex-col items-center text-center">
         <div className="relative">
           <img
-            src={user.avatarUrl}
-            alt={user.fullName}
+            src={user.photoUrl ?? ""}
+            alt={fullName}
             className="h-20 w-20 rounded-full object-cover ring-4 ring-primary/10"
           />
 
@@ -163,11 +201,11 @@ export function ProfilePanel() {
         </div>
 
         <h3 className="mt-4 text-sm font-bold text-foreground">
-          {user.fullName}
+          {fullName}
         </h3>
 
         <p className="mt-1 text-xs text-muted-foreground">
-          {user.role} · School Management
+          Super Admin · School Management
         </p>
       </div>
 
@@ -175,6 +213,8 @@ export function ProfilePanel() {
         <InfoSection title="Quick Information" items={quickInfo} />
 
         <InfoSection title="Contact Information" items={contactInfo} />
+
+        <InfoSection title="Employment Information" items={employmentInfo} />
 
         <InfoSection title="System Access" items={accessInfo} />
       </div>

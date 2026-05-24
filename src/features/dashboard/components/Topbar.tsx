@@ -1,4 +1,13 @@
-import { Bell, Globe2, Menu, Moon, Sun, X } from "lucide-react";
+import {
+  Bell,
+  ChevronRight,
+  Globe2,
+  Menu,
+  Moon,
+  Sparkles,
+  Sun,
+  X,
+} from "lucide-react";
 import { useState } from "react";
 import { useTheme } from "next-themes";
 import { useLocation } from "react-router-dom";
@@ -6,6 +15,15 @@ import { useLocation } from "react-router-dom";
 import { useCurrentUser } from "../hooks/useCurrentUser";
 import { useNotifications } from "../hooks/useNotifications";
 import { useLayoutStore } from "../store/layoutStore";
+
+function formatSegment(value?: string) {
+  if (!value) return "";
+
+  return value
+    .split("-")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+}
 
 function getSectionTitle(pathname: string) {
   if (pathname === "/") return "Dashboard";
@@ -17,9 +35,29 @@ function getSectionTitle(pathname: string) {
   if (pathname.startsWith("/communication")) return "Communication";
   if (pathname.startsWith("/reports")) return "Reports";
   if (pathname.startsWith("/settings")) return "Settings";
-  if (pathname.startsWith("/logout")) return "Logout";
 
   return "Dashboard";
+}
+
+function getCurrentPageTitle(pathname: string) {
+  const segments = pathname.split("/").filter(Boolean);
+
+  if (segments.length === 0) return "Overview";
+  if (segments.length === 1) return "Overview";
+
+  return formatSegment(segments[1]);
+}
+
+function getPageAccent(pathname: string) {
+  if (pathname.includes("students")) return "var(--primary)";
+  if (pathname.includes("teachers")) return "var(--hindi)";
+  if (pathname.includes("parents")) return "var(--maths)";
+  if (pathname.includes("secretaries")) return "var(--warning)";
+  if (pathname.includes("supervisors")) return "var(--science)";
+  if (pathname.includes("counselors")) return "var(--success)";
+  if (pathname.includes("service-staff")) return "var(--english)";
+
+  return "var(--primary)";
 }
 
 export function Topbar() {
@@ -49,10 +87,14 @@ export function Topbar() {
   const toggleLanguage = useLayoutStore((state) => state.toggleLanguage);
 
   const sectionTitle = getSectionTitle(location.pathname);
+  const currentPageTitle = getCurrentPageTitle(location.pathname);
+  const accent = getPageAccent(location.pathname);
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border/50 bg-background/80 px-4 py-3 backdrop-blur-xl md:px-6 lg:px-8">
-      <div className="flex h-11 items-center justify-between gap-4">
+    <header className="sticky top-0 z-40 bg-background/70 px-4 py-3 backdrop-blur-2xl md:px-6 lg:px-8">
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-primary/10 to-transparent" />
+
+      <div className="page-shell flex h-12 items-center justify-between gap-4">
         <div className="flex min-w-0 items-center gap-3">
           <button
             type="button"
@@ -62,40 +104,56 @@ export function Topbar() {
             <Menu size={18} />
           </button>
 
-          <div className="min-w-0">
-            <h1 className="truncate text-lg font-bold text-foreground">
-              {sectionTitle}
-            </h1>
+          <div className="flex min-w-0 items-center gap-3">
+            <span
+              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-2xl"
+              style={{
+                backgroundColor: `color-mix(in srgb, ${accent} 14%, transparent)`,
+                color: accent,
+              }}
+            >
+              <Sparkles size={15} />
+            </span>
 
-            <p className="hidden text-xs text-muted-foreground sm:block">
-              Manage this section easily
-            </p>
+            <div className="flex min-w-0 items-center gap-2">
+              <h1 className="truncate text-[20px] font-extrabold tracking-[-0.03em] text-foreground">
+                {sectionTitle}
+              </h1>
+
+              <ChevronRight
+                size={15}
+                strokeWidth={2}
+                className="shrink-0 text-muted-foreground/60"
+              />
+
+              <span
+                className="truncate rounded-full px-3 py-1 text-[12px] font-semibold"
+                style={{
+                  backgroundColor: `color-mix(in srgb, ${accent} 14%, transparent)`,
+                  color: accent,
+                }}
+              >
+                {currentPageTitle}
+              </span>
+            </div>
           </div>
         </div>
 
-        <div
-          className={[
-            "ml-auto flex items-center gap-3 transition-all duration-300 ease-out",
-            isProfilePanelOpen ? "lg:mr-[320px]" : "",
-          ].join(" ")}
-        >
+        <div className="ml-auto flex items-center gap-3 transition-all duration-300 ease-out">
           <button
             type="button"
             onClick={toggleLanguage}
-            className="interactive flex h-10 min-w-10 items-center justify-center gap-1 rounded-full border border-border/70 bg-card/90 px-3 text-foreground shadow-soft hover:bg-muted"
+            className="interactive flex h-10 min-w-10 items-center justify-center gap-1 rounded-full border border-border/60 bg-card/80 px-3 text-foreground shadow-soft hover:bg-muted"
             title="Language"
           >
             <Globe2 size={16} />
-
-            <span className="text-[11px] font-bold uppercase">
-              {language}
-            </span>
+            <span className="text-[11px] font-bold uppercase">{language}</span>
           </button>
 
           <button
             type="button"
             onClick={() => setTheme(isDark ? "light" : "dark")}
-            className="interactive flex h-10 w-10 items-center justify-center rounded-full border border-border/70 bg-card/90 text-foreground shadow-soft hover:bg-muted"
+            className="interactive flex h-10 w-10 items-center justify-center rounded-full border border-border/60 bg-card/80 text-foreground shadow-soft hover:bg-muted"
             title={isDark ? "Switch to light mode" : "Switch to dark mode"}
           >
             {isDark ? <Sun size={17} /> : <Moon size={17} />}
@@ -105,7 +163,7 @@ export function Topbar() {
             <button
               type="button"
               onClick={() => setIsNotificationsOpen((value) => !value)}
-              className="interactive relative flex h-10 w-10 items-center justify-center rounded-full border border-border/70 bg-card/90 text-foreground shadow-soft hover:bg-muted"
+              className="interactive relative flex h-10 w-10 items-center justify-center rounded-full border border-border/60 bg-card/80 text-foreground shadow-soft hover:bg-muted"
               title="Notifications"
             >
               <Bell size={17} />
@@ -175,7 +233,7 @@ export function Topbar() {
             <button
               type="button"
               onClick={toggleProfilePanel}
-              className="interactive flex h-10 w-10 items-center justify-center rounded-full bg-card/90 shadow-soft ring-1 ring-border/70 hover:scale-105"
+              className="interactive flex h-10 w-10 items-center justify-center rounded-full bg-card/80 shadow-soft ring-1 ring-border/60 hover:scale-105"
               title="Open profile"
             >
               <img

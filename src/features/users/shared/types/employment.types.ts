@@ -17,5 +17,5 @@ export type EmploymentInformation =
 
   university: string;
 
-  graduationYear: number;
+  graduationYear: string;
 };

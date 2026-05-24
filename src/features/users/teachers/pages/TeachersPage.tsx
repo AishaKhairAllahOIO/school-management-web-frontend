@@ -1,93 +1,127 @@
-import { Plus, Search } from "lucide-react";
 import { useState } from "react";
 
-import { TeacherDeleteDialog } from "../components/TeacherDeleteDialog";
-import { TeacherFormModal } from "../components/TeacherFormModal";
-import { TeachersTable } from "../components/TeachersTable";
-import { useTeachers } from "../hooks/useTeachers";
-import type { Teacher, TeacherFormData } from "../types/teacher.types";
+import { UserCrudPage } from "../../shared/components/UserCrudPage";
+import type { AccountStatus, RecordStatus } from "../../shared/types/user.enums";
+import { teacherCrudConfig } from "../config/teacherCrud.config";
+import type { TeacherUser } from "../types/teacher.types";
+
+const teachersMock: TeacherUser[] = [
+  {
+    id: "teacher-001",
+    category: "teacher",
+    firstName: "Sarah",
+    lastName: "Miller",
+    fatherName: "John",
+    motherName: "Anna",
+    birthDate: "1988-04-12",
+    birthPlace: "Amsterdam",
+    gender: "female",
+    nationality: "other",
+    address: "45 School Street",
+    phoneNumber: "+31 612 345 678",
+    photoUrl: "https://randomuser.me/api/portraits/women/32.jpg",
+    recordStatus: "active",
+    accountStatus: "enabled",
+    createdAt: "2026-01-01",
+    updatedAt: "2026-05-01",
+    deletedAt: null,
+    teacherCode: "TCH-001",
+    teacherEmail: "sarah.miller@school.com",
+    hireDate: "2016-09-01",
+    degree: "master",
+    specialization: "Mathematics",
+    yearsOfExperience: 10,
+    university: "University of Amsterdam",
+    graduationYear: "2011",
+    subjects: ["arabic"]
+  },
+  {
+    id: "teacher-002",
+    category: "teacher",
+    firstName: "Daniel",
+    lastName: "Johnson",
+    fatherName: "Robert",
+    motherName: "Maria",
+    birthDate: "1985-11-03",
+    birthPlace: "Rotterdam",
+    gender: "male",
+    nationality: "other",
+    address: "18 Main Avenue",
+    phoneNumber: "+31 623 456 789",
+    photoUrl: "https://randomuser.me/api/portraits/men/41.jpg",
+    recordStatus: "active",
+    accountStatus: "enabled",
+    createdAt: "2026-01-01",
+    updatedAt: "2026-05-01",
+    deletedAt: null,
+    teacherCode: "TCH-002",
+    teacherEmail: "daniel.johnson@school.com",
+    hireDate: "2018-02-15",
+    degree: "bachelor",
+    specialization: "English Literature",
+    yearsOfExperience: 12,
+    university: "Leiden University",
+    graduationYear: "2007",
+        subjects: ["arabic"]
+
+  },
+];
 
 export function TeachersPage() {
-  const {
-    teachers,
-    searchQuery,
-    setSearchQuery,
-    addTeacher,
-    updateTeacher,
-    deleteTeacher,
-  } = useTeachers();
+  const [teachers, setTeachers] = useState<TeacherUser[]>(teachersMock);
 
-  const [isFormOpen, setIsFormOpen] = useState(false);
-  const [selectedTeacher, setSelectedTeacher] = useState<Teacher | null>(null);
-  const [teacherToDelete, setTeacherToDelete] = useState<Teacher | null>(null);
-
-  function openAddModal() {
-    setSelectedTeacher(null);
-    setIsFormOpen(true);
+  function handleAdd() {
+    console.log("Add teacher");
   }
 
-  function openEditModal(teacher: Teacher) {
-    setSelectedTeacher(teacher);
-    setIsFormOpen(true);
+  function handleView(teacher: TeacherUser) {
+    console.log("View teacher", teacher);
   }
 
-  function handleSubmit(data: TeacherFormData) {
-    if (selectedTeacher) {
-      updateTeacher(selectedTeacher.id, data);
-    } else {
-      addTeacher(data);
-    }
+  function handleEdit(teacher: TeacherUser) {
+    console.log("Edit teacher", teacher);
   }
 
-  function confirmDelete() {
-    if (!teacherToDelete) return;
+  function handleDelete(teacher: TeacherUser) {
+    setTeachers((current) =>
+      current.filter((item) => item.id !== teacher.id)
+    );
+  }
 
-    deleteTeacher(teacherToDelete.id);
-    setTeacherToDelete(null);
+  function handleChangeRecordStatus(
+    teacher: TeacherUser,
+    status: RecordStatus
+  ) {
+    setTeachers((current) =>
+      current.map((item) =>
+        item.id === teacher.id ? { ...item, recordStatus: status } : item
+      )
+    );
+  }
+
+  function handleChangeAccountStatus(
+    teacher: TeacherUser,
+    status: AccountStatus
+  ) {
+    setTeachers((current) =>
+      current.map((item) =>
+        item.id === teacher.id ? { ...item, accountStatus: status } : item
+      )
+    );
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <div className="flex h-12 w-full items-center gap-3 rounded-2xl bg-card px-4 shadow-soft ring-1 ring-border/60 md:max-w-md">
-          <Search size={18} className="text-muted-foreground" />
-
-          <input
-            value={searchQuery}
-            onChange={(event) => setSearchQuery(event.target.value)}
-            placeholder="Search teachers..."
-            className="w-full bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
-          />
-        </div>
-
-        <button
-          type="button"
-          onClick={openAddModal}
-          className="interactive flex h-12 items-center justify-center gap-2 rounded-2xl bg-primary px-6 text-sm font-bold text-white shadow-soft transition hover:bg-primary-dark"
-        >
-          <Plus size={18} />
-          Add Teacher
-        </button>
-      </div>
-
-      <TeachersTable
-        teachers={teachers}
-        onEdit={openEditModal}
-        onDelete={setTeacherToDelete}
-      />
-
-      <TeacherFormModal
-        isOpen={isFormOpen}
-        teacher={selectedTeacher}
-        onClose={() => setIsFormOpen(false)}
-        onSubmit={handleSubmit}
-      />
-
-      <TeacherDeleteDialog
-        teacher={teacherToDelete}
-        onCancel={() => setTeacherToDelete(null)}
-        onConfirm={confirmDelete}
-      />
-    </div>
+    <UserCrudPage
+      config={teacherCrudConfig}
+      items={teachers}
+      getId={(teacher) => teacher.id}
+      getName={(teacher) => `${teacher.firstName} ${teacher.lastName}`}
+      onAdd={handleAdd}
+      onView={handleView}
+      onEdit={handleEdit}
+      onDeleteConfirm={handleDelete}
+      onChangeRecordStatus={handleChangeRecordStatus}
+      onChangeAccountStatus={handleChangeAccountStatus}
+    />
   );
 }
