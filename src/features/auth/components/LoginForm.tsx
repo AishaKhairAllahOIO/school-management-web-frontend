@@ -1,4 +1,4 @@
- import { useState } from "react";
+import { useState } from "react";
 
 import { Eye, EyeOff } from "lucide-react";
 
@@ -6,7 +6,10 @@ import { useForm } from "react-hook-form";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import { loginSchema,  type LoginSchema } from "../schemas/login.schema";
+import {
+  loginSchema,
+  type LoginSchema,
+} from "../schemas/login.schema";
 
 import { useLogin } from "../hooks/use-login";
 
@@ -34,7 +37,6 @@ export function LoginForm() {
     watch,
     formState: { errors },
   } = useForm<LoginSchema>({
-
     resolver: zodResolver(loginSchema),
 
     defaultValues: {
@@ -71,6 +73,7 @@ export function LoginForm() {
           "
         >
 
+          {/* Logo */}
           <div
             className="
               flex
@@ -79,14 +82,14 @@ export function LoginForm() {
               items-center
               justify-center
               rounded-2xl
-              bg-[#5B4FC7]
-              text-white
+              bg-primary
+              text-primary-foreground
               text-xl
               font-bold
-              shadow-lg
+              shadow-soft
             "
           >
-            S  
+            S
           </div>
 
           <div>
@@ -95,23 +98,20 @@ export function LoginForm() {
               className="
                 text-3xl
                 font-bold
-                text-[#1A1A2E]
+                text-foreground
               "
             >
-            Welcome to login system   
+              Welcome to login system
             </h1>
-
-             
           </div>
         </div>
- 
 
         <p
           className="
             mt-2
             text-sm
             leading-6
-            text-gray-500
+            text-muted-foreground
           "
         >
           Login to continue managing
@@ -137,6 +137,11 @@ export function LoginForm() {
             type="email"
             placeholder="admin@school.com"
             autoComplete="email"
+            className="
+            focus-visible:ring-2
+            focus-visible:ring-primary/50
+            focus-visible:border-primary
+          "
             {...register("email")}
           />
 
@@ -144,7 +149,7 @@ export function LoginForm() {
             <p
               className="
                 text-sm
-                text-red-500
+                text-destructive
               "
             >
               {errors.email.message}
@@ -170,7 +175,12 @@ export function LoginForm() {
               }
               placeholder="Enter your password"
               autoComplete="current-password"
-              className="pr-12"
+              className="
+                pr-12
+                focus-visible:ring-2
+                focus-visible:ring-primary/50
+                focus-visible:border-primary
+              "
               {...register("password")}
             />
 
@@ -186,9 +196,9 @@ export function LoginForm() {
                 right-3
                 top-1/2
                 -translate-y-1/2
-                text-gray-500
+                text-muted-foreground
                 transition-colors
-                hover:text-[#5B4FC7]
+                hover:text-primary
               "
             >
               {
@@ -203,7 +213,7 @@ export function LoginForm() {
             <p
               className="
                 text-sm
-                text-red-500
+                text-destructive
               "
             >
               {errors.password.message}
@@ -245,7 +255,7 @@ export function LoginForm() {
               className="
                 cursor-pointer
                 text-sm
-                text-gray-600
+                text-muted-foreground
               "
             >
               Remember me
@@ -253,35 +263,31 @@ export function LoginForm() {
           </div>
 
           <Link
-        to="/forgot-password"
-        className="
-        text-sm
-        font-medium
-        text-[#5B4FC7]
-        transition-colors
-        hover:text-[#4A3FB5]
-         hover:underline "
->
-         Forgot Password?
-       </Link>
+            to="/forgot-password"
+            className="
+              text-sm
+              font-medium
+              text-primary
+              transition-colors
+              hover:text-primary-dark
+              hover:underline
+            "
+          >
+            Forgot Password?
+          </Link>
         </div>
-        
 
         {/* Submit */}
         <Button
           type="submit"
           disabled={loginMutation.isPending}
+          size="lg"
           className="
             h-13
             w-full
             rounded-xl
-            bg-[#5B4FC7]
-            text-white
-            font-medium
-            shadow-lg
-            transition-all
-            hover:bg-[#4A3FB5]
-            hover:shadow-xl
+            shadow-soft
+            hover:shadow-soft-lg
           "
         >
           {
@@ -298,7 +304,7 @@ export function LoginForm() {
           mt-8
           text-center
           text-sm
-          text-gray-400
+          text-muted-foreground
         "
       >
         © 2026 School Desk.
@@ -307,6 +313,3 @@ export function LoginForm() {
     </div>
   );
 }
-
-
-

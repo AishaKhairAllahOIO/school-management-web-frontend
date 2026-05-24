@@ -5,7 +5,7 @@ from "@hookform/resolvers/zod";
 
 import { ArrowLeft } from "lucide-react";
 
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 import {
   forgotPasswordSchema,
@@ -15,59 +15,102 @@ import {
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
 import { Label } from "@/shared/ui/label";
-import { useForgotPassword } from "../hooks/use-forgot-password";
+
+import { useForgotPassword }
+from "../hooks/use-forgot-password";
 
 export function ForgotPasswordForm() {
-const navigate = useNavigate();
+
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<ForgotPasswordSchema>({
     resolver:
-      zodResolver(forgotPasswordSchema),
+      zodResolver(
+        forgotPasswordSchema
+      ),
   });
 
   const forgotPasswordMutation =
-  useForgotPassword();
+    useForgotPassword();
 
   function onSubmit(
-  values: ForgotPasswordSchema
-    ) {
+    values: ForgotPasswordSchema
+  ) {
 
-  forgotPasswordMutation.mutate({
-    email: values.email,
-  });
-}
- 
+    forgotPasswordMutation.mutate({
+      email: values.email,
+    });
+  }
+
   return (
-    <div className="rounded-[32px] border border-white/20 bg-white/80 p-15 shadow-2xl backdrop-blur-xl">
+
+    <div
+      className="
+        rounded-[32px]
+        border
+        border-border
+        bg-card/80
+        p-15
+        shadow-soft-lg
+        backdrop-blur-xl
+      "
+    >
 
       <Link
         to="/login"
-        className="mb-15 inline-flex items-center gap-2 text-sm text-gray-500 transition-colors hover:text-[#5B4FC7]"
+        className="
+          mb-15
+          inline-flex
+          items-center
+          gap-2
+          text-sm
+          text-muted-foreground
+          transition-colors
+          hover:text-primary
+        "
       >
         <ArrowLeft size={18} />
+
         Back to login
       </Link>
 
-      <h1 className="text-3xl font-bold text-[#1A1A2E]">
+      <h1
+        className="
+          text-3xl
+          font-bold
+          text-foreground
+        "
+      >
         Forgot Password
       </h1>
 
-      <p className="mt-3 text-sm leading-6 text-gray-500">
+      <p
+        className="
+          mt-3
+          text-sm
+          leading-6
+          text-muted-foreground
+        "
+      >
         Enter your email address and we
         will send you an OTP code.
       </p>
 
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="mt-8 space-y-10"
+        className="
+          mt-8
+          space-y-10
+        "
       >
 
         <div className="space-y-5">
 
-          <Label>Email</Label>
+          <Label>
+            Email
+          </Label>
 
           <Input
             type="email"
@@ -76,32 +119,38 @@ const navigate = useNavigate();
           />
 
           {errors.email && (
-            <p className="text-sm text-red-500">
+
+            <p
+              className="
+                text-sm
+                text-destructive
+              "
+            >
               {errors.email.message}
             </p>
           )}
         </div>
 
         <Button
-    type="submit"
-    disabled={
-    forgotPasswordMutation.isPending
-  }
-    className="
-      h-12
-      w-full
-      rounded-2xl
-      bg-[#5B4FC7]
-      text-white
-      hover:bg-[#4A3FB5]
-  "
->
-  {
-      forgotPasswordMutation.isPending
-        ? "Sending..."
-        : "Send OTP"
-  }
-</Button>  
+          type="submit"
+          disabled={
+            forgotPasswordMutation.isPending
+          }
+          size="lg"
+          className="
+            h-12
+            w-full
+            rounded-2xl
+            shadow-soft
+            hover:shadow-soft-lg
+          "
+        >
+          {
+            forgotPasswordMutation.isPending
+              ? "Sending..."
+              : "Send OTP"
+          }
+        </Button>
       </form>
     </div>
   );

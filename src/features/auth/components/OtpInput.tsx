@@ -5,7 +5,6 @@ import {
 } from "react";
 
 type OtpInputProps = {
-
   length?: number;
 
   onComplete: (
@@ -128,18 +127,19 @@ export function OtpInput({
             w-14
             rounded-2xl
             border
-            border-gray-200
-            bg-white
+            border-border
+            bg-background
             text-center
             text-xl
             font-semibold
-            text-[#1A1A2E]
-            shadow-sm
+            text-foreground
+            shadow-soft
             outline-none
             transition-all
-            focus:border-[#5B4FC7]
+
+            focus:border-primary
             focus:ring-4
-            focus:ring-[#5B4FC7]/20
+            focus:ring-primary/20
           "
         />
       ))}

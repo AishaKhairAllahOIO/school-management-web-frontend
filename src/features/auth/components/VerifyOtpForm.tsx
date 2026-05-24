@@ -25,7 +25,9 @@ from "../hooks/use-verify-password-otp";
 
 import { useVerifyOtp }
 from "../hooks/use-verify-otp";
-import { useResendPasswordOtp } from "../hooks/useResendPasswordOtp";
+
+import { useResendPasswordOtp }
+from "../hooks/useResendPasswordOtp";
 
 export function VerifyOtpForm() {
 
@@ -46,11 +48,9 @@ export function VerifyOtpForm() {
     resetTimer,
   } = useResendOtpTimer(60);
 
-  // login otp mutation
   const verifyOtpMutation =
     useVerifyOtp();
 
-  // forgot password otp mutation
   const verifyPasswordOtpMutation =
     useVerifyPasswordOtp();
 
@@ -68,7 +68,6 @@ export function VerifyOtpForm() {
 
     if (!email) return;
 
-    // forgot password flow
     if (isResetFlow) {
 
       verifyPasswordOtpMutation.mutate({
@@ -79,7 +78,6 @@ export function VerifyOtpForm() {
       return;
     }
 
-    // login flow
     verifyOtpMutation.mutate({
       email,
       otp,
@@ -88,25 +86,22 @@ export function VerifyOtpForm() {
     });
   }
 
- 
   function handleResendOtp() {
 
-  if (!canResend || !email)
-    return;
+    if (!canResend || !email)
+      return;
 
-  if (isResetFlow) {
+    if (isResetFlow) {
 
-    resendPasswordOtpMutation.mutate({
-      email,
-    });
+      resendPasswordOtpMutation.mutate({
+        email,
+      });
 
-    resetTimer();
+      resetTimer();
 
-    return;
+      return;
+    }
   }
-
-  // login resend later
-}
 
   return (
     <motion.div
@@ -126,10 +121,10 @@ export function VerifyOtpForm() {
         max-w-md
         rounded-[32px]
         border
-        border-white/20
-        bg-white/80
+        border-border
+        bg-card/80
         p-8
-        shadow-2xl
+        shadow-soft-lg
         backdrop-blur-xl
       "
     >
@@ -146,9 +141,9 @@ export function VerifyOtpForm() {
           items-center
           gap-2
           text-sm
-          text-gray-500
+          text-muted-foreground
           transition-colors
-          hover:text-[#5B4FC7]
+          hover:text-primary
         "
       >
         <ArrowLeft size={16} />
@@ -160,7 +155,7 @@ export function VerifyOtpForm() {
         className="
           text-3xl
           font-bold
-          text-[#1A1A2E]
+          text-foreground
         "
       >
         Verify OTP
@@ -171,7 +166,7 @@ export function VerifyOtpForm() {
           mt-3
           text-sm
           leading-6
-          text-gray-500
+          text-muted-foreground
         "
       >
         Enter the 6-digit code
@@ -194,14 +189,13 @@ export function VerifyOtpForm() {
           verifyOtpMutation.isPending ||
           verifyPasswordOtpMutation.isPending
         }
+        size="lg"
         className="
           mt-8
-          h-12
           w-full
           rounded-2xl
-          bg-[#5B4FC7]
-          text-white
-          hover:bg-[#4A3FB5]
+          shadow-soft
+          hover:shadow-soft-lg
         "
       >
         {
@@ -217,7 +211,7 @@ export function VerifyOtpForm() {
           mt-6
           text-center
           text-sm
-          text-gray-500
+          text-muted-foreground
         "
       >
         Didn’t receive the code?
@@ -231,8 +225,10 @@ export function VerifyOtpForm() {
           w-full
           text-sm
           font-medium
-          text-[#5B4FC7]
-          disabled:text-gray-400
+          text-primary
+          transition-colors
+          hover:text-primary/80
+          disabled:text-muted-foreground
         "
       >
         {

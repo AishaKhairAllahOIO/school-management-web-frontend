@@ -6,9 +6,11 @@ import { Eye, EyeOff } from "lucide-react";
 
 import { useForm } from "react-hook-form";
 
-import { zodResolver } from "@hookform/resolvers/zod";
+import { zodResolver }
+from "@hookform/resolvers/zod";
 
-import { useLocation } from "react-router-dom";
+import { useLocation }
+from "react-router-dom";
 
 import {
   resetPasswordSchema,
@@ -91,10 +93,10 @@ export function ResetPasswordForm() {
         max-w-md
         rounded-[32px]
         border
-        border-white/20
-        bg-white/80
+        border-border
+        bg-card/80
         p-8
-        shadow-2xl
+        shadow-soft-lg
         backdrop-blur-xl
       "
     >
@@ -103,7 +105,7 @@ export function ResetPasswordForm() {
         className="
           text-3xl
           font-bold
-          text-[#1A1A2E]
+          text-foreground
         "
       >
         Reset Password
@@ -114,7 +116,7 @@ export function ResetPasswordForm() {
           mt-3
           text-sm
           leading-6
-          text-gray-500
+          text-muted-foreground
         "
       >
         Create a new secure password
@@ -164,9 +166,9 @@ export function ResetPasswordForm() {
                 right-3
                 top-1/2
                 -translate-y-1/2
-                text-gray-500
+                text-muted-foreground
                 transition-colors
-                hover:text-[#5B4FC7]
+                hover:text-primary
               "
             >
               {
@@ -182,7 +184,7 @@ export function ResetPasswordForm() {
             <p
               className="
                 text-sm
-                text-red-500
+                text-destructive
               "
             >
               {
@@ -226,9 +228,9 @@ export function ResetPasswordForm() {
                 right-3
                 top-1/2
                 -translate-y-1/2
-                text-gray-500
+                text-muted-foreground
                 transition-colors
-                hover:text-[#5B4FC7]
+                hover:text-primary
               "
             >
               {
@@ -244,7 +246,7 @@ export function ResetPasswordForm() {
             <p
               className="
                 text-sm
-                text-red-500
+                text-destructive
               "
             >
               {
@@ -261,13 +263,12 @@ export function ResetPasswordForm() {
           disabled={
             resetPasswordMutation.isPending
           }
+          size="lg"
           className="
-            h-12
             w-full
             rounded-2xl
-            bg-[#5B4FC7]
-            text-white
-            hover:bg-[#4A3FB5]
+            shadow-soft
+            hover:shadow-soft-lg
           "
         >
           {
