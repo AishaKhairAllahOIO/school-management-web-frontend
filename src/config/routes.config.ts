@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 export const routesConfig = {
   auth: {
     login: "/login",
@@ -65,3 +66,5 @@ export const routesConfig = {
     schoolRules: "/settings/school-rules",
   },
 };
+=======
+>>>>>>> e393295b03180ed0e70bb8e4353e7ea928f66909
