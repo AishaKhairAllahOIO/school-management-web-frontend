@@ -207,23 +207,6 @@ button:disabled {
   opacity: 0.6;
 }
 
-input,
-textarea,
-select {
-  outline: none !important;
-  box-shadow: none !important;
-}
-
-input:focus,
-input:focus-visible,
-textarea:focus,
-textarea:focus-visible,
-select:focus,
-select:focus-visible {
-  outline: none !important;
-  box-shadow: none !important;
-}
-
 ::selection {
   background: var(--primary);
   color: var(--primary-foreground);
