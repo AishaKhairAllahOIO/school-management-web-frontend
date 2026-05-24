@@ -1,5 +1,5 @@
 import type { BaseUser } from "../../shared/types/base-user.types";
-import type { SchoolGrade } from "../../shared/types/school.enums";
+import type { SchoolGrade } from "../../../settings/school-config/types/school.enums";
 
 export type StudentAcademicStatus = 
   | "studying"

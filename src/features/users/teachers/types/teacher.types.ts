@@ -1,6 +1,6 @@
 import type { BaseUser } from "../../shared/types/base-user.types";
 import type { EmploymentInformation } from "../../shared/types/employment.types";
-import type { SchoolSubject } from "../../shared/types/school.enums";
+import type { SchoolSubject } from "../../../settings/school-config/types/school.enums";
 
 export type TeacherUser = BaseUser & EmploymentInformation & {
   category: "teacher";

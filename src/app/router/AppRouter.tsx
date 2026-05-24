@@ -2,6 +2,7 @@ import { Navigate, createBrowserRouter, RouterProvider } from "react-router-dom"
 
 import { DashboardLayout } from "@/app/layouts/DashboardLayout";
 import { TeachersPage } from "@/features/users/teachers/pages/TeachersPage";
+import { SchoolConfigPage } from "@/features/settings/school-config/pages/SchoolConfigPage";
 
 function PlaceholderPage({ title }: { title: string }) {
   return (
@@ -156,7 +157,7 @@ const router = createBrowserRouter([
           },
           {
             path: "school-config",
-            element: <PlaceholderPage title="School Config" />,
+            element: <SchoolConfigPage />,
           },
           {
             path: "system-config",
