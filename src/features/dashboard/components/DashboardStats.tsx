@@ -30,15 +30,31 @@ export function DashboardStats() {
         const Icon = statIcons[stat.icon];
 
         return (
-          <article
-            key={stat.id}
-            className="soft-card rounded-3xl p-4"
-          >
-            <div className="flex items-start justify-between">
-              <div
-                className={`flex h-12 w-12 items-center justify-center rounded-2xl ${statIconClasses[stat.icon]}`}
-              >
-                <Icon size={22} strokeWidth={1.9} />
+          <article key={stat.id} className="soft-card rounded-3xl p-5">
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex items-start gap-4">
+                <div
+                  className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl ${statIconClasses[stat.icon]}`}
+                >
+                  <Icon size={24} strokeWidth={1.9} />
+                </div>
+
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">
+                    {stat.label}
+                  </p>
+
+                  <h3 className="mt-1 text-[1.75rem] font-bold leading-none tracking-[-0.04em] text-foreground">
+                    {stat.value}
+                  </h3>
+
+                  <p className="mt-3 text-sm text-muted-foreground">
+                    <span className="font-semibold text-success">
+                      {stat.growth}
+                    </span>{" "}
+                    vs last month
+                  </p>
+                </div>
               </div>
 
               <button
@@ -47,23 +63,6 @@ export function DashboardStats() {
               >
                 <MoreVertical size={17} />
               </button>
-            </div>
-
-            <div className="mt-4">
-              <p className="text-sm font-medium text-muted-foreground">
-                {stat.label}
-              </p>
-
-              <h3 className="mt-1 text-[2rem] font-bold tracking-[-0.04em] text-foreground">
-                {stat.value}
-              </h3>
-
-              <p className="mt-2 text-sm text-muted-foreground">
-                <span className="font-semibold text-success">
-                  {stat.growth}
-                </span>{" "}
-                vs last month
-              </p>
             </div>
           </article>
         );

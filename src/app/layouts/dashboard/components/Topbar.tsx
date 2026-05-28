@@ -68,7 +68,7 @@ export function Topbar() {
 
   return (
     <header className="sticky top-0 z-40 px-4 pb-2 pt-4 md:px-6 lg:px-8">
-      <div className="mx-auto flex h-11 w-full max-w-[1440px] items-center justify-between">
+      <div className="mx-auto flex h-10 w-full max-w-[1430px] items-center justify-between">
         <div className="flex min-w-0 items-center gap-5">
           <button
             type="button"
@@ -90,7 +90,7 @@ export function Topbar() {
               className="shrink-0 text-muted-foreground/45"
             />
 
-            <span className="inline-flex h-7 items-center rounded-full bg-primary/10 px-3 text-[11px] font-medium text-primary">
+            <span className="inline-flex h-6 items-center rounded-full bg-primary/10 px-3 text-[11px] font-medium text-primary">
               {currentPageTitle}
             </span>
           </div>

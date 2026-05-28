@@ -27,7 +27,7 @@ export function DashboardLayout() {
       >
         <Topbar />
 
-        <main className="px-4 pb-5 pt-1 md:px-6 lg:px-8">
+        <main className="px-4 pb-5 pt-4 md:px-6 lg:px-8">
           <div className="mx-auto w-full max-w-[1440px]">
             <Outlet />
           </div>

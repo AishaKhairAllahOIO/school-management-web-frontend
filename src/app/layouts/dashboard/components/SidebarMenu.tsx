@@ -47,7 +47,7 @@ export function SidebarMenu({ variant }: SidebarMenuProps) {
                 "text-sidebar-foreground/70 transition-all duration-300 ease-out hover:text-white",
                 item.disabled ? "pointer-events-none opacity-40" : "",
                 active
-                  ? "text-white before:absolute before:left-0 before:top-1/2 before:h-7 before:w-[4px] before:-translate-y-1/2 before:rounded-r-full before:bg-white"
+                  ? "text-white before:absolute before:-left-5 before:top-1/2 before:h-7 before:w-[4px] before:-translate-y-1/2 before:rounded-r-full before:bg-white"
                   : "",
               ].join(" ")}
             >
