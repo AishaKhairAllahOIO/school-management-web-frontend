@@ -1,14 +1,46 @@
-export type CurrentUser = {
+export type DashboardStat = {
   id: string;
-  fullName: string;
-  role: string;
-  avatarUrl: string;
+  label: string;
+  value: string;
+  growth: string;
+  icon: "students" | "teachers" | "classes" | "revenue";
 };
 
-export type NotificationItem = {
+export type AttendancePoint = {
+  day: string;
+  rate: number;
+};
+
+export type RecentActivity = {
   id: string;
   title: string;
   description: string;
   time: string;
-  isUnread: boolean;
+  type: "student" | "payment" | "schedule" | "teacher";
+};
+
+export type StudentsByGradeItem = {
+  grade: string;
+  total: number;
+  percentage: number;
+};
+
+export type FeeCollection = {
+  totalCollected: number;
+  totalFees: number;
+  collectionRate: number;
+};
+
+export type UpcomingEvent = {
+  id: string;
+  month: string;
+  day: string;
+  title: string;
+  dateTime: string;
+};
+
+export type DashboardInsight = {
+  title: string;
+  description: string;
+  actionLabel: string;
 };
