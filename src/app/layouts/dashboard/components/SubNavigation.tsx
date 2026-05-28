@@ -113,6 +113,16 @@ const subNavigationItems: SubNavigationSection[] = [
     ],
   },
   {
+  basePath: "/scheduling",
+  items: [
+    { title: "Classes", path: "/scheduling/classes", icon: CalendarDays },
+    { title: "Teachers", path: "/scheduling/teachers", icon: UserCheck },
+    { title: "Exams", path: "/scheduling/exams", icon: FileText },
+    { title: "Quizzes", path: "/scheduling/quizzes", icon: BookOpen },
+    { title: "Holidays", path: "/scheduling/holidays", icon: CalendarDays },
+  ],
+},
+  {
     basePath: "/finance",
     items: [
       { title: "Fees", path: "/finance/fees", icon: Wallet },
