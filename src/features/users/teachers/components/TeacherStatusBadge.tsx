@@ -1,26 +1,26 @@
-import type { TeacherStatus } from "../types/teacher.types";
-
-const statusConfig: Record<TeacherStatus, string> = {
-  active: "bg-success/10 text-success",
-  inactive: "bg-muted text-muted-foreground",
-  on_leave: "bg-warning/10 text-warning",
+type TeacherStatusBadgeProps = {
+  status: string;
 };
 
-const statusLabel: Record<TeacherStatus, string> = {
-  active: "Active",
-  inactive: "Inactive",
-  on_leave: "On Leave",
-};
+export function TeacherStatusBadge({ status }: TeacherStatusBadgeProps) {
+  const isActive = status === "active" || status === "enabled";
 
-export function TeacherStatusBadge({ status }: { status: TeacherStatus }) {
   return (
     <span
       className={[
-        "inline-flex rounded-full px-3 py-1 text-xs font-bold",
-        statusConfig[status],
+        "inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold",
+        isActive
+          ? "bg-success/10 text-success"
+          : "bg-muted text-muted-foreground",
       ].join(" ")}
     >
-      {statusLabel[status]}
+      <span
+        className={[
+          "h-1.5 w-1.5 rounded-full",
+          isActive ? "bg-success" : "bg-muted-foreground",
+        ].join(" ")}
+      />
+      {isActive ? "Active" : "Inactive"}
     </span>
   );
 }
