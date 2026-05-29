@@ -16,6 +16,8 @@ import { ResetPasswordPage } from "@/features/auth/pages/ResetPasswordPage";
 import { TeachersPage } from "@/features/users/teachers/pages/TeachersPage";
 
 import { SchoolConfigPage } from "@/features/settings/school-config/pages/SchoolConfigPage";
+import { ClassesPage } from "@/features/academics/classes/pages/ClassesPage";
+ 
 
 function PlaceholderPage({
   title,
@@ -186,11 +188,14 @@ const router = createBrowserRouter([
           },
 
           {
-            path: "classes",
-            element: (
-              <PlaceholderPage title="Classes" />
-            ),
-          },
+
+           path: "classes",
+           element:(
+           <ClassesPage />
+          ) ,
+
+           },
+
 
           {
             path: "sections",
@@ -278,10 +283,11 @@ const router = createBrowserRouter([
           {
             path: "classes",
             element: (
-              <PlaceholderPage title="Class Schedules" />
+              <PlaceholderPage title="Classes" />
             ),
           },
-
+//.............................................................
+          
           {
             path: "teachers",
             element: (
