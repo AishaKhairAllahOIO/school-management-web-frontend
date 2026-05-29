@@ -11,6 +11,7 @@ import {
   FileText,
   GraduationCap,
   HeartHandshake,
+  LayoutList,
   Settings,
   ShieldCheck,
   UserCheck,
@@ -45,41 +46,13 @@ const defaultAccent: AccentColor = {
 };
 
 const userFolderColors: Record<string, AccentColor> = {
-  "/users/students": {
-    main: "#5B4FC7",
-    light: "#6D5FDB",
-    dark: "#4A3FB5",
-  },
-  "/users/teachers": {
-    main: "#5B6FE8",
-    light: "#7B8CFF",
-    dark: "#4D5FD4",
-  },
-  "/users/parents": {
-    main: "#4EABBE",
-    light: "#5FC6DA",
-    dark: "#3F92A3",
-  },
-  "/users/secretaries": {
-    main: "#F59E0B",
-    light: "#FBBF24",
-    dark: "#D97706",
-  },
-  "/users/supervisors": {
-    main: "#3D5A9E",
-    light: "#5B7AC8",
-    dark: "#304A86",
-  },
-  "/users/counselors": {
-    main: "#10B981",
-    light: "#34D399",
-    dark: "#059669",
-  },
-  "/users/service-staff": {
-    main: "#EF7B6C",
-    light: "#FF8B7D",
-    dark: "#D96558",
-  },
+  "/users/students": { main: "#5B4FC7", light: "#6D5FDB", dark: "#4A3FB5" },
+  "/users/teachers": { main: "#5B6FE8", light: "#7B8CFF", dark: "#4D5FD4" },
+  "/users/parents": { main: "#4EABBE", light: "#5FC6DA", dark: "#3F92A3" },
+  "/users/secretaries": { main: "#F59E0B", light: "#FBBF24", dark: "#D97706" },
+  "/users/supervisors": { main: "#3D5A9E", light: "#5B7AC8", dark: "#304A86" },
+  "/users/counselors": { main: "#10B981", light: "#34D399", dark: "#059669" },
+  "/users/service-staff": { main: "#EF7B6C", light: "#FF8B7D", dark: "#D96558" },
 };
 
 const subNavigationItems: SubNavigationSection[] = [
@@ -99,9 +72,10 @@ const subNavigationItems: SubNavigationSection[] = [
     basePath: "/academics",
     items: [
       { title: "Classes", path: "/academics/classes", icon: BookOpen },
+      { title: "Sections", path: "/academics/sections", icon: CalendarDays },
       { title: "Subjects", path: "/academics/subjects", icon: FileText },
-      { title: "Exams", path: "/academics/exams", icon: FileText },
-      { title: "Grades", path: "/academics/grades", icon: GraduationCap },
+      { title: "Classrooms", path: "/academics/classrooms", icon: BookOpen },
+      { title: "Curriculum", path: "/academics/curriculum", icon: GraduationCap },
       { title: "Promotions", path: "/academics/promotions", icon: UserCheck },
     ],
   },
@@ -113,15 +87,15 @@ const subNavigationItems: SubNavigationSection[] = [
     ],
   },
   {
-  basePath: "/scheduling",
-  items: [
-    { title: "Classes", path: "/scheduling/classes", icon: CalendarDays },
-    { title: "Teachers", path: "/scheduling/teachers", icon: UserCheck },
-    { title: "Exams", path: "/scheduling/exams", icon: FileText },
-    { title: "Quizzes", path: "/scheduling/quizzes", icon: BookOpen },
-    { title: "Holidays", path: "/scheduling/holidays", icon: CalendarDays },
-  ],
-},
+    basePath: "/scheduling",
+    items: [
+      { title: "Classes", path: "/scheduling/classes", icon: CalendarDays },
+      { title: "Teachers", path: "/scheduling/teachers", icon: UserCheck },
+      { title: "Exams", path: "/scheduling/exams", icon: FileText },
+      { title: "Quizzes", path: "/scheduling/quizzes", icon: BookOpen },
+      { title: "Holidays", path: "/scheduling/holidays", icon: CalendarDays },
+    ],
+  },
   {
     basePath: "/finance",
     items: [
@@ -197,9 +171,7 @@ function FolderItem({
   path,
   isActive,
   icon: Icon,
-}: SubNavigationItem & {
-  isActive: boolean;
-}) {
+}: SubNavigationItem & { isActive: boolean }) {
   const animationRef = useRef<HTMLDivElement | null>(null);
   const color = userFolderColors[path] ?? defaultAccent;
 
@@ -240,11 +212,7 @@ function FolderItem({
         <div ref={animationRef} className="absolute inset-0" />
 
         <div className="relative z-10 flex h-full w-full flex-col items-center justify-center gap-1 px-2 pt-5">
-          <Icon
-            size={16}
-            className="text-primary-foreground"
-            strokeWidth={1.8}
-          />
+          <Icon size={16} className="text-primary-foreground" strokeWidth={1.8} />
 
           <span className="text-center text-[13px] font-medium leading-tight text-primary-foreground">
             {title}
@@ -260,23 +228,21 @@ function TabItem({
   path,
   isActive,
   icon: Icon,
-}: SubNavigationItem & {
-  isActive: boolean;
-}) {
+}: SubNavigationItem & { isActive: boolean }) {
   return (
     <NavLink
       to={path}
       className={[
-        "group relative flex h-10 shrink-0 items-center gap-2 rounded-2xl px-4 text-xs font-semibold transition-all duration-300",
+        "group relative flex h-12 shrink-0 items-center gap-3 rounded-2xl px-5 text-sm font-semibold transition-all duration-300",
         isActive
           ? "bg-primary text-primary-foreground shadow-soft"
-          : "bg-card/70 text-muted-foreground ring-1 ring-border/60 hover:bg-card hover:text-foreground",
+          : "text-foreground/80 hover:bg-muted hover:text-foreground",
       ].join(" ")}
     >
       <Icon
-        size={15}
-        strokeWidth={1.8}
-        className={isActive ? "text-primary-foreground" : "text-primary"}
+        size={18}
+        strokeWidth={1.9}
+        className={isActive ? "text-primary-foreground" : "text-foreground"}
       />
 
       <span>{title}</span>
@@ -301,7 +267,9 @@ export function SubNavigation() {
         <nav
           className={[
             "scrollbar-thin flex max-w-full overflow-x-auto pb-4",
-            isUsersSection ? "items-center gap-4" : "items-center gap-2",
+            isUsersSection
+              ? "items-center gap-4"
+              : "items-center gap-3 rounded-3xl border border-border/70 bg-card/75 p-2 shadow-soft backdrop-blur-xl",
           ].join(" ")}
         >
           {currentSection.items.map((item) =>

@@ -6,6 +6,7 @@ import { schedulingRoutes } from "@/features/scheduling/routes";
 import { SchoolConfigPage } from "@/features/settings/school-config/pages/SchoolConfigPage";
 import { ParentsPage } from "@/features/users/parents/pages/ParentsPage";
 import { StudentsPage } from "@/features/users/students/pages/StudentsPage";
+import { ClassesPage } from "@/features/academics/pages/ClassesPage";
 import { TeachersPage } from "@/features/users/teachers/pages/TeachersPage";
 
 function PlaceholderPage({ title }: { title: string }) {
@@ -38,16 +39,17 @@ export const appRoutes = [
   },
 
   {
-    path: "academics",
-    children: [
-      { index: true, element: <Navigate to="classes" replace /> },
-      { path: "classes", element: <PlaceholderPage title="Classes" /> },
-      { path: "subjects", element: <PlaceholderPage title="Subjects" /> },
-      { path: "exams", element: <PlaceholderPage title="Exams" /> },
-      { path: "grades", element: <PlaceholderPage title="Grades" /> },
-      { path: "promotions", element: <PlaceholderPage title="Promotions" /> },
-    ],
-  },
+  path: "academics",
+  children: [
+    { index: true, element: <Navigate to="classes" replace /> },
+    { path: "classes", element: <ClassesPage /> },
+    { path: "sections", element: <PlaceholderPage title="Sections" /> },
+    { path: "subjects", element: <PlaceholderPage title="Subjects" /> },
+    { path: "classrooms", element: <PlaceholderPage title="Classrooms" /> },
+    { path: "curriculum", element: <PlaceholderPage title="Curriculum" /> },
+    { path: "promotions", element: <PlaceholderPage title="Promotions" /> },
+  ],
+},
 
   {
     path: "attendance",
