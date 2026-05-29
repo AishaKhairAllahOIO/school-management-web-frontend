@@ -49,7 +49,6 @@ function getCurrentPageTitle(pathname: string) {
 
 export function Topbar() {
   const location = useLocation();
-
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
 
   const { user } = useCurrentUser();
@@ -59,47 +58,48 @@ export function Topbar() {
     (state) => state.toggleMobileSidebar
   );
 
-  const openProfilePanel = useLayoutStore(
-    (state) => state.openProfilePanel
-  );
+  const openProfilePanel = useLayoutStore((state) => state.openProfilePanel);
 
   const sectionTitle = getSectionTitle(location.pathname);
   const currentPageTitle = getCurrentPageTitle(location.pathname);
 
   return (
-    <header className="sticky top-0 z-40 px-4 pb-2 pt-4 md:px-6 lg:px-8">
-      <div className="mx-auto flex h-10 w-full max-w-[1430px] items-center justify-between">
-        <div className="flex min-w-0 items-center gap-5">
+    <header className="sticky top-0 z-40 pb-2 pt-4">
+      <div className="grid h-11 w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-4">
+        <div className="flex min-w-0 items-center">
           <button
             type="button"
             onClick={toggleMobileSidebar}
             aria-label="Open mobile sidebar"
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl text-foreground transition hover:bg-muted lg:hidden"
+            className="mr-3 flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl text-foreground transition hover:bg-muted lg:hidden"
           >
             <Menu size={18} />
           </button>
 
-          <div className="flex min-w-0 items-center gap-3">
-            <h1 className="truncate text-[20px] font-semibold tracking-[-0.03em] text-foreground">
+          <div className="flex min-w-0 max-w-[520px] items-center gap-2.5">
+            <h1 className="truncate text-[20px] font-semibold tracking-[-0.025em] text-foreground">
               {sectionTitle}
             </h1>
 
             <ChevronRight
-              size={15}
-              strokeWidth={2}
-              className="shrink-0 text-muted-foreground/45"
+              size={14}
+              strokeWidth={1.8}
+              className="shrink-0 text-muted-foreground/40"
             />
 
-            <span className="inline-flex h-6 items-center rounded-full bg-primary/10 px-3 text-[11px] font-medium text-primary">
+            <span className="inline-flex h-7 max-w-[150px] shrink-0 items-center truncate rounded-xl border border-border/60 bg-card/70 px-3 text-[12px] font-medium text-foreground shadow-[0_8px_20px_rgba(0,0,0,0.04)]">
               {currentPageTitle}
             </span>
           </div>
         </div>
 
-        <div className="ml-auto flex shrink-0 items-center gap-2">
-          <LanguageToggle />
+        <div className="flex shrink-0 items-center gap-3">
+          <div className="flex items-center gap-2">
+            <LanguageToggle />
+            <ThemeToggle />
+          </div>
 
-          <ThemeToggle />
+          <div className="h-6 w-px bg-border/70" />
 
           <div className="relative">
             <button
@@ -133,6 +133,7 @@ export function Topbar() {
                   <button
                     type="button"
                     onClick={() => setIsNotificationsOpen(false)}
+                    aria-label="Close notifications"
                     className="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground transition hover:bg-muted hover:text-foreground"
                   >
                     <X size={15} />
@@ -174,19 +175,19 @@ export function Topbar() {
             )}
           </div>
 
-          <div className="hidden items-center gap-2 pl-2 lg:flex">
+          <div className="hidden items-center gap-2 pl-1 lg:flex">
             <img
               src={user.avatarUrl}
               alt={user.fullName}
-              className="h-11 w-11 rounded-full object-cover ring-2 ring-background"
+              className="h-10 w-10 rounded-full object-cover ring-2 ring-background"
             />
 
-            <div className="flex min-w-[120px] flex-col text-left">
-              <span className="truncate text-sm font-semibold leading-5 text-foreground">
+            <div className="flex min-w-0 max-w-[116px] flex-col text-left">
+              <span className="truncate text-[13px] font-semibold leading-5 text-foreground">
                 {user.fullName}
               </span>
 
-              <span className="truncate text-xs text-muted-foreground">
+              <span className="truncate text-[11px] text-muted-foreground">
                 {user.role}
               </span>
             </div>
@@ -195,15 +196,16 @@ export function Topbar() {
               type="button"
               onClick={openProfilePanel}
               aria-label="Open profile menu"
-              className="flex h-10 w-10 items-center justify-center rounded-full border border-border/60 bg-card text-muted-foreground shadow-soft transition hover:bg-muted hover:text-foreground"
+              className="flex h-8 w-8 items-center justify-center rounded-full border border-border/60 bg-card text-muted-foreground shadow-soft transition hover:bg-muted hover:text-foreground"
             >
-              <ChevronDown size={15} />
+              <ChevronDown size={13} />
             </button>
           </div>
 
           <button
             type="button"
             onClick={openProfilePanel}
+            aria-label="Open profile panel"
             className="flex h-10 w-10 items-center justify-center rounded-full lg:hidden"
           >
             <img

@@ -17,6 +17,7 @@ function isItemActive(pathname: string, item: SidebarItem) {
   if (item.path === "/") return pathname === "/";
 
   const basePath = getBasePath(item.path);
+
   return pathname === item.path || pathname.startsWith(`${basePath}/`);
 }
 
@@ -42,6 +43,7 @@ export function SidebarMenu({ variant }: SidebarMenuProps) {
               end={item.exact}
               title={item.title}
               aria-label={item.title}
+              aria-current={active ? "page" : undefined}
               className={[
                 "relative flex h-11 w-full items-center justify-center",
                 "text-sidebar-foreground/70 transition-all duration-300 ease-out hover:text-white",
@@ -69,16 +71,23 @@ export function SidebarMenu({ variant }: SidebarMenuProps) {
             key={item.path}
             to={item.path}
             end={item.exact}
+            aria-current={active ? "page" : undefined}
             className={[
               "relative mx-3 flex h-11 items-center rounded-2xl px-4",
-              "text-[13px] font-semibold transition-all duration-300 ease-out",
+              "text-[13px] font-semibold tracking-[-0.005em] transition-all duration-300 ease-out",
               item.disabled ? "pointer-events-none opacity-40" : "",
               active
-                ? "bg-[#6C4DF6] text-white shadow-[0_14px_30px_rgba(108,77,246,0.35)]"
-                : "text-sidebar-foreground/82 hover:bg-white/8 hover:text-white",
+                ? "bg-primary text-primary-foreground shadow-[0_14px_30px_rgba(0,0,0,0.18)]"
+                : "text-sidebar-foreground/80 hover:bg-white/8 hover:text-white",
             ].join(" ")}
           >
             <span className="truncate">{item.title}</span>
+
+            {item.badge ? (
+              <span className="ml-auto rounded-full bg-white/15 px-1.5 py-0.5 text-[10px] font-bold text-white">
+                {item.badge}
+              </span>
+            ) : null}
           </NavLink>
         );
       })}

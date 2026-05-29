@@ -11,7 +11,6 @@ import {
   FileText,
   GraduationCap,
   HeartHandshake,
-  LayoutList,
   Settings,
   ShieldCheck,
   UserCheck,
@@ -212,7 +211,11 @@ function FolderItem({
         <div ref={animationRef} className="absolute inset-0" />
 
         <div className="relative z-10 flex h-full w-full flex-col items-center justify-center gap-1 px-2 pt-5">
-          <Icon size={16} className="text-primary-foreground" strokeWidth={1.8} />
+          <Icon
+            size={16}
+            className="text-primary-foreground"
+            strokeWidth={1.8}
+          />
 
           <span className="text-center text-[13px] font-medium leading-tight text-primary-foreground">
             {title}
@@ -233,16 +236,16 @@ function TabItem({
     <NavLink
       to={path}
       className={[
-        "group relative flex h-12 shrink-0 items-center gap-3 rounded-2xl px-5 text-sm font-semibold transition-all duration-300",
+        "group relative flex h-11 shrink-0 items-center gap-2.5 rounded-2xl px-4 text-[13px] font-semibold transition-all duration-300",
         isActive
           ? "bg-primary text-primary-foreground shadow-soft"
           : "text-foreground/80 hover:bg-muted hover:text-foreground",
       ].join(" ")}
     >
       <Icon
-        size={18}
+        size={16}
         strokeWidth={1.9}
-        className={isActive ? "text-primary-foreground" : "text-foreground"}
+        className={isActive ? "text-primary-foreground" : "text-foreground/75"}
       />
 
       <span>{title}</span>
@@ -261,38 +264,43 @@ export function SubNavigation() {
 
   const isUsersSection = currentSection.basePath === "/users";
 
-  return (
-    <div className="px-4 pt-5 md:px-6 lg:px-8">
-      <div className="mx-auto w-full max-w-[1440px]">
-        <nav
-          className={[
-            "scrollbar-thin flex max-w-full overflow-x-auto pb-4",
-            isUsersSection
-              ? "items-center gap-4"
-              : "items-center gap-3 rounded-3xl border border-border/70 bg-card/75 p-2 shadow-soft backdrop-blur-xl",
-          ].join(" ")}
-        >
-          {currentSection.items.map((item) =>
-            isUsersSection ? (
-              <FolderItem
-                key={item.path}
-                title={item.title}
-                path={item.path}
-                icon={item.icon}
-                isActive={location.pathname === item.path}
-              />
-            ) : (
-              <TabItem
-                key={item.path}
-                title={item.title}
-                path={item.path}
-                icon={item.icon}
-                isActive={location.pathname === item.path}
-              />
-            )
-          )}
-        </nav>
-      </div>
+ return (
+  <div className="pt-5">
+    <div
+      className={[
+        "w-full overflow-hidden",
+        !isUsersSection
+          ? "rounded-3xl border border-border/70 bg-card/75 p-2 shadow-soft backdrop-blur-xl"
+          : "",
+      ].join(" ")}
+    >
+      <nav
+        className={[
+          "scrollbar-thin flex w-full max-w-full overflow-x-auto",
+          isUsersSection ? "items-center gap-4 pb-4" : "items-center gap-2.5",
+        ].join(" ")}
+      >
+        {currentSection.items.map((item) =>
+          isUsersSection ? (
+            <FolderItem
+              key={item.path}
+              title={item.title}
+              path={item.path}
+              icon={item.icon}
+              isActive={location.pathname === item.path}
+            />
+          ) : (
+            <TabItem
+              key={item.path}
+              title={item.title}
+              path={item.path}
+              icon={item.icon}
+              isActive={location.pathname === item.path}
+            />
+          )
+        )}
+      </nav>
     </div>
-  );
+  </div>
+);
 }
