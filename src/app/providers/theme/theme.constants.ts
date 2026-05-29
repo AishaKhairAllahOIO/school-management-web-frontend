@@ -1,0 +1,5 @@
+import type { AppTheme } from "@/app/providers/theme/theme.types";
+
+export const THEME_ATTRIBUTE = "class";
+export const DEFAULT_THEME: AppTheme = "system";
+export const THEME_STORAGE_KEY = "app-theme";

@@ -1,54 +1,227 @@
 import { Outlet } from "react-router-dom";
+import { motion } from "framer-motion";
 
 export function AuthLayout() {
   return (
-    <div className="min-h-screen grid lg:grid-cols-2 bg-[#F5F7FB]">
+    <div className="relative min-h-screen overflow-hidden bg-background">
 
-      {/* Left Section */}
-      <div
-        className="
-          hidden lg:flex
-          flex-col
-          justify-between
-          p-12
-          bg-gradient-to-br
-          from-[#5B4FC7]
-          to-[#4A3FB5]
-          text-white
-        "
-      >
-        <div>
-          <h1 className="text-4xl font-bold leading-tight">
-            School Management
-            <br />
-            Dashboard
-          </h1>
+      {/* MAIN GRID */}
+      <div className="relative z-10 grid min-h-screen lg:grid-cols-2">
 
-          <p className="mt-5 text-lg text-white/80 leading-8">
-            Manage students, attendance,
-            finance, academics, and reports
-            in one modern platform.
+        {/* LEFT SIDE */}
+        <div
+          className="
+            relative
+            hidden
+            overflow-hidden
+            bg-gradient-to-br
+            from-primary
+            to-primary-dark
+            lg:flex
+            lg:flex-col
+            lg:justify-center
+            px-20
+            py-20
+            text-primary-foreground
+          "
+        >
+
+          {/* Animated Background Blobs */}
+          <motion.div
+            animate={{
+              y: [0, -40, 0],
+              x: [0, 40, 0],
+              scale: [2, 3, 2],
+            }}
+            transition={{
+              duration: 15,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+            className="
+              absolute
+              left-[-80px]
+              top-[-80px]
+              h-[240px]
+              w-[240px]
+              rounded-full
+              bg-card/10
+            "
+          />
+
+          <motion.div
+            animate={{
+              y: [0, 40, 0],
+              x: [0, -30, 0],
+              scale: [0.5, 2, 0.5],
+            }}
+            transition={{
+              duration: 15,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+            className="
+              absolute
+              bottom-[-60px]
+              right-[20px]
+              h-[180px]
+              w-[180px]
+              rounded-full
+              bg-card/10
+            "
+          />
+
+          <motion.div
+            animate={{
+              x: [0, -40, 0],
+              y: [0, -20, 0],
+            }}
+            transition={{
+              duration: 10,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+            className="
+              absolute
+              bottom-[-60px]
+              left-[20px]
+              h-[180px]
+              w-[180px]
+              rounded-full
+              bg-card/10
+            "
+          />
+
+          {/* Logo */}
+          <div className="relative z-10 mb-10 flex items-center gap-4">
+
+            <div
+              className="
+                flex
+                h-14
+                w-14
+                items-center
+                justify-center
+                rounded-2xl
+                bg-card
+                text-2xl
+                font-bold
+                text-primary
+                shadow-soft
+              "
+            >
+              S
+            </div>
+
+            <div>
+              <h1 className="text-3xl font-bold">
+                School Desk
+              </h1>
+
+              <p className="mt-1 text-sm text-primary-foreground/70">
+                School Management Dashboard
+              </p>
+            </div>
+          </div>
+
+          {/* Title */}
+          <motion.h2
+            animate={{
+              textShadow: [
+                "0px 0px 0px rgba(255,255,255,0.3)",
+                "0px 0px 12px rgba(255,255,255,0.5)",
+                "0px 0px 0px rgba(255,255,255,0.3)",
+              ],
+            }}
+            transition={{
+              duration: 3,
+              repeat: Infinity,
+              ease: "linear",
+            }}
+            className="
+              relative
+              z-10
+              text-5xl
+              font-bold
+              leading-tight
+            "
+          >
+            Manage Your School Easily.
+          </motion.h2>
+
+          <p
+            className="
+              relative
+              z-10
+              mt-6
+              text-lg
+              leading-8
+              text-primary-foreground/80
+            "
+          >
+            Modern dashboard for managing students,
+            academics, attendance, schedules, and finance.
           </p>
+
+          {/* Curved Divider */}
+          <div
+            className="
+              absolute
+              right-[-120px]
+              top-0
+              h-full
+              w-[200px]
+              rounded-[30px]
+              bg-background
+            "
+          />
         </div>
 
-        <div className="space-y-4">
-          <div className="rounded-2xl bg-white/10 backdrop-blur-sm p-5">
-            Smart Academic Management
-          </div>
+        {/* RIGHT SIDE */}
+        <div
+          className="
+            relative
+            flex
+            items-center
+            justify-center
+            px-6
+            py-16
+            lg:px-16
+          "
+        >
 
-          <div className="rounded-2xl bg-white/10 backdrop-blur-sm p-5">
-            Attendance & Scheduling
-          </div>
+          <div
+            className="
+              absolute
+              inset-0
+              bg-card/30
+              backdrop-blur-[2px]
+            "
+          />
 
-          <div className="rounded-2xl bg-white/10 backdrop-blur-sm p-5">
-            Reports & Financial Tracking
-          </div>
+          <motion.div
+            initial={{
+              opacity: 0,
+              y: 20,
+            }}
+            animate={{
+              opacity: 1,
+              y: 0,
+            }}
+            transition={{
+              duration: 0.5,
+            }}
+            className="
+              relative
+              z-10
+              mt-10
+              w-full
+              max-w-md
+            "
+          >
+            <Outlet />
+          </motion.div>
         </div>
-      </div>
-
-      {/* Right Section */}
-      <div className="flex items-center justify-center px-6 py-10 bg-white">
-        <Outlet />
       </div>
     </div>
   );

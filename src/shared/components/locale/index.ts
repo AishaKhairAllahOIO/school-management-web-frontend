@@ -1,0 +1,1 @@
+export { LanguageToggle } from "@/shared/components/locale/LanguageToggle";

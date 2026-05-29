@@ -1,16 +1,22 @@
-import { Toaster } from "sonner";
-import { QueryProvider } from "./QueryProvider";
-import { ThemeProvider } from "./ThemeProvider";
+import type { ReactNode } from "react";
 
-type AppProvidersProps = {children: React.ReactNode;};
+import { QueryProvider } from "@/app/providers/query";
+import { ThemeProvider } from "@/app/providers/theme";
+import { LocaleProvider } from "@/app/providers/locale";
+import { AppToaster } from "@/app/providers/ui";
 
-export function AppProviders({ children }: AppProvidersProps)
-{
+type AppProvidersProps = {
+  children: ReactNode;
+};
+
+export function AppProviders({ children }: AppProvidersProps) {
   return (
     <QueryProvider>
       <ThemeProvider>
-        {children}
-        <Toaster richColors position="top-right" />
+        <LocaleProvider>
+          {children}
+          <AppToaster />
+        </LocaleProvider>
       </ThemeProvider>
     </QueryProvider>
   );

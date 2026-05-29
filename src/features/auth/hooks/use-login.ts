@@ -1,51 +1,45 @@
-import { useMutation }
-from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 
-import { useNavigate }
-from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
-import { login }
-from "../api/auth.api";
+import { login } from "../api/auth.api";
 
-import { useAuthStore }
-from "../store/auth.store";
+import { notify } from "@/shared/lib/toast";
 
-import { notify }
-from "@/shared/lib/toast";
-
-import { handleApiError }
-from "@/shared/lib/error-handler";
+import { handleApiError } from "@/shared/lib/error-handler";
 
 export function useLogin() {
 
   const navigate = useNavigate();
 
-  const setAuth =
-    useAuthStore(
-      (state) => state.setAuth
-    );
-
   return useMutation({
 
     mutationFn: login,
 
-    onSuccess: (data) => {
-
-      setAuth(
-        data.token,
-        data.user
-      );
+    onSuccess: (_, variables) => {
 
       notify.success(
-        "Welcome back"
+        "OTP sent successfully"
       );
 
-      navigate("/dashboard");
+      navigate(
+        "/verify-otp",
+        {
+          state: {
+            email: variables.email,
+            rememberMe:
+              variables.rememberMe,
+          },
+        }
+      );
     },
 
-    onError: (error) => {
+   onError: (error) => {
 
-      handleApiError(error);
-    },
+  console.log("LOGIN ERROR:", error);
+
+  handleApiError(error);
+},
   });
 }
+ 
