@@ -18,6 +18,9 @@ import { TeachersPage } from "@/features/users/teachers/pages/TeachersPage";
 import { SchoolConfigPage } from "@/features/settings/school-config/pages/SchoolConfigPage";
 import { ClassesPage } from "@/features/academics/classes/pages/ClassesPage";
  
+import { StudentAttendancePage } from "@/features/attendance/students/pages/StudentAttendancePage";
+import { StaffAttendancePage } from "@/features/attendance/staff/pages/StaffAttendancePage";
+import { LeaveRequestsPage } from "@/features/attendance/Leave Requests/pages/LeaveRequestsPage";
 
 function PlaceholderPage({
   title,
@@ -252,14 +255,21 @@ const router = createBrowserRouter([
           {
             path: "students",
             element: (
-              <PlaceholderPage title="Students Attendance" />
+              <StudentAttendancePage  />
             ),
           },
 
           {
             path: "staff",
             element: (
-              <PlaceholderPage title="Staff Attendance" />
+              <StaffAttendancePage />
+            ),
+          },
+          
+          {
+            path: "vacations",
+            element: (
+              <LeaveRequestsPage />
             ),
           },
         ],

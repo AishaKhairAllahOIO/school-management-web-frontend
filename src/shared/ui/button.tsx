@@ -35,7 +35,7 @@ const buttonVariants = cva(
       variant: {
         default:
           `
-          bg-primary
+          bg-accent-foreground
           text-primary-foreground
           shadow-md
 

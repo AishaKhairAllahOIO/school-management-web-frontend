@@ -82,7 +82,7 @@ export function LoginForm() {
               items-center
               justify-center
               rounded-2xl
-              bg-primary
+              bg-accent-foreground
               text-primary-foreground
               text-xl
               font-bold
@@ -255,7 +255,7 @@ export function LoginForm() {
               className="
                 cursor-pointer
                 text-sm
-                text-muted-foreground
+                text-accent-foreground
               "
             >
               Remember me
@@ -267,7 +267,7 @@ export function LoginForm() {
             className="
               text-sm
               font-medium
-              text-primary
+              text-accent-foreground
               transition-colors
               hover:text-primary-dark
               hover:underline
