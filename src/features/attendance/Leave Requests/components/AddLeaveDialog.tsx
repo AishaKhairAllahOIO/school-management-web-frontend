@@ -15,7 +15,7 @@ export const AddLeaveDialog = () => {
     <Dialog>
 
       <DialogTrigger asChild>
-        <Button>
+        <Button >
           <Plus size={16}/>
           Add Request
         </Button>
