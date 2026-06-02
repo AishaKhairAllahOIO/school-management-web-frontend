@@ -7,10 +7,12 @@ import {
   Bell,
   BookOpen,
   Briefcase,
+  Building2,
   CalendarDays,
   FileText,
   GraduationCap,
   HeartHandshake,
+  LockKeyhole,
   Settings,
   ShieldCheck,
   UserCheck,
@@ -115,8 +117,10 @@ const subNavigationItems: SubNavigationSection[] = [
     basePath: "/settings",
     items: [
       { title: "Roles", path: "/settings/roles", icon: ShieldCheck },
-      { title: "Permissions", path: "/settings/permissions", icon: UserCog },
-      { title: "School Config", path: "/settings/school-config", icon: Settings },
+      { title: "Permissions", path: "/settings/permissions", icon: LockKeyhole },
+      { title: "General", path: "/settings/general", icon: Building2 },
+      { title: "Academic", path: "/settings/academic", icon: BookOpen },
+      { title: "Security", path: "/settings/security", icon: ShieldCheck },
     ],
   },
 ];
@@ -236,16 +240,16 @@ function TabItem({
     <NavLink
       to={path}
       className={[
-        "group relative flex h-11 shrink-0 items-center gap-2.5 rounded-2xl px-4 text-[13px] font-semibold transition-all duration-300",
+        "group relative flex h-14 shrink-0 items-center justify-center gap-3 rounded-2xl px-8 text-[14px] font-semibold transition-all duration-300",
         isActive
-          ? "bg-primary text-primary-foreground shadow-soft"
-          : "text-foreground/80 hover:bg-muted hover:text-foreground",
+          ? "bg-primary/10 text-primary"
+          : "text-muted-foreground hover:bg-muted/70 hover:text-foreground",
       ].join(" ")}
     >
       <Icon
-        size={16}
+        size={18}
         strokeWidth={1.9}
-        className={isActive ? "text-primary-foreground" : "text-foreground/75"}
+        className={isActive ? "text-primary" : "text-muted-foreground"}
       />
 
       <span>{title}</span>
@@ -264,43 +268,45 @@ export function SubNavigation() {
 
   const isUsersSection = currentSection.basePath === "/users";
 
- return (
-  <div className="pt-5">
-    <div
-      className={[
-        "w-full overflow-hidden",
-        !isUsersSection
-          ? "rounded-3xl border border-border/70 bg-card/75 p-2 shadow-soft backdrop-blur-xl"
-          : "",
-      ].join(" ")}
-    >
-      <nav
+  return (
+    <div className="pt-5">
+      <div
         className={[
-          "scrollbar-thin flex w-full max-w-full overflow-x-auto",
-          isUsersSection ? "items-center gap-4 pb-4" : "items-center gap-2.5",
+          "w-full overflow-hidden",
+          !isUsersSection
+            ? "rounded-3xl border border-border/70 bg-card/80 p-1.5 shadow-soft backdrop-blur-xl"
+            : "",
         ].join(" ")}
       >
-        {currentSection.items.map((item) =>
-          isUsersSection ? (
-            <FolderItem
-              key={item.path}
-              title={item.title}
-              path={item.path}
-              icon={item.icon}
-              isActive={location.pathname === item.path}
-            />
-          ) : (
-            <TabItem
-              key={item.path}
-              title={item.title}
-              path={item.path}
-              icon={item.icon}
-              isActive={location.pathname === item.path}
-            />
-          )
-        )}
-      </nav>
+        <nav
+          className={[
+            "scrollbar-thin flex w-full max-w-full overflow-x-auto",
+            isUsersSection
+              ? "items-center gap-4 pb-4"
+              : "items-center justify-between gap-2",
+          ].join(" ")}
+        >
+          {currentSection.items.map((item) =>
+            isUsersSection ? (
+              <FolderItem
+                key={item.path}
+                title={item.title}
+                path={item.path}
+                icon={item.icon}
+                isActive={location.pathname === item.path}
+              />
+            ) : (
+              <TabItem
+                key={item.path}
+                title={item.title}
+                path={item.path}
+                icon={item.icon}
+                isActive={location.pathname === item.path}
+              />
+            )
+          )}
+        </nav>
+      </div>
     </div>
-  </div>
-);
+  );
 }

@@ -1,5 +1,5 @@
 export type DashboardStat = {
-  id: string;
+  id: "students" | "teachers" | "classes" | "revenue";
   label: string;
   value: string;
   growth: string;
@@ -13,10 +13,10 @@ export type AttendancePoint = {
 
 export type RecentActivity = {
   id: string;
+  type: "student" | "payment" | "schedule" | "teacher";
   title: string;
   description: string;
   time: string;
-  type: "student" | "payment" | "schedule" | "teacher";
 };
 
 export type StudentsByGradeItem = {

@@ -8,6 +8,11 @@ import { ParentsPage } from "@/features/users/parents/pages/ParentsPage";
 import { StudentsPage } from "@/features/users/students/pages/StudentsPage";
 import { ClassesPage } from "@/features/academics/pages/ClassesPage";
 import { TeachersPage } from "@/features/users/teachers/pages/TeachersPage";
+import { RolesPage } from "@/features/settings/roles/pages/RolesPage";
+import { PermissionsPage } from "@/features/settings/permissions/pages/PermissionsPage";
+import { GeneralSettingsPage } from "@/features/settings/general/pages/GeneralSettingsPage";
+import { AcademicSettingsPage } from "@/features/settings/academic/pages/AcademicSettingsPage";
+import { SecuritySettingsPage } from "@/features/settings/security/pages/SecuritySettingsPage";
 
 function PlaceholderPage({ title }: { title: string }) {
   return (
@@ -78,10 +83,10 @@ export const appRoutes = [
     path: "settings",
     children: [
       { index: true, element: <Navigate to="roles" replace /> },
-      { path: "roles", element: <PlaceholderPage title="Roles" /> },
-      { path: "permissions", element: <PlaceholderPage title="Permissions" /> },
-      { path: "school-config", element: <SchoolConfigPage /> },
-      { path: "system-config", element: <PlaceholderPage title="System Config" /> },
-    ],
+      { path: "roles", element: <RolesPage /> },
+      { path: "permissions", element: <PermissionsPage /> },
+{ path: "general", element: <GeneralSettingsPage /> },
+{ path: "academic", element: <AcademicSettingsPage /> },
+{ path: "security", element: <SecuritySettingsPage /> },    ],
   },
 ];

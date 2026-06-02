@@ -1,4 +1,9 @@
-import { ChevronLeft, ChevronRight, GraduationCap } from "lucide-react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  ExternalLink,
+  GraduationCap,
+} from "lucide-react";
 
 import { SidebarMenu } from "@/app/layouts/dashboard/components/SidebarMenu";
 import { useLayoutStore } from "@/app/layouts/dashboard/store/layoutStore";
@@ -20,13 +25,20 @@ export function Sidebar() {
 
   const schoolDisplayName = getDisplaySchoolName(schoolConfigMock.schoolName);
 
+  const schoolWebsiteUrl =
+    (schoolConfigMock as { websiteUrl?: string; schoolWebsiteUrl?: string })
+      .websiteUrl ??
+    (schoolConfigMock as { websiteUrl?: string; schoolWebsiteUrl?: string })
+      .schoolWebsiteUrl ??
+    "#";
+
   return (
     <aside
       className={[
         "fixed left-0 top-0 z-50 hidden h-screen overflow-visible rounded-r-3xl sidebar-gradient text-sidebar-foreground shadow-2xl transition-all duration-300 ease-out lg:grid",
         isCollapsed
           ? "w-[56px] grid-cols-[56px] grid-rows-[76px_1fr_64px]"
-          : "w-[242px] grid-cols-[56px_1fr] grid-rows-[76px_1fr_64px]",
+          : "w-[242px] grid-cols-[56px_1fr] grid-rows-[76px_1fr_auto]",
       ].join(" ")}
     >
       {isCollapsed && (
@@ -56,7 +68,7 @@ export function Sidebar() {
 
       {!isCollapsed && (
         <>
-          <div className="flex h-[76px] items-center justify-between gap-3 pl-6 pr-4">
+          <div className="flex h-[76px] items-center justify-between gap-3 border-b border-white/10 pl-6 pr-4">
             <div className="flex min-w-0 items-center gap-3">
               <span className="flex h-10 w-10 shrink-0 items-center justify-center text-white">
                 <GraduationCap size={26} strokeWidth={1.8} />
@@ -86,8 +98,21 @@ export function Sidebar() {
             </button>
           </div>
 
-          <div className="min-h-0 overflow-visible px-3">
+          <div className="min-h-0 overflow-visible px-3 pt-3">
             <SidebarMenu variant="labels" />
+          </div>
+
+          <div className="border-t border-white/10 px-4 pb-4 pt-4">
+            <a
+              href={schoolWebsiteUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="flex h-10 items-center justify-between rounded-2xl bg-white/5 px-3 text-[11px] font-semibold text-white/75 transition hover:bg-white/10 hover:text-white"
+            >
+              <span>School Website</span>
+
+              <ExternalLink size={13} strokeWidth={1.8} />
+            </a>
           </div>
         </>
       )}

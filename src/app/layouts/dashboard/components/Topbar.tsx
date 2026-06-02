@@ -60,6 +60,10 @@ export function Topbar() {
 
   const openProfilePanel = useLayoutStore((state) => state.openProfilePanel);
 
+  const isProfilePanelOpen = useLayoutStore(
+    (state) => state.isProfilePanelOpen
+  );
+
   const sectionTitle = getSectionTitle(location.pathname);
   const currentPageTitle = getCurrentPageTitle(location.pathname);
 
@@ -175,45 +179,49 @@ export function Topbar() {
             )}
           </div>
 
-          <div className="hidden items-center gap-2 pl-1 lg:flex">
-            <img
-              src={user.avatarUrl}
-              alt={user.fullName}
-              className="h-10 w-10 rounded-full object-cover ring-2 ring-background"
-            />
+          {!isProfilePanelOpen && (
+            <div className="hidden items-center gap-2 pl-1 lg:flex">
+              <img
+                src={user.avatarUrl}
+                alt={user.fullName}
+                className="h-10 w-10 rounded-full object-cover ring-2 ring-background"
+              />
 
-            <div className="flex min-w-0 max-w-[116px] flex-col text-left">
-              <span className="truncate text-[13px] font-semibold leading-5 text-foreground">
-                {user.fullName}
-              </span>
+              <div className="flex min-w-0 max-w-[116px] flex-col text-left">
+                <span className="truncate text-[13px] font-semibold leading-5 text-foreground">
+                  {user.fullName}
+                </span>
 
-              <span className="truncate text-[11px] text-muted-foreground">
-                {user.role}
-              </span>
+                <span className="truncate text-[11px] text-muted-foreground">
+                  {user.role}
+                </span>
+              </div>
+
+              <button
+                type="button"
+                onClick={openProfilePanel}
+                aria-label="Open profile menu"
+                className="flex h-8 w-8 items-center justify-center rounded-full border border-border/60 bg-card text-muted-foreground shadow-soft transition hover:bg-muted hover:text-foreground"
+              >
+                <ChevronDown size={13} />
+              </button>
             </div>
+          )}
 
+          {!isProfilePanelOpen && (
             <button
               type="button"
               onClick={openProfilePanel}
-              aria-label="Open profile menu"
-              className="flex h-8 w-8 items-center justify-center rounded-full border border-border/60 bg-card text-muted-foreground shadow-soft transition hover:bg-muted hover:text-foreground"
+              aria-label="Open profile panel"
+              className="flex h-10 w-10 items-center justify-center rounded-full lg:hidden"
             >
-              <ChevronDown size={13} />
+              <img
+                src={user.avatarUrl}
+                alt={user.fullName}
+                className="h-10 w-10 rounded-full object-cover ring-2 ring-background"
+              />
             </button>
-          </div>
-
-          <button
-            type="button"
-            onClick={openProfilePanel}
-            aria-label="Open profile panel"
-            className="flex h-10 w-10 items-center justify-center rounded-full lg:hidden"
-          >
-            <img
-              src={user.avatarUrl}
-              alt={user.fullName}
-              className="h-10 w-10 rounded-full object-cover ring-2 ring-background"
-            />
-          </button>
+          )}
         </div>
       </div>
     </header>
