@@ -26,7 +26,7 @@ export function DashboardLayout() {
         className={[
           "flex h-screen flex-col transition-all duration-300 ease-out",
           isSidebarCollapsed ? "lg:pl-[72px]" : "lg:pl-[238px]",
-          isProfilePanelOpen ? "lg:pr-[344px]" : "lg:pr-0",
+          isProfilePanelOpen ? "lg:pr-[320px]" : "lg:pr-0",
         ].join(" ")}
       >
         <div className="shrink-0 px-4 md:px-6 lg:px-8">

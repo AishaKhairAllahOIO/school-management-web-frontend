@@ -3,7 +3,7 @@ import type { SchoolConfig } from "../types/school-config.types";
 export const schoolConfigMock: SchoolConfig = {
   id: "school-config-001",
 
-  schoolName: "Aisha International School",
+  schoolName: "School Management",
   description:
     "A modern educational institution focused on academic excellence, student growth, and smart school management.",
 
