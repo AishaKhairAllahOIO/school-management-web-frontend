@@ -37,7 +37,7 @@ export function useUploadSchoolLogo() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (file: File) => uploadSchoolLogo(file),
+    mutationFn: uploadSchoolLogo,
 
     onSuccess: (data) => {
       queryClient.setQueryData(generalSettingsQueryKey, data);
@@ -61,7 +61,7 @@ export function useUploadSchoolImage() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (file: File) => uploadSchoolImage(file),
+    mutationFn: uploadSchoolImage,
 
     onSuccess: (data) => {
       queryClient.setQueryData(generalSettingsQueryKey, data);
@@ -73,7 +73,7 @@ export function useDeleteSchoolImage() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (imageId: string) => deleteSchoolImage(imageId),
+    mutationFn: deleteSchoolImage,
 
     onSuccess: (data) => {
       queryClient.setQueryData(generalSettingsQueryKey, data);

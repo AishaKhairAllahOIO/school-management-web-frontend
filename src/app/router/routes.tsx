@@ -3,7 +3,6 @@ import { Navigate } from "react-router-dom";
 import { dashboardRoutes } from "@/features/dashboard/routes";
 import { schedulingRoutes } from "@/features/scheduling/routes";
 
-import { SchoolConfigPage } from "@/features/settings/school-config/pages/SchoolConfigPage";
 import { ParentsPage } from "@/features/users/parents/pages/ParentsPage";
 import { StudentsPage } from "@/features/users/students/pages/StudentsPage";
 import { ClassesPage } from "@/features/academics/pages/ClassesPage";

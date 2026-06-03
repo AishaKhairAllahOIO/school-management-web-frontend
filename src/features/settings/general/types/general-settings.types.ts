@@ -39,8 +39,6 @@ export type GeneralSettings = {
   openingTime: string;
   closingTime: string;
 
-  academicYear: string;
-
   createdAt: string;
   updatedAt: string;
 };
@@ -49,3 +47,5 @@ export type UpdateGeneralSettingsPayload = Omit<
   GeneralSettings,
   "id" | "logoUrl" | "images" | "createdAt" | "updatedAt"
 >;
+
+
