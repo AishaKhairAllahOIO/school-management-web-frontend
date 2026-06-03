@@ -17,6 +17,7 @@ import { StaffAttendancePage } from "@/features/attendance/staff/pages/StaffAtte
 import { LeaveRequestsPage } from "@/features/attendance/Leave Requests/pages/LeaveRequestsPage";
 import { ClassroomsPage } from "@/features/academics/classrooms/pages/ClassroomsPage";
 import { GradesPage } from "@/features/academics/grades/pages/GradesPage";
+import { GradeSubjectsPage } from "@/features/academics/grade-subjects/pages/GradeSubjectsPage";
 
 import { SubjectsPage } from "@/features/academics/subjects/pages/SubjectsPage";
 
@@ -55,12 +56,12 @@ export const appRoutes = [
   children: [
     { index: true, element: <Navigate to="classes" replace /> },
     
-    { path: "classes", element: <PlaceholderPage title="Sections" /> },
     { path: "grades", element: <GradesPage /> },
     { path: "subjects", element: <SubjectsPage /> },
     { path: "classrooms", element: <ClassroomsPage /> },
-    { path: "curriculum", element: <PlaceholderPage title="Curriculum" /> },
-    { path: "promotions", element: <PlaceholderPage title="Promotions" /> },
+        { path: "gradeSubject", element: < GradeSubjectsPage/> },
+
+   
   ],
 },
 

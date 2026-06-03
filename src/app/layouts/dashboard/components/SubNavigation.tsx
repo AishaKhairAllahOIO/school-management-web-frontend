@@ -13,7 +13,6 @@ import {
   GraduationCap,
   HeartHandshake,
   LockKeyhole,
-  Settings,
   ShieldCheck,
   UserCheck,
   UserCog,
@@ -73,11 +72,10 @@ const subNavigationItems: SubNavigationSection[] = [
     basePath: "/academics",
     items: [
       { title: "grades", path: "/academics/grades", icon: BookOpen },
-      { title: "Sections", path: "/academics/sections", icon: CalendarDays },
       { title: "Subjects", path: "/academics/subjects", icon: FileText },
       { title: "Classrooms", path: "/academics/classrooms", icon: BookOpen },
-      { title: "Curriculum", path: "/academics/curriculum", icon: GraduationCap },
-      { title: "Promotions", path: "/academics/promotions", icon: UserCheck },
+      { title: "Grade Subject", path: "/academics/gradeSubject", icon: BookOpen },
+      
     ],
   },
   {
