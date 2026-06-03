@@ -72,7 +72,7 @@ const subNavigationItems: SubNavigationSection[] = [
   {
     basePath: "/academics",
     items: [
-      { title: "Classes", path: "/academics/classes", icon: BookOpen },
+      { title: "grades", path: "/academics/grades", icon: BookOpen },
       { title: "Sections", path: "/academics/sections", icon: CalendarDays },
       { title: "Subjects", path: "/academics/subjects", icon: FileText },
       { title: "Classrooms", path: "/academics/classrooms", icon: BookOpen },

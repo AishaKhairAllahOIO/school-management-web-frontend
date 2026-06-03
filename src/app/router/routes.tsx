@@ -6,7 +6,6 @@ import { reportsRoutes } from "@/features/reports/routes";
 
 import { ParentsPage } from "@/features/users/parents/pages/ParentsPage";
 import { StudentsPage } from "@/features/users/students/pages/StudentsPage";
-import { ClassesPage } from "@/features/academics/pages/ClassesPage";
 import { TeachersPage } from "@/features/users/teachers/pages/TeachersPage";
 import { RolesPage } from "@/features/settings/roles/pages/RolesPage";
 import { PermissionsPage } from "@/features/settings/permissions/pages/PermissionsPage";
@@ -16,6 +15,11 @@ import { SecuritySettingsPage } from "@/features/settings/security/pages/Securit
 import { StudentAttendancePage } from "@/features/attendance/students/pages/StudentAttendancePage";
 import { StaffAttendancePage } from "@/features/attendance/staff/pages/StaffAttendancePage";
 import { LeaveRequestsPage } from "@/features/attendance/Leave Requests/pages/LeaveRequestsPage";
+import { ClassroomsPage } from "@/features/academics/classrooms/pages/ClassroomsPage";
+import { GradesPage } from "@/features/academics/grades/pages/GradesPage";
+
+import { SubjectsPage } from "@/features/academics/subjects/pages/SubjectsPage";
+
 
 function PlaceholderPage({ title }: { title: string }) {
   return (
@@ -50,10 +54,11 @@ export const appRoutes = [
   path: "academics",
   children: [
     { index: true, element: <Navigate to="classes" replace /> },
-    { path: "classes", element: <ClassesPage /> },
-    { path: "sections", element: <PlaceholderPage title="Sections" /> },
-    { path: "subjects", element: <PlaceholderPage title="Subjects" /> },
-    { path: "classrooms", element: <PlaceholderPage title="Classrooms" /> },
+    
+    { path: "classes", element: <PlaceholderPage title="Sections" /> },
+    { path: "grades", element: <GradesPage /> },
+    { path: "subjects", element: <SubjectsPage /> },
+    { path: "classrooms", element: <ClassroomsPage /> },
     { path: "curriculum", element: <PlaceholderPage title="Curriculum" /> },
     { path: "promotions", element: <PlaceholderPage title="Promotions" /> },
   ],
