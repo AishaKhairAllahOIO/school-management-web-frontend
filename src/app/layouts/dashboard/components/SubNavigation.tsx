@@ -85,6 +85,7 @@ const subNavigationItems: SubNavigationSection[] = [
     items: [
       { title: "Students", path: "/attendance/students", icon: Users },
       { title: "Staff", path: "/attendance/staff", icon: UserCheck },
+      { title: "Vacations", path: "/attendance/vacations", icon: CalendarDays },
     ],
   },
   {

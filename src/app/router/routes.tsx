@@ -2,6 +2,7 @@ import { Navigate } from "react-router-dom";
 
 import { dashboardRoutes } from "@/features/dashboard/routes";
 import { schedulingRoutes } from "@/features/scheduling/routes";
+import { reportsRoutes } from "@/features/reports/routes";
 
 import { ParentsPage } from "@/features/users/parents/pages/ParentsPage";
 import { StudentsPage } from "@/features/users/students/pages/StudentsPage";
@@ -12,6 +13,9 @@ import { PermissionsPage } from "@/features/settings/permissions/pages/Permissio
 import { GeneralSettingsPage } from "@/features/settings/general/pages/GeneralSettingsPage";
 import { AcademicSettingsPage } from "@/features/settings/academic/pages/AcademicSettingsPage";
 import { SecuritySettingsPage } from "@/features/settings/security/pages/SecuritySettingsPage";
+import { StudentAttendancePage } from "@/features/attendance/students/pages/StudentAttendancePage";
+import { StaffAttendancePage } from "@/features/attendance/staff/pages/StaffAttendancePage";
+import { LeaveRequestsPage } from "@/features/attendance/Leave Requests/pages/LeaveRequestsPage";
 
 function PlaceholderPage({ title }: { title: string }) {
   return (
@@ -59,12 +63,14 @@ export const appRoutes = [
     path: "attendance",
     children: [
       { index: true, element: <Navigate to="students" replace /> },
-      { path: "students", element: <PlaceholderPage title="Students Attendance" /> },
-      { path: "staff", element: <PlaceholderPage title="Staff Attendance" /> },
+      { path: "students", element: <StudentAttendancePage/> },
+      { path: "staff", element: <StaffAttendancePage /> },
+      { path: "vacations", element: < LeaveRequestsPage /> },
     ],
   },
 
   schedulingRoutes,
+  reportsRoutes,
 
   {
     path: "finance",
