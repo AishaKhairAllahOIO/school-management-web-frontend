@@ -15,8 +15,7 @@ export function AuthLayout() {
             hidden
             overflow-hidden
             bg-gradient-to-br
-            from-primary
-            to-primary-dark
+            sidebar-gradient
             lg:flex
             lg:flex-col
             lg:justify-center
@@ -106,7 +105,7 @@ export function AuthLayout() {
                 bg-card
                 text-2xl
                 font-bold
-                text-primary
+                text-sidebar-active
                 shadow-soft
               "
             >
