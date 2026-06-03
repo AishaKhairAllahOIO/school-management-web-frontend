@@ -1,36 +1,39 @@
-import { CalendarDays, Edit3, Plus, Save, Trash2 } from "lucide-react";
+import type { InputHTMLAttributes, SelectHTMLAttributes } from "react";
+import {
+  Award,
+  CalendarDays,
+  CheckCircle2,
+  Edit3,
+  GraduationCap,
+  Percent,
+  Plus,
+  Save,
+  Settings2,
+  Trash2,
+} from "lucide-react";
 
-const terms = [
-  { name: "First Term", type: "Term", startDate: "Aug 01, 2024", endDate: "Oct 31, 2024", status: "Active" },
-  { name: "Second Term", type: "Term", startDate: "Nov 01, 2024", endDate: "Jan 31, 2025", status: "Active" },
-  { name: "Third Term", type: "Term", startDate: "Feb 01, 2025", endDate: "Apr 30, 2025", status: "Active" },
-  { name: "Summer Term", type: "Term", startDate: "May 01, 2025", endDate: "Jul 31, 2025", status: "Upcoming" },
-];
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useEffect } from "react";
+import { useFieldArray, useForm } from "react-hook-form";
 
-const gradeScale = [
-  { grade: "A", min: "90", max: "100", label: "Excellent", className: "bg-success/10 text-success" },
-  { grade: "B", min: "80", max: "89", label: "Very Good", className: "bg-info/10 text-info" },
-  { grade: "C", min: "70", max: "79", label: "Good", className: "bg-warning/10 text-warning" },
-  { grade: "D", min: "60", max: "69", label: "Pass", className: "bg-primary/10 text-primary" },
-  { grade: "F", min: "0", max: "59", label: "Fail", className: "bg-destructive/10 text-destructive" },
-];
-
-const preferences = [
-  { title: "Auto Promote Students", description: "Automatically promote students to next class", enabled: true },
-  { title: "Allow Student Repeating", description: "Allow students to repeat classes", enabled: true },
-  { title: "Calculate GPA", description: "Enable GPA calculation for students", enabled: true },
-  { title: "Rank Students", description: "Enable ranking of students in classes", enabled: true },
-  { title: "Use Attendance in Promotion", description: "Consider attendance in promotion decision", enabled: false },
-];
+import {
+  useAcademicSettings,
+  useUpdateAcademicSettings,
+} from "@/features/settings/academic/hooks/useAcademicSettings";
+import {
+  academicSettingsSchema,
+  type AcademicSettingsFormValues,
+} from "@/features/settings/academic/schemas/academic-settings.schema";
 
 function SelectField({
   label,
-  value,
   options,
-}: {
+  error,
+  ...props
+}: SelectHTMLAttributes<HTMLSelectElement> & {
   label: string;
-  value: string;
-  options: string[];
+  options: { label: string; value: string }[];
+  error?: string;
 }) {
   return (
     <label className="block min-w-0">
@@ -39,23 +42,32 @@ function SelectField({
       </span>
 
       <select
-        defaultValue={value}
+        {...props}
         className="h-10 w-full rounded-xl border border-border/70 bg-card px-3 text-xs font-semibold text-foreground outline-none transition focus:border-primary/50 focus:ring-4 focus:ring-primary/10"
       >
         {options.map((option) => (
-          <option key={option}>{option}</option>
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
         ))}
       </select>
+
+      {error ? (
+        <p className="mt-1 text-[10px] font-semibold text-destructive">
+          {error}
+        </p>
+      ) : null}
     </label>
   );
 }
 
 function TextField({
   label,
-  value,
-}: {
+  error,
+  ...props
+}: InputHTMLAttributes<HTMLInputElement> & {
   label: string;
-  value: string | number;
+  error?: string;
 }) {
   return (
     <label className="block min-w-0">
@@ -64,17 +76,30 @@ function TextField({
       </span>
 
       <input
-        defaultValue={value}
+        {...props}
         className="h-10 w-full rounded-xl border border-border/70 bg-card px-3 text-xs font-semibold text-foreground outline-none transition focus:border-primary/50 focus:ring-4 focus:ring-primary/10"
       />
+
+      {error ? (
+        <p className="mt-1 text-[10px] font-semibold text-destructive">
+          {error}
+        </p>
+      ) : null}
     </label>
   );
 }
 
-function Toggle({ enabled }: { enabled: boolean }) {
+function Toggle({
+  enabled,
+  onClick,
+}: {
+  enabled: boolean;
+  onClick: () => void;
+}) {
   return (
     <button
       type="button"
+      onClick={onClick}
       className={[
         "relative h-6 w-11 shrink-0 rounded-full transition",
         enabled ? "bg-primary" : "bg-muted",
@@ -93,29 +118,197 @@ function Toggle({ enabled }: { enabled: boolean }) {
 function SectionTitle({
   title,
   description,
+  icon: Icon,
 }: {
   title: string;
   description: string;
+  icon: typeof CalendarDays;
 }) {
   return (
-    <div>
-      <h2 className="text-sm font-bold text-foreground">{title}</h2>
-      <p className="mt-1.5 text-xs text-muted-foreground">{description}</p>
+    <div className="flex items-start gap-3">
+      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+        <Icon size={18} />
+      </span>
+
+      <div>
+        <h2 className="text-sm font-bold text-foreground">{title}</h2>
+        <p className="mt-1.5 text-xs text-muted-foreground">{description}</p>
+      </div>
     </div>
   );
 }
 
-export function AcademicSettingsPage() {
+function StatCard({
+  label,
+  value,
+  icon: Icon,
+}: {
+  label: string;
+  value: string;
+  icon: typeof CalendarDays;
+}) {
   return (
-    <div className="soft-card rounded-3xl p-5">
+    <div className="rounded-3xl border border-border/70 bg-card p-4 shadow-soft">
+      <div className="flex items-center gap-3">
+        <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+          <Icon size={19} />
+        </span>
+
+        <div>
+          <p className="text-[11px] font-semibold text-muted-foreground">
+            {label}
+          </p>
+          <p className="mt-1 text-lg font-bold text-foreground">{value}</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function getGradeClass(index: number) {
+  const classes = [
+    "bg-success/10 text-success",
+    "bg-info/10 text-info",
+    "bg-warning/10 text-warning",
+    "bg-primary/10 text-primary",
+    "bg-destructive/10 text-destructive",
+  ];
+
+  return classes[index % classes.length];
+}
+
+export function AcademicSettingsPage() {
+  const { data, isLoading, isError } = useAcademicSettings();
+  const updateMutation = useUpdateAcademicSettings();
+
+  const {
+    register,
+    control,
+    handleSubmit,
+    reset,
+    watch,
+    setValue,
+    formState: { errors, isDirty },
+  } = useForm<AcademicSettingsFormValues>({
+    resolver: zodResolver(academicSettingsSchema),
+  });
+
+  const termsArray = useFieldArray({
+    control,
+    name: "terms",
+  });
+
+  const gradeScaleArray = useFieldArray({
+    control,
+    name: "gradeScale",
+  });
+
+  useEffect(() => {
+    if (!data) return;
+
+    reset({
+      currentAcademicYearId: data.currentAcademicYearId,
+      academicYears: data.academicYears,
+      terms: data.terms,
+      gradeScale: data.gradeScale.map((item) => ({
+        ...item,
+        minimumScore: String(item.minimumScore),
+        maximumScore: String(item.maximumScore),
+      })),
+      preferences: data.preferences,
+      passingGrade: data.passingGrade,
+      maximumGrade: String(data.maximumGrade),
+      gpaScale: data.gpaScale,
+      minimumAttendancePercentage: String(data.minimumAttendancePercentage),
+      promotionThreshold: String(data.promotionThreshold),
+    });
+  }, [data, reset]);
+
+  if (isLoading) {
+    return (
+      <div className="soft-card rounded-3xl p-5 text-sm font-semibold text-muted-foreground">
+        Loading academic settings...
+      </div>
+    );
+  }
+
+  if (isError || !data) {
+    return (
+      <div className="soft-card rounded-3xl p-5">
+        <h2 className="text-base font-bold text-foreground">
+          Failed to load academic settings
+        </h2>
+
+        <p className="mt-2 text-sm text-muted-foreground">
+          Please refresh the page or try again later.
+        </p>
+      </div>
+    );
+  }
+
+  const academicYears = watch("academicYears") ?? [];
+  const terms = watch("terms") ?? [];
+  const gradeScale = watch("gradeScale") ?? [];
+  const currentAcademicYearId = watch("currentAcademicYearId");
+  const currentYear = academicYears.find(
+    (year) => year.id === currentAcademicYearId
+  );
+  const preferences = watch("preferences");
+
+  function onSubmit(values: AcademicSettingsFormValues) {
+    updateMutation.mutate({
+      ...values,
+      gradeScale: values.gradeScale.map((item) => ({
+        ...item,
+        minimumScore: Number(item.minimumScore),
+        maximumScore: Number(item.maximumScore),
+      })),
+      maximumGrade: Number(values.maximumGrade),
+      minimumAttendancePercentage: Number(values.minimumAttendancePercentage),
+      promotionThreshold: Number(values.promotionThreshold),
+    });
+  }
+
+  return (
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      className="soft-card rounded-3xl p-5"
+    >
       <div className="mb-5">
         <h1 className="text-[24px] font-bold tracking-[-0.04em] text-foreground">
           Academic Settings
         </h1>
 
         <p className="mt-2 text-sm text-muted-foreground">
-          Manage all academic related settings and configurations for your school.
+          Manage academic years, terms, grading, promotion rules, and academic
+          preferences.
         </p>
+      </div>
+
+      <div className="mb-4 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <StatCard
+          label="Current Year"
+          value={currentYear?.name ?? "—"}
+          icon={CalendarDays}
+        />
+
+        <StatCard
+          label="Terms"
+          value={String(terms.length)}
+          icon={GraduationCap}
+        />
+
+        <StatCard
+          label="GPA Scale"
+          value={watch("gpaScale") ?? "—"}
+          icon={Award}
+        />
+
+        <StatCard
+          label="Promotion"
+          value={`${watch("promotionThreshold") ?? "—"}%`}
+          icon={Percent}
+        />
       </div>
 
       <div className="grid gap-4 min-[1024px]:grid-cols-2">
@@ -123,24 +316,38 @@ export function AcademicSettingsPage() {
           <SectionTitle
             title="Academic Year"
             description="Configure the current academic year"
+            icon={CalendarDays}
           />
 
           <div className="mt-5 grid gap-4 min-[760px]:grid-cols-[1fr_116px]">
             <div className="grid gap-4 sm:grid-cols-2">
               <SelectField
                 label="Current Academic Year"
-                value="2024 - 2025"
-                options={["2024 - 2025", "2025 - 2026", "2026 - 2027"]}
+                options={academicYears.map((year) => ({
+                  label: year.name,
+                  value: year.id,
+                }))}
+                error={errors.currentAcademicYearId?.message}
+                {...register("currentAcademicYearId")}
               />
 
-              <SelectField
-                label="Year Format"
-                value="2024 - 2025"
-                options={["2024 - 2025", "2025 - 2026", "2026 - 2027"]}
+              <TextField
+                label="Year Name"
+                value={currentYear?.name ?? ""}
+                readOnly
               />
 
-              <TextField label="Start Date" value="Aug 01, 2024" />
-              <TextField label="End Date" value="Jul 31, 2025" />
+              <TextField
+                label="Start Date"
+                value={currentYear?.startDate ?? ""}
+                readOnly
+              />
+
+              <TextField
+                label="End Date"
+                value={currentYear?.endDate ?? ""}
+                readOnly
+              />
             </div>
 
             <div className="hidden items-center justify-center rounded-3xl bg-primary/10 text-primary min-[760px]:flex">
@@ -154,10 +361,20 @@ export function AcademicSettingsPage() {
             <SectionTitle
               title="Terms & Semesters"
               description="Manage terms or semesters for the academic year"
+              icon={GraduationCap}
             />
 
             <button
               type="button"
+              onClick={() =>
+                termsArray.append({
+                  id: crypto.randomUUID(),
+                  name: "New Term",
+                  startDate: "",
+                  endDate: "",
+                  status: "upcoming",
+                })
+              }
               className="flex h-9 shrink-0 items-center gap-2 rounded-xl bg-primary px-3 text-[11px] font-bold text-primary-foreground shadow-soft transition hover:bg-primary/90"
             >
               <Plus size={14} />
@@ -169,57 +386,68 @@ export function AcademicSettingsPage() {
             <table className="w-full table-fixed text-left">
               <thead>
                 <tr className="border-b border-border/70 text-[10px] font-semibold text-muted-foreground">
-                  <th className="w-[23%] px-3 py-2.5">Term Name</th>
-                  <th className="w-[13%] px-3 py-2.5">Type</th>
+                  <th className="w-[25%] px-3 py-2.5">Term Name</th>
                   <th className="w-[20%] px-3 py-2.5">Start Date</th>
                   <th className="w-[20%] px-3 py-2.5">End Date</th>
-                  <th className="w-[13%] px-3 py-2.5">Status</th>
-                  <th className="w-[11%] px-3 py-2.5 text-center">Actions</th>
+                  <th className="w-[18%] px-3 py-2.5">Status</th>
+                  <th className="w-[17%] px-3 py-2.5 text-center">Actions</th>
                 </tr>
               </thead>
 
               <tbody>
-                {terms.map((term) => (
+                {termsArray.fields.map((term, index) => (
                   <tr
-                    key={term.name}
+                    key={term.id}
                     className="border-b border-border/60 last:border-0"
                   >
-                    <td className="truncate px-3 py-2.5 text-[11px] font-bold text-foreground">
-                      {term.name}
-                    </td>
-
-                    <td className="px-3 py-2.5 text-[11px] text-muted-foreground">
-                      {term.type}
-                    </td>
-
-                    <td className="truncate px-3 py-2.5 text-[11px] text-muted-foreground">
-                      {term.startDate}
-                    </td>
-
-                    <td className="truncate px-3 py-2.5 text-[11px] text-muted-foreground">
-                      {term.endDate}
+                    <td className="px-3 py-2.5">
+                      <input
+                        {...register(`terms.${index}.name`)}
+                        className="h-8 w-full rounded-lg border border-border/70 bg-card px-2 text-[11px] font-semibold text-foreground outline-none"
+                      />
                     </td>
 
                     <td className="px-3 py-2.5">
-                      <span
-                        className={[
-                          "rounded-full px-2 py-0.5 text-[9px] font-bold",
-                          term.status === "Active"
-                            ? "bg-success/10 text-success"
-                            : "bg-info/10 text-info",
-                        ].join(" ")}
+                      <input
+                        type="date"
+                        {...register(`terms.${index}.startDate`)}
+                        className="h-8 w-full rounded-lg border border-border/70 bg-card px-2 text-[11px] font-semibold text-foreground outline-none"
+                      />
+                    </td>
+
+                    <td className="px-3 py-2.5">
+                      <input
+                        type="date"
+                        {...register(`terms.${index}.endDate`)}
+                        className="h-8 w-full rounded-lg border border-border/70 bg-card px-2 text-[11px] font-semibold text-foreground outline-none"
+                      />
+                    </td>
+
+                    <td className="px-3 py-2.5">
+                      <select
+                        {...register(`terms.${index}.status`)}
+                        className="h-8 w-full rounded-lg border border-border/70 bg-card px-2 text-[10px] font-bold text-foreground outline-none"
                       >
-                        {term.status}
-                      </span>
+                        <option value="active">Active</option>
+                        <option value="upcoming">Upcoming</option>
+                        <option value="completed">Completed</option>
+                      </select>
                     </td>
 
                     <td className="px-3 py-2.5">
                       <div className="flex justify-center gap-1">
-                        <button className="flex h-7 w-7 items-center justify-center rounded-lg border border-border/70 text-muted-foreground transition hover:bg-muted hover:text-foreground">
+                        <button
+                          type="button"
+                          className="flex h-7 w-7 items-center justify-center rounded-lg border border-border/70 text-muted-foreground transition hover:bg-muted hover:text-foreground"
+                        >
                           <Edit3 size={12} />
                         </button>
 
-                        <button className="flex h-7 w-7 items-center justify-center rounded-lg border border-border/70 text-muted-foreground transition hover:bg-muted hover:text-foreground">
+                        <button
+                          type="button"
+                          onClick={() => termsArray.remove(index)}
+                          className="flex h-7 w-7 items-center justify-center rounded-lg border border-border/70 text-muted-foreground transition hover:bg-muted hover:text-foreground"
+                        >
                           <Trash2 size={12} />
                         </button>
                       </div>
@@ -235,64 +463,86 @@ export function AcademicSettingsPage() {
           <SectionTitle
             title="Grading System"
             description="Configure the grading system for your school"
+            icon={Award}
           />
 
-          <div className="mt-5 grid gap-4 min-[760px]:grid-cols-[1fr_165px]">
-            <div className="min-w-0">
-              <div className="grid gap-3 sm:grid-cols-3">
-                <SelectField
-                  label="Grading System"
-                  value="Letter Grade"
-                  options={["Letter Grade", "Percentage", "Points"]}
-                />
+          <div className="mt-5 space-y-4">
+            <div className="grid gap-3 sm:grid-cols-3">
+              <SelectField
+                label="GPA Scale"
+                options={[
+                  { label: "4.0", value: "4.0" },
+                  { label: "5.0", value: "5.0" },
+                  { label: "100", value: "100" },
+                ]}
+                error={errors.gpaScale?.message}
+                {...register("gpaScale")}
+              />
 
-                <SelectField
-                  label="Passing Grade"
-                  value="D"
-                  options={["A", "B", "C", "D", "F"]}
-                />
+              <SelectField
+                label="Passing Grade"
+                options={[
+                  { label: "A", value: "A" },
+                  { label: "B", value: "B" },
+                  { label: "C", value: "C" },
+                  { label: "D", value: "D" },
+                  { label: "F", value: "F" },
+                ]}
+                error={errors.passingGrade?.message}
+                {...register("passingGrade")}
+              />
 
-                <TextField label="Total Grade (Max)" value="100" />
-              </div>
+              <TextField
+                label="Total Grade"
+                type="number"
+                error={errors.maximumGrade?.message}
+                {...register("maximumGrade")}
+              />
+            </div>
 
-              <div className="mt-4">
-                <p className="mb-2 text-[11px] font-semibold text-muted-foreground">
-                  Grade Scale
-                </p>
+            <div>
+              <p className="mb-2 text-[11px] font-semibold text-muted-foreground">
+                Grade Scale
+              </p>
 
-                <div className="space-y-1.5">
-                  {gradeScale.map((grade) => (
-                    <div
-                      key={grade.grade}
-                      className="grid grid-cols-[1fr_1fr_1fr_32px] gap-2"
+              <div className="space-y-1.5">
+                {gradeScaleArray.fields.map((grade, index) => (
+                  <div
+                    key={grade.id}
+                    className="grid grid-cols-[0.7fr_1fr_1fr_1.2fr_32px] gap-2"
+                  >
+                    <input
+                      {...register(`gradeScale.${index}.grade`)}
+                      className="h-8 min-w-0 rounded-lg border border-border/70 bg-card px-2 text-[11px] font-semibold text-foreground outline-none"
+                    />
+
+                    <input
+                      type="number"
+                      {...register(`gradeScale.${index}.minimumScore`)}
+                      className="h-8 min-w-0 rounded-lg border border-border/70 bg-card px-2 text-[11px] font-semibold text-foreground outline-none"
+                    />
+
+                    <input
+                      type="number"
+                      {...register(`gradeScale.${index}.maximumScore`)}
+                      className="h-8 min-w-0 rounded-lg border border-border/70 bg-card px-2 text-[11px] font-semibold text-foreground outline-none"
+                    />
+
+                    <input
+                      {...register(`gradeScale.${index}.description`)}
+                      className="h-8 min-w-0 rounded-lg border border-border/70 bg-card px-2 text-[11px] font-semibold text-foreground outline-none"
+                    />
+
+                    <button
+                      type="button"
+                      onClick={() => gradeScaleArray.remove(index)}
+                      className="flex h-8 w-8 items-center justify-center rounded-lg border border-border/70 text-muted-foreground transition hover:bg-muted hover:text-foreground"
                     >
-                      <input
-                        defaultValue={grade.grade}
-                        className="h-8 rounded-lg border border-border/70 bg-card px-2 text-[11px] font-semibold text-foreground outline-none"
-                      />
-
-                      <input
-                        defaultValue={grade.min}
-                        className="h-8 rounded-lg border border-border/70 bg-card px-2 text-[11px] font-semibold text-foreground outline-none"
-                      />
-
-                      <input
-                        defaultValue={grade.max}
-                        className="h-8 rounded-lg border border-border/70 bg-card px-2 text-[11px] font-semibold text-foreground outline-none"
-                      />
-
-                      <button className="flex h-8 w-8 items-center justify-center rounded-lg border border-border/70 text-muted-foreground transition hover:bg-muted hover:text-foreground">
-                        <Trash2 size={12} />
-                      </button>
-                    </div>
-                  ))}
-                </div>
+                      <Trash2 size={12} />
+                    </button>
+                  </div>
+                ))}
               </div>
-
-              <button className="mt-3 flex h-9 items-center gap-2 rounded-xl border border-border/70 px-3 text-[11px] font-bold text-foreground transition hover:bg-muted">
-                <Plus size={13} />
-                Add Grade
-              </button>
             </div>
 
             <div className="rounded-3xl bg-primary/5 p-3">
@@ -300,68 +550,157 @@ export function AcademicSettingsPage() {
                 Grade Scale Preview
               </h3>
 
-              <div className="space-y-2">
-                {gradeScale.map((grade) => (
+              <div className="grid gap-2 sm:grid-cols-2">
+                {gradeScale.map((grade, index) => (
                   <div
-                    key={grade.grade}
-                    className={`grid grid-cols-[20px_1fr_auto] items-center gap-2 rounded-xl px-2.5 py-2 text-[10px] font-bold ${grade.className}`}
+                    key={grade.id}
+                    className={[
+                      "grid grid-cols-[24px_1fr_auto] items-center gap-2 rounded-xl px-2.5 py-2 text-[10px] font-bold",
+                      getGradeClass(index),
+                    ].join(" ")}
                   >
-                    <span>{grade.grade}</span>
+                    <span>{grade.grade || "—"}</span>
                     <span>
-                      {grade.min} - {grade.max}
+                      {grade.minimumScore || "—"} - {grade.maximumScore || "—"}
                     </span>
-                    <span>{grade.label}</span>
+                    <span>{grade.description || "—"}</span>
                   </div>
                 ))}
               </div>
             </div>
+
+            <button
+              type="button"
+              onClick={() =>
+                gradeScaleArray.append({
+                  id: crypto.randomUUID(),
+                  grade: "",
+                  minimumScore: "",
+                  maximumScore: "",
+                  description: "",
+                })
+              }
+              className="flex h-9 items-center gap-2 rounded-xl border border-border/70 px-3 text-[11px] font-bold text-foreground transition hover:bg-muted"
+            >
+              <Plus size={13} />
+              Add Grade
+            </button>
           </div>
         </section>
 
         <section className="min-w-0 rounded-3xl border border-border/70 bg-card p-4">
           <SectionTitle
-            title="Other Academic Settings"
-            description="Configure other academic preferences"
+            title="Academic Rules"
+            description="Configure promotion, attendance, and ranking rules"
+            icon={Settings2}
           />
 
+          <div className="mt-5 grid gap-4 md:grid-cols-2">
+            <TextField
+              label="Minimum Attendance %"
+              type="number"
+              error={errors.minimumAttendancePercentage?.message}
+              {...register("minimumAttendancePercentage")}
+            />
+
+            <TextField
+              label="Promotion Threshold %"
+              type="number"
+              error={errors.promotionThreshold?.message}
+              {...register("promotionThreshold")}
+            />
+          </div>
+
           <div className="mt-4 overflow-hidden rounded-2xl border border-border/70">
-            {preferences.map((item, index) => (
-              <div
-                key={item.title}
-                className={[
-                  "flex items-center justify-between gap-4 px-4 py-3.5",
-                  index !== preferences.length - 1
-                    ? "border-b border-border/70"
-                    : "",
-                ].join(" ")}
-              >
-                <div>
-                  <p className="text-xs font-bold text-foreground">
-                    {item.title}
-                  </p>
+            {[
+              [
+                "autoPromoteStudents",
+                "Auto Promote Students",
+                "Automatically promote students to next class",
+              ],
+              [
+                "allowStudentRepeating",
+                "Allow Student Repeating",
+                "Allow students to repeat classes",
+              ],
+              [
+                "calculateGpa",
+                "Calculate GPA",
+                "Enable GPA calculation for students",
+              ],
+              [
+                "rankStudents",
+                "Rank Students",
+                "Enable ranking of students in classes",
+              ],
+              [
+                "useAttendanceInPromotion",
+                "Use Attendance in Promotion",
+                "Consider attendance in promotion decision",
+              ],
+            ].map(([key, title, description], index) => {
+              const fieldKey =
+                key as keyof AcademicSettingsFormValues["preferences"];
 
-                  <p className="mt-1 text-[11px] text-muted-foreground">
-                    {item.description}
-                  </p>
+              return (
+                <div
+                  key={key}
+                  className={[
+                    "flex items-center justify-between gap-4 px-4 py-3.5",
+                    index !== 4 ? "border-b border-border/70" : "",
+                  ].join(" ")}
+                >
+                  <div className="flex items-start gap-3">
+                    <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                      <CheckCircle2 size={15} />
+                    </span>
+
+                    <div>
+                      <p className="text-xs font-bold text-foreground">
+                        {title}
+                      </p>
+                      <p className="mt-1 text-[11px] text-muted-foreground">
+                        {description}
+                      </p>
+                    </div>
+                  </div>
+
+                  <Toggle
+                    enabled={Boolean(preferences?.[fieldKey])}
+                    onClick={() =>
+                      setValue(
+                        `preferences.${fieldKey}`,
+                        !preferences?.[fieldKey],
+                        { shouldDirty: true, shouldValidate: true }
+                      )
+                    }
+                  />
                 </div>
-
-                <Toggle enabled={item.enabled} />
-              </div>
-            ))}
+              );
+            })}
           </div>
         </section>
       </div>
 
       <div className="mt-5 flex justify-end gap-3 border-t border-border/70 pt-5">
-        <button className="h-10 rounded-xl border border-border/70 bg-card px-8 text-xs font-bold text-foreground transition hover:bg-muted">
+        <button
+          type="button"
+          onClick={() => reset()}
+          disabled={!isDirty || updateMutation.isPending}
+          className="h-10 rounded-xl border border-border/70 bg-card px-8 text-xs font-bold text-foreground transition hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50"
+        >
           Cancel
         </button>
 
-        <button className="flex h-10 items-center gap-2 rounded-xl bg-primary px-8 text-xs font-bold text-primary-foreground shadow-soft transition hover:bg-primary/90">
+        <button
+          type="submit"
+          disabled={updateMutation.isPending}
+          className="flex h-10 items-center gap-2 rounded-xl bg-primary px-8 text-xs font-bold text-primary-foreground shadow-soft transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-70"
+        >
           <Save size={15} />
-          Save Changes
+          {updateMutation.isPending ? "Saving..." : "Save Changes"}
         </button>
       </div>
-    </div>
+    </form>
   );
 }

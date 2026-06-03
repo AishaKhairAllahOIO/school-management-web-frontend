@@ -30,7 +30,6 @@ export const generalSettingsSchema = z.object({
   openingTime: z.string().min(1, "Opening time is required"),
   closingTime: z.string().min(1, "Closing time is required"),
 
-  academicYear: z.string().min(1, "Academic year is required"),
 });
 
 export type GeneralSettingsFormValues = z.infer<

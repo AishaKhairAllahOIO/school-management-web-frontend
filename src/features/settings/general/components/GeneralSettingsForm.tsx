@@ -473,13 +473,7 @@ export function GeneralSettingsForm({ initialData }: GeneralSettingsFormProps) {
                   {...register("closingTime")}
                 />
 
-                <SelectInput
-                  label="Academic Year"
-                  required
-                  options={["2024 - 2025", "2025 - 2026", "2026 - 2027"]}
-                  error={errors.academicYear?.message}
-                  {...register("academicYear")}
-                />
+               
               </div>
             </section>
 
@@ -548,7 +542,6 @@ export function GeneralSettingsForm({ initialData }: GeneralSettingsFormProps) {
     city: watchedValues.city,
     country: watchedValues.country,
     logoUrl: initialData.logoUrl,
-    academicYear: watchedValues.academicYear,
     openingTime: watchedValues.openingTime,
     closingTime: watchedValues.closingTime,
   }}
