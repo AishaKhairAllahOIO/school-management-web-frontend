@@ -2,6 +2,7 @@ import { Navigate } from "react-router-dom";
 
 import { dashboardRoutes } from "@/features/dashboard/routes";
 import { schedulingRoutes } from "@/features/scheduling/routes";
+import { reportsRoutes } from "@/features/reports/routes";
 
 import { SchoolConfigPage } from "@/features/settings/school-config/pages/SchoolConfigPage";
 import { ParentsPage } from "@/features/users/parents/pages/ParentsPage";
@@ -70,6 +71,7 @@ export const appRoutes = [
   },
 
   schedulingRoutes,
+  reportsRoutes,
 
   {
     path: "finance",
