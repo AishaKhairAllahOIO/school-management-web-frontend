@@ -11,12 +11,18 @@ export type TeacherUser = BaseUser & EmploymentInformation & {
 subjectIds: string[];
 };
 
-export type TeacherClassroomAssignment = {
+
+export type TeacherAssignment = {
   id: string;
 
   teacherId: string;
-
   classroomId: string;
+  subjectId: string;
 
-subjectIds: string[];
+  academicYearId: string;
+
+  isActive: boolean;
+
+  createdAt: string;
+  updatedAt: string;
 };

@@ -1,11 +1,6 @@
 import { Edit3, Eye, Phone, Trash2 } from "lucide-react";
 
-import { StudentAcademicStatusBadge } from "@/features/users/students/components/StudentAcademicStatusBadge";
-import { studentsMock } from "@/features/users/students/data/students.mock";
-
-function formatGrade(value: string) {
-  return value.replace("_", " ").replace("grade", "Grade");
-}
+import { studentsMock } from "@/features/users/students/mocks/students.mock";
 
 export function StudentsTable() {
   return (
@@ -71,23 +66,13 @@ export function StudentsTable() {
                   </p>
                 </td>
 
-                <td className="px-6 py-4">
-                  <span className="inline-flex rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
-                    {formatGrade(student.grade)}
-                  </span>
-                </td>
 
                 <td className="px-6 py-4 text-sm text-muted-foreground">
                   {student.classroomId}
                 </td>
 
-                <td className="px-6 py-4 text-sm text-muted-foreground">
-                  {student.enrollmentDate}
-                </td>
+              
 
-                <td className="px-6 py-4">
-                  <StudentAcademicStatusBadge status={student.academicStatus} />
-                </td>
 
                 <td className="px-6 py-4">
                   <div className="flex justify-center gap-2">

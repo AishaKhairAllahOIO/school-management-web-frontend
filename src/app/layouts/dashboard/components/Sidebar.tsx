@@ -5,6 +5,7 @@ import {
   GraduationCap,
 } from "lucide-react";
 
+import sidebar from "@/assets/images/sidebar.png";
 import { SidebarMenu } from "@/app/layouts/dashboard/components/SidebarMenu";
 import { useLayoutStore } from "@/app/layouts/dashboard/store/layoutStore";
 import { schoolConfigMock } from "@/features/settings/school-config/mocks/school-config.mock";
@@ -41,25 +42,34 @@ export function Sidebar() {
           : "w-[242px] grid-cols-[56px_1fr] grid-rows-[76px_1fr_auto]",
       ].join(" ")}
     >
+      <div
+        className="pointer-events-none absolute inset-0 z-0 rounded-r-3xl"
+        style={{
+          backgroundImage: `url(${sidebar})`,
+          backgroundPosition: "center",
+          backgroundRepeat: "repeat",
+          backgroundSize: "350px",
+          opacity: 0.12,
+          mixBlendMode: "difference",
+          filter: "brightness(1.15)",
+        }}
+      />
+
       {isCollapsed && (
         <button
           type="button"
           onClick={toggleSidebar}
           aria-label="Expand sidebar"
-          className="absolute left-[62px] top-6 z-[80] flex h-8 w-8 items-center justify-center rounded-full border border-border/70 bg-card text-primary shadow-soft transition duration-300 hover:scale-105 hover:bg-accent"
+          className="absolute left-[62px] top-6 z-[100] flex h-8 w-8 items-center justify-center rounded-full border border-border/70 bg-card text-primary shadow-soft transition duration-300 hover:scale-105 hover:bg-accent"
         >
           <ChevronRight size={15} />
         </button>
       )}
 
-      <div className="row-span-3 flex flex-col items-center rounded-r-3xl bg-white/8">
+      <div className="relative z-10 row-span-3 flex flex-col items-center rounded-r-3xl bg-white/8">
         <div className="flex h-[76px] items-center justify-center">
           {isCollapsed ? (
-            <GraduationCap
-              size={26}
-              strokeWidth={1.8}
-              className="text-white"
-            />
+            <GraduationCap size={26} strokeWidth={1.8} className="text-white" />
           ) : null}
         </div>
 
@@ -68,7 +78,7 @@ export function Sidebar() {
 
       {!isCollapsed && (
         <>
-          <div className="flex h-[76px] items-center justify-between gap-3 border-b border-white/10 pl-6 pr-4">
+          <div className="relative z-10 flex h-[76px] items-center justify-between gap-3 border-b border-white/10 pl-6 pr-4">
             <div className="flex min-w-0 items-center gap-3">
               <span className="flex h-10 w-10 shrink-0 items-center justify-center text-white">
                 <GraduationCap size={26} strokeWidth={1.8} />
@@ -98,11 +108,11 @@ export function Sidebar() {
             </button>
           </div>
 
-          <div className="min-h-0 overflow-visible px-3 pt-3">
+          <div className="relative z-10 min-h-0 overflow-visible px-3 pt-3">
             <SidebarMenu variant="labels" />
           </div>
 
-          <div className="border-t border-white/10 px-4 pb-4 pt-4">
+          <div className="relative z-10 border-t border-white/10 px-4 pb-4 pt-4">
             <a
               href={schoolWebsiteUrl}
               target="_blank"
@@ -110,7 +120,6 @@ export function Sidebar() {
               className="flex h-10 items-center justify-between rounded-2xl bg-white/5 px-3 text-[11px] font-semibold text-white/75 transition hover:bg-white/10 hover:text-white"
             >
               <span>School Website</span>
-
               <ExternalLink size={13} strokeWidth={1.8} />
             </a>
           </div>

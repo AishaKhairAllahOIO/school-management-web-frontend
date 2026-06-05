@@ -6,10 +6,8 @@ export const studentsMock: StudentUser[] = [
     category: "student",
     studentCode: "STD-001",
     parentId: "parent-1",
-    grade: "grade_9",
+    gradeId: "ninth",
     classroomId: "classroom-9a",
-    enrollmentDate: "2023-09-01",
-    academicStatus: "studying",
 
     firstName: "Emma",
     lastName: "Johnson",
@@ -18,7 +16,7 @@ export const studentsMock: StudentUser[] = [
     birthDate: "2010-04-12",
     birthPlace: "Amsterdam",
     gender: "female",
-    nationality: "dutch",
+    nationality: "palestinian",
     address: "Amsterdam, Netherlands",
     phoneNumber: "+31 612 345 678",
     photoUrl:
@@ -34,10 +32,8 @@ export const studentsMock: StudentUser[] = [
     category: "student",
     studentCode: "STD-002",
     parentId: "parent-2",
-    grade: "grade_10",
+    gradeId: "seventh",
     classroomId: "classroom-10b",
-    enrollmentDate: "2022-09-01",
-    academicStatus: "passed",
 
     firstName: "Liam",
     lastName: "Brown",
@@ -46,7 +42,7 @@ export const studentsMock: StudentUser[] = [
     birthDate: "2009-07-21",
     birthPlace: "Rotterdam",
     gender: "male",
-    nationality: "dutch",
+    nationality: "palestinian",
     address: "Rotterdam, Netherlands",
     phoneNumber: "+31 623 456 789",
     photoUrl:
