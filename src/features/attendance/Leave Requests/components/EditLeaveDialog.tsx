@@ -3,11 +3,11 @@ import { Edit2 } from "lucide-react";
 import { Button } from "@/shared/ui/button";
 
 import type {
-  StaffLeave,
+  LeaveRequest,
 } from "../types/staffLeave.types";
 
 interface Props {
-  leave: StaffLeave;
+  leave: LeaveRequest;
 }
 
 export const EditLeaveDialog = ({

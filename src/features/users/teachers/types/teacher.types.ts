@@ -1,6 +1,5 @@
 import type { BaseUser } from "../../shared/types/base-user.types";
 import type { EmploymentInformation } from "../../shared/types/employment.types";
-import type { SchoolSubject } from "../../../settings/school-config/types/school.enums";
 
 export type TeacherUser = BaseUser & EmploymentInformation & {
   category: "teacher";
@@ -9,15 +8,21 @@ export type TeacherUser = BaseUser & EmploymentInformation & {
 
   teacherEmail: string;
 
-  subjects: SchoolSubject[];
+subjectIds: string[];
 };
 
-export type TeacherClassroomAssignment = {
+
+export type TeacherAssignment = {
   id: string;
 
   teacherId: string;
-
   classroomId: string;
+  subjectId: string;
 
-  subject: SchoolSubject;
+  academicYearId: string;
+
+  isActive: boolean;
+
+  createdAt: string;
+  updatedAt: string;
 };

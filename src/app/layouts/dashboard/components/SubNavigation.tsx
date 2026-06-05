@@ -4,8 +4,10 @@ import lottie from "lottie-web";
 import { NavLink, useLocation } from "react-router-dom";
 
 import {
+  Award,
   Bell,
   BookOpen,
+  BookOpenCheck,
   Briefcase,
   Building2,
   CalendarDays,
@@ -13,10 +15,10 @@ import {
   GraduationCap,
   HeartHandshake,
   LockKeyhole,
-  Settings,
   ShieldCheck,
   UserCheck,
   UserCog,
+  UserRoundCheck,
   Users,
   Wallet,
 } from "lucide-react";
@@ -72,12 +74,25 @@ const subNavigationItems: SubNavigationSection[] = [
   {
     basePath: "/academics",
     items: [
-      { title: "Classes", path: "/academics/classes", icon: BookOpen },
-      { title: "Sections", path: "/academics/sections", icon: CalendarDays },
-      { title: "Subjects", path: "/academics/subjects", icon: FileText },
-      { title: "Classrooms", path: "/academics/classrooms", icon: BookOpen },
-      { title: "Curriculum", path: "/academics/curriculum", icon: GraduationCap },
-      { title: "Promotions", path: "/academics/promotions", icon: UserCheck },
+      { title: "Grades", path: "/academics/grades", icon: GraduationCap },
+      { title: "Subjects", path: "/academics/subjects", icon: BookOpen },
+      { title: "Classrooms", path: "/academics/classrooms", icon: Building2 },
+      {
+        title: "Grade Subjects",
+        path: "/academics/grade-subjects",
+        icon: BookOpenCheck,
+      },
+      {
+        title: "Student Enrollments",
+        path: "/academics/student-enrollments",
+        icon: UserRoundCheck,
+      },
+      {
+        title: "Teacher Assignments",
+        path: "/academics/teacher-assignments",
+        icon: UserCheck,
+      },
+      { title: "Grade Book", path: "/academics/grade-book", icon: Award },
     ],
   },
   {
@@ -103,7 +118,9 @@ const subNavigationItems: SubNavigationSection[] = [
     items: [
       { title: "Fees", path: "/finance/fees", icon: Wallet },
       { title: "Payments", path: "/finance/payments", icon: Wallet },
+      { title: "Installments", path: "/finance/installments", icon: Wallet },
       { title: "Salaries", path: "/finance/salaries", icon: Briefcase },
+      { title: "Deductions", path: "/finance/deductions", icon: Wallet },
     ],
   },
   {
@@ -117,11 +134,11 @@ const subNavigationItems: SubNavigationSection[] = [
   {
     basePath: "/settings",
     items: [
-      { title: "Roles", path: "/settings/roles", icon: ShieldCheck },
-      { title: "Permissions", path: "/settings/permissions", icon: LockKeyhole },
       { title: "General", path: "/settings/general", icon: Building2 },
       { title: "Academic", path: "/settings/academic", icon: BookOpen },
       { title: "Security", path: "/settings/security", icon: ShieldCheck },
+      { title: "Roles", path: "/settings/roles", icon: ShieldCheck },
+      { title: "Permissions", path: "/settings/permissions", icon: LockKeyhole },
     ],
   },
 ];
@@ -216,11 +233,7 @@ function FolderItem({
         <div ref={animationRef} className="absolute inset-0" />
 
         <div className="relative z-10 flex h-full w-full flex-col items-center justify-center gap-1 px-2 pt-5">
-          <Icon
-            size={16}
-            className="text-primary-foreground"
-            strokeWidth={1.8}
-          />
+          <Icon size={16} className="text-primary-foreground" strokeWidth={1.8} />
 
           <span className="text-center text-[13px] font-medium leading-tight text-primary-foreground">
             {title}
@@ -241,16 +254,16 @@ function TabItem({
     <NavLink
       to={path}
       className={[
-        "group relative flex h-14 shrink-0 items-center justify-center gap-3 rounded-2xl px-8 text-[14px] font-semibold transition-all duration-300",
+        "group relative flex h-11 shrink-0 items-center gap-2.5 rounded-2xl px-4 text-[13px] font-semibold transition-all duration-300",
         isActive
-          ? "bg-primary/10 text-primary"
-          : "text-muted-foreground hover:bg-muted/70 hover:text-foreground",
+          ? "bg-primary text-primary-foreground shadow-soft"
+          : "text-foreground/80 hover:bg-muted hover:text-foreground",
       ].join(" ")}
     >
       <Icon
-        size={18}
+        size={16}
         strokeWidth={1.9}
-        className={isActive ? "text-primary" : "text-muted-foreground"}
+        className={isActive ? "text-primary-foreground" : "text-foreground/75"}
       />
 
       <span>{title}</span>
@@ -275,16 +288,14 @@ export function SubNavigation() {
         className={[
           "w-full overflow-hidden",
           !isUsersSection
-            ? "rounded-3xl border border-border/70 bg-card/80 p-1.5 shadow-soft backdrop-blur-xl"
+            ? "rounded-3xl border border-border/70 bg-card/75 p-2 shadow-soft backdrop-blur-xl"
             : "",
         ].join(" ")}
       >
         <nav
           className={[
             "scrollbar-thin flex w-full max-w-full overflow-x-auto",
-            isUsersSection
-              ? "items-center gap-4 pb-4"
-              : "items-center justify-between gap-2",
+            isUsersSection ? "items-center gap-4 pb-4" : "items-center gap-2.5",
           ].join(" ")}
         >
           {currentSection.items.map((item) =>

@@ -1,0 +1,36 @@
+import type { GradeBookEntry } from "@/features/academics/grade-book/types/grade-book.types";
+
+export const gradeBookMock: GradeBookEntry[] = [
+  {
+    id: "grade-book-1",
+    studentId: "student-1",
+    classroomId: "classroom-9-a",
+    subjectId: "subject-math",
+    teacherAssignmentId: "teacher-assignment-1",
+    academicYearId: "year-2024-2025",
+    termId: "term-1",
+    assessmentTitle: "Quiz 1",
+    assessmentType: "quiz",
+    score: 18,
+    maxScore: 20,
+    note: "Excellent performance",
+    createdAt: "2025-01-01T10:00:00.000Z",
+    updatedAt: "2025-01-01T10:00:00.000Z",
+  },
+  {
+    id: "grade-book-2",
+    studentId: "student-1",
+    classroomId: "classroom-9-a",
+    subjectId: "subject-english",
+    teacherAssignmentId: "teacher-assignment-2",
+    academicYearId: "year-2024-2025",
+    termId: "term-1",
+    assessmentTitle: "Midterm Exam",
+    assessmentType: "exam",
+    score: 84,
+    maxScore: 100,
+    note: null,
+    createdAt: "2025-01-01T10:00:00.000Z",
+    updatedAt: "2025-01-01T10:00:00.000Z",
+  },
+];

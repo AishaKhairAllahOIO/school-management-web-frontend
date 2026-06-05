@@ -5,11 +5,30 @@ import {
   MapPin,
   Phone,
 } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 
-import type { GeneralSettings } from "@/features/settings/general/types/general-settings.types";
+export type BrandingPreviewData = {
+  schoolName?: string;
+  shortName?: string;
+  description?: string;
+
+  phoneNumber?: string;
+  emergencyPhoneNumber?: string;
+  email?: string;
+  website?: string;
+
+  city?: string;
+  country?: string;
+
+  logoUrl?: string | null;
+
+  academicYear?: string;
+  openingTime?: string;
+  closingTime?: string;
+};
 
 type Props = {
-  data: Partial<GeneralSettings>;
+  data: BrandingPreviewData;
 };
 
 export function BrandingPreview({ data }: Props) {
@@ -22,73 +41,54 @@ export function BrandingPreview({ data }: Props) {
           {data.logoUrl ? (
             <img
               src={data.logoUrl}
-              alt={data.schoolName}
+              alt={data.schoolName ?? "School logo"}
               className="h-full w-full rounded-full object-cover"
             />
           ) : (
-            <Building2
-              size={54}
-              className="text-primary"
-            />
+            <Building2 size={54} className="text-primary" />
           )}
         </div>
 
         <div className="mt-5 text-center">
           <h3 className="text-2xl font-bold text-foreground">
-            {data.schoolName}
+            {data.schoolName || "School Name"}
           </h3>
 
           <p className="mt-2 text-sm text-muted-foreground">
-            {data.description}
+            {data.description || "School description will appear here."}
           </p>
         </div>
 
         <div className="mt-6 overflow-hidden rounded-2xl border border-border/70">
-          <InfoRow
-            icon={Phone}
-            value={data.phoneNumber}
-          />
-
-          <InfoRow
-            icon={Phone}
-            value={data.emergencyPhoneNumber}
-          />
-
-          <InfoRow
-            icon={Mail}
-            value={data.email}
-          />
-
-          <InfoRow
-            icon={Globe2}
-            value={data.website}
-          />
-
+          <InfoRow icon={Phone} value={data.phoneNumber} />
+          <InfoRow icon={Phone} value={data.emergencyPhoneNumber} />
+          <InfoRow icon={Mail} value={data.email} />
+          <InfoRow icon={Globe2} value={data.website} />
           <InfoRow
             icon={MapPin}
-            value={`${data.city ?? ""}, ${data.country ?? ""}`}
+            value={[data.city, data.country].filter(Boolean).join(", ")}
             isLast
           />
         </div>
 
         <div className="mt-5 rounded-2xl bg-primary/5 p-4">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-4">
             <span className="text-xs font-semibold text-muted-foreground">
               Academic Year
             </span>
 
             <span className="text-sm font-bold text-primary">
-              {data.academicYear}
+              {data.academicYear || "—"}
             </span>
           </div>
 
-          <div className="mt-3 flex items-center justify-between">
+          <div className="mt-3 flex items-center justify-between gap-4">
             <span className="text-xs font-semibold text-muted-foreground">
               Working Hours
             </span>
 
             <span className="text-sm font-bold text-foreground">
-              {data.openingTime} - {data.closingTime}
+              {data.openingTime || "—"} - {data.closingTime || "—"}
             </span>
           </div>
         </div>
@@ -102,7 +102,7 @@ function InfoRow({
   value,
   isLast,
 }: {
-  icon: typeof Phone;
+  icon: LucideIcon;
   value?: string;
   isLast?: boolean;
 }) {
@@ -113,12 +113,9 @@ function InfoRow({
         !isLast ? "border-b border-border/70" : "",
       ].join(" ")}
     >
-      <Icon
-        size={15}
-        className="text-primary"
-      />
+      <Icon size={15} className="text-primary" />
 
-      <span className="text-sm text-muted-foreground">
+      <span className="truncate text-sm text-muted-foreground">
         {value || "—"}
       </span>
     </div>

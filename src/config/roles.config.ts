@@ -1,12 +1,7 @@
-export const rolesConfig = 
-{
-  SUPER_ADMIN: "SUPER_ADMIN",
-  ADVISOR: "ADVISOR",
-  SECRETARY: "SECRETARY",
-  TEACHER: "TEACHER",
-  STUDENT: "STUDENT",
-  PARENT: "PARENT",
-  COUNSELOR: "COUNSELOR",
-} as const;
+export type UserRole = "SUPER_ADMIN" | "ADVISOR" | "SECRETARY";
 
-export type UserRole = keyof typeof rolesConfig;
+export const rolesConfig = {
+  SUPER_ADMIN: "SUPER_ADMIN" as const,
+  ADVISOR: "ADVISOR" as const,
+  SECRETARY: "SECRETARY" as const,
+};

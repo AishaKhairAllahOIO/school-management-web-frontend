@@ -31,8 +31,7 @@ export function SidebarMenu({ variant }: SidebarMenuProps) {
 
   if (variant === "icons") {
     return (
-      <nav className="flex flex-1 flex-col items-center gap-1 pt-1">
-        {visibleItems.map((item) => {
+<nav className="flex flex-1 flex-col items-center gap-1 pt-3">        {visibleItems.map((item) => {
           const Icon = item.icon;
           const active = isItemActive(location.pathname, item);
 
@@ -62,8 +61,7 @@ export function SidebarMenu({ variant }: SidebarMenuProps) {
   }
 
   return (
-    <nav className="flex flex-col gap-1 pt-1">
-      {visibleItems.map((item) => {
+<nav className="flex flex-col gap-1 pt-0">      {visibleItems.map((item) => {
         const active = isItemActive(location.pathname, item);
 
         return (

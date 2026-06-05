@@ -1,7 +1,6 @@
 import { Outlet } from "react-router-dom";
 
 import { MobileSidebar } from "@/app/layouts/dashboard/components/MobileSidebar";
-import { ProfilePanel } from "@/app/layouts/dashboard/components/ProfilePanel";
 import { Sidebar } from "@/app/layouts/dashboard/components/Sidebar";
 import { SubNavigation } from "@/app/layouts/dashboard/components/SubNavigation";
 import { Topbar } from "@/app/layouts/dashboard/components/Topbar";
@@ -12,21 +11,15 @@ export function DashboardLayout() {
     (state) => state.isSidebarCollapsed
   );
 
-  const isProfilePanelOpen = useLayoutStore(
-    (state) => state.isProfilePanelOpen
-  );
-
   return (
     <div className="h-screen overflow-hidden app-shell-bg">
       <Sidebar />
       <MobileSidebar />
-      <ProfilePanel />
 
       <div
         className={[
           "flex h-screen flex-col transition-all duration-300 ease-out",
           isSidebarCollapsed ? "lg:pl-[72px]" : "lg:pl-[238px]",
-          isProfilePanelOpen ? "lg:pr-[320px]" : "lg:pr-0",
         ].join(" ")}
       >
         <div className="shrink-0 px-4 md:px-6 lg:px-8">

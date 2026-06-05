@@ -6,6 +6,38 @@ export type DashboardStat = {
   icon: "students" | "teachers" | "classes" | "revenue";
 };
 
+export type MetricIcon =
+  | "students"
+  | "teachers"
+  | "classes"
+  | "fees"
+  | "attendance"
+  | "documents"
+  | "calls"
+  | "cases"
+  | "warnings"
+  | "meetings"
+  | "wallet"
+  | "revenue";
+
+export type DashboardMetric = {
+  id: string;
+  label: string;
+  value: string;
+  change: string;
+  icon: MetricIcon;
+};
+
+export type ChartPoint = {
+  label: string;
+  value: number;
+};
+
+export type GradeDistributionItem = {
+  label: string;
+  value: number;
+};
+
 export type AttendancePoint = {
   day: string;
   rate: number;

@@ -1,4 +1,5 @@
 import { generalSettingsMock } from "@/features/settings/general/mocks/general-settings.mock";
+
 import type {
   GeneralSettings,
   SchoolImage,

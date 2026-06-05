@@ -1,8 +1,11 @@
 import type {
   AttendancePoint,
+  ChartPoint,
   DashboardInsight,
+  DashboardMetric,
   DashboardStat,
   FeeCollection,
+  GradeDistributionItem,
   RecentActivity,
   StudentsByGradeItem,
   UpcomingEvent,

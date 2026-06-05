@@ -2,8 +2,6 @@ import {
   Building2,
   CalendarDays,
   Clock,
-  Eye,
-  GalleryHorizontal,
   Globe2,
   Mail,
   MapPin,
@@ -16,9 +14,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 
-import { BrandingPreview } from "@/features/settings/general/components/BrandingPreview";
-import { SchoolGallery } from "@/features/settings/general/components/SchoolGallery";
-import { SchoolLogoUpload } from "@/features/settings/general/components/SchoolLogoUpload";
+import { BrandingPreview } from "./BrandingPreview";
+import { SchoolGallery } from "./SchoolGallery";
+import { SchoolLogoUpload } from "./SchoolLogoUpload";
 import {
   useUpdateGeneralSettings,
 } from "@/features/settings/general/hooks/useGeneralSettings";
@@ -194,7 +192,6 @@ export function GeneralSettingsForm({ initialData }: GeneralSettingsFormProps) {
       workingDays: initialData.workingDays,
       openingTime: initialData.openingTime,
       closingTime: initialData.closingTime,
-      academicYear: initialData.academicYear,
     },
   });
 
@@ -221,7 +218,6 @@ export function GeneralSettingsForm({ initialData }: GeneralSettingsFormProps) {
       workingDays: initialData.workingDays,
       openingTime: initialData.openingTime,
       closingTime: initialData.closingTime,
-      academicYear: initialData.academicYear,
     });
   }, [initialData, reset]);
 
@@ -477,13 +473,7 @@ export function GeneralSettingsForm({ initialData }: GeneralSettingsFormProps) {
                   {...register("closingTime")}
                 />
 
-                <SelectInput
-                  label="Academic Year"
-                  required
-                  options={["2024 - 2025", "2025 - 2026", "2026 - 2027"]}
-                  error={errors.academicYear?.message}
-                  {...register("academicYear")}
-                />
+               
               </div>
             </section>
 
@@ -540,7 +530,22 @@ export function GeneralSettingsForm({ initialData }: GeneralSettingsFormProps) {
         </div>
 
         <aside className="space-y-5">
-          <BrandingPreview data={{ ...initialData, ...watchedValues }} />
+         <BrandingPreview
+  data={{
+    schoolName: watchedValues.schoolName,
+    shortName: watchedValues.shortName,
+    description: watchedValues.description,
+    phoneNumber: watchedValues.phoneNumber,
+    emergencyPhoneNumber: watchedValues.emergencyPhoneNumber,
+    email: watchedValues.email,
+    website: watchedValues.website,
+    city: watchedValues.city,
+    country: watchedValues.country,
+    logoUrl: initialData.logoUrl,
+    openingTime: watchedValues.openingTime,
+    closingTime: watchedValues.closingTime,
+  }}
+/>
           <SchoolGallery images={initialData.images} />
         </aside>
       </div>

@@ -1,24 +1,32 @@
-import { Globe2 } from "lucide-react";
-
 import { useLocale } from "@/app/providers/locale";
 
 export function LanguageToggle() {
   const { language, setLanguage } = useLocale();
 
-  const toggleLanguage = () => {
+  function toggleLanguage() {
     setLanguage(language === "en" ? "ar" : "en");
-  };
+  }
 
   return (
     <button
       type="button"
       onClick={toggleLanguage}
       aria-label="Toggle language"
-      className="flex h-10 min-w-10 items-center justify-center gap-1 rounded-full border border-border/60 bg-card/80 px-3 text-foreground shadow-soft transition hover:bg-muted"
+      className="
+        flex h-[44px] w-[44px]
+        items-center justify-center
+        rounded-[14px]
+        bg-white/92
+        text-[#111232]
+        shadow-[0_16px_38px_rgba(46,38,108,0.10)]
+        ring-1 ring-[#EEF0FA]
+        backdrop-blur-xl
+        transition duration-200
+        hover:-translate-y-0.5
+        hover:bg-white
+      "
     >
-      <Globe2 size={16} />
-
-      <span className="text-[11px] font-bold uppercase">
+      <span className="text-[12px] font-bold uppercase tracking-tight">
         {language}
       </span>
     </button>

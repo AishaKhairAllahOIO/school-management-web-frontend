@@ -7,6 +7,7 @@ export const generalSettingsSchema = z.object({
 
   phoneNumber: z.string().min(5, "Phone number is required"),
   emergencyPhoneNumber: z.string().min(5, "Emergency phone is required"),
+
   email: z.string().email("Invalid email address"),
   website: z.string().url("Invalid website URL").optional().or(z.literal("")),
 
@@ -19,15 +20,18 @@ export const generalSettingsSchema = z.object({
     longitude: z.string().optional(),
   }),
 
-  defaultLanguage: z.string().min(1),
-  timezone: z.string().min(1),
-  dateFormat: z.string().min(1),
-  currency: z.string().min(1),
+  defaultLanguage: z.string().min(1, "Default language is required"),
+  timezone: z.string().min(1, "Timezone is required"),
+  dateFormat: z.string().min(1, "Date format is required"),
+  currency: z.string().min(1, "Currency is required"),
 
   workingDays: z.array(z.string()).min(1, "Select at least one working day"),
-  openingTime: z.string().min(1),
-  closingTime: z.string().min(1),
-  academicYear: z.string().min(1),
+
+  openingTime: z.string().min(1, "Opening time is required"),
+  closingTime: z.string().min(1, "Closing time is required"),
+
 });
 
-export type GeneralSettingsFormValues = z.infer<typeof generalSettingsSchema>;
+export type GeneralSettingsFormValues = z.infer<
+  typeof generalSettingsSchema
+>;

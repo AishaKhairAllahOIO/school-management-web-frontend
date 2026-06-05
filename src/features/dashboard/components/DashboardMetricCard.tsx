@@ -1,6 +1,7 @@
 import {
   AlertTriangle,
   BookOpen,
+  CircleDollarSign,
   FileText,
   GraduationCap,
   Phone,
@@ -23,10 +24,12 @@ const icons = {
   cases: ShieldCheck,
   warnings: AlertTriangle,
   meetings: Users,
+  wallet: Wallet,
+  revenue: CircleDollarSign,
 };
 
 export function DashboardMetricCard({ metric }: { metric: DashboardMetric }) {
-  const Icon = icons[metric.icon];
+  const Icon = icons[metric.icon as keyof typeof icons];
 
   return (
     <article className="soft-card rounded-3xl p-5">

@@ -105,7 +105,7 @@ export function SecuritySettingsPage() {
                 </span>
 
                 {"enabled" in rule ? (
-                  <Toggle enabled={rule.enabled} />
+                  <Toggle enabled={rule.enabled ?? false} />
                 ) : (
                   <span className="text-xs font-bold text-muted-foreground">
                     {rule.value}

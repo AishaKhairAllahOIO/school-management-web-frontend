@@ -1,11 +1,5 @@
 import type { BaseUser } from "../../shared/types/base-user.types";
-import type { SchoolGrade } from "../../../settings/school-config/types/school.enums";
 
-export type StudentAcademicStatus = 
-  | "studying"
-  | "passed" 
-  | "failed" 
-  | "graduated";
 
 export type StudentUser = BaseUser & {
   category: "student";
@@ -14,11 +8,9 @@ export type StudentUser = BaseUser & {
 
   parentId: string;
 
-  grade: SchoolGrade;
+
+  gradeId: string;
 
   classroomId: string;
 
-  enrollmentDate: string;
-
-  academicStatus: StudentAcademicStatus;
 };
