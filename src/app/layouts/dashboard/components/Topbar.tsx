@@ -4,7 +4,6 @@ import {
   CalendarDays,
   ChevronDown,
   ChevronRight,
-  CircleHelp,
   Eye,
   LogOut,
   Settings,
@@ -234,9 +233,25 @@ function ProfileMenu({
               icon={Eye}
               onClick={openProfilePage}
             />
-            <ProfileMenuItem title="Account Settings" icon={Settings} />
-            <ProfileMenuItem title="Security" icon={ShieldCheck} />
-            <ProfileMenuItem title="Help & Support" icon={CircleHelp} />
+            <ProfileMenuItem
+  title="Change Password"
+  icon={ShieldCheck}
+  onClick={() => {
+    onClose();
+    navigate("/profile");
+  }}
+/>
+
+{user.role === "Super Admin" ? (
+  <ProfileMenuItem
+    title="Manage Users"
+    icon={Settings}
+    onClick={() => {
+      onClose();
+      navigate("/users");
+    }}
+  />
+) : null}
           </div>
 
           <div className="mt-[18px] border-t border-[#ECECF6] pt-[14px]">
