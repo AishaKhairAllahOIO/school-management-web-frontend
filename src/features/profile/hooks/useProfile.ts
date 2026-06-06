@@ -6,7 +6,7 @@ import type { DashboardProfileUser } from "@/features/profile/types/profile.type
 export function useProfile() {
   const { user } = useCurrentUser();
 
-  const profileUser = user as DashboardProfileUser;
+  const profileUser = user as unknown as DashboardProfileUser;
 
   const identity = getProfileIdentity(profileUser);
   const permissions = getProfilePermissions(profileUser);

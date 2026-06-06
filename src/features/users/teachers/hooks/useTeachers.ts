@@ -27,6 +27,14 @@ export function useTeachers() {
   function addTeacher(data: TeacherFormData) {
     const newTeacher: Teacher = {
       id: crypto.randomUUID(),
+      category: "teacher",
+      teacherCode: `TCH-${Math.floor(Math.random() * 10000).toString().padStart(4, "0")}`,
+      teacherEmail: data.email,
+      recordStatus: "active",
+      accountStatus: "enabled",
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      deletedAt: null,
       ...data,
     };
 

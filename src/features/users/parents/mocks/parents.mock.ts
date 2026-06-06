@@ -9,6 +9,7 @@ export const parentsMock: ParentUser[] = [
     parentCode: "PAR-001",
 
     occupation: "Software Engineer",
+    relation: "father",
 
     firstName: "Michael",
     lastName: "Johnson",
@@ -44,6 +45,7 @@ export const parentsMock: ParentUser[] = [
     parentCode: "PAR-002",
 
     occupation: "Doctor",
+    relation: "mother",
 
     firstName: "Sophia",
     lastName: "Brown",

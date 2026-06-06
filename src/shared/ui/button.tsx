@@ -1,17 +1,7 @@
 import * as React from "react"
-<<<<<<< HEAD
-
-import { Slot } from "radix-ui"
-
-import { cva, type VariantProps }
-from "class-variance-authority"
-
-import { cn } from "@/shared/lib/utils"
-=======
+import { Slot } from "@radix-ui/react-slot"
 import { cva, type VariantProps } from "class-variance-authority"
-import { Slot } from "@radix-ui/react-slot";
-import { cn } from "@/lib/utils"
->>>>>>> 50fb19c146e13d4692319c097692bef716925a06
+import { cn } from "@/shared/lib/utils"
 
 const buttonVariants = cva(
   `
@@ -91,7 +81,8 @@ const buttonVariants = cva(
         default: "h-11 px-5",
         sm: "h-9 px-4",
         lg: "h-12 px-6",
-        icon: "size-10",
+        icon: "h-10 w-10",
+        "icon-sm": "h-9 w-9",
       },
     },
 
@@ -114,7 +105,7 @@ function Button({
   }) {
 
   const Comp = asChild
-    ? Slot.Root
+    ? Slot.arguments
     : "button"
 
   return (

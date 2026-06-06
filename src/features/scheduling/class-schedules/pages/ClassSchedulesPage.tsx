@@ -271,3 +271,11 @@
 //     </div>
 //   );
 // }
+
+export function ClassSchedulesPage() {
+  return (
+    <div className="p-6 rounded-3xl border border-border/70 bg-card text-center text-sm text-muted-foreground">
+      Class schedules are under construction.
+    </div>
+  );
+}

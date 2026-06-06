@@ -2,17 +2,7 @@ import { Edit2 } from "lucide-react";
 
 import { Button } from "@/shared/ui/button";
 
-import type {
-  LeaveRequest,
-} from "../types/staffLeave.types";
-
-interface Props {
-  leave: LeaveRequest;
-}
-
-export const EditLeaveDialog = ({
-  leave,
-}: Props) => {
+export const EditLeaveDialog = () => {
   return (
     <Button
       size="icon"

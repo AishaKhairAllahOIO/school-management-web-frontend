@@ -6,10 +6,7 @@ import {
   getClassSchedules,
   updateClassSchedule,
 } from "@/features/scheduling/class-schedules/api/class-schedules.api";
-import type {
-  CreateClassSchedulePayload,
-  UpdateClassSchedulePayload,
-} from "@/features/scheduling/class-schedules/types/class-schedule.types";
+import type { UpdateClassSchedulePayload } from "@/features/scheduling/class-schedules/types/class-schedule.types";
 
 export const classSchedulesQueryKey = ["scheduling", "class-schedules"];
 

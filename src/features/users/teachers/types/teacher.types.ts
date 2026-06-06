@@ -8,9 +8,31 @@ export type TeacherUser = BaseUser & EmploymentInformation & {
 
   teacherEmail: string;
 
-subjectIds: string[];
+  email: string;
+  phone: string;
+  city: string;
+  subject: string;
+  department: string;
+  employmentType: "Full-time" | "Part-time" | "Contract";
+  status: "active" | "inactive" | "on_leave";
+  studyStartDate: string;
+  studyEndDate: string;
 };
 
+export type TeacherFormData = Omit<
+  TeacherUser,
+  | "id"
+  | "category"
+  | "teacherCode"
+  | "teacherEmail"
+  | "recordStatus"
+  | "accountStatus"
+  | "createdAt"
+  | "updatedAt"
+  | "deletedAt"
+>;
+
+export type Teacher = TeacherUser;
 
 export type TeacherAssignment = {
   id: string;
