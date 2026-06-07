@@ -136,7 +136,6 @@ const subNavigationItems: SubNavigationSection[] = [
     items: [
       { title: "General", path: "/settings/general", icon: Building2 },
       { title: "Academic", path: "/settings/academic", icon: BookOpen },
-      { title: "Security", path: "/settings/security", icon: ShieldCheck },
       { title: "Roles", path: "/settings/roles", icon: ShieldCheck },
       { title: "Permissions", path: "/settings/permissions", icon: LockKeyhole },
     ],

@@ -268,4 +268,29 @@
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
+
+.field-input {
+  height: 2.75rem;
+  width: 100%;
+  border-radius: 1rem;
+  border: 1px solid rgba(var(--border), 0.75);
+  background: rgba(var(--background), 0.9);
+  padding: 0 0.875rem;
+  font-size: 0.875rem;
+  color: rgb(var(--foreground));
+  outline: none;
+  transition: 0.2s ease;
+}
+
+.field-input:focus {
+  border-color: rgba(var(--primary), 0.7);
+  box-shadow: 0 0 0 3px rgba(var(--primary), 0.12);
+}
+
+.schedule-dialog-card {
+  background:
+    radial-gradient(circle at top left, rgba(var(--primary), 0.14), transparent 18rem),
+    radial-gradient(circle at bottom right, rgba(var(--info), 0.12), transparent 18rem),
+    rgb(var(--card));
+}
 }
