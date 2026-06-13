@@ -6,13 +6,10 @@ import {
   getGradeBookEntries,
   updateGradeBookEntry,
 } from "@/features/academics/grade-book/api/grade-book.api";
-<<<<<<< HEAD
+
 import type {
   UpdateGradeBookEntryPayload,
 } from "@/features/academics/grade-book/types/grade-book.types";
-=======
-import type { UpdateGradeBookEntryPayload } from "@/features/academics/grade-book/types/grade-book.types";
->>>>>>> eda85da6a42b280ef2904d76f2bf1c05c3269c29
 
 export const gradeBookQueryKey = ["academics", "grade-book"];
 

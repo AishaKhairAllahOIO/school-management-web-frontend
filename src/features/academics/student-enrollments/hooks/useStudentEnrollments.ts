@@ -6,13 +6,9 @@ import {
   getStudentEnrollments,
   updateStudentEnrollment,
 } from "@/features/academics/student-enrollments/api/student-enrollments.api";
-<<<<<<< HEAD
 import type {
   UpdateStudentEnrollmentPayload,
 } from "@/features/academics/student-enrollments/types/student-enrollment.types";
-=======
-import type { UpdateStudentEnrollmentPayload } from "@/features/academics/student-enrollments/types/student-enrollment.types";
->>>>>>> eda85da6a42b280ef2904d76f2bf1c05c3269c29
 
 export const studentEnrollmentsQueryKey = [
   "academics",
