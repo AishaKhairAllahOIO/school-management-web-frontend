@@ -7,7 +7,6 @@ import {
   updateGradeBookEntry,
 } from "@/features/academics/grade-book/api/grade-book.api";
 import type {
-  CreateGradeBookEntryPayload,
   UpdateGradeBookEntryPayload,
 } from "@/features/academics/grade-book/types/grade-book.types";
 

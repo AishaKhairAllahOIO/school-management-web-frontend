@@ -1,7 +1,6 @@
 import type { LucideIcon } from "lucide-react";
 import {
   Bell,
-  CalendarDays,
   ChevronDown,
   ChevronRight,
   Eye,
@@ -62,6 +61,16 @@ function getCurrentPageTitle(pathname: string) {
   return formatSegment(segments[1]);
 }
 
+function getRoleLabel(user: { category?: string; role?: string }) {
+  if (user.role) return user.role;
+
+  if (user.category === "super_admin") return "Super Admin";
+  if (user.category === "secretary") return "Secretary";
+  if (user.category === "supervisor") return "Supervisor";
+
+  return "User";
+}
+
 function TopbarBreadcrumb({ pathname }: { pathname: string }) {
   return (
     <div className="hidden min-w-0 items-center gap-[13px] lg:flex">
@@ -82,7 +91,7 @@ function TopbarBreadcrumb({ pathname }: { pathname: string }) {
   );
 }
 
-function ThemeSwitch() {
+function ThemeButton() {
   const { theme, setTheme } = useTheme();
   const isDark = theme === "dark";
 
@@ -91,27 +100,15 @@ function ThemeSwitch() {
       type="button"
       onClick={() => setTheme(isDark ? "light" : "dark")}
       aria-label="Toggle theme"
-      className="relative flex h-[44px] w-[78px] items-center rounded-[15px] bg-white/92 p-[5px] shadow-[0_16px_38px_rgba(46,38,108,0.10)] ring-1 ring-[#EEF0FA] backdrop-blur-xl"
+      className={topbarItem}
     >
-      <span
-        className={[
-          "absolute top-[5px] h-[34px] w-[34px] rounded-[12px] shadow-[0_10px_22px_rgba(46,38,108,0.16)] transition-all duration-300",
-          isDark ? "left-[39px] bg-[#317CE8]" : "left-[5px] bg-[#FFF4D8]",
-        ].join(" ")}
-      />
-
-      <span className="relative z-10 flex h-[34px] w-[34px] items-center justify-center rounded-[12px] text-[#F5A623]">
-        <Sun size={16} strokeWidth={2.1} />
-      </span>
-
-      <span
-        className={[
-          "relative z-10 flex h-[34px] w-[34px] items-center justify-center rounded-[12px]",
-          isDark ? "text-white" : "text-[#317CE8]",
-        ].join(" ")}
-      >
-        <MoonFillIcon />
-      </span>
+      {isDark ? (
+        <span className="text-[#317CE8]">
+          <MoonFillIcon />
+        </span>
+      ) : (
+        <Sun size={17} strokeWidth={2.1} className="text-[#F5A623]" />
+      )}
     </button>
   );
 }
@@ -187,6 +184,14 @@ function ProfileMenu({
   const navigate = useNavigate();
   const { user } = useCurrentUser();
 
+  const fullName =
+    "fullName" in user
+      ? user.fullName
+      : `${user.firstName} ${user.lastName}`.trim();
+
+  const photoUrl = "avatarUrl" in user ? user.avatarUrl : user.photoUrl;
+  const roleLabel = getRoleLabel(user);
+
   function openProfilePage() {
     onClose();
     navigate("/profile");
@@ -200,18 +205,18 @@ function ProfileMenu({
         className="flex h-[44px] items-center gap-[10px] rounded-[16px] bg-white/92 py-[5px] pl-[7px] pr-[6px] shadow-[0_16px_38px_rgba(46,38,108,0.10)] ring-1 ring-[#EEF0FA] backdrop-blur-xl"
       >
         <img
-          src={user.avatarUrl}
-          alt={user.fullName}
+          src={photoUrl}
+          alt={fullName}
           className="h-[34px] w-[34px] rounded-full object-cover ring-[2px] ring-white"
         />
 
         <span className="flex min-w-0 max-w-[120px] flex-col text-left">
           <span className="truncate text-[12px] font-bold leading-[15px] text-[#111232]">
-            {user.fullName}
+            {fullName}
           </span>
 
           <span className="truncate text-[10px] font-semibold leading-[14px] text-[#8A8BA0]">
-            {user.role}
+            {roleLabel}
           </span>
         </span>
 
@@ -233,25 +238,26 @@ function ProfileMenu({
               icon={Eye}
               onClick={openProfilePage}
             />
-            <ProfileMenuItem
-  title="Change Password"
-  icon={ShieldCheck}
-  onClick={() => {
-    onClose();
-    navigate("/profile");
-  }}
-/>
 
-{user.role === "Super Admin" ? (
-  <ProfileMenuItem
-    title="Manage Users"
-    icon={Settings}
-    onClick={() => {
-      onClose();
-      navigate("/users");
-    }}
-  />
-) : null}
+            <ProfileMenuItem
+              title="Change Password"
+              icon={ShieldCheck}
+              onClick={() => {
+                onClose();
+                navigate("/profile");
+              }}
+            />
+
+            {roleLabel === "Super Admin" ? (
+              <ProfileMenuItem
+                title="Manage Users"
+                icon={Settings}
+                onClick={() => {
+                  onClose();
+                  navigate("/users");
+                }}
+              />
+            ) : null}
           </div>
 
           <div className="mt-[18px] border-t border-[#ECECF6] pt-[14px]">
@@ -299,6 +305,13 @@ export function Topbar() {
   const location = useLocation();
   const { user } = useCurrentUser();
 
+  const fullName =
+    "fullName" in user
+      ? user.fullName
+      : `${user.firstName} ${user.lastName}`.trim();
+
+  const photoUrl = "avatarUrl" in user ? user.avatarUrl : user.photoUrl;
+
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
 
@@ -319,46 +332,38 @@ export function Topbar() {
           <TopbarBreadcrumb pathname={location.pathname} />
         </div>
 
-        <div className="flex shrink-0 items-center">
-          <div className="flex items-center gap-[13px]">
-            <button type="button" className={topbarItem} aria-label="Calendar">
-              <CalendarDays size={18} strokeWidth={2.05} />
-            </button>
+        <div className="flex shrink-0 items-center gap-[12px]">
+          <NotificationsMenu
+            isOpen={isNotificationsOpen}
+            onToggle={toggleNotifications}
+          />
 
-            <NotificationsMenu
-              isOpen={isNotificationsOpen}
-              onToggle={toggleNotifications}
+          <div className="w-[16px]" />
+
+          <LanguageToggle />
+
+          <ThemeButton />
+
+          <div className="w-[8px]" />
+
+          <ProfileMenu
+            isOpen={isProfileMenuOpen}
+            onToggle={toggleProfileMenu}
+            onClose={() => setIsProfileMenuOpen(false)}
+          />
+
+          <button
+            type="button"
+            onClick={toggleProfileMenu}
+            aria-label="Open profile menu"
+            className="flex h-[44px] w-[44px] items-center justify-center rounded-full lg:hidden"
+          >
+            <img
+              src={photoUrl}
+              alt={fullName}
+              className="h-[42px] w-[42px] rounded-full object-cover ring-[2px] ring-white"
             />
-          </div>
-
-          <div className="w-[34px]" />
-
-          <div className="flex items-center gap-[12px]">
-            <LanguageToggle />
-
-            <ThemeSwitch />
-
-            <div className="w-[8px]" />
-
-            <ProfileMenu
-              isOpen={isProfileMenuOpen}
-              onToggle={toggleProfileMenu}
-              onClose={() => setIsProfileMenuOpen(false)}
-            />
-
-            <button
-              type="button"
-              onClick={toggleProfileMenu}
-              aria-label="Open profile menu"
-              className="flex h-[44px] w-[44px] items-center justify-center rounded-full lg:hidden"
-            >
-              <img
-                src={user.avatarUrl}
-                alt={user.fullName}
-                className="h-[42px] w-[42px] rounded-full object-cover ring-[2px] ring-white"
-              />
-            </button>
-          </div>
+          </button>
         </div>
       </div>
     </header>

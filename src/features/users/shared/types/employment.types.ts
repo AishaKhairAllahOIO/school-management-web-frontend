@@ -7,6 +7,7 @@ export type Degree =
 
 export type EmploymentInformation = 
 {
+  
   hireDate: string;
 
   degree: Degree;

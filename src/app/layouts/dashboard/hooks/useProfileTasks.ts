@@ -1,8 +1,7 @@
-import { profileTasksMock } from "../../../../features/dashboard/mocks/profileTasks.mock";
 
 export function useProfileTasks() {
   return {
-    tasks: profileTasksMock,
+    tasks: "g",
     isLoading: false,
     isError: false,
   };

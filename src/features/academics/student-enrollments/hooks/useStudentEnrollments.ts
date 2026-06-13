@@ -7,7 +7,6 @@ import {
   updateStudentEnrollment,
 } from "@/features/academics/student-enrollments/api/student-enrollments.api";
 import type {
-  CreateStudentEnrollmentPayload,
   UpdateStudentEnrollmentPayload,
 } from "@/features/academics/student-enrollments/types/student-enrollment.types";
 

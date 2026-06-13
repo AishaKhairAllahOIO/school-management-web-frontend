@@ -5,7 +5,8 @@ export type UserCategory =
   | "secretary"
   | "supervisor"
   | "counselor"
-  | "service_staff";
+  | "service_staff"
+  | "super_admin";
 
 export type UserNationality =
   | "syrian"

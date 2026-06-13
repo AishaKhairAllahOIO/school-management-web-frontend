@@ -5,6 +5,7 @@ import type { ServiceStaffUser } from "../../service-staff/types/service-staff.t
 import type { StudentUser } from "../../students/types/student.types";
 import type { SupervisorUser } from "../../supervisors/types/supervisor.types";
 import type { TeacherUser } from "../../teachers/types/teacher.types";
+import type { SuperAdminUser } from "../../super-admin/types/super-admin.types";
 
 export type User =
   | StudentUser
@@ -13,4 +14,5 @@ export type User =
   | SecretaryUser
   | SupervisorUser
   | CounselorUser
-  | ServiceStaffUser;
+  | ServiceStaffUser
+  | SuperAdminUser;

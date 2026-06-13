@@ -293,4 +293,28 @@
     radial-gradient(circle at bottom right, rgba(var(--info), 0.12), transparent 18rem),
     rgb(var(--card));
 }
+
+.sidebar-shell {
+  box-shadow:
+    0 26px 80px rgba(12, 8, 48, 0.36),
+    inset -1px 0 0 rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-pattern {
+  opacity: 0.1;
+  mix-blend-mode: screen;
+  filter: brightness(1.25) contrast(0.9);
+}
+
+.sidebar-logo-glow {
+  box-shadow:
+    0 16px 34px rgba(103, 58, 244, 0.38),
+    inset 0 1px 0 rgba(255, 255, 255, 0.28);
+}
+
+.sidebar-active-glow {
+  box-shadow:
+    0 16px 34px rgba(103, 58, 244, 0.34),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18);
+}
 }
