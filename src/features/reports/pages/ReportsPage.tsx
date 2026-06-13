@@ -1,14 +1,53 @@
-import { BarChart3 } from "lucide-react";
+import { BarChart3, CalendarCheck, FileText, ListChecks, PieChart, TrendingUp, Users, Wallet } from "lucide-react";
 
 import { Button } from "@/shared/ui/button";
 import { Card } from "@/shared/ui/card";
 import { RecentReportsList } from "../components/RecentReportsList";
 import { ReportCard } from "../components/ReportCard";
 import { ReportMetricCard } from "../components/ReportMetricCard";
+import { ReportAnalyticsCard } from "../components/ReportAnalyticsCard";
 import { useReports } from "../hooks/useReports";
 
 export function ReportsPage() {
   const { data, isLoading } = useReports();
+
+  const analyticsMetrics = [
+    {
+      title: "Payment Delay Rate",
+      value: "18%",
+      description: "Students with overdue fees and pending collection.",
+      icon: Wallet,
+      color: "text-warning bg-warning/10",
+    },
+    {
+      title: "Attendance Alert",
+      value: "12%",
+      description: "Students approaching absence thresholds.",
+      icon: CalendarCheck,
+      color: "text-info bg-info/10",
+    },
+    {
+      title: "Behavioral Incidents",
+      value: "24",
+      description: "Open evaluations and disciplinary actions.",
+      icon: ListChecks,
+      color: "text-destructive bg-destructive/10",
+    },
+    {
+      title: "Academic Risk",
+      value: "8%",
+      description: "Students needing intervention based on grades.",
+      icon: TrendingUp,
+      color: "text-success bg-success/10",
+    },
+    {
+      title: "Salary Compliance",
+      value: "100%",
+      description: "Payroll processed for active staff this month.",
+      icon: Users,
+      color: "text-primary bg-primary/10",
+    },
+  ];
 
   if (isLoading || !data) {
     return (
@@ -46,6 +85,12 @@ export function ReportsPage() {
 
       <div className="grid gap-6 xl:grid-cols-[1.35fr_0.65fr]">
         <section className="space-y-6">
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            {analyticsMetrics.map((metric) => (
+              <ReportAnalyticsCard key={metric.title} metric={metric} />
+            ))}
+          </div>
+
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
             {data.metrics.map((metric) => (
               <ReportMetricCard key={metric.title} metric={metric} />

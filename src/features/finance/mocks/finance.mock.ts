@@ -1,0 +1,121 @@
+import type {
+  FinanceData,
+} from "../types/finance.types";
+
+export const financeData: FinanceData = {
+  gradeFees: [
+    {
+      grade: "Grade 10",
+      className: "A",
+      annualFee: "10,500 SAR",
+      collected: "8,900 SAR",
+      outstanding: "1,600 SAR",
+    },
+    {
+      grade: "Grade 11",
+      className: "B",
+      annualFee: "11,200 SAR",
+      collected: "9,450 SAR",
+      outstanding: "1,750 SAR",
+    },
+    {
+      grade: "Grade 12",
+      className: "C",
+      annualFee: "12,000 SAR",
+      collected: "10,100 SAR",
+      outstanding: "1,900 SAR",
+    },
+  ],
+  remainingBalances: [
+    {
+      student: "Sara Ali",
+      grade: "Grade 10",
+      className: "A",
+      balance: "1,200 SAR",
+      nextDue: "Jun 15, 2026",
+    },
+    {
+      student: "Mohammed Nasser",
+      grade: "Grade 11",
+      className: "B",
+      balance: "900 SAR",
+      nextDue: "Jun 02, 2026",
+    },
+    {
+      student: "Lina Ahmad",
+      grade: "Grade 12",
+      className: "C",
+      balance: "1,500 SAR",
+      nextDue: "Jun 05, 2026",
+    },
+  ],
+  payments: [
+    {
+      id: "PAY-001",
+      student: "Omar Hassan",
+      amount: "2,100 SAR",
+      method: "Bank Transfer",
+      status: "Completed",
+      date: "May 22, 2026",
+      overdue: false,
+    },
+    {
+      id: "PAY-002",
+      student: "Nada Saleh",
+      amount: "1,500 SAR",
+      method: "Cash",
+      status: "Pending",
+      date: "May 18, 2026",
+      overdue: false,
+    },
+    {
+      id: "PAY-003",
+      student: "Yousef Ali",
+      amount: "1,900 SAR",
+      method: "Credit Card",
+      status: "Overdue",
+      date: "May 10, 2026",
+      overdue: true,
+    },
+    {
+      id: "PAY-004",
+      student: "Lama Faris",
+      amount: "2,200 SAR",
+      method: "Bank Transfer",
+      status: "Completed",
+      date: "May 12, 2026",
+      overdue: false,
+    },
+  ],
+  overdueSummary: {
+    totalOverdue: "18,500 SAR",
+    overdueAccounts: 12,
+    averageDelay: "11 days",
+  },
+  installments: [
+    {
+      id: "INST-01",
+      student: "Ammar Fawzi",
+      grade: "Grade 10",
+      nextPaymentDate: "Jun 05, 2026",
+      amount: "1,100 SAR",
+      status: "Pending",
+    },
+    {
+      id: "INST-02",
+      student: "Reem Fahd",
+      grade: "Grade 11",
+      nextPaymentDate: "Jun 08, 2026",
+      amount: "1,250 SAR",
+      status: "Delayed",
+    },
+    {
+      id: "INST-03",
+      student: "Tariq Yousif",
+      grade: "Grade 12",
+      nextPaymentDate: "Jun 12, 2026",
+      amount: "1,300 SAR",
+      status: "Paid",
+    },
+  ],
+};

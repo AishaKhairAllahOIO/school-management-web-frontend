@@ -7,6 +7,7 @@ import {
   PieChart,
   TrendingUp,
   Users,
+  Wallet,
 } from "lucide-react";
 import type { ReportsResponse } from "../types/reports.types";
 
@@ -43,28 +44,40 @@ export const reportsMock: ReportsResponse = {
   ],
   reportCards: [
     {
-      title: "Attendance Summary",
-      description: "Track student attendance trends and monthly summaries.",
+      title: "Financial Reports",
+      description: "Review fee collection, balances, and tuition payment history.",
+      icon:  Wallet,
+      action: "Export PDF",
+    },
+    {
+      title: "Attendance Reports",
+      description: "Monitor student and staff attendance patterns.",
       icon: CalendarCheck,
       action: "Generate",
     },
     {
-      title: "Grade Breakdown",
-      description: "View performance by class, subject, and grade level.",
-      icon: PieChart,
+      title: "Salary Reports",
+      description: "Analyze payroll by teachers, supervisors, and service staff.",
+      icon: ListChecks,
       action: "View details",
     },
     {
-      title: "Behavior Logs",
-      description: "Analyze student behavior reports and interventions.",
-      icon: ListChecks,
+      title: "Academic Reports",
+      description: "Track grades, top students, and class performance.",
+      icon: PieChart,
+      action: "Generate",
+    },
+    {
+      title: "Behavioral Reports",
+      description: "Review evaluations, warnings, and disciplinary cases.",
+      icon: Users,
       action: "Download",
     },
     {
-      title: "Staff Activity",
-      description: "Review staff attendance and engagement over time.",
-      icon: Users,
-      action: "Generate",
+      title: "Analytics Center",
+      description: "See the most critical KPIs across finance, attendance, and student behavior.",
+      icon: BarChart3,
+      action: "Open dashboard",
     },
   ],
   recentReports: [
