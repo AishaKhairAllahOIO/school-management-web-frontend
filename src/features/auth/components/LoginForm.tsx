@@ -241,7 +241,7 @@ export function LoginForm() {
             <Checkbox
               id="rememberMe"
               checked={rememberMe}
-              onCheckedChange={(checked) => {
+              onCheckedChange={(checked: boolean) => {
 
                 setValue(
                   "rememberMe",

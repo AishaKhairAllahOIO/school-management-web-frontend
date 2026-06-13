@@ -18,7 +18,7 @@ export function TeacherAssignmentsPage() {
   const { data: assignments = [], isLoading, isError } = useTeacherAssignments();
   const { data: classrooms = [] } = useClassrooms();
   const { data: subjects = [] } = useSubjects();
-  const { data: teachers = [] } = useTeachers();
+  const { teachers = [] } = useTeachers();
 
   const deleteMutation = useDeleteTeacherAssignment();
   const [search, setSearch] = useState("");

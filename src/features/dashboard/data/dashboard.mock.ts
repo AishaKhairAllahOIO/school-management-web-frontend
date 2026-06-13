@@ -1,8 +1,11 @@
 import type {
   AttendancePoint,
+  ChartPoint,
   DashboardInsight,
+  DashboardMetric,
   DashboardStat,
   FeeCollection,
+  GradeDistributionItem,
   RecentActivity,
   StudentsByGradeItem,
   UpcomingEvent,
@@ -134,3 +137,144 @@ export const dashboardInsight: DashboardInsight = {
     "Attendance remains above 90% and fee collection reached 75% of the annual target.",
   actionLabel: "View Reports",
 };
+
+export const secretaryMetrics: DashboardMetric[] = [
+  {
+    id: "secretary-1",
+    label: "Pending Requests",
+    value: "18",
+    change: "+6%",
+    icon: "documents",
+  },
+  {
+    id: "secretary-2",
+    label: "Calls Scheduled",
+    value: "42",
+    change: "+12%",
+    icon: "calls",
+  },
+  {
+    id: "secretary-3",
+    label: "Fees Reviewed",
+    value: "57",
+    change: "+9%",
+    icon: "wallet",
+  },
+  {
+    id: "secretary-4",
+    label: "Active Cases",
+    value: "8",
+    change: "-2%",
+    icon: "cases",
+  },
+];
+
+export const supervisorMetrics: DashboardMetric[] = [
+  {
+    id: "supervisor-1",
+    label: "Students Flagged",
+    value: "24",
+    change: "+5%",
+    icon: "students",
+  },
+  {
+    id: "supervisor-2",
+    label: "Open Cases",
+    value: "12",
+    change: "+3%",
+    icon: "warnings",
+  },
+  {
+    id: "supervisor-3",
+    label: "Reports Submitted",
+    value: "31",
+    change: "+10%",
+    icon: "documents",
+  },
+  {
+    id: "supervisor-4",
+    label: "Meetings Planned",
+    value: "7",
+    change: "0%",
+    icon: "meetings",
+  },
+];
+
+export const superAdminMetrics: DashboardMetric[] = [
+  {
+    id: "superadmin-1",
+    label: "Total Revenue",
+    value: "$48.7K",
+    change: "+8.7%",
+    icon: "revenue",
+  },
+  {
+    id: "superadmin-2",
+    label: "Attendance Rate",
+    value: "93%",
+    change: "+1.2%",
+    icon: "attendance",
+  },
+  {
+    id: "superadmin-3",
+    label: "Active Classes",
+    value: "42",
+    change: "+1.6%",
+    icon: "classes",
+  },
+  {
+    id: "superadmin-4",
+    label: "Teacher Performance",
+    value: "A+",
+    change: "+3%",
+    icon: "teachers",
+  },
+];
+
+export const attendanceChart: ChartPoint[] = [
+  { label: "Mon", value: 92 },
+  { label: "Tue", value: 95 },
+  { label: "Wed", value: 94 },
+  { label: "Thu", value: 93 },
+  { label: "Fri", value: 90 },
+];
+
+export const gradeDistribution: GradeDistributionItem[] = [
+  { label: "Seventh Grade", value: 438 },
+  { label: "Eighth Grade", value: 405 },
+  { label: "Ninth Grade", value: 405 },
+];
+
+export const secretaryActivities: RecentActivity[] = [
+  {
+    id: "secretary-activity-1",
+    type: "schedule",
+    title: "Registration forms reviewed",
+    description: "New student registration requests were processed.",
+    time: "10 min ago",
+  },
+  {
+    id: "secretary-activity-2",
+    type: "payment",
+    title: "Fee receipts verified",
+    description: "Confirmed fee payments for three students.",
+    time: "45 min ago",
+  },
+];
+
+export const supervisorActivities: RecentActivity[] = [
+  {
+    id: "supervisor-activity-1",
+    type: "teacher",
+    title: "Follow-up meeting scheduled",
+    description: "Met with students at academic risk.",
+    time: "1 hour ago",
+  },
+  {
+    id: "supervisor-activity-2",
+    type: "student",
+    title: "Attendance review completed",
+    description: "Reviewed absence records for grade 9.",
+    time: "2 hours ago",
+  },
+];

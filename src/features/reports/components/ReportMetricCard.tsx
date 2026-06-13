@@ -1,5 +1,3 @@
-import type { LucideIcon } from "lucide-react";
-
 import { Card } from "@/shared/ui/card";
 import type { ReportMetric } from "../types/reports.types";
 

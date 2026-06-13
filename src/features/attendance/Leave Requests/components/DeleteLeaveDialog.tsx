@@ -2,13 +2,7 @@ import { Trash2 } from "lucide-react";
 
 import { Button } from "@/shared/ui/button";
 
-interface Props {
-  id: string;
-}
-
-export const DeleteLeaveDialog = ({
-  id,
-}: Props) => {
+export const DeleteLeaveDialog = () => {
   return (
     <Button
       size="icon"

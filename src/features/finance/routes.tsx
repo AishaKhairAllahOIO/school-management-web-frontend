@@ -1,22 +1,15 @@
-function PlaceholderPage({ title }: { title: string }) {
-  return (
-    <div className="rounded-3xl bg-card p-8 shadow-soft">
-      <h1 className="text-3xl font-bold text-foreground">{title}</h1>
-      <p className="mt-2 text-muted-foreground">
-        This page content appears inside the dashboard container.
-      </p>
-    </div>
-  );
-}
+import { FeesPage } from "@/features/finance/pages/FeesPage";
+import { PaymentsPage } from "@/features/finance/pages/PaymentsPage";
+import { InstallmentsPage } from "@/features/finance/pages/InstallmentsPage";
 
 export const financeRoutes = {
   path: "finance",
   children: [
-    { index: true, element: <PlaceholderPage title="Fees" /> },
-    { path: "fees", element: <PlaceholderPage title="Fees" /> },
-    { path: "payments", element: <PlaceholderPage title="Payments" /> },
-    { path: "installments", element: <PlaceholderPage title="Installments" /> },
-    { path: "salaries", element: <PlaceholderPage title="Salaries" /> },
-    { path: "deductions", element: <PlaceholderPage title="Deductions" /> },
+    { index: true, element: <FeesPage /> },
+    { path: "fees", element: <FeesPage /> },
+    { path: "payments", element: <PaymentsPage /> },
+    { path: "installments", element: <InstallmentsPage /> },
+    { path: "salaries", element: <FeesPage /> },
+    { path: "deductions", element: <FeesPage /> },
   ],
 };

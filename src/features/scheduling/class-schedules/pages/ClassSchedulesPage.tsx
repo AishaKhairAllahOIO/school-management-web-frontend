@@ -222,6 +222,7 @@ export function ClassSchedulesPage() {
                       {slot.label}
                     </td>
 
+<<<<<<< HEAD
                     {weekDays.map((day) => {
                       const cell = visibleSchedules.find(
                         (item) =>
@@ -382,6 +383,30 @@ export function ClassSchedulesPage() {
         }}
         onSubmit={handleSubmit}
       />
+=======
+//               {upcomingClasses.length === 0 && (
+//                 <tr>
+//                   <td
+//                     colSpan={7}
+//                     className="py-10 text-center text-sm text-muted-foreground"
+//                   >
+//                     No upcoming classes found.
+//                   </td>
+//                 </tr>
+//               )}
+//             </tbody>
+//           </table>
+//         </div>
+//       </section>
+//     </div>
+//   );
+// }
+
+export function ClassSchedulesPage() {
+  return (
+    <div className="p-6 rounded-3xl border border-border/70 bg-card text-center text-sm text-muted-foreground">
+      Class schedules are under construction.
+>>>>>>> eda85da6a42b280ef2904d76f2bf1c05c3269c29
     </div>
   );
 }
