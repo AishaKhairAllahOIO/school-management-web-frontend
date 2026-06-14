@@ -10,7 +10,7 @@ import {
   Wallet,
 } from "lucide-react";
 
-import type { SidebarItem } from "@/app/layouts/dashboard/types/sidebar.types";
+import type { SidebarItem } from "@/app/layouts/app/types/sidebar.types";
 
 export const sidebarItems: SidebarItem[] = [
   {

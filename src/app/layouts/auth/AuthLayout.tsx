@@ -5,10 +5,8 @@ export function AuthLayout() {
   return (
     <div className="relative min-h-screen overflow-hidden bg-background">
 
-      {/* MAIN GRID */}
       <div className="relative z-10 grid min-h-screen lg:grid-cols-2">
 
-        {/* LEFT SIDE */}
         <div
           className="
             relative
@@ -25,7 +23,6 @@ export function AuthLayout() {
           "
         >
 
-          {/* Animated Background Blobs */}
           <motion.div
             animate={{
               y: [0, -40, 0],
@@ -91,7 +88,6 @@ export function AuthLayout() {
             "
           />
 
-          {/* Logo */}
           <div className="relative z-10 mb-10 flex items-center gap-4">
 
             <div
@@ -123,7 +119,6 @@ export function AuthLayout() {
             </div>
           </div>
 
-          {/* Title */}
           <motion.h2
             animate={{
               textShadow: [
@@ -162,7 +157,6 @@ export function AuthLayout() {
             academics, attendance, schedules, and finance.
           </p>
 
-          {/* Curved Divider */}
           <div
             className="
               absolute
@@ -176,7 +170,6 @@ export function AuthLayout() {
           />
         </div>
 
-        {/* RIGHT SIDE */}
         <div
           className="
             relative

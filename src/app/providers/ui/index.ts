@@ -1,1 +1,1 @@
-export { AppToaster } from "@/app/providers/ui/AppToaster";
+export { AppToaster } from "./AppToaster";

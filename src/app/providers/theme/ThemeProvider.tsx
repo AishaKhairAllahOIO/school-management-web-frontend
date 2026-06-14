@@ -5,7 +5,7 @@ import {
   DEFAULT_THEME,
   THEME_ATTRIBUTE,
   THEME_STORAGE_KEY,
-} from "@/app/providers/theme/theme.constants";
+} from "./theme.constants";
 
 type ThemeProviderProps = {
   children: ReactNode;

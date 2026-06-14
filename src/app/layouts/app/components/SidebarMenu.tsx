@@ -1,7 +1,7 @@
 import { NavLink, useLocation } from "react-router-dom";
 
-import { sidebarItems } from "@/app/layouts/dashboard/config/sidebarItems";
-import type { SidebarItem } from "@/app/layouts/dashboard/types/sidebar.types";
+import { sidebarItems } from "@/app/layouts/app/config/sidebarItems";
+import type { SidebarItem } from "@/app/layouts/app/types/sidebar.types";
 
 type SidebarMenuProps = {
   variant: "icons" | "labels";
@@ -74,9 +74,9 @@ export function SidebarMenu({ variant }: SidebarMenuProps) {
               "relative mx-3 flex h-11 items-center rounded-2xl px-4",
               "text-[13px] font-semibold tracking-[-0.005em] transition-all duration-300 ease-out",
               item.disabled ? "pointer-events-none opacity-40" : "",
-              active
-                ? "bg-primary text-primary-foreground shadow-[0_14px_30px_rgba(0,0,0,0.18)]"
-                : "text-sidebar-foreground/80 hover:bg-white/8 hover:text-white",
+            active
+  ? "bg-white/12 text-white ring-1 ring-white/12 "
+  : "text-sidebar-foreground/75 hover:bg-white/8 hover:text-white"
             ].join(" ")}
           >
             <span className="truncate">{item.title}</span>

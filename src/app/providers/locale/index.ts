@@ -1,8 +1,8 @@
-export { LocaleProvider } from "@/app/providers/locale/LocaleProvider";
-export { useLocale } from "@/app/providers/locale/useLocale";
+export { LocaleProvider } from "./LocaleProvider";
+export { useLocale } from "./useLocale";
 
 export type {
   AppDirection,
   AppLanguage,
   LocaleContextValue,
-} from "@/app/providers/locale/locale.types";
+} from "./locale.types";

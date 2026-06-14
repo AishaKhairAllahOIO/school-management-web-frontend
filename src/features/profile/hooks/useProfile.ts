@@ -1,4 +1,4 @@
-import { useCurrentUser } from "@/app/layouts/dashboard/hooks/useCurrentUser";
+import { useCurrentUser } from "@/app/layouts/app/hooks/useCurrentUser";
 import { getProfileIdentity } from "@/features/profile/utils/profileIdentity";
 import { getProfilePermissions } from "@/features/profile/utils/profilePermissions";
 import type { DashboardProfileUser } from "@/features/profile/types/profile.types";

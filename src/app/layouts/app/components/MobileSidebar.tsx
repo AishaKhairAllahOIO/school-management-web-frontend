@@ -7,8 +7,8 @@ import {
 } from "lucide-react";
 import { NavLink } from "react-router-dom";
 
-import { SidebarMenu } from "@/app/layouts/dashboard/components/SidebarMenu";
-import { useLayoutStore } from "@/app/layouts/dashboard/store/layoutStore";
+import { SidebarMenu } from "@/app/layouts/app/components/SidebarMenu";
+import { useLayoutStore } from "@/app/layouts/app/store/layoutStore";
 
 export function MobileSidebar() {
   const isOpen = useLayoutStore((state) => state.isMobileSidebarOpen);

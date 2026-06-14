@@ -6,8 +6,8 @@ import {
 } from "lucide-react";
 
 import sidebar from "@/assets/images/sidebar.png";
-import { SidebarMenu } from "@/app/layouts/dashboard/components/SidebarMenu";
-import { useLayoutStore } from "@/app/layouts/dashboard/store/layoutStore";
+import { SidebarMenu } from "@/app/layouts/app/components/SidebarMenu";
+import { useLayoutStore } from "@/app/layouts/app/store/layoutStore";
 import { schoolConfigMock } from "@/features/settings/school-config/mocks/school-config.mock";
 
 function getDisplaySchoolName(name: string, maxLength = 14) {

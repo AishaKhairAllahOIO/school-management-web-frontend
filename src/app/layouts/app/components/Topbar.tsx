@@ -14,8 +14,8 @@ import { useState } from "react";
 import { useTheme } from "next-themes";
 import { useLocation, useNavigate } from "react-router-dom";
 
-import { useCurrentUser } from "@/app/layouts/dashboard/hooks/useCurrentUser";
-import { useNotifications } from "@/app/layouts/dashboard/hooks/useNotifications";
+import { useCurrentUser } from "@/app/layouts/app/hooks/useCurrentUser";
+import { useNotifications } from "@/app/layouts/app/hooks/useNotifications";
 import { LanguageToggle } from "@/shared/components/locale";
 
 const topbarItem =

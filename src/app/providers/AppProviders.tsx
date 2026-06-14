@@ -1,8 +1,8 @@
 import type { ReactNode } from "react";
 
+import { LocaleProvider } from "@/app/providers/locale";
 import { QueryProvider } from "@/app/providers/query";
 import { ThemeProvider } from "@/app/providers/theme";
-import { LocaleProvider } from "@/app/providers/locale";
 import { AppToaster } from "@/app/providers/ui";
 
 type AppProvidersProps = {

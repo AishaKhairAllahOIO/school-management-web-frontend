@@ -1,4 +1,4 @@
-export { ThemeProvider } from "@/app/providers/theme/ThemeProvider";
-export { useAppTheme } from "@/app/providers/theme/useAppTheme";
+export { ThemeProvider } from "./ThemeProvider";
+export { useAppTheme } from "./useAppTheme";
 
-export type { AppTheme } from "@/app/providers/theme/theme.types";
+export type { AppTheme } from "./theme.types";

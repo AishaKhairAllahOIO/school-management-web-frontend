@@ -1,12 +1,12 @@
 import { Outlet } from "react-router-dom";
 
-import { MobileSidebar } from "@/app/layouts/dashboard/components/MobileSidebar";
-import { Sidebar } from "@/app/layouts/dashboard/components/Sidebar";
-import { SubNavigation } from "@/app/layouts/dashboard/components/SubNavigation";
-import { Topbar } from "@/app/layouts/dashboard/components/Topbar";
-import { useLayoutStore } from "@/app/layouts/dashboard/store/layoutStore";
+import { MobileSidebar } from "@/app/layouts/app/components/MobileSidebar";
+import { Sidebar } from "@/app/layouts/app/components/Sidebar";
+import { SubNavigation } from "@/app/layouts/app/components/SubNavigation";
+import { Topbar } from "@/app/layouts/app/components/Topbar";
+import { useLayoutStore } from "@/app/layouts/app/store/layoutStore";
 
-export function DashboardLayout() {
+export function AppLayout() {
   const isSidebarCollapsed = useLayoutStore(
     (state) => state.isSidebarCollapsed
   );

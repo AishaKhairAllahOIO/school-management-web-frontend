@@ -1,4 +1,4 @@
-import { notificationsMock } from "@/app/layouts/dashboard/mocks/notifications.mock";
+import { notificationsMock } from "@/app/layouts/app/mocks/notifications.mock";
 
 export function useNotifications() {
   const unreadCount = notificationsMock.filter(

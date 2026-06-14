@@ -1,13 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
 
-import { LocaleContext } from "@/app/providers/locale/LocaleContext";
-import { LANGUAGE_STORAGE_KEY } from "@/app/providers/locale/locale.constants";
-import {
-  getDirection,
-  getInitialLanguage,
-} from "@/app/providers/locale/locale.helpers";
-import type { LocaleContextValue } from "@/app/providers/locale/locale.types";
+import { translations } from "@/app/translations";
+
+import { LocaleContext } from "./LocaleContext";
+import { LANGUAGE_STORAGE_KEY } from "./locale.constants";
+import { getDirection, getInitialLanguage } from "./locale.helpers";
+import type { LocaleContextValue } from "./locale.types";
 
 type LocaleProviderProps = {
   children: ReactNode;
@@ -30,9 +29,14 @@ export function LocaleProvider({ children }: LocaleProviderProps) {
       language,
       direction,
       setLanguage,
+      t: translations[language],
     }),
     [language, direction]
   );
 
-  return <LocaleContext.Provider value={value}>{children}</LocaleContext.Provider>;
+  return (
+    <LocaleContext.Provider value={value}>
+      {children}
+    </LocaleContext.Provider>
+  );
 }

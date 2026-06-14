@@ -1,0 +1,1 @@
+export { appLayout } from "@/app/layouts/app/AppLayout";

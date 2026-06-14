@@ -1,1 +1,0 @@
-export { DashboardLayout } from "@/app/layouts/dashboard/DashboardLayout";
