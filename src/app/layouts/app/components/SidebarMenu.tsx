@@ -5,6 +5,7 @@ import type { SidebarItem } from "@/app/layouts/app/types/sidebar.types";
 
 type SidebarMenuProps = {
   variant: "icons" | "labels";
+  onNavigate?: () => void;
 };
 
 function getBasePath(path: string) {
@@ -25,13 +26,14 @@ function getVisibleSidebarItems(items: SidebarItem[]) {
   return items.filter((item) => !item.hidden);
 }
 
-export function SidebarMenu({ variant }: SidebarMenuProps) {
+export function SidebarMenu({ variant, onNavigate }: SidebarMenuProps) {
   const location = useLocation();
   const visibleItems = getVisibleSidebarItems(sidebarItems);
 
   if (variant === "icons") {
     return (
-<nav className="flex flex-1 flex-col items-center gap-1 pt-3">        {visibleItems.map((item) => {
+      <nav className="flex flex-1 flex-col items-center gap-1 pt-3">
+        {visibleItems.map((item) => {
           const Icon = item.icon;
           const active = isItemActive(location.pathname, item);
 
@@ -43,6 +45,7 @@ export function SidebarMenu({ variant }: SidebarMenuProps) {
               title={item.title}
               aria-label={item.title}
               aria-current={active ? "page" : undefined}
+              onClick={onNavigate}
               className={[
                 "relative flex h-11 w-full items-center justify-center",
                 "text-sidebar-foreground/70 transition-all duration-300 ease-out hover:text-white",
@@ -61,7 +64,8 @@ export function SidebarMenu({ variant }: SidebarMenuProps) {
   }
 
   return (
-<nav className="flex flex-col gap-1 pt-0">      {visibleItems.map((item) => {
+    <nav className="flex flex-col gap-1 pt-0">
+      {visibleItems.map((item) => {
         const active = isItemActive(location.pathname, item);
 
         return (
@@ -70,13 +74,14 @@ export function SidebarMenu({ variant }: SidebarMenuProps) {
             to={item.path}
             end={item.exact}
             aria-current={active ? "page" : undefined}
+            onClick={onNavigate}
             className={[
               "relative mx-3 flex h-11 items-center rounded-2xl px-4",
               "text-[13px] font-semibold tracking-[-0.005em] transition-all duration-300 ease-out",
               item.disabled ? "pointer-events-none opacity-40" : "",
-            active
-  ? "bg-white/12 text-white ring-1 ring-white/12 "
-  : "text-sidebar-foreground/75 hover:bg-white/8 hover:text-white"
+              active
+                ? "bg-white/12 text-white ring-1 ring-white/12"
+                : "text-sidebar-foreground/75 hover:bg-white/8 hover:text-white",
             ].join(" ")}
           >
             <span className="truncate">{item.title}</span>

@@ -1,4 +1,4 @@
-import type { UserRole } from "@/config/roles.config";
+import type { UserRole } from "@/shared/constants/roles.config";
 
 export interface LoginPayload {
   email: string;

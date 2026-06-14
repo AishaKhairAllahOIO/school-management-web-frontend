@@ -17,10 +17,10 @@ import { handleApiError }
 from "@/shared/lib/error-handler";
 
 import { rolesConfig }
-from "@/config/roles.config";
+from "@/shared/constants/roles.config";
 
 import type { UserRole }
-from "@/config/roles.config";
+from "@/shared/constants/roles.config";
 
 export function useVerifyOtp() {
 

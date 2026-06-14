@@ -5,6 +5,7 @@ import {
   ChevronRight,
   Eye,
   LogOut,
+  Menu,
   Settings,
   ShieldCheck,
   Sun,
@@ -16,6 +17,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 
 import { useCurrentUser } from "@/app/layouts/app/hooks/useCurrentUser";
 import { useNotifications } from "@/app/layouts/app/hooks/useNotifications";
+import { useLayoutStore } from "@/app/layouts/app/store/layoutStore";
 import { LanguageToggle } from "@/shared/components/locale";
 
 const topbarItem =
@@ -303,6 +305,9 @@ function ProfileMenuItem({
 
 export function Topbar() {
   const location = useLocation();
+  const openMobileSidebar = useLayoutStore(
+    (state) => state.openMobileSidebar
+  );
   const { user } = useCurrentUser();
 
   const fullName =
@@ -328,7 +333,16 @@ export function Topbar() {
   return (
     <header className="sticky top-0 z-40 pb-4 pt-4">
       <div className="flex h-[44px] w-full items-center justify-between">
-        <div className="flex min-w-0 flex-1 items-center">
+        <div className="flex min-w-0 flex-1 items-center gap-3">
+          <button
+            type="button"
+            onClick={openMobileSidebar}
+            aria-label="Open sidebar"
+            className="flex h-[44px] w-[44px] items-center justify-center rounded-[14px] bg-white/92 text-[#080A2A] shadow-[0_16px_38px_rgba(46,38,108,0.10)] ring-1 ring-[#EEF0FA] backdrop-blur-xl transition duration-200 hover:-translate-y-0.5 hover:bg-white lg:hidden"
+          >
+            <Menu size={20} strokeWidth={2.1} />
+          </button>
+
           <TopbarBreadcrumb pathname={location.pathname} />
         </div>
 
