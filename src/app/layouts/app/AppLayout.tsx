@@ -5,11 +5,23 @@ import { Sidebar } from "@/app/layouts/app/components/Sidebar";
 import { SubNavigation } from "@/app/layouts/app/components/SubNavigation";
 import { Topbar } from "@/app/layouts/app/components/Topbar";
 import { useLayoutStore } from "@/app/layouts/app/store/layoutStore";
+import { useLocale } from "@/app/providers/locale";
 
 export function AppLayout() {
   const isSidebarCollapsed = useLayoutStore(
     (state) => state.isSidebarCollapsed
   );
+
+  const { direction } = useLocale();
+
+  const sidebarOffsetClass =
+    direction === "rtl"
+      ? isSidebarCollapsed
+        ? "lg:pr-[72px]"
+        : "lg:pr-[238px]"
+      : isSidebarCollapsed
+        ? "lg:pl-[72px]"
+        : "lg:pl-[238px]";
 
   return (
     <div className="h-screen overflow-hidden app-shell-bg">
@@ -19,7 +31,7 @@ export function AppLayout() {
       <div
         className={[
           "flex h-screen flex-col transition-all duration-300 ease-out",
-          isSidebarCollapsed ? "lg:pl-[72px]" : "lg:pl-[238px]",
+          sidebarOffsetClass,
         ].join(" ")}
       >
         <div className="shrink-0 px-4 md:px-6 lg:px-8">

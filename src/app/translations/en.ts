@@ -49,4 +49,26 @@ export const en: TranslationDictionary = {
     forbidden: "Access denied",
     notFound: "Resource not found",
   },
+  layout: {
+  sidebar: {
+    academy: "Academy",
+    schoolWebsite: "School Website",
+    expandSidebar: "Expand sidebar",
+    collapseSidebar: "Collapse sidebar",
+  },
+  topbar: {
+  openSidebar: "Open sidebar",
+  toggleTheme: "Toggle theme",
+  notifications: "Notifications",
+  notificationsTitle: "Notifications",
+  unreadUpdates: "You have {{count}} unread updates",
+  overview: "Overview",
+  online: "Online",
+  viewProfile: "View Profile",
+  changePassword: "Change Password",
+  manageUsers: "Manage Users",
+  logout: "Log Out",
+  openProfileMenu: "Open profile menu",
+},
+},
 };

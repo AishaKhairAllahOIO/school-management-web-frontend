@@ -2,6 +2,7 @@ import type { LucideIcon } from "lucide-react";
 import {
   Bell,
   ChevronDown,
+  ChevronLeft,
   ChevronRight,
   Eye,
   LogOut,
@@ -18,6 +19,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useCurrentUser } from "@/app/layouts/app/hooks/useCurrentUser";
 import { useNotifications } from "@/app/layouts/app/hooks/useNotifications";
 import { useLayoutStore } from "@/app/layouts/app/store/layoutStore";
+import { useLocale } from "@/app/providers/locale";
 import { LanguageToggle } from "@/shared/components/locale";
 
 const topbarItem =
@@ -43,23 +45,25 @@ function formatSegment(value?: string) {
     .join(" ");
 }
 
-function getSectionTitle(pathname: string) {
-  if (pathname === "/") return "Dashboard";
-  if (pathname.startsWith("/users")) return "Users";
-  if (pathname.startsWith("/academics")) return "Academic";
-  if (pathname.startsWith("/attendance")) return "Attendance";
-  if (pathname.startsWith("/scheduling")) return "Scheduling";
-  if (pathname.startsWith("/finance")) return "Finance";
-  if (pathname.startsWith("/communication")) return "Communication";
-  if (pathname.startsWith("/reports")) return "Reports";
-  if (pathname.startsWith("/settings")) return "Settings";
+function getSectionKey(pathname: string) {
+  if (pathname === "/") return "dashboard";
+  if (pathname.startsWith("/users")) return "users";
+  if (pathname.startsWith("/academics")) return "academics";
+  if (pathname.startsWith("/attendance")) return "attendance";
+  if (pathname.startsWith("/scheduling")) return "scheduling";
+  if (pathname.startsWith("/finance")) return "finance";
+  if (pathname.startsWith("/communication")) return "communications";
+  if (pathname.startsWith("/reports")) return "reports";
+  if (pathname.startsWith("/settings")) return "settings";
 
-  return "Dashboard";
+  return "dashboard";
 }
 
-function getCurrentPageTitle(pathname: string) {
+function getCurrentPageTitle(pathname: string, overviewLabel: string) {
   const segments = pathname.split("/").filter(Boolean);
-  if (segments.length <= 1) return "Overview";
+
+  if (segments.length <= 1) return overviewLabel;
+
   return formatSegment(segments[1]);
 }
 
@@ -74,20 +78,31 @@ function getRoleLabel(user: { category?: string; role?: string }) {
 }
 
 function TopbarBreadcrumb({ pathname }: { pathname: string }) {
+  const { direction, t } = useLocale();
+
+  const sectionKey = getSectionKey(pathname);
+  const sectionTitle = t.navigation[sectionKey];
+  const currentPageTitle = getCurrentPageTitle(
+    pathname,
+    t.layout.topbar.overview
+  );
+
+  const BreadcrumbChevron = direction === "rtl" ? ChevronLeft : ChevronRight;
+
   return (
     <div className="hidden min-w-0 items-center gap-[13px] lg:flex">
       <h1 className="truncate text-[15px] font-bold tracking-[-0.02em] text-[#090A2D]">
-        {getSectionTitle(pathname)}
+        {sectionTitle}
       </h1>
 
-      <ChevronRight
+      <BreadcrumbChevron
         size={14}
         strokeWidth={1.9}
         className="shrink-0 text-[#C3C4D7]"
       />
 
       <span className="inline-flex h-[34px] max-w-[150px] shrink-0 items-center rounded-[12px] bg-[#F7F7FE] px-[17px] text-[12px] font-semibold text-[#252543] shadow-[inset_0_0_0_1px_rgba(235,236,248,0.9)]">
-        {getCurrentPageTitle(pathname)}
+        {currentPageTitle}
       </span>
     </div>
   );
@@ -95,13 +110,15 @@ function TopbarBreadcrumb({ pathname }: { pathname: string }) {
 
 function ThemeButton() {
   const { theme, setTheme } = useTheme();
+  const { t } = useLocale();
+
   const isDark = theme === "dark";
 
   return (
     <button
       type="button"
       onClick={() => setTheme(isDark ? "light" : "dark")}
-      aria-label="Toggle theme"
+      aria-label={t.layout.topbar.toggleTheme}
       className={topbarItem}
     >
       {isDark ? (
@@ -123,36 +140,41 @@ function NotificationsMenu({
   onToggle: () => void;
 }) {
   const { notifications, unreadCount } = useNotifications();
+  const { t } = useLocale();
 
   return (
     <div className="relative">
       <button
         type="button"
         onClick={onToggle}
-        aria-label="Notifications"
+        aria-label={t.layout.topbar.notifications}
         className={topbarItem}
       >
         <Bell size={18} strokeWidth={2.05} />
 
         {unreadCount > 0 && (
-          <span className="absolute -right-[5px] -top-[6px] flex h-[20px] min-w-[20px] items-center justify-center rounded-full bg-[#6C45FF] px-1 text-[10px] font-bold leading-none text-white ring-[3px] ring-white">
+          <span className="absolute -end-[5px] -top-[6px] flex h-[20px] min-w-[20px] items-center justify-center rounded-full bg-[#6C45FF] px-1 text-[10px] font-bold leading-none text-white ring-[3px] ring-white">
             {unreadCount}
           </span>
         )}
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 top-full mt-4 w-[340px] rounded-[26px] border border-white/80 bg-white/95 p-4 shadow-[0_30px_80px_rgba(37,31,92,0.18)] backdrop-blur-2xl">
+        <div className="absolute end-0 top-full mt-4 w-[340px] rounded-[26px] border border-white/80 bg-white/95 p-4 shadow-[0_30px_80px_rgba(37,31,92,0.18)] backdrop-blur-2xl">
           <div className="mb-4">
             <h3 className="text-[14px] font-bold text-[#090A2D]">
-              Notifications
+              {t.layout.topbar.notificationsTitle}
             </h3>
+
             <p className="mt-1 text-[12px] text-[#7F8198]">
-              You have {unreadCount} unread updates
+              {t.layout.topbar.unreadUpdates.replace(
+                "{{count}}",
+                String(unreadCount)
+              )}
             </p>
           </div>
 
-          <div className="max-h-[280px] space-y-2 overflow-y-auto pr-1 scrollbar-thin">
+          <div className="max-h-[280px] space-y-2 overflow-y-auto pe-1 scrollbar-thin">
             {notifications.map((item) => (
               <div
                 key={item.id}
@@ -161,9 +183,11 @@ function NotificationsMenu({
                 <p className="truncate text-[12px] font-bold text-[#111232]">
                   {item.title}
                 </p>
+
                 <p className="mt-1 line-clamp-2 text-[12px] leading-5 text-[#777991]">
                   {item.description}
                 </p>
+
                 <p className="mt-1 text-[11px] text-[#A0A1B4]">{item.time}</p>
               </div>
             ))}
@@ -184,6 +208,7 @@ function ProfileMenu({
   onClose: () => void;
 }) {
   const navigate = useNavigate();
+  const { t } = useLocale();
   const { user } = useCurrentUser();
 
   const fullName =
@@ -204,7 +229,7 @@ function ProfileMenu({
       <button
         type="button"
         onClick={onToggle}
-        className="flex h-[44px] items-center gap-[10px] rounded-[16px] bg-white/92 py-[5px] pl-[7px] pr-[6px] shadow-[0_16px_38px_rgba(46,38,108,0.10)] ring-1 ring-[#EEF0FA] backdrop-blur-xl"
+        className="flex h-[44px] items-center gap-[10px] rounded-[16px] bg-white/92 py-[5px] pe-[6px] ps-[7px] shadow-[0_16px_38px_rgba(46,38,108,0.10)] ring-1 ring-[#EEF0FA] backdrop-blur-xl"
       >
         <img
           src={photoUrl}
@@ -212,7 +237,7 @@ function ProfileMenu({
           className="h-[34px] w-[34px] rounded-full object-cover ring-[2px] ring-white"
         />
 
-        <span className="flex min-w-0 max-w-[120px] flex-col text-left">
+        <span className="flex min-w-0 max-w-[120px] flex-col text-start">
           <span className="truncate text-[12px] font-bold leading-[15px] text-[#111232]">
             {fullName}
           </span>
@@ -228,21 +253,21 @@ function ProfileMenu({
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 top-full mt-4 w-[255px] rounded-[26px] border border-white/80 bg-white/95 p-[18px] shadow-[0_30px_80px_rgba(37,31,92,0.18)] backdrop-blur-2xl">
+        <div className="absolute end-0 top-full mt-4 w-[255px] rounded-[26px] border border-white/80 bg-white/95 p-[18px] shadow-[0_30px_80px_rgba(37,31,92,0.18)] backdrop-blur-2xl">
           <div className="mb-[20px] flex items-center gap-[9px] px-1 text-[12px] font-medium text-[#7B7D92]">
             <span className="h-[7px] w-[7px] rounded-full bg-[#22C55E]" />
-            Online
+            {t.layout.topbar.online}
           </div>
 
           <div className="space-y-[8px]">
             <ProfileMenuItem
-              title="View Profile"
+              title={t.layout.topbar.viewProfile}
               icon={Eye}
               onClick={openProfilePage}
             />
 
             <ProfileMenuItem
-              title="Change Password"
+              title={t.layout.topbar.changePassword}
               icon={ShieldCheck}
               onClick={() => {
                 onClose();
@@ -252,7 +277,7 @@ function ProfileMenu({
 
             {roleLabel === "Super Admin" ? (
               <ProfileMenuItem
-                title="Manage Users"
+                title={t.layout.topbar.manageUsers}
                 icon={Settings}
                 onClick={() => {
                   onClose();
@@ -265,12 +290,13 @@ function ProfileMenu({
           <div className="mt-[18px] border-t border-[#ECECF6] pt-[14px]">
             <button
               type="button"
-              className="flex h-[44px] w-full items-center gap-[13px] rounded-[15px] px-[10px] text-left text-[13px] font-bold text-[#FF3B4E] transition hover:bg-[#FFF0F1]"
+              className="flex h-[44px] w-full items-center gap-[13px] rounded-[15px] px-[10px] text-start text-[13px] font-bold text-[#FF3B4E] transition hover:bg-[#FFF0F1]"
             >
               <span className="flex h-[32px] w-[32px] items-center justify-center rounded-[12px] bg-[#FFECEF] text-[#FF3B4E]">
                 <LogOut size={16} strokeWidth={2.1} />
               </span>
-              Log Out
+
+              {t.layout.topbar.logout}
             </button>
           </div>
         </div>
@@ -292,7 +318,7 @@ function ProfileMenuItem({
     <button
       type="button"
       onClick={onClick}
-      className="flex h-[44px] w-full items-center gap-[13px] rounded-[15px] px-[10px] text-left text-[13px] font-semibold text-[#151634] transition hover:bg-[#F7F6FF]"
+      className="flex h-[44px] w-full items-center gap-[13px] rounded-[15px] px-[10px] text-start text-[13px] font-semibold text-[#151634] transition hover:bg-[#F7F6FF]"
     >
       <span className="flex h-[32px] w-[32px] items-center justify-center rounded-[12px] bg-[#F3F2FB] text-[#171734]">
         <Icon size={16} strokeWidth={2.05} />
@@ -305,9 +331,9 @@ function ProfileMenuItem({
 
 export function Topbar() {
   const location = useLocation();
-  const openMobileSidebar = useLayoutStore(
-    (state) => state.openMobileSidebar
-  );
+  const { t } = useLocale();
+
+  const openMobileSidebar = useLayoutStore((state) => state.openMobileSidebar);
   const { user } = useCurrentUser();
 
   const fullName =
@@ -337,7 +363,7 @@ export function Topbar() {
           <button
             type="button"
             onClick={openMobileSidebar}
-            aria-label="Open sidebar"
+            aria-label={t.layout.topbar.openSidebar}
             className="flex h-[44px] w-[44px] items-center justify-center rounded-[14px] bg-white/92 text-[#080A2A] shadow-[0_16px_38px_rgba(46,38,108,0.10)] ring-1 ring-[#EEF0FA] backdrop-blur-xl transition duration-200 hover:-translate-y-0.5 hover:bg-white lg:hidden"
           >
             <Menu size={20} strokeWidth={2.1} />
@@ -369,7 +395,7 @@ export function Topbar() {
           <button
             type="button"
             onClick={toggleProfileMenu}
-            aria-label="Open profile menu"
+            aria-label={t.layout.topbar.openProfileMenu}
             className="flex h-[44px] w-[44px] items-center justify-center rounded-full lg:hidden"
           >
             <img

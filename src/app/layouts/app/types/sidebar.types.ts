@@ -1,19 +1,15 @@
 import type { LucideIcon } from "lucide-react";
 
+import type { TranslationDictionary } from "@/app/translations/types";
+
+export type SidebarNavigationKey = keyof TranslationDictionary["navigation"];
+
 export type SidebarItem = {
-  title: string;
+  titleKey: SidebarNavigationKey;
   path: string;
   icon: LucideIcon;
-
-  children?: SidebarItem[];
-
-  badge?: string | number;
-
-  hidden?: boolean;
-
-  disabled?: boolean;
-
-  permissions?: string[];
-
   exact?: boolean;
+  hidden?: boolean;
+  disabled?: boolean;
+  badge?: string;
 };

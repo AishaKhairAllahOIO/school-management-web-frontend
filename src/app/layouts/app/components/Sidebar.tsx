@@ -8,6 +8,7 @@ import {
 import sidebar from "@/assets/images/sidebar.png";
 import { SidebarMenu } from "@/app/layouts/app/components/SidebarMenu";
 import { useLayoutStore } from "@/app/layouts/app/store/layoutStore";
+import { useLocale } from "@/app/providers/locale";
 import { schoolConfigMock } from "@/features/settings/school-config/mocks/school-config.mock";
 
 function getDisplaySchoolName(name: string, maxLength = 14) {
@@ -20,30 +21,62 @@ function getDisplaySchoolName(name: string, maxLength = 14) {
     .join("");
 }
 
-export function Sidebar() {
-  const isCollapsed = useLayoutStore((state) => state.isSidebarCollapsed);
-  const toggleSidebar = useLayoutStore((state) => state.toggleSidebar);
-
-  const schoolDisplayName = getDisplaySchoolName(schoolConfigMock.schoolName);
-
-  const schoolWebsiteUrl =
+function getSchoolWebsiteUrl() {
+  return (
     (schoolConfigMock as { websiteUrl?: string; schoolWebsiteUrl?: string })
       .websiteUrl ??
     (schoolConfigMock as { websiteUrl?: string; schoolWebsiteUrl?: string })
       .schoolWebsiteUrl ??
-    "#";
+    "#"
+  );
+}
+
+export function Sidebar() {
+  const isCollapsed = useLayoutStore((state) => state.isSidebarCollapsed);
+  const toggleSidebar = useLayoutStore((state) => state.toggleSidebar);
+
+  const { direction, t } = useLocale();
+
+  const isRtl = direction === "rtl";
+
+  const sidebarPositionClass = isRtl
+    ? "right-0 rounded-l-3xl"
+    : "left-0 rounded-r-3xl";
+
+  const sidebarRadiusClass = isRtl ? "rounded-l-3xl" : "rounded-r-3xl";
+
+  const collapsedTogglePositionClass = isRtl ? "right-[62px]" : "left-[62px]";
+
+  const collapseIcon = isRtl ? (
+    <ChevronRight size={15} />
+  ) : (
+    <ChevronLeft size={15} />
+  );
+
+  const expandIcon = isRtl ? (
+    <ChevronLeft size={15} />
+  ) : (
+    <ChevronRight size={15} />
+  );
+
+  const schoolDisplayName = getDisplaySchoolName(schoolConfigMock.schoolName);
+  const schoolWebsiteUrl = getSchoolWebsiteUrl();
 
   return (
     <aside
       className={[
-        "fixed left-0 top-0 z-50 hidden h-screen overflow-visible rounded-r-3xl sidebar-gradient text-sidebar-foreground shadow-2xl transition-all duration-300 ease-out lg:grid",
+        "fixed top-0 z-50 hidden h-screen overflow-visible sidebar-gradient text-sidebar-foreground shadow-2xl transition-all duration-300 ease-out lg:grid",
+        sidebarPositionClass,
         isCollapsed
           ? "w-[56px] grid-cols-[56px] grid-rows-[76px_1fr_64px]"
           : "w-[242px] grid-cols-[56px_1fr] grid-rows-[76px_1fr_auto]",
       ].join(" ")}
     >
       <div
-        className="pointer-events-none absolute inset-0 z-0 rounded-r-3xl"
+        className={[
+          "pointer-events-none absolute inset-0 z-0",
+          sidebarRadiusClass,
+        ].join(" ")}
         style={{
           backgroundImage: `url(${sidebar})`,
           backgroundPosition: "center",
@@ -59,14 +92,22 @@ export function Sidebar() {
         <button
           type="button"
           onClick={toggleSidebar}
-          aria-label="Expand sidebar"
-          className="absolute left-[62px] top-6 z-[100] flex h-8 w-8 items-center justify-center rounded-full border border-border/70 bg-card text-primary shadow-soft transition duration-300 hover:scale-105 hover:bg-accent"
+          aria-label={t.layout.sidebar.expandSidebar}
+          className={[
+            "absolute top-6 z-[100] flex h-8 w-8 items-center justify-center rounded-full border border-border/70 bg-card text-primary shadow-soft transition duration-300 hover:scale-105 hover:bg-accent",
+            collapsedTogglePositionClass,
+          ].join(" ")}
         >
-          <ChevronRight size={15} />
+          {expandIcon}
         </button>
       )}
 
-      <div className="relative z-10 row-span-3 flex flex-col items-center rounded-r-3xl bg-white/8">
+      <div
+        className={[
+          "relative z-10 row-span-3 flex flex-col items-center bg-white/8",
+          sidebarRadiusClass,
+        ].join(" ")}
+      >
         <div className="flex h-[76px] items-center justify-center">
           {isCollapsed ? (
             <GraduationCap size={26} strokeWidth={1.8} className="text-white" />
@@ -78,7 +119,7 @@ export function Sidebar() {
 
       {!isCollapsed && (
         <>
-          <div className="relative z-10 flex h-[76px] items-center justify-between gap-3 border-b border-white/10 pl-6 pr-4">
+          <div className="relative z-10 flex h-[76px] items-center justify-between gap-3 border-b border-white/10 px-4 ps-6">
             <div className="flex min-w-0 items-center gap-3">
               <span className="flex h-10 w-10 shrink-0 items-center justify-center text-white">
                 <GraduationCap size={26} strokeWidth={1.8} />
@@ -93,7 +134,7 @@ export function Sidebar() {
                 </h1>
 
                 <p className="truncate text-[10px] font-medium text-white/50">
-                  Academy
+                  {t.layout.sidebar.academy}
                 </p>
               </div>
             </div>
@@ -101,10 +142,10 @@ export function Sidebar() {
             <button
               type="button"
               onClick={toggleSidebar}
-              aria-label="Collapse sidebar"
+              aria-label={t.layout.sidebar.collapseSidebar}
               className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/8 text-white/75 transition duration-300 hover:bg-white/15 hover:text-white"
             >
-              <ChevronLeft size={15} />
+              {collapseIcon}
             </button>
           </div>
 
@@ -119,7 +160,7 @@ export function Sidebar() {
               rel="noreferrer"
               className="flex h-10 items-center justify-between rounded-2xl bg-white/5 px-3 text-[11px] font-semibold text-white/75 transition hover:bg-white/10 hover:text-white"
             >
-              <span>School Website</span>
+              <span>{t.layout.sidebar.schoolWebsite}</span>
               <ExternalLink size={13} strokeWidth={1.8} />
             </a>
           </div>

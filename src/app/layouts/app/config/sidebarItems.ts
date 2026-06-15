@@ -14,56 +14,48 @@ import type { SidebarItem } from "@/app/layouts/app/types/sidebar.types";
 
 export const sidebarItems: SidebarItem[] = [
   {
-    title: "Dashboard",
+    titleKey: "dashboard",
     path: "/",
     icon: LayoutDashboard,
     exact: true,
   },
-
   {
-    title: "Users",
+    titleKey: "users",
     path: "/users/students",
     icon: Users,
   },
-
   {
-    title: "Academic",
+    titleKey: "academics",
     path: "/academics/classes",
     icon: GraduationCap,
   },
-
   {
-    title: "Attendance",
+    titleKey: "attendance",
     path: "/attendance/students",
     icon: ClipboardCheck,
   },
-
   {
-    title: "Scheduling",
+    titleKey: "scheduling",
     path: "/scheduling/classes",
     icon: CalendarDays,
   },
-
   {
-    title: "Finance",
+    titleKey: "finance",
     path: "/finance/fees",
     icon: Wallet,
   },
-
   {
-    title: "Communication",
+    titleKey: "communications",
     path: "/communication/announcements",
     icon: MessageCircle,
   },
-
   {
-    title: "Reports",
+    titleKey: "reports",
     path: "/reports",
     icon: BarChart3,
   },
-
   {
-    title: "Settings",
+    titleKey: "settings",
     path: "/settings/roles",
     icon: Settings,
   },

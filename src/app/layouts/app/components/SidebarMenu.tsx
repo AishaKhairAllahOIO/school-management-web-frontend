@@ -2,6 +2,7 @@ import { NavLink, useLocation } from "react-router-dom";
 
 import { sidebarItems } from "@/app/layouts/app/config/sidebarItems";
 import type { SidebarItem } from "@/app/layouts/app/types/sidebar.types";
+import { useLocale } from "@/app/providers/locale";
 
 type SidebarMenuProps = {
   variant: "icons" | "labels";
@@ -28,6 +29,8 @@ function getVisibleSidebarItems(items: SidebarItem[]) {
 
 export function SidebarMenu({ variant, onNavigate }: SidebarMenuProps) {
   const location = useLocation();
+  const { direction, t } = useLocale();
+
   const visibleItems = getVisibleSidebarItems(sidebarItems);
 
   if (variant === "icons") {
@@ -36,21 +39,25 @@ export function SidebarMenu({ variant, onNavigate }: SidebarMenuProps) {
         {visibleItems.map((item) => {
           const Icon = item.icon;
           const active = isItemActive(location.pathname, item);
+          const title = t.navigation[item.titleKey];
 
           return (
             <NavLink
               key={item.path}
               to={item.path}
               end={item.exact}
-              title={item.title}
-              aria-label={item.title}
+              title={title}
+              aria-label={title}
               aria-current={active ? "page" : undefined}
               onClick={onNavigate}
               className={[
                 "relative flex h-11 w-full items-center justify-center",
                 "text-sidebar-foreground/70 transition-all duration-300 ease-out hover:text-white",
                 item.disabled ? "pointer-events-none opacity-40" : "",
-                active
+                active && direction === "rtl"
+                  ? "text-white before:absolute before:-right-5 before:top-1/2 before:h-7 before:w-[4px] before:-translate-y-1/2 before:rounded-l-full before:bg-white"
+                  : "",
+                active && direction === "ltr"
                   ? "text-white before:absolute before:-left-5 before:top-1/2 before:h-7 before:w-[4px] before:-translate-y-1/2 before:rounded-r-full before:bg-white"
                   : "",
               ].join(" ")}
@@ -67,6 +74,7 @@ export function SidebarMenu({ variant, onNavigate }: SidebarMenuProps) {
     <nav className="flex flex-col gap-1 pt-0">
       {visibleItems.map((item) => {
         const active = isItemActive(location.pathname, item);
+        const title = t.navigation[item.titleKey];
 
         return (
           <NavLink
@@ -84,10 +92,10 @@ export function SidebarMenu({ variant, onNavigate }: SidebarMenuProps) {
                 : "text-sidebar-foreground/75 hover:bg-white/8 hover:text-white",
             ].join(" ")}
           >
-            <span className="truncate">{item.title}</span>
+            <span className="truncate">{title}</span>
 
             {item.badge ? (
-              <span className="ml-auto rounded-full bg-white/15 px-1.5 py-0.5 text-[10px] font-bold text-white">
+              <span className="ms-auto rounded-full bg-white/15 px-1.5 py-0.5 text-[10px] font-bold text-white">
                 {item.badge}
               </span>
             ) : null}
