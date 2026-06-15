@@ -1,15 +1,12 @@
-export type ApiResponse<T> = 
-{
+export type ApiResponse<T> = {
   success: boolean;
   message?: string;
   data: T;
 };
 
-export type PaginatedResponse<T> = 
-{
+export type PaginatedResponse<T> = {
   data: T[];
-  meta: 
-  {
+  meta: {
     page: number;
     limit: number;
     total: number;

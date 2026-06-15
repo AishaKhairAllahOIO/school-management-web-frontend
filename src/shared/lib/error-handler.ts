@@ -2,48 +2,32 @@ import axios from "axios";
 
 import { notify } from "./toast";
 
-export const handleApiError = (
-  error: unknown
-) => {
-
-  if (!axios.isAxiosError(error)) {
-
-    notify.error(
-      "Unexpected error occurred"
-    );
-
-    return;
-  }
-
-  const response =
-    error.response?.data;
-
-  // backend message
-  if (response?.message) {
-
-    notify.error(response.message);
-
-    return;
-  }
-
-  // validation errors
-  if (response?.errors) {
-
-    const firstError =
-      Object.values(response.errors)
-        .flat()[0];
-
-    if (firstError) {
-
-      notify.error(
-        String(firstError)
-      );
-
-      return;
-    }
-  }
-
-  notify.error(
-    "Something went wrong"
-  );
+type ApiErrorResponse = {
+  message?: string;
+  errors?: Record<string, string[]>;
 };
+
+export function handleApiError(error: unknown) {
+  if (!axios.isAxiosError<ApiErrorResponse>(error)) {
+    notify.error("Unexpected error occurred");
+    return;
+  }
+
+  const response = error.response?.data;
+
+  if (response?.message) {
+    notify.error(response.message);
+    return;
+  }
+
+  const firstValidationError = response?.errors
+    ? Object.values(response.errors).flat()[0]
+    : undefined;
+
+  if (firstValidationError) {
+    notify.error(firstValidationError);
+    return;
+  }
+
+  notify.error("Something went wrong");
+}

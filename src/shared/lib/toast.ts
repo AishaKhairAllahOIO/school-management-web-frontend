@@ -1,47 +1,27 @@
-import { toast }
-from "sonner";
+import { toast } from "sonner";
 
 export const notify = {
-
-  success: (
-    message: string
-  ) => {
-
+  success(message: string) {
     toast.success(message);
   },
 
-  error: (
-    message: string
-  ) => {
-
+  error(message: string) {
     toast.error(message);
   },
 
-  warning: (
-    message: string
-  ) => {
-
+  warning(message: string) {
     toast.warning(message);
   },
 
-  info: (
-    message: string
-  ) => {
-
+  info(message: string) {
     toast.info(message);
   },
 
-  loading: (
-    message: string
-  ) => {
-
+  loading(message: string) {
     return toast.loading(message);
   },
 
-  dismiss: (
-    toastId?: string | number
-  ) => {
-
+  dismiss(toastId?: string | number) {
     toast.dismiss(toastId);
   },
 };

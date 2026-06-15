@@ -1,8 +1,10 @@
 import axios from "axios";
+
+import  { env } from "@/app/config";
 import { setupAxiosInterceptors } from "./axiosInterceptors";
 
 export const axiosClient = axios.create({
-  baseURL: import.meta.env.VITE_API_URL,
+  baseURL: env.apiBaseUrl,
   headers: {
     "Content-Type": "application/json",
   },
