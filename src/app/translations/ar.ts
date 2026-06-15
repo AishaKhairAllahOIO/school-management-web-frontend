@@ -1,15 +1,52 @@
 import type { TranslationDictionary } from "./types";
 
-export const ar: TranslationDictionary = 
-{
-  dashboard: "لوحة التحكم",
-  users: "المستخدمون",
-  academics: "الأكاديمي",
-  attendance: "الدوام",
-  scheduling: "الجداول",
-  finance: "المالية",
-  reports: "التقارير",
-  settings: "الإعدادات",
-  profile: "الملف الشخصي",
-  logout: "تسجيل الخروج",
+export const ar: TranslationDictionary = {
+  common: {
+    save: "حفظ",
+    cancel: "إلغاء",
+    edit: "تعديل",
+    delete: "حذف",
+    search: "بحث",
+    loading: "جاري التحميل...",
+    noData: "لا توجد بيانات",
+    back: "رجوع",
+    close: "إغلاق",
+    confirm: "تأكيد",
+  },
+
+  navigation: {
+    dashboard: "لوحة التحكم",
+    users: "المستخدمون",
+    academics: "الشؤون الأكاديمية",
+    attendance: "الحضور",
+    scheduling: "الجدولة",
+    finance: "المالية",
+    communications: "التواصل",
+    reports: "التقارير",
+    settings: "الإعدادات",
+    profile: "الملف الشخصي",
+  },
+
+  auth: {
+    login: "تسجيل الدخول",
+    logout: "تسجيل الخروج",
+    email: "البريد الإلكتروني",
+    password: "كلمة المرور",
+    forgotPassword: "نسيت كلمة المرور؟",
+    rememberMe: "تذكرني",
+  },
+
+  validation: {
+    required: "هذا الحقل مطلوب",
+    invalidEmail: "يرجى إدخال بريد إلكتروني صحيح",
+    minLength: "القيمة قصيرة جدًا",
+    maxLength: "القيمة طويلة جدًا",
+  },
+
+  errors: {
+    somethingWentWrong: "حدث خطأ غير متوقع",
+    unauthorized: "غير مصرح لك",
+    forbidden: "ليس لديك صلاحية الوصول",
+    notFound: "العنصر غير موجود",
+  },
 };

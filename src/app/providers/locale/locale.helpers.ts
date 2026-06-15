@@ -20,7 +20,11 @@ export function getDirection(language: AppLanguage): AppDirection {
 }
 
 export function getInitialLanguage(): AppLanguage {
-  const savedLanguage = localStorage.getItem(LANGUAGE_STORAGE_KEY);
+  if (typeof window === "undefined") {
+    return DEFAULT_LANGUAGE;
+  }
+
+  const savedLanguage = window.localStorage.getItem(LANGUAGE_STORAGE_KEY);
 
   if (isSupportedLanguage(savedLanguage)) {
     return savedLanguage;

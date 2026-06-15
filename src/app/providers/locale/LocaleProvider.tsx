@@ -21,7 +21,7 @@ export function LocaleProvider({ children }: LocaleProviderProps) {
     document.documentElement.lang = language;
     document.documentElement.dir = direction;
 
-    localStorage.setItem(LANGUAGE_STORAGE_KEY, language);
+    window.localStorage.setItem(LANGUAGE_STORAGE_KEY, language);
   }, [language, direction]);
 
   const value = useMemo<LocaleContextValue>(

@@ -1,6 +1,6 @@
 import { createBrowserRouter } from "react-router-dom";
 
-import { AppLayout  } from "@/app/layouts/app/AppLayout";
+import { AppLayout } from "@/app/layouts/app/AppLayout";
 import { ErrorPage, NotFoundPage } from "@/app/pages";
 import { LoginPage } from "@/features/auth/pages/LoginPage";
 
@@ -14,7 +14,7 @@ export const router = createBrowserRouter([
   },
   {
     path: "/",
-    element: <AppLayout  />,
+    element: <AppLayout />,
     errorElement: <ErrorPage />,
     children: [
       ...appRoutes,

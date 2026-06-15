@@ -1,1 +1,1 @@
-export { ThemeToggle } from "@/shared/components/theme/ThemeToggle";
+export { ThemeToggle } from "./ThemeToggle";
