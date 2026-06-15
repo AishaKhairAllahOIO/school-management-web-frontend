@@ -19,7 +19,7 @@ export const schoolConfigMock: SchoolConfig = {
   phoneNumber: "+963 944 000 000",
   emergencyPhoneNumber: "+963 955 000 000",
   email: "info@aishaschool.com",
-  website: "www.aishaschool.com",
+  website: "https://dazzling-salmiakki-a0914e.netlify.app/",
 
   images: [],
 

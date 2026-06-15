@@ -22,13 +22,7 @@ function getDisplaySchoolName(name: string, maxLength = 14) {
 }
 
 function getSchoolWebsiteUrl() {
-  return (
-    (schoolConfigMock as { websiteUrl?: string; schoolWebsiteUrl?: string })
-      .websiteUrl ??
-    (schoolConfigMock as { websiteUrl?: string; schoolWebsiteUrl?: string })
-      .schoolWebsiteUrl ??
-    "#"
-  );
+  return schoolConfigMock.website ?? "#";
 }
 
 export function Sidebar() {
