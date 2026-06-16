@@ -2,6 +2,11 @@ import { useMemo, useState } from "react";
 
 import { UsersToolbar } from "@/features/users/shared/components/UsersToolbar";
 import { UsersTable } from "@/features/users/shared/components/UsersTable";
+import { supervisorCsvColumns } from "@/features/users/shared/config/userCsvColumns";
+import {
+  exportDataToCsv,
+  parseCsvFile,
+} from "@/features/users/shared/utils/usersCsv.utils";
 
 import { supervisorsMock } from "@/features/users/supervisors/mocks/supervisors.mock";
 import type { SupervisorUser } from "@/features/users/supervisors/types/supervisor.types";
@@ -28,6 +33,23 @@ export function SupervisorsPage() {
     });
   }, [searchValue]);
 
+  function handleExportSupervisors() {
+    exportDataToCsv(
+      filteredSupervisors,
+      supervisorCsvColumns,
+      "supervisors.csv"
+    );
+  }
+
+  async function handleImportSupervisors(file: File) {
+    const rows = await parseCsvFile(file);
+
+    console.log("Supervisors CSV rows ready for API:", rows);
+
+    // لاحقًا:
+    // await createSupervisorsBulk(rows);
+  }
+
   return (
     <div className="space-y-4">
       <UsersToolbar
@@ -38,8 +60,8 @@ export function SupervisorsPage() {
         exportLabel="Export Supervisors"
         filterLabel="Filter"
         onSearchChange={setSearchValue}
-        onImport={() => {}}
-        onExport={() => {}}
+        onImport={handleImportSupervisors}
+        onExport={handleExportSupervisors}
       />
 
       <UsersTable<SupervisorUser>

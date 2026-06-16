@@ -2,6 +2,11 @@ import { useMemo, useState } from "react";
 
 import { UsersToolbar } from "@/features/users/shared/components/UsersToolbar";
 import { UsersTable } from "@/features/users/shared/components/UsersTable";
+import { secretaryCsvColumns } from "@/features/users/shared/config/userCsvColumns";
+import {
+  exportDataToCsv,
+  parseCsvFile,
+} from "@/features/users/shared/utils/usersCsv.utils";
 
 import { secretariesMock } from "@/features/users/secretaries/mocks/secretaries.mock";
 import type { SecretaryUser } from "@/features/users/secretaries/types/secretary.types";
@@ -28,6 +33,23 @@ export function SecretariesPage() {
     });
   }, [searchValue]);
 
+  function handleExportSecretaries() {
+    exportDataToCsv(
+      filteredSecretaries,
+      secretaryCsvColumns,
+      "secretaries.csv"
+    );
+  }
+
+  async function handleImportSecretaries(file: File) {
+    const rows = await parseCsvFile(file);
+
+    console.log("Secretaries CSV rows ready for API:", rows);
+
+    // لاحقًا:
+    // await createSecretariesBulk(rows);
+  }
+
   return (
     <div className="space-y-4">
       <UsersToolbar
@@ -38,8 +60,8 @@ export function SecretariesPage() {
         exportLabel="Export Secretaries"
         filterLabel="Filter"
         onSearchChange={setSearchValue}
-        onImport={() => {}}
-        onExport={() => {}}
+        onImport={handleImportSecretaries}
+        onExport={handleExportSecretaries}
       />
 
       <UsersTable<SecretaryUser>

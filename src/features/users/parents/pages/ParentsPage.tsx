@@ -2,6 +2,11 @@ import { useMemo, useState } from "react";
 
 import { UsersToolbar } from "@/features/users/shared/components/UsersToolbar";
 import { UsersTable } from "@/features/users/shared/components/UsersTable";
+import { parentCsvColumns } from "@/features/users/shared/config/userCsvColumns";
+import {
+  exportDataToCsv,
+  parseCsvFile,
+} from "@/features/users/shared/utils/usersCsv.utils";
 import { parentsMock } from "@/features/users/parents/mocks/parents.mock";
 import type { ParentUser } from "@/features/users/parents/types/parent.types";
 
@@ -20,11 +25,24 @@ export function ParentsPage() {
         fullName.includes(search) ||
         parent.phoneNumber.toLowerCase().includes(search) ||
         parent.parentCode.toLowerCase().includes(search) ||
-        parent.occupation!.toLowerCase().includes(search) ||
+        (parent.occupation ?? "").toLowerCase().includes(search) ||
         parent.relation.toLowerCase().includes(search)
       );
     });
   }, [searchValue]);
+
+  function handleExportParents() {
+    exportDataToCsv(filteredParents, parentCsvColumns, "parents.csv");
+  }
+
+  async function handleImportParents(file: File) {
+    const rows = await parseCsvFile(file);
+
+    console.log("Parents CSV rows ready for API:", rows);
+
+    // لاحقًا:
+    // await createParentsBulk(rows);
+  }
 
   return (
     <div className="space-y-4">
@@ -36,8 +54,8 @@ export function ParentsPage() {
         exportLabel="Export Parents"
         filterLabel="Filter"
         onSearchChange={setSearchValue}
-        onImport={() => {}}
-        onExport={() => {}}
+        onImport={handleImportParents}
+        onExport={handleExportParents}
       />
 
       <UsersTable<ParentUser>

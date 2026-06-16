@@ -2,6 +2,11 @@ import { useMemo, useState } from "react";
 
 import { UsersToolbar } from "@/features/users/shared/components/UsersToolbar";
 import { UsersTable } from "@/features/users/shared/components/UsersTable";
+import { teacherCsvColumns } from "@/features/users/shared/config/userCsvColumns";
+import {
+  exportDataToCsv,
+  parseCsvFile,
+} from "@/features/users/shared/utils/usersCsv.utils";
 import { teachersMock } from "@/features/users/teachers/mocks/teachers.mock";
 import type { TeacherUser } from "@/features/users/teachers/types/teacher.types";
 
@@ -27,6 +32,19 @@ export function TeachersPage() {
     });
   }, [searchValue]);
 
+  function handleExportTeachers() {
+    exportDataToCsv(filteredTeachers, teacherCsvColumns, "teachers.csv");
+  }
+
+  async function handleImportTeachers(file: File) {
+    const rows = await parseCsvFile(file);
+
+    console.log("Teachers CSV rows ready for API:", rows);
+
+    // لاحقًا:
+    // await createTeachersBulk(rows);
+  }
+
   return (
     <div className="space-y-4">
       <UsersToolbar
@@ -37,8 +55,8 @@ export function TeachersPage() {
         exportLabel="Export Teachers"
         filterLabel="Filter"
         onSearchChange={setSearchValue}
-        onImport={() => {}}
-        onExport={() => {}}
+        onImport={handleImportTeachers}
+        onExport={handleExportTeachers}
       />
 
       <UsersTable<TeacherUser>
