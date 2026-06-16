@@ -1,13 +1,20 @@
-import { BookOpen, Edit3, Plus, Search, Trash2, UserCheck } from "lucide-react";
+import {
+  BookOpen,
+  Edit3,
+  Plus,
+  Search,
+  Trash2,
+  UserCheck,
+} from "lucide-react";
 
 import { useState } from "react";
 
+import { useClassrooms } from "@/features/academics/classrooms/hooks/useClassrooms";
+import { useSubjects } from "@/features/academics/subjects/hooks/useSubjects";
 import {
   useDeleteTeacherAssignment,
   useTeacherAssignments,
 } from "@/features/academics/teacher-assignments/hooks/useTeacherAssignments";
-import { useClassrooms } from "@/features/academics/classrooms/hooks/useClassrooms";
-import { useSubjects } from "@/features/academics/subjects/hooks/useSubjects";
 import { useTeachers } from "@/features/users/teachers/hooks/useTeachers";
 
 function getFullName(firstName?: string, lastName?: string) {
@@ -18,7 +25,7 @@ export function TeacherAssignmentsPage() {
   const { data: assignments = [], isLoading, isError } = useTeacherAssignments();
   const { data: classrooms = [] } = useClassrooms();
   const { data: subjects = [] } = useSubjects();
-  const { teachers = [] } = useTeachers();
+  const { data: teachers = [] } = useTeachers();
 
   const deleteMutation = useDeleteTeacherAssignment();
   const [search, setSearch] = useState("");
@@ -81,7 +88,10 @@ export function TeacherAssignmentsPage() {
           </div>
         </div>
 
-        <button className="flex h-10 items-center gap-2 rounded-xl bg-primary px-4 text-xs font-bold text-primary-foreground shadow-soft">
+        <button
+          type="button"
+          className="flex h-10 items-center gap-2 rounded-xl bg-primary px-4 text-xs font-bold text-primary-foreground shadow-soft"
+        >
           <Plus size={15} />
           Add Assignment
         </button>
@@ -180,7 +190,10 @@ export function TeacherAssignmentsPage() {
 
                 <td className="px-4 py-3">
                   <div className="flex justify-center gap-2">
-                    <button className="flex h-8 w-8 items-center justify-center rounded-xl border border-border/70 text-muted-foreground transition hover:bg-muted hover:text-foreground">
+                    <button
+                      type="button"
+                      className="flex h-8 w-8 items-center justify-center rounded-xl border border-border/70 text-muted-foreground transition hover:bg-muted hover:text-foreground"
+                    >
                       <Edit3 size={13} />
                     </button>
 
