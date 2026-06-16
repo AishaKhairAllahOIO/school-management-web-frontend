@@ -1,19 +1,12 @@
 import { Navigate } from "react-router-dom";
 
-import { StudentsPage } from "@/features/users/students/pages/StudentsPage";
-import { TeachersPage } from "@/features/users/teachers/pages/TeachersPage";
+import { CounselorsPage } from "@/features/users/counselors/pages/CounselorsPage";
 import { ParentsPage } from "@/features/users/parents/pages/ParentsPage";
-
-function PlaceholderPage({ title }: { title: string }) {
-  return (
-    <div className="rounded-3xl bg-card p-8 shadow-soft">
-      <h1 className="text-3xl font-bold text-foreground">{title}</h1>
-      <p className="mt-2 text-muted-foreground">
-        This page content appears inside the dashboard container.
-      </p>
-    </div>
-  );
-}
+import { SecretariesPage } from "@/features/users/secretaries/pages/SecretariesPage";
+import { ServiceStaffPage } from "@/features/users/service-staff/pages/ServiceStaffPage";
+import { StudentsPage } from "@/features/users/students/pages/StudentsPage";
+import { SupervisorsPage } from "@/features/users/supervisors/pages/SupervisorsPage";
+import { TeachersPage } from "@/features/users/teachers/pages/TeachersPage";
 
 export const usersRoutes = {
   path: "users",
@@ -22,9 +15,9 @@ export const usersRoutes = {
     { path: "students", element: <StudentsPage /> },
     { path: "teachers", element: <TeachersPage /> },
     { path: "parents", element: <ParentsPage /> },
-    { path: "secretaries", element: <PlaceholderPage title="Secretaries" /> },
-    { path: "supervisors", element: <PlaceholderPage title="Supervisors" /> },
-    { path: "counselors", element: <PlaceholderPage title="Counselors" /> },
-    { path: "service-staff", element: <PlaceholderPage title="Service Staff" /> },
+    { path: "secretaries", element: <SecretariesPage /> },
+    { path: "supervisors", element: <SupervisorsPage /> },
+    { path: "counselors", element: <CounselorsPage/> },
+    { path: "service-staff", element: <ServiceStaffPage/> },
   ],
 };
