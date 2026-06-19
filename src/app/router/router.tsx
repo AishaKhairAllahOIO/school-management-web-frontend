@@ -2,14 +2,13 @@ import { createBrowserRouter } from "react-router-dom";
 
 import { AppLayout } from "@/app/layouts/app/AppLayout";
 import { ErrorPage, NotFoundPage } from "@/app/pages";
-import { LoginPage } from "@/features/auth/pages/LoginPage";
-
 import { appRoutes } from "./routes";
+import { AuthLayout } from "../layouts/auth/AuthLayout";
 
 export const router = createBrowserRouter([
   {
     path: "/auth/login",
-    element: <LoginPage />,
+    element: <AuthLayout />,
     errorElement: <ErrorPage />,
   },
   {
