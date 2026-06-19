@@ -119,6 +119,7 @@ const subNavigationItems: SubNavigationSection[] = [
       { title: "Fees", path: "/finance/fees", icon: Wallet },
       { title: "Payments", path: "/finance/payments", icon: Wallet },
       { title: "Installments", path: "/finance/installments", icon: Wallet },
+      { title: "Payroll History", path: "/finance/payroll-history", icon: Wallet },
       { title: "Salaries", path: "/finance/salaries", icon: Briefcase },
       { title: "Deductions", path: "/finance/deductions", icon: Wallet },
     ],
@@ -128,7 +129,8 @@ const subNavigationItems: SubNavigationSection[] = [
     items: [
       { title: "Announcements", path: "/communication/announcements", icon: Bell },
       { title: "Notifications", path: "/communication/notifications", icon: Bell },
-      { title: "Activities", path: "/communication/activities", icon: CalendarDays },
+      { title: "Messages", path: "/communication/messages", icon: FileText },
+      { title: "complaints", path: "/communication/complaints", icon: FileText },
     ],
   },
   {
