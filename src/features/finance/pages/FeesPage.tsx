@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { BarChart3, CreditCard, DollarSign, Users } from "lucide-react";
 
 import { Button } from "@/shared/ui/button";
@@ -20,57 +20,55 @@ export function FeesPage() {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [reminderNotice, setReminderNotice] = useState<string | null>(null);
 
-  if (isLoading || !data) {
-    return (
-      <div className="rounded-3xl bg-card p-8 shadow-soft">
-        <h1 className="text-3xl font-bold text-foreground">Fees</h1>
-        <p className="mt-2 text-muted-foreground">Loading financial summary...</p>
-      </div>
-    );
-  }
+  useEffect(() => {
+    setClassFilter("all");
+  }, [gradeFilter]);
 
-  const gradeOptions = useMemo(
-    () => ["all", ...new Set(data.gradeFees.map((fee) => fee.grade))],
-    [data.gradeFees]
+    const gradeOptions = useMemo(
+    () => ["all", ...new Set(data?.gradeFees?.map((fee) => fee.grade) || [])],
+    [data?.gradeFees]
   );
 
   const classOptions = useMemo(
     () => [
       "all",
       ...new Set(
-        data.gradeFees
+        (data?.gradeFees || [])
           .filter((fee) => gradeFilter === "all" || fee.grade === gradeFilter)
           .map((fee) => fee.className)
       ),
     ],
-    [data.gradeFees, gradeFilter]
+    [data?.gradeFees, gradeFilter]
   );
 
-  const filteredFees = useMemo(
-    () =>
-      data.gradeFees.filter((fee) => {
-        const matchesGrade = gradeFilter === "all" || fee.grade === gradeFilter;
-        const matchesClass = classFilter === "all" || fee.className === classFilter;
-        const query = searchQuery.trim().toLowerCase();
-        const matchesSearch =
-          !query ||
-          fee.grade.toLowerCase().includes(query) ||
-          fee.className.toLowerCase().includes(query) ||
-          fee.annualFee.toLowerCase().includes(query) ||
-          fee.collected.toLowerCase().includes(query) ||
-          fee.outstanding.toLowerCase().includes(query);
+  const filteredFees = useMemo(() => {
+    const query = searchQuery.trim().toLowerCase();
+    const fees = data?.gradeFees || [];
 
-        return matchesGrade && matchesClass && matchesSearch;
-      }),
-    [data.gradeFees, gradeFilter, classFilter, searchQuery]
-  );
+    return fees.filter((fee) => {
+      const matchesGrade = gradeFilter === "all" || fee.grade === gradeFilter;
+      const matchesClass = classFilter === "all" || fee.className === classFilter;
+      
+      const matchesSearch =
+        !query ||
+        fee.grade.toLowerCase().includes(query) ||
+        fee.className.toLowerCase().includes(query) ||
+        fee.annualFee.toLowerCase().includes(query) ||
+        fee.collected.toLowerCase().includes(query) ||
+        fee.outstanding.toLowerCase().includes(query);
+
+      return matchesGrade && matchesClass && matchesSearch;
+    });
+  }, [data?.gradeFees, gradeFilter, classFilter, searchQuery]);
 
   const totalCollected = filteredFees.reduce((sum, fee) => {
-    return sum + Number(fee.collected.replace(/[^0-9.-]+/g, ""));
+    const parsed = Number(fee.collected.replace(/[^0-9.-]+/g, ""));
+    return sum + (isNaN(parsed) ? 0 : parsed);
   }, 0);
 
   const totalOutstanding = filteredFees.reduce((sum, fee) => {
-    return sum + Number(fee.outstanding.replace(/[^0-9.-]+/g, ""));
+    const parsed = Number(fee.outstanding.replace(/[^0-9.-]+/g, ""));
+    return sum + (isNaN(parsed) ? 0 : parsed);
   }, 0);
 
   const filteredCount = filteredFees.length;
@@ -80,6 +78,15 @@ export function FeesPage() {
       `Reminders queued for ${filteredCount} fee schedules. Outstanding balances are under review.`
     );
   };
+
+   if (isLoading || !data) {
+    return (
+      <div className="rounded-3xl bg-card p-8 shadow-soft">
+        <h1 className="text-3xl font-bold text-foreground">Fees</h1>
+        <p className="mt-2 text-muted-foreground">Loading financial summary...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
