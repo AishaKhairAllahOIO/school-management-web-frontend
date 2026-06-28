@@ -6,11 +6,6 @@ export type EnrollmentStatus =
   | "completed"
   | "cancelled";
 
-export type EnrollmentSource =
-  | "new_registration"
-  | "promotion"
-  | "transfer_in"
-  | "manual";
 
 export type StudentEnrollment = {
   id: string;
@@ -18,15 +13,12 @@ export type StudentEnrollment = {
   studentId: string;
 
   academicYearId: string;
-  semesterId: string;
+  academicTermId: string;
 
   gradeId: string;
   classroomId: string;
 
-  enrollmentCode: string;
-
   enrollmentStatus: EnrollmentStatus;
-  enrollmentSource: EnrollmentSource;
 
   enrollmentDate: string;
 
@@ -35,10 +27,6 @@ export type StudentEnrollment = {
   transferredAt?: string | null;
   completedAt?: string | null;
   cancelledAt?: string | null;
-
-  isActive: boolean;
-
-  notes?: string | null;
 
   createdAt: string;
   updatedAt: string;
