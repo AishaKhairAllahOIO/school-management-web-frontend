@@ -46,7 +46,6 @@ export type CreateGradeSubjectPayload = {
   passingMark: number;
 
   isFailingSubject: boolean;
-  includedInTotal: boolean;
 
   weightInTotal: number;
 

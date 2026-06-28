@@ -9,7 +9,7 @@ export type TeacherWorkload = {
   requiredMonthlyPeriods: number;
 
   assignedMonthlyPeriods: number;//in salary
-  remainingMonthlyPeriods: number;//back calculate  (requiredMonthlyPeriods-remainingMonthlyPeriods)
+  remainingMonthlyPeriods: number;//back calculate  (requiredMonthlyPeriods-assignedMonthlyPeriods)
 
   createdAt: string;
   updatedAt: string;

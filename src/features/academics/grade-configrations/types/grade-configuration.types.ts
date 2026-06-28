@@ -28,8 +28,6 @@ export type CreateGradeConfigurationPayload = {
 
   supervisorId: string;
 
-  defaultClassroomCapacity: number;
-
   plannedClassroomsCount: number;
 
 
