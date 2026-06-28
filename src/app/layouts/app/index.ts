@@ -1,1 +1,1 @@
-export { appLayout } from "@/app/layouts/app/AppLayout";
+export { AppLayout } from "@/app/layouts/app/AppLayout";
