@@ -1,51 +1,87 @@
-export type AcademicTermStatus = "active" | "upcoming" | "completed";
+export type SchoolDay =
+  | "sunday"
+  | "monday"
+  | "tuesday"
+  | "wednesday"
+  | "thursday"
+  | "friday"
+  | "saturday";
+
+export type AcademicStageType = "primary" | "middle" | "secondary";
 
 export type AcademicYear = {
   id: string;
-  name: string;
+
+  name: string; 
+
   startDate: string;
   endDate: string;
+
   isCurrent: boolean;
+
+  createdAt: string;
+  updatedAt: string;
 };
 
 export type AcademicTerm = {
   id: string;
-  name: string;
+
+  academicYearId: string;
+
   startDate: string;
   endDate: string;
-  status: AcademicTermStatus;
+
+  order: number;
+
+  isCurrent: boolean;
+  isFinalTerm: boolean;
+
+  createdAt: string;
+  updatedAt: string;
 };
 
-export type GradeScaleItem = {
+export type AcademicStage = {
   id: string;
-  grade: string;
-  minimumScore: number;
-  maximumScore: number;
-  description: string;
+
+  type: AcademicStageType;
+
+  createdAt: string;
+  updatedAt: string;
 };
 
-export type AcademicPreferences = {
-  autoPromoteStudents: boolean;
-  allowStudentRepeating: boolean;
-  calculateGpa: boolean;
-  rankStudents: boolean;
-  useAttendanceInPromotion: boolean;
+export type SchoolBreak = {
+  id: string;
+
+  afterPeriodIndex: number;
+
+  durationMinutes: number;
 };
+
+export type SchoolDayConfiguration = {
+  day: SchoolDay;
+
+  periodsCount: number;
+};
+
+export type SchoolDayScheduleSettings = {
+  workingDays: SchoolDayConfiguration[];
+
+  dayStartTime: string;
+  dayEndTime: string; //from back
+
+  periodDurationMinutes: number;
+
+  breaks: SchoolBreak[];
+};
+
 
 export type AcademicSettings = {
   id: string;
 
   currentAcademicYearId: string;
-  academicYears: AcademicYear[];
-  terms: AcademicTerm[];
-  gradeScale: GradeScaleItem[];
-  preferences: AcademicPreferences;
+  currentAcademicTermId: string;
 
-  passingGrade: string;
-  maximumGrade: number;
-  gpaScale: "4.0" | "5.0" | "100";
-  minimumAttendancePercentage: number;
-  promotionThreshold: number;
+  scheduleSettings: SchoolDayScheduleSettings;
 
   createdAt: string;
   updatedAt: string;

@@ -30,15 +30,6 @@ export type GeneralSettings = {
   logoUrl?: string | null;
   images: SchoolImage[];
 
-  defaultLanguage: string;
-  timezone: string;
-  dateFormat: string;
-  currency: string;
-
-  workingDays: string[];
-  openingTime: string;
-  closingTime: string;
-
   createdAt: string;
   updatedAt: string;
 };

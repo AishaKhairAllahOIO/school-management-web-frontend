@@ -1,24 +1,30 @@
+
 export type TeacherAssignment = {
   id: string;
 
-  teacherId: string;
-  classroomId: string;
-  subjectId: string;
-
   academicYearId: string;
+  academicTermId: string;
 
-  isActive: boolean;
+  teacherId: string;
+
+  gradeSubjectId: string;
+
+  classroomIds: string[];
 
   createdAt: string;
   updatedAt: string;
 };
 
 export type CreateTeacherAssignmentPayload = {
-  teacherId: string;
-  classroomId: string;
-  subjectId: string;
   academicYearId: string;
-  isActive: boolean;
+  academicTermId: string;
+
+  teacherId: string;
+
+  gradeSubjectId: string;
+
+  classroomIds: string[];
+
 };
 
 export type UpdateTeacherAssignmentPayload =

@@ -7,6 +7,7 @@ export type Degree =
 
 export type EmploymentInformation = 
 {
+  email: string;
   
   hireDate: string;
 
@@ -19,4 +20,5 @@ export type EmploymentInformation =
   university: string;
 
   graduationYear: string;
+  
 };

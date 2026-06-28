@@ -8,6 +8,10 @@ export type UserCategory =
   | "service_staff"
   | "super_admin";
 
+export type UserGender =
+  | "male"
+  | "female";
+
 export type UserNationality =
   | "syrian"
   | "lebanese"
@@ -15,13 +19,9 @@ export type UserNationality =
   | "jordanian"
   | "other";
 
-export type UserGender =
-  | "female"
-  | "male";
-
 export type RecordStatus =
-  | "active"
   | "draft"
+  | "active"
   | "archived"
   | "deleted";
 

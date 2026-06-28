@@ -1,30 +1,45 @@
-export type StudentEnrollmentStatus =
-  | "active"
-  | "completed"
+export type EnrollmentStatus =
+  | "pending_payment"
+  | "enrolled"
+  | "withdrawn"
   | "transferred"
-  | "withdrawn";
+  | "completed"
+  | "cancelled";
+
+export type EnrollmentSource =
+  | "new_registration"
+  | "promotion"
+  | "transfer_in"
+  | "manual";
 
 export type StudentEnrollment = {
   id: string;
 
   studentId: string;
-  classroomId: string;
+
   academicYearId: string;
+  semesterId: string;
+
+  gradeId: string;
+  classroomId: string;
+
+  enrollmentCode: string;
+
+  enrollmentStatus: EnrollmentStatus;
+  enrollmentSource: EnrollmentSource;
 
   enrollmentDate: string;
-  status: StudentEnrollmentStatus;
+
+  activatedAt?: string | null;
+  withdrawnAt?: string | null;
+  transferredAt?: string | null;
+  completedAt?: string | null;
+  cancelledAt?: string | null;
+
+  isActive: boolean;
+
+  notes?: string | null;
 
   createdAt: string;
   updatedAt: string;
 };
-
-export type CreateStudentEnrollmentPayload = {
-  studentId: string;
-  classroomId: string;
-  academicYearId: string;
-  enrollmentDate: string;
-  status: StudentEnrollmentStatus;
-};
-
-export type UpdateStudentEnrollmentPayload =
-  Partial<CreateStudentEnrollmentPayload>;
