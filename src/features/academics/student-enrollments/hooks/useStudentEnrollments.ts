@@ -1,68 +1,29 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-import {
-  createStudentEnrollment,
-  deleteStudentEnrollment,
-  getStudentEnrollments,
-  updateStudentEnrollment,
-} from "@/features/academics/student-enrollments/api/student-enrollments.api";
-import type {
-  UpdateStudentEnrollmentPayload,
-} from "@/features/academics/student-enrollments/types/student-enrollment.types";
+import { studentEnrollmentApi, type CreateStudentEnrollmentPayload, type UpdateStudentEnrollmentPayload } from "../api/studentEnrollment.api";
 
-export const studentEnrollmentsQueryKey = [
-  "academics",
-  "student-enrollments",
-];
+export const studentEnrollmentQueryKey = ["academics", "studentEnrollments"];
 
 export function useStudentEnrollments() {
-  return useQuery({
-    queryKey: studentEnrollmentsQueryKey,
-    queryFn: getStudentEnrollments,
-  });
+  return useQuery({ queryKey: studentEnrollmentQueryKey, queryFn: studentEnrollmentApi.list });
+}
+
+function useRefreshStudentEnrollments() {
+  const queryClient = useQueryClient();
+  return () => queryClient.invalidateQueries({ queryKey: studentEnrollmentQueryKey });
 }
 
 export function useCreateStudentEnrollment() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: createStudentEnrollment,
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: studentEnrollmentsQueryKey,
-      });
-    },
-  });
+  const refresh = useRefreshStudentEnrollments();
+  return useMutation({ mutationFn: (payload: CreateStudentEnrollmentPayload) => studentEnrollmentApi.create(payload), onSuccess: refresh });
 }
 
 export function useUpdateStudentEnrollment() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: ({
-      enrollmentId,
-      payload,
-    }: {
-      enrollmentId: string;
-      payload: UpdateStudentEnrollmentPayload;
-    }) => updateStudentEnrollment(enrollmentId, payload),
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: studentEnrollmentsQueryKey,
-      });
-    },
-  });
+  const refresh = useRefreshStudentEnrollments();
+  return useMutation({ mutationFn: ({ id, payload }: { id: string; payload: UpdateStudentEnrollmentPayload }) => studentEnrollmentApi.update(id, payload), onSuccess: refresh });
 }
 
 export function useDeleteStudentEnrollment() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: deleteStudentEnrollment,
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: studentEnrollmentsQueryKey,
-      });
-    },
-  });
+  const refresh = useRefreshStudentEnrollments();
+  return useMutation({ mutationFn: studentEnrollmentApi.remove, onSuccess: refresh });
 }

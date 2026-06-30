@@ -4,7 +4,6 @@ import lottie from "lottie-web";
 import { NavLink, useLocation } from "react-router-dom";
 
 import {
-  Award,
   Bell,
   BookOpen,
   BookOpenCheck,
@@ -72,29 +71,55 @@ const subNavigationItems: SubNavigationSection[] = [
     ],
   },
   {
-    basePath: "/academics",
-    items: [
-      { title: "Grades", path: "/academics/grades", icon: GraduationCap },
-      { title: "Subjects", path: "/academics/subjects", icon: BookOpen },
-      { title: "Classrooms", path: "/academics/classrooms", icon: Building2 },
-      {
-        title: "Grade Subjects",
-        path: "/academics/grade-subjects",
-        icon: BookOpenCheck,
-      },
-      {
-        title: "Student Enrollments",
-        path: "/academics/student-enrollments",
-        icon: UserRoundCheck,
-      },
-      {
-        title: "Teacher Assignments",
-        path: "/academics/teacher-assignments",
-        icon: UserCheck,
-      },
-      { title: "Grade Book", path: "/academics/grade-book", icon: Award },
-    ],
-  },
+  basePath: "/academics",
+  items: [
+    {
+      title: "Grades",
+      path: "/academics/grades",
+      icon: GraduationCap,
+    },
+    {
+      title: "Grade Configurations",
+      path: "/academics/grade-configurations",
+      icon: Building2,
+    },
+    {
+      title: "Classrooms",
+      path: "/academics/classrooms",
+      icon: Building2,
+    },
+    {
+      title: "Subjects",
+      path: "/academics/subjects",
+      icon: BookOpen,
+    },
+    {
+      title: "Grade Subjects",
+      path: "/academics/grade-subjects",
+      icon: BookOpenCheck,
+    },
+    {
+      title: "Assessments",
+      path: "/academics/assessments",
+      icon: FileText,
+    },
+    {
+      title: "Teacher Workloads",
+      path: "/academics/teacher-workloads",
+      icon: Briefcase,
+    },
+    {
+      title: "Teacher Assignments",
+      path: "/academics/teacher-assignments",
+      icon: UserCheck,
+    },
+    {
+      title: "Student Enrollments",
+      path: "/academics/student-enrollments",
+      icon: UserRoundCheck,
+    },
+  ],
+},
   {
     basePath: "/attendance",
     items: [

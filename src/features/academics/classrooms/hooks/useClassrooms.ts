@@ -1,60 +1,43 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-import {
-  createClassroom,
-  deleteClassroom,
-  getClassrooms,
-  updateClassroom,
-} from "@/features/academics/classrooms/api/classrooms.api";
-import type {
-  CreateClassroomPayload,
-  UpdateClassroomPayload,
-} from "@/features/academics/classrooms/types/classroom.types";
+import { classroomApi } from "../api/classroom.api";
+import type { CreateClassroomPayload, UpdateClassroomPayload } from "../types/classroom.types";
 
-export const classroomsQueryKey = ["academics", "classrooms"];
+export const classroomQueryKey = ["academics", "classrooms"];
 
 export function useClassrooms() {
   return useQuery({
-    queryKey: classroomsQueryKey,
-    queryFn: getClassrooms,
+    queryKey: classroomQueryKey,
+    queryFn: classroomApi.list,
   });
 }
 
-export function useCreateClassroom() {
+function useRefreshClassrooms() {
   const queryClient = useQueryClient();
+  return () => queryClient.invalidateQueries({ queryKey: classroomQueryKey });
+}
 
+export function useCreateClassroom() {
+  const refresh = useRefreshClassrooms();
   return useMutation({
-    mutationFn: (payload: CreateClassroomPayload) => createClassroom(payload),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: classroomsQueryKey });
-    },
+    mutationFn: (payload: CreateClassroomPayload) => classroomApi.create(payload),
+    onSuccess: refresh,
   });
 }
 
 export function useUpdateClassroom() {
-  const queryClient = useQueryClient();
-
+  const refresh = useRefreshClassrooms();
   return useMutation({
-    mutationFn: ({
-      classroomId,
-      payload,
-    }: {
-      classroomId: string;
-      payload: UpdateClassroomPayload;
-    }) => updateClassroom(classroomId, payload),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: classroomsQueryKey });
-    },
+    mutationFn: ({ id, payload }: { id: string; payload: UpdateClassroomPayload }) =>
+      classroomApi.update(id, payload),
+    onSuccess: refresh,
   });
 }
 
 export function useDeleteClassroom() {
-  const queryClient = useQueryClient();
-
+  const refresh = useRefreshClassrooms();
   return useMutation({
-    mutationFn: deleteClassroom,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: classroomsQueryKey });
-    },
+    mutationFn: classroomApi.remove,
+    onSuccess: refresh,
   });
 }

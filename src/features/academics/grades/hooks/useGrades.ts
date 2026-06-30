@@ -1,60 +1,43 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-import {
-  createGrade,
-  deleteGrade,
-  getGrades,
-  updateGrade,
-} from "@/features/academics/grades/api/grades.api";
-import type {
-  CreateGradePayload,
-  UpdateGradePayload,
-} from "@/features/academics/grades/types/grade.types";
+import { gradeApi } from "../api/grade.api";
+import type { CreateGradePayload, UpdateGradePayload } from "../types/grade.types";
 
-export const gradesQueryKey = ["academics", "grades"];
+export const gradeQueryKey = ["academics", "grades"];
 
 export function useGrades() {
   return useQuery({
-    queryKey: gradesQueryKey,
-    queryFn: getGrades,
+    queryKey: gradeQueryKey,
+    queryFn: gradeApi.list,
   });
 }
 
-export function useCreateGrade() {
+function useRefreshGrades() {
   const queryClient = useQueryClient();
+  return () => queryClient.invalidateQueries({ queryKey: gradeQueryKey });
+}
 
+export function useCreateGrade() {
+  const refresh = useRefreshGrades();
   return useMutation({
-    mutationFn: (payload: CreateGradePayload) => createGrade(payload),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: gradesQueryKey });
-    },
+    mutationFn: (payload: CreateGradePayload) => gradeApi.create(payload),
+    onSuccess: refresh,
   });
 }
 
 export function useUpdateGrade() {
-  const queryClient = useQueryClient();
-
+  const refresh = useRefreshGrades();
   return useMutation({
-    mutationFn: ({
-      gradeId,
-      payload,
-    }: {
-      gradeId: string;
-      payload: UpdateGradePayload;
-    }) => updateGrade(gradeId, payload),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: gradesQueryKey });
-    },
+    mutationFn: ({ id, payload }: { id: string; payload: UpdateGradePayload }) =>
+      gradeApi.update(id, payload),
+    onSuccess: refresh,
   });
 }
 
 export function useDeleteGrade() {
-  const queryClient = useQueryClient();
-
+  const refresh = useRefreshGrades();
   return useMutation({
-    mutationFn: deleteGrade,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: gradesQueryKey });
-    },
+    mutationFn: gradeApi.remove,
+    onSuccess: refresh,
   });
 }

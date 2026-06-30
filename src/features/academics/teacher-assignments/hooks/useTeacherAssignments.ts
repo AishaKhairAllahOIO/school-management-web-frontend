@@ -1,68 +1,43 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-import {
-  createTeacherAssignment,
-  deleteTeacherAssignment,
-  getTeacherAssignments,
-  updateTeacherAssignment,
-} from "@/features/academics/teacher-assignments/api/teacher-assignments.api";
-import type {
-  UpdateTeacherAssignmentPayload,
-} from "@/features/academics/teacher-assignments/types/teacher-assignment.types";
+import { teacherAssignmentApi } from "../api/teacherAssignment.api";
+import type { CreateTeacherAssignmentPayload, UpdateTeacherAssignmentPayload } from "../types/teacher-assignment.types";
 
-export const teacherAssignmentsQueryKey = [
-  "academics",
-  "teacher-assignments",
-];
+export const teacherAssignmentQueryKey = ["academics", "teacherAssignments"];
 
 export function useTeacherAssignments() {
   return useQuery({
-    queryKey: teacherAssignmentsQueryKey,
-    queryFn: getTeacherAssignments,
+    queryKey: teacherAssignmentQueryKey,
+    queryFn: teacherAssignmentApi.list,
   });
 }
 
-export function useCreateTeacherAssignment() {
+function useRefreshTeacherAssignments() {
   const queryClient = useQueryClient();
+  return () => queryClient.invalidateQueries({ queryKey: teacherAssignmentQueryKey });
+}
 
+export function useCreateTeacherAssignment() {
+  const refresh = useRefreshTeacherAssignments();
   return useMutation({
-    mutationFn: createTeacherAssignment,
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: teacherAssignmentsQueryKey,
-      });
-    },
+    mutationFn: (payload: CreateTeacherAssignmentPayload) => teacherAssignmentApi.create(payload),
+    onSuccess: refresh,
   });
 }
 
 export function useUpdateTeacherAssignment() {
-  const queryClient = useQueryClient();
-
+  const refresh = useRefreshTeacherAssignments();
   return useMutation({
-    mutationFn: ({
-      assignmentId,
-      payload,
-    }: {
-      assignmentId: string;
-      payload: UpdateTeacherAssignmentPayload;
-    }) => updateTeacherAssignment(assignmentId, payload),
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: teacherAssignmentsQueryKey,
-      });
-    },
+    mutationFn: ({ id, payload }: { id: string; payload: UpdateTeacherAssignmentPayload }) =>
+      teacherAssignmentApi.update(id, payload),
+    onSuccess: refresh,
   });
 }
 
 export function useDeleteTeacherAssignment() {
-  const queryClient = useQueryClient();
-
+  const refresh = useRefreshTeacherAssignments();
   return useMutation({
-    mutationFn: deleteTeacherAssignment,
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: teacherAssignmentsQueryKey,
-      });
-    },
+    mutationFn: teacherAssignmentApi.remove,
+    onSuccess: refresh,
   });
 }

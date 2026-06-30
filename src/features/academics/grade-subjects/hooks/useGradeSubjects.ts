@@ -1,59 +1,43 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-import {
-  createGradeSubject,
-  deleteGradeSubject,
-  getGradeSubjects,
-  updateGradeSubject,
-} from "@/features/academics/grade-subjects/api/grade-subjects.api";
-import type {
-  UpdateGradeSubjectPayload,
-} from "@/features/academics/grade-subjects/types/grade-subject.types";
+import { gradeSubjectApi } from "../api/gradeSubject.api";
+import type { CreateGradeSubjectPayload, UpdateGradeSubjectPayload } from "../types/grade-subject.types";
 
-export const gradeSubjectsQueryKey = ["academics", "grade-subjects"];
+export const gradeSubjectQueryKey = ["academics", "gradeSubjects"];
 
 export function useGradeSubjects() {
   return useQuery({
-    queryKey: gradeSubjectsQueryKey,
-    queryFn: getGradeSubjects,
+    queryKey: gradeSubjectQueryKey,
+    queryFn: gradeSubjectApi.list,
   });
 }
 
-export function useCreateGradeSubject() {
+function useRefreshGradeSubjects() {
   const queryClient = useQueryClient();
+  return () => queryClient.invalidateQueries({ queryKey: gradeSubjectQueryKey });
+}
 
+export function useCreateGradeSubject() {
+  const refresh = useRefreshGradeSubjects();
   return useMutation({
-    mutationFn: createGradeSubject,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: gradeSubjectsQueryKey });
-    },
+    mutationFn: (payload: CreateGradeSubjectPayload) => gradeSubjectApi.create(payload),
+    onSuccess: refresh,
   });
 }
 
 export function useUpdateGradeSubject() {
-  const queryClient = useQueryClient();
-
+  const refresh = useRefreshGradeSubjects();
   return useMutation({
-    mutationFn: ({
-      gradeSubjectId,
-      payload,
-    }: {
-      gradeSubjectId: string;
-      payload: UpdateGradeSubjectPayload;
-    }) => updateGradeSubject(gradeSubjectId, payload),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: gradeSubjectsQueryKey });
-    },
+    mutationFn: ({ id, payload }: { id: string; payload: UpdateGradeSubjectPayload }) =>
+      gradeSubjectApi.update(id, payload),
+    onSuccess: refresh,
   });
 }
 
 export function useDeleteGradeSubject() {
-  const queryClient = useQueryClient();
-
+  const refresh = useRefreshGradeSubjects();
   return useMutation({
-    mutationFn: deleteGradeSubject,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: gradeSubjectsQueryKey });
-    },
+    mutationFn: gradeSubjectApi.remove,
+    onSuccess: refresh,
   });
 }
