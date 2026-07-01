@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 
+import { FirebaseMessagingProvider } from "@/app/providers/firebase";
 import { LocaleProvider } from "@/app/providers/locale";
 import { QueryProvider } from "@/app/providers/query";
 import { ThemeProvider } from "@/app/providers/theme";
@@ -15,6 +16,7 @@ export function AppProviders({ children }: AppProvidersProps) {
       <ThemeProvider>
         <LocaleProvider>
           {children}
+          <FirebaseMessagingProvider />
           <AppToaster />
         </LocaleProvider>
       </ThemeProvider>

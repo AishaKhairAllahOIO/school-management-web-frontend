@@ -1,157 +1,73 @@
+import { zodResolver } from "@hookform/resolvers/zod";
+import { ArrowLeft, Mail } from "lucide-react";
 import { useForm } from "react-hook-form";
-
-import { zodResolver }
-from "@hookform/resolvers/zod";
-
-import { ArrowLeft } from "lucide-react";
-
 import { Link } from "react-router-dom";
 
+import { Button } from "@/shared/ui/button";
+import { Input } from "@/shared/ui/input";
+
+import { AUTH_ROUTES } from "../constants/auth.constants";
+import { useForgotPassword } from "../hooks/use-forgot-password";
 import {
   forgotPasswordSchema,
   type ForgotPasswordSchema,
 } from "../schemas/forgot-password.schema";
 
-import { Button } from "@/shared/ui/button";
-import { Input } from "@/shared/ui/input";
-import { Label } from "@/shared/ui/label";
-
-import { useForgotPassword }
-from "../hooks/use-forgot-password";
-
 export function ForgotPasswordForm() {
+  const forgotPasswordMutation = useForgotPassword();
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<ForgotPasswordSchema>({
-    resolver:
-      zodResolver(
-        forgotPasswordSchema
-      ),
+  const form = useForm<ForgotPasswordSchema>({
+    resolver: zodResolver(forgotPasswordSchema),
+    defaultValues: {
+      email: "",
+    },
   });
 
-  const forgotPasswordMutation =
-    useForgotPassword();
-
-  function onSubmit(
-    values: ForgotPasswordSchema
-  ) {
-
-    forgotPasswordMutation.mutate({
-      email: values.email,
-    });
-  }
-
   return (
-
-    <div
-      className="
-        rounded-[32px]
-        border
-        border-border
-        bg-card/80
-        p-15
-        shadow-soft-lg
-        backdrop-blur-xl
-      "
+    <form
+      onSubmit={form.handleSubmit((values) => forgotPasswordMutation.mutate(values))}
+      className="space-y-5"
     >
+      <div className="space-y-2">
+        <label htmlFor="email" className="text-sm font-black text-[#17142F]">
+          Email
+        </label>
 
-      <Link
-        to="/login"
-        className="
-          mb-15
-          inline-flex
-          items-center
-          gap-2
-          text-sm
-          text-muted-foreground
-          transition-colors
-          hover:text-primary
-        "
-      >
-        <ArrowLeft size={18} />
-
-        Back to login
-      </Link>
-
-      <h1
-        className="
-          text-3xl
-          font-bold
-          text-foreground
-        "
-      >
-        Forgot Password
-      </h1>
-
-      <p
-        className="
-          mt-3
-          text-sm
-          leading-6
-          text-muted-foreground
-        "
-      >
-        Enter your email address and we
-        will send you an OTP code.
-      </p>
-
-      <form
-        onSubmit={handleSubmit(onSubmit)}
-        className="
-          mt-8
-          space-y-10
-        "
-      >
-
-        <div className="space-y-5">
-
-          <Label>
-            Email
-          </Label>
+        <div className="relative">
+          <Mail className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
 
           <Input
+            id="email"
             type="email"
-            placeholder="admin@school.com"
-            {...register("email")}
+            autoComplete="email"
+            placeholder="Enter your email"
+            className="h-14 rounded-2xl border-slate-200 bg-white pl-12 pr-4 text-sm font-bold text-slate-900 shadow-[0_10px_28px_rgba(15,23,42,0.04)] placeholder:text-slate-400 focus-visible:ring-primary/20"
+            {...form.register("email")}
           />
-
-          {errors.email && (
-
-            <p
-              className="
-                text-sm
-                text-destructive
-              "
-            >
-              {errors.email.message}
-            </p>
-          )}
         </div>
 
-        <Button
-          type="submit"
-          disabled={
-            forgotPasswordMutation.isPending
-          }
-          size="lg"
-          className="
-            h-12
-            w-full
-            rounded-2xl
-            shadow-soft
-            hover:shadow-soft-lg
-          "
-        >
-          {
-            forgotPasswordMutation.isPending
-              ? "Sending..."
-              : "Send OTP"
-          }
-        </Button>
-      </form>
-    </div>
+        {form.formState.errors.email && (
+          <p className="text-xs font-bold text-destructive">
+            {form.formState.errors.email.message}
+          </p>
+        )}
+      </div>
+
+      <Button
+        type="submit"
+        className="h-14 w-full rounded-2xl primary-gradient text-base font-black text-white shadow-[0_20px_42px_rgba(103,58,244,0.28)]"
+        disabled={forgotPasswordMutation.isPending}
+      >
+        {forgotPasswordMutation.isPending ? "Sending code..." : "Send OTP"}
+      </Button>
+
+      <Link
+        to={AUTH_ROUTES.LOGIN}
+        className="mx-auto inline-flex items-center gap-2 text-sm font-extrabold text-muted-foreground transition hover:text-primary"
+      >
+        <ArrowLeft className="h-4 w-4" />
+        Back to Login
+      </Link>
+    </form>
   );
 }

@@ -1,2 +1,2 @@
-export { appConfig } from "./app.config";
 export { env } from "./env.config";
+export { appConfig } from "./app.config";

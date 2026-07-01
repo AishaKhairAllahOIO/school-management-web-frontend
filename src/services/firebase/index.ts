@@ -1,5 +1,4 @@
-
-
-export { firebaseApp } from "./firebase.app";
-export { firebaseAuth } from "./firebase.auth";
-export { firestoreDb } from "./firebase.firestore";
+export * from "./firebase.config";
+export * from "./firebase.constants";
+export * from "./firebase.messaging";
+export * from "./firebase.sw";

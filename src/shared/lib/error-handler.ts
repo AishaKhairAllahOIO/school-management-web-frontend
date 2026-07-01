@@ -1,33 +1,15 @@
-import axios from "axios";
+import type { AxiosError } from "axios";
+import type { LaravelErrorResponse } from "@/services/types/apiResponse";
 
-import { notify } from "./toast";
+export function extractApiErrorMessage(error: unknown): string {
+  const axiosError = error as AxiosError<LaravelErrorResponse>;
+  const errors = axiosError.response?.data?.errors;
 
-type ApiErrorResponse = {
-  message?: string;
-  errors?: Record<string, string[]>;
-};
-
-export function handleApiError(error: unknown) {
-  if (!axios.isAxiosError<ApiErrorResponse>(error)) {
-    notify.error("Unexpected error occurred");
-    return;
+  if (errors) {
+    const firstField = Object.keys(errors)[0];
+    const firstMessage = errors[firstField]?.[0];
+    if (firstMessage) return firstMessage;
   }
 
-  const response = error.response?.data;
-
-  if (response?.message) {
-    notify.error(response.message);
-    return;
-  }
-
-  const firstValidationError = response?.errors
-    ? Object.values(response.errors).flat()[0]
-    : undefined;
-
-  if (firstValidationError) {
-    notify.error(firstValidationError);
-    return;
-  }
-
-  notify.error("Something went wrong");
+  return axiosError.response?.data?.message || axiosError.response?.data?.error || axiosError.message || "Something went wrong. Please try again.";
 }

@@ -21,6 +21,7 @@ import { useNotifications } from "@/app/layouts/app/hooks/useNotifications";
 import { useLayoutStore } from "@/app/layouts/app/store/layoutStore";
 import { useLocale } from "@/app/providers/locale";
 import { LanguageToggle } from "@/shared/components/locale";
+import { useLogout } from "@/features/auth/hooks/use-logout";
 
 const topbarItem =
   "relative flex h-[44px] w-[44px] items-center justify-center rounded-[14px] bg-white/92 text-[#080A2A] shadow-[0_16px_38px_rgba(46,38,108,0.10)] ring-1 ring-[#EEF0FA] backdrop-blur-xl transition duration-200 hover:-translate-y-0.5 hover:bg-white";
@@ -88,7 +89,6 @@ function TopbarBreadcrumb({ pathname }: { pathname: string }) {
   );
 
   const BreadcrumbChevron = direction === "rtl" ? ChevronLeft : ChevronRight;
-
   return (
     <div className="hidden min-w-0 items-center gap-[13px] lg:flex">
       <h1 className="truncate text-[15px] font-bold tracking-[-0.02em] text-[#090A2D]">
@@ -210,6 +210,8 @@ function ProfileMenu({
   const navigate = useNavigate();
   const { t } = useLocale();
   const { user } = useCurrentUser();
+    const logoutMutation = useLogout();
+
 
   const fullName =
     "fullName" in user
@@ -275,6 +277,7 @@ function ProfileMenu({
               }}
             />
 
+
             {roleLabel === "Super Admin" ? (
               <ProfileMenuItem
                 title={t.layout.topbar.manageUsers}
@@ -287,18 +290,22 @@ function ProfileMenu({
             ) : null}
           </div>
 
-          <div className="mt-[18px] border-t border-[#ECECF6] pt-[14px]">
-            <button
-              type="button"
-              className="flex h-[44px] w-full items-center gap-[13px] rounded-[15px] px-[10px] text-start text-[13px] font-bold text-[#FF3B4E] transition hover:bg-[#FFF0F1]"
-            >
-              <span className="flex h-[32px] w-[32px] items-center justify-center rounded-[12px] bg-[#FFECEF] text-[#FF3B4E]">
-                <LogOut size={16} strokeWidth={2.1} />
-              </span>
+        <div className="mt-[18px] border-t border-[#ECECF6] pt-[14px]">
+          
+  <button
+  
+    type="button"
+    onClick={() => logoutMutation.mutate()}
+    disabled={logoutMutation.isPending}
+    className="flex h-[44px] w-full items-center gap-[13px] rounded-[15px] px-[10px] text-start text-[13px] font-bold text-[#FF3B4E] transition hover:bg-[#FFF0F1] disabled:cursor-not-allowed disabled:opacity-60"
+  >
+    <span className="flex h-[32px] w-[32px] items-center justify-center rounded-[12px] bg-[#FFECEF] text-[#FF3B4E]">
+      <LogOut size={16} strokeWidth={2.1} />
+    </span>
 
-              {t.layout.topbar.logout}
-            </button>
-          </div>
+    {logoutMutation.isPending ? "Logging out..." : t.layout.topbar.logout}
+  </button>
+</div>
         </div>
       )}
     </div>
