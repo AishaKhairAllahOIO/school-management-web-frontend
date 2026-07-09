@@ -1,9 +1,6 @@
-import type { WebAllowedRole } from "@/shared/constants/roles.config";
+export type AuthRole = string;
 
-export type AuthRole = WebAllowedRole | string;
-
-export type AuthUser = 
-{
+export type AuthUser = {
   id: number;
   role: AuthRole[];
   email: string;
@@ -11,75 +8,66 @@ export type AuthUser =
   permissions: string[];
 };
 
-export type LoginPayload = 
-{
+export type LoginPayload = {
   email: string;
   password: string;
 };
 
-export type VerifyLoginOtpPayload = 
-{
+export type VerifyLoginOtpPayload = {
   email: string;
   otp: string;
   remember_me?: "1" | "0";
 };
 
-export type ForgotPasswordPayload = 
-{
+export type ForgotPasswordPayload = {
   email: string;
 };
 
-export type VerifyPasswordOtpPayload = 
-{
+export type VerifyPasswordOtpPayload = {
   email: string;
   otp: string;
 };
 
-export type ResendPasswordOtpPayload = 
-{
+export type ResendPasswordOtpPayload = {
   email: string;
 };
 
-export type ResetPasswordPayload = 
-{
+export type ResetPasswordPayload = {
   email: string;
   tempToken: string;
   password: string;
   password_confirmation: string;
 };
 
-export type VerifyLoginOtpResponse = 
-{
+export type AuthSessionResponse = {
   user: AuthUser;
   token: string;
 };
 
-export type ResetPasswordResponse = 
-{
-  user: AuthUser;
-  token: string;
-};
+export type VerifyLoginOtpResponse = AuthSessionResponse;
 
-export type ForgotPasswordResponse = 
-{
+export type ResetPasswordResponse = AuthSessionResponse;
+
+export type ForgotPasswordResponse = {
   remaining_time: number;
 };
 
-export type VerifyPasswordOtpResponse = 
-{
+export type ResendPasswordOtpResponse = {
+  remaining_time: number;
+};
+
+export type VerifyPasswordOtpResponse = {
   temp_token: string;
 };
 
-export type AuthStorageData = 
-{
+export type AuthStorageData = {
   token: string;
   user: AuthUser;
   permissions: string[];
   rememberMe: boolean;
 };
 
-export type LoginOtpRouteState = 
-{
+export type LoginOtpRouteState = {
   email: string;
   isResetFlow?: false;
 };

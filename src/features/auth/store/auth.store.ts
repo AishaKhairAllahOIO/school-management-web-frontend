@@ -1,6 +1,14 @@
 import { create } from "zustand";
+
 import { authStorage } from "../lib/auth.storage";
 import type { AuthUser } from "../types/auth.types";
+
+type SetAuthPayload = {
+  token: string;
+  user: AuthUser;
+  permissions: string[];
+  rememberMe: boolean;
+};
 
 type AuthState = {
   token: string | null;
@@ -8,8 +16,9 @@ type AuthState = {
   permissions: string[];
   isAuthenticated: boolean;
   isHydrated: boolean;
+
   hydrate: () => void;
-  setAuth: (payload: { token: string; user: AuthUser; permissions: string[]; rememberMe: boolean }) => void;
+  setAuth: (payload: SetAuthPayload) => void;
   clearAuth: () => void;
 };
 
@@ -35,7 +44,12 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
 
   setAuth: ({ token, user, permissions, rememberMe }) => {
-    authStorage.set({ token, user, permissions, rememberMe });
+    authStorage.set({
+      token,
+      user,
+      permissions,
+      rememberMe,
+    });
 
     set({
       token,

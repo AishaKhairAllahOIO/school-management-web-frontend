@@ -2,24 +2,21 @@ import { API_ENDPOINTS } from "@/services/api/endpoints";
 import { axiosClient } from "@/services/axios/axiosClient";
 import type { ApiResponse } from "@/services/types/apiResponse";
 
-export type RegisterDeviceTokenPayload = {
-  fcm_token: string;
-};
-
-export type DeleteDeviceTokenPayload = {
-  fcm_token: string;
-};
+import type {
+  DeviceTokenPayload,
+  DeviceTokenResponse,
+} from "../types/notification.types";
 
 export const deviceTokenService = {
-  register(payload: RegisterDeviceTokenPayload) {
-    return axiosClient.post<ApiResponse>(
+  register(payload: DeviceTokenPayload) {
+    return axiosClient.post<ApiResponse<DeviceTokenResponse>>(
       API_ENDPOINTS.AUTH.DEVICE_TOKENS,
       payload
     );
   },
 
-  remove(payload: DeleteDeviceTokenPayload) {
-    return axiosClient.delete<ApiResponse>(
+  remove(payload: DeviceTokenPayload) {
+    return axiosClient.delete<ApiResponse<DeviceTokenResponse>>(
       API_ENDPOINTS.AUTH.DEVICE_TOKENS,
       {
         data: payload,

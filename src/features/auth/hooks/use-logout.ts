@@ -2,10 +2,9 @@ import { useMutation } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
-import { getCurrentFcmToken } from "@/services/firebase/firebase.messaging";
+import { unregisterCurrentFirebaseDevice } from "@/features/notifications";
 
 import { authService } from "../api/auth.service";
-import { deviceTokenService } from "../api/device-token.service";
 import { AUTH_ROUTES } from "../constants/auth.constants";
 import { useAuthStore } from "../store/auth.store";
 
@@ -16,15 +15,9 @@ export function useLogout() {
   return useMutation({
     mutationFn: async () => {
       try {
-        const fcmToken = await getCurrentFcmToken();
-
-        if (fcmToken) {
-          await deviceTokenService.remove({
-            fcm_token: fcmToken,
-          });
-        }
+        await unregisterCurrentFirebaseDevice();
       } catch {
-        // Do not block logout if FCM unregister fails.
+        // Device token deletion failure must not block logout.
       }
 
       return authService.logout();

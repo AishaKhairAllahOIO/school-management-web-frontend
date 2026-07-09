@@ -1,13 +1,8 @@
-export type ApiResponse<T = unknown> = {
+export type ApiResponse<T = unknown> = 
+{
   status: boolean;
-  message: string;
+  message?: string;
   data?: T;
 };
 
-export type LaravelValidationErrors = Record<string, string[]>;
-
-export type LaravelErrorResponse = {
-  message?: string;
-  error?: string;
-  errors?: LaravelValidationErrors;
-};
+export type ApiValidationErrors = Record<string, string[]>;

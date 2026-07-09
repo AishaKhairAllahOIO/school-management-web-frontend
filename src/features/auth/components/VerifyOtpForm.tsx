@@ -7,6 +7,7 @@ import { Button } from "@/shared/ui/button";
 import { Checkbox } from "@/shared/ui/checkbox";
 import { Label } from "@/shared/ui/label";
 
+import { AUTH_ROUTES } from "../constants/auth.constants";
 import { useResendOtpTimer } from "../hooks/use-resend-otp-timer";
 import { useResendPasswordOtp } from "../hooks/use-resend-password-otp";
 import { useVerifyOtp } from "../hooks/use-verify-otp";
@@ -87,7 +88,7 @@ export function VerifyOtpForm({
       />
 
       {form.formState.errors.otp && (
-        <p className="text-center text-sm font-bold text-destructive">
+        <p className="text-center text-xs font-bold text-destructive">
           {form.formState.errors.otp.message}
         </p>
       )}
@@ -108,7 +109,7 @@ export function VerifyOtpForm({
             htmlFor="rememberMe"
             className="cursor-pointer text-sm font-bold text-slate-600"
           >
-            Remember this device
+            Remember me
           </Label>
         </div>
       )}
@@ -118,34 +119,37 @@ export function VerifyOtpForm({
         className="h-14 w-full rounded-2xl primary-gradient text-base font-black text-white shadow-[0_20px_42px_rgba(103,58,244,0.28)]"
         disabled={isPending}
       >
-        {isPending ? "Verifying..." : "Verify Code"}
+        {isPending
+          ? "Verifying..."
+          : isResetFlow
+            ? "Verify"
+            : "Verify & Sign In"}
       </Button>
 
-      <div className="text-center text-sm text-muted-foreground">
+      <div className="text-center text-sm text-slate-500">
         {isResetFlow ? (
           <button
             type="button"
             onClick={resendResetOtp}
             disabled={!timer.canResend || resendPasswordMutation.isPending}
-            className="font-extrabold text-primary disabled:text-muted-foreground"
+            className="font-extrabold text-primary transition hover:opacity-75 disabled:text-slate-400"
           >
             {resendPasswordMutation.isPending
               ? "Resending..."
               : timer.canResend
                 ? "Resend code"
-                : `Resend available in ${timer.seconds}s`}
+                : `Resend in ${timer.seconds}s`}
           </button>
         ) : (
-          <span>
-            Login code resend is not available until the backend provides a
-            dedicated endpoint.
+          <span className="font-medium">
+            Check your email for the verification code.
           </span>
         )}
       </div>
 
       <Link
-        to={isResetFlow ? "/auth/forgot-password" : "/auth/login"}
-        className="inline-flex items-center gap-2 text-sm font-extrabold text-muted-foreground transition hover:text-primary"
+        to={isResetFlow ? AUTH_ROUTES.FORGOT_PASSWORD : AUTH_ROUTES.LOGIN}
+        className="mx-auto inline-flex items-center gap-2 text-sm font-extrabold text-muted-foreground transition hover:text-primary"
       >
         <ArrowLeft className="h-4 w-4" />
         Back

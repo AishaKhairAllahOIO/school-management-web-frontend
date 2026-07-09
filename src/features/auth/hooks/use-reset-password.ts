@@ -3,10 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
 import { getAxiosErrorMessage } from "@/services/axios/axiosError";
-import { requestFcmToken } from "@/services/firebase/firebase.messaging";
+import { registerCurrentFirebaseDevice } from "@/features/notifications";
 
 import { authService } from "../api/auth.service";
-import { deviceTokenService } from "../api/device-token.service";
 import { AUTH_ROUTES } from "../constants/auth.constants";
 import { isAllowedWebUser } from "../lib/auth.utils";
 import { useAuthStore } from "../store/auth.store";
@@ -22,7 +21,7 @@ export function useResetPassword() {
     mutationFn: (payload: ResetPasswordPayload) =>
       authService.resetPassword(payload),
 
-    onSuccess: (response) => {
+    onSuccess: async (response) => {
       const authData = response.data.data;
 
       if (!authData?.token || !authData.user) {
@@ -45,16 +44,11 @@ export function useResetPassword() {
         rememberMe: false,
       });
 
-      requestFcmToken()
-        .then((fcmToken) => {
-          if (!fcmToken) return;
-
-          return deviceTokenService.register({
-            fcm_token: fcmToken,
-          });
-        })
-        .catch(() => {
-        });
+      try {
+        await registerCurrentFirebaseDevice();
+      } catch {
+        // Notification registration failure must not block reset login.
+      }
 
       toast.success(
         response.data.message || "Password reset successfully. Welcome back."

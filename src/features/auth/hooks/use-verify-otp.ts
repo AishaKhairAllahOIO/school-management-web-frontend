@@ -3,10 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
 import { getAxiosErrorMessage } from "@/services/axios/axiosError";
-import { requestFcmToken } from "@/services/firebase/firebase.messaging";
-
+import { registerCurrentFirebaseDevice } from "@/features/notifications";
 import { authService } from "../api/auth.service";
-import { deviceTokenService } from "../api/device-token.service";
 import { AUTH_ROUTES } from "../constants/auth.constants";
 import { isAllowedWebUser } from "../lib/auth.utils";
 import { useAuthStore } from "../store/auth.store";
@@ -33,6 +31,7 @@ export function useVerifyOtp() {
       if (!isAllowedWebUser(authData.user)) {
         clearAuth();
         toast.error("Your account role is not allowed to access the dashboard.");
+        navigate(AUTH_ROUTES.LOGIN, { replace: true });
         return;
       }
 
@@ -46,15 +45,9 @@ export function useVerifyOtp() {
       });
 
       try {
-        const fcmToken = await requestFcmToken();
-
-        if (fcmToken) {
-          await deviceTokenService.register({
-            fcm_token: fcmToken,
-          });
-        }
+        await registerCurrentFirebaseDevice();
       } catch {
-        // فشل الإشعارات لا يمنع تسجيل الدخول
+        // Notification registration failure must not block login.
       }
 
       toast.success(response.data.message || "Logged in successfully.");

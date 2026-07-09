@@ -1,4 +1,4 @@
-export const AUTH_STORAGE_KEYS = 
+export const AUTH_STORAGE_KEYS =
 {
   TOKEN: "auth_token",
   USER: "auth_user",

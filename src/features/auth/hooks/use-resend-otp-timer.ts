@@ -5,8 +5,14 @@ export function useResendOtpTimer(initialSeconds = 60) {
 
   useEffect(() => {
     if (seconds <= 0) return;
-    const timer = window.setInterval(() => setSeconds((current) => Math.max(0, current - 1)), 1000);
-    return () => window.clearInterval(timer);
+
+    const timer = window.setInterval(() => {
+      setSeconds((current) => Math.max(0, current - 1));
+    }, 1000);
+
+    return () => {
+      window.clearInterval(timer);
+    };
   }, [seconds]);
 
   return {

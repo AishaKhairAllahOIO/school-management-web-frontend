@@ -1,68 +1,65 @@
-import { getToken, onMessage, type Unsubscribe } from "firebase/messaging";
-import { toast } from "sonner";
+import {
+  getMessaging,
+  getToken,
+  isSupported,
+  onMessage,
+  type MessagePayload,
+} from "firebase/messaging";
 
-import { FIREBASE_VAPID_KEY } from "./firebase.constants";
-import { getFirebaseMessaging } from "./firebase.config";
+import { firebaseVapidKey } from "./firebase.config";
+import { firebaseApp } from "./firebase.app";
 
-export async function requestNotificationPermission(): Promise<boolean> {
-  if (!("Notification" in window)) return false;
+const FIREBASE_MESSAGING_SW_PATH = "/firebase-messaging-sw.js";
 
-  if (Notification.permission === "granted") return true;
+export async function getFirebaseMessaging() {
+  const supported = await isSupported();
 
-  if (Notification.permission === "denied") return false;
-
-  const permission = await Notification.requestPermission();
-
-  return permission === "granted";
-}
-
-export async function requestFcmToken(): Promise<string | null> {
-  const messaging = await getFirebaseMessaging();
-
-  if (!messaging) return null;
-
-  const permissionGranted = await requestNotificationPermission();
-
-  if (!permissionGranted) return null;
-
-  if (!FIREBASE_VAPID_KEY) {
-    throw new Error("Missing VITE_FIREBASE_VAPID_KEY.");
+  if (!supported) {
+    return null;
   }
 
-  const token = await getToken(messaging, {
-    vapidKey: FIREBASE_VAPID_KEY,
-  });
-
-  return token || null;
+  return getMessaging(firebaseApp);
 }
 
-export async function getCurrentFcmToken(): Promise<string | null> {
+export async function requestNotificationPermission() {
+  if (!("Notification" in window)) {
+    return "unsupported" as const;
+  }
+
+  return Notification.requestPermission();
+}
+
+export async function requestFcmToken() {
   const messaging = await getFirebaseMessaging();
 
-  if (!messaging) return null;
+  if (!messaging) {
+    return null;
+  }
 
-  if (!FIREBASE_VAPID_KEY) return null;
+  const permission = await requestNotificationPermission();
 
-  const token = await getToken(messaging, {
-    vapidKey: FIREBASE_VAPID_KEY,
+  if (permission !== "granted") {
+    return null;
+  }
+
+  const registration = await navigator.serviceWorker.register(
+    FIREBASE_MESSAGING_SW_PATH
+  );
+
+  return getToken(messaging, {
+    vapidKey: firebaseVapidKey,
+    serviceWorkerRegistration: registration,
   });
-
-  return token || null;
 }
 
-export async function listenToForegroundMessages(): Promise<Unsubscribe> {
+export async function listenToForegroundMessages(
+  callback: (payload: MessagePayload) => void
+) {
   const messaging = await getFirebaseMessaging();
 
   if (!messaging) {
     return () => {};
   }
 
-  return onMessage(messaging, (payload) => {
-    const title = payload.notification?.title || "New notification";
-    const body = payload.notification?.body || "";
-
-    toast.info(title, {
-      description: body,
-    });
-  });
+  return onMessage(messaging, callback);
 }
