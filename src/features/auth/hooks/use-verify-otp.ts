@@ -24,9 +24,16 @@ export function useVerifyOtp() {
       const authData = response.data.data;
 
       if (!authData?.token || !authData.user) {
-        toast.error("Invalid login response. Please try again.");
-        return;
-      }
+  clearAuth();
+
+  toast.error("Invalid login response. Please try again.");
+
+  navigate(AUTH_ROUTES.LOGIN, {
+    replace: true,
+  });
+
+  return;
+}
 
       if (!isAllowedWebUser(authData.user)) {
         clearAuth();

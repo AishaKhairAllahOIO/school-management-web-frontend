@@ -32,11 +32,13 @@ export async function unregisterCurrentFirebaseDevice() {
     return null;
   }
 
-  await deviceTokenService.remove({
-    fcm_token: storedToken,
-  });
+  try {
+    await deviceTokenService.remove({
+      fcm_token: storedToken,
+    });
 
-  notificationTokenStorage.clear();
-
-  return storedToken;
+    return storedToken;
+  } finally {
+    notificationTokenStorage.clear();
+  }
 }

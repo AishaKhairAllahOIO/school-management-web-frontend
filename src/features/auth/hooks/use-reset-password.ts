@@ -24,12 +24,19 @@ export function useResetPassword() {
     onSuccess: async (response) => {
       const authData = response.data.data;
 
-      if (!authData?.token || !authData.user) {
-        toast.error("Password reset succeeded, but login data was not returned.");
-        navigate(AUTH_ROUTES.LOGIN, { replace: true });
-        return;
-      }
+     if (!authData?.token || !authData.user) {
+  clearAuth();
 
+  toast.error(
+    "Password reset succeeded, but login data was not returned.",
+  );
+
+  navigate(AUTH_ROUTES.LOGIN, {
+    replace: true,
+  });
+
+  return;
+}
       if (!isAllowedWebUser(authData.user)) {
         clearAuth();
         toast.error("This account is not allowed to access the web dashboard.");

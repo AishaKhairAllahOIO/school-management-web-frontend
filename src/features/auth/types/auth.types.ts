@@ -44,21 +44,25 @@ export type AuthSessionResponse = {
   token: string;
 };
 
+export type LoginResponse = undefined;
+
 export type VerifyLoginOtpResponse = AuthSessionResponse;
 
-export type ResetPasswordResponse = AuthSessionResponse;
-
 export type ForgotPasswordResponse = {
-  remaining_time: number;
-};
-
-export type ResendPasswordOtpResponse = {
   remaining_time: number;
 };
 
 export type VerifyPasswordOtpResponse = {
   temp_token: string;
 };
+
+export type ResendPasswordOtpResponse = {
+  remaining_time: number;
+};
+
+export type ResetPasswordResponse = AuthSessionResponse;
+
+export type LogoutResponse = undefined;
 
 export type AuthStorageData = {
   token: string;

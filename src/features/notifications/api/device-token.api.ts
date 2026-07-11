@@ -11,7 +11,7 @@ export const deviceTokenService = {
   register(payload: DeviceTokenPayload) {
     return axiosClient.post<ApiResponse<DeviceTokenResponse>>(
       API_ENDPOINTS.AUTH.DEVICE_TOKENS,
-      payload
+      payload,
     );
   },
 
@@ -20,7 +20,7 @@ export const deviceTokenService = {
       API_ENDPOINTS.AUTH.DEVICE_TOKENS,
       {
         data: payload,
-      }
+      },
     );
   },
 };

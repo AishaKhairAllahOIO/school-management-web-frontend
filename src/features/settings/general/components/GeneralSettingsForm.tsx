@@ -1,30 +1,24 @@
 import {
   Building2,
-  CalendarDays,
-  Clock,
   Globe2,
   Mail,
   MapPin,
   Phone,
   Save,
-  Settings,
 } from "lucide-react";
-
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 
-import { BrandingPreview } from "./BrandingPreview";
 import { SchoolGallery } from "./SchoolGallery";
 import { SchoolLogoUpload } from "./SchoolLogoUpload";
-import {
-  useUpdateGeneralSettings,
-} from "@/features/settings/general/hooks/useGeneralSettings";
+import { useUpdateGeneralSettings } from "@/features/settings/general/hooks/useGeneralSettings";
 import {
   generalSettingsSchema,
   type GeneralSettingsFormValues,
 } from "@/features/settings/general/schemas/general-settings.schema";
 import type { GeneralSettings } from "@/features/settings/general/types/general-settings.types";
+import { getAxiosValidationErrors } from "@/services/axios/axiosError";
 
 type GeneralSettingsFormProps = {
   initialData: GeneralSettings;
@@ -74,42 +68,6 @@ function TextInput({
   );
 }
 
-function SelectInput({
-  label,
-  required,
-  options,
-  error,
-  ...props
-}: React.SelectHTMLAttributes<HTMLSelectElement> & {
-  label: string;
-  required?: boolean;
-  options: string[];
-  error?: string;
-}) {
-  return (
-    <label className="block">
-      <span className="mb-2 block text-[11px] font-bold text-foreground/80">
-        {label} {required ? <span className="text-destructive">*</span> : null}
-      </span>
-
-      <select
-        {...props}
-        className="h-11 w-full rounded-xl border border-border/70 bg-card px-4 text-sm font-semibold text-foreground outline-none transition focus:border-primary/50 focus:ring-4 focus:ring-primary/10"
-      >
-        {options.map((option) => (
-          <option key={option}>{option}</option>
-        ))}
-      </select>
-
-      {error ? (
-        <p className="mt-1 text-[11px] font-semibold text-destructive">
-          {error}
-        </p>
-      ) : null}
-    </label>
-  );
-}
-
 function SectionHeader({
   title,
   description,
@@ -133,127 +91,201 @@ function SectionHeader({
   );
 }
 
-function DayButton({
-  label,
-  active,
-  onClick,
-}: {
-  label: string;
-  active: boolean;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={[
-        "h-9 rounded-xl px-3 text-xs font-bold transition",
-        active
-          ? "bg-primary text-primary-foreground shadow-soft"
-          : "bg-muted text-muted-foreground",
-      ].join(" ")}
-    >
-      {label}
-    </button>
-  );
-}
+
 
 export function GeneralSettingsForm({ initialData }: GeneralSettingsFormProps) {
   const updateMutation = useUpdateGeneralSettings();
 
-  const {
-    register,
-    handleSubmit,
-    reset,
-    watch,
-    setValue,
-    formState: { errors, isDirty },
-  } = useForm<GeneralSettingsFormValues>({
-    resolver: zodResolver(generalSettingsSchema),
-    defaultValues: {
-      schoolName: initialData.schoolName,
-      shortName: initialData.shortName,
-      description: initialData.description,
-      phoneNumber: initialData.phoneNumber,
-      emergencyPhoneNumber: initialData.emergencyPhoneNumber,
-      email: initialData.email,
-      website: initialData.website ?? "",
-      address: initialData.address,
-      city: initialData.city,
-      country: initialData.country,
-      location: {
-  latitude: String(initialData.location.latitude ?? ""),
-  longitude: String(initialData.location.longitude ?? ""),
-},
-      defaultLanguage: initialData.defaultLanguage,
-      timezone: initialData.timezone,
-      dateFormat: initialData.dateFormat,
-      currency: initialData.currency,
-      workingDays: initialData.workingDays,
-      openingTime: initialData.openingTime,
-      closingTime: initialData.closingTime,
-    },
-  });
+const {
+  register,
+  handleSubmit,
+  reset,
+  watch,
+  setError,
+  setValue,
+  formState: { errors, isDirty },
+} = useForm<GeneralSettingsFormValues>({
+  resolver: zodResolver(generalSettingsSchema),
 
-  useEffect(() => {
-    reset({
-      schoolName: initialData.schoolName,
-      shortName: initialData.shortName,
-      description: initialData.description,
-      phoneNumber: initialData.phoneNumber,
-      emergencyPhoneNumber: initialData.emergencyPhoneNumber,
-      email: initialData.email,
-      website: initialData.website ?? "",
-      address: initialData.address,
-      city: initialData.city,
-      country: initialData.country,
-      location: {
-  latitude: String(initialData.location.latitude ?? ""),
-  longitude: String(initialData.location.longitude ?? ""),
+  defaultValues: {
+    schoolName: initialData.schoolName,
+    shortName: initialData.shortName,
+    description: initialData.description,
+
+    phoneNumber: initialData.phoneNumber,
+    emergencyPhoneNumber: initialData.emergencyPhoneNumber,
+
+    email: initialData.email,
+    website: initialData.website ?? "",
+
+    address: initialData.address,
+    city: initialData.city,
+    country: initialData.country,
+    logo: initialData.logoUrl ?? "",
+
+    location: {
+  latitude:
+    initialData.id === 0
+      ? ""
+      : String(initialData.location.latitude),
+
+  longitude:
+    initialData.id === 0
+      ? ""
+      : String(initialData.location.longitude),
 },
-      defaultLanguage: initialData.defaultLanguage,
-      timezone: initialData.timezone,
-      dateFormat: initialData.dateFormat,
-      currency: initialData.currency,
-      workingDays: initialData.workingDays,
-      openingTime: initialData.openingTime,
-      closingTime: initialData.closingTime,
-    });
-  }, [initialData, reset]);
+  },
+});
+
+ useEffect(() => {
+  reset({
+    schoolName: initialData.schoolName,
+    shortName: initialData.shortName,
+    description: initialData.description,
+
+    phoneNumber: initialData.phoneNumber,
+    emergencyPhoneNumber: initialData.emergencyPhoneNumber,
+
+    email: initialData.email,
+    website: initialData.website ?? "",
+
+    address: initialData.address,
+    city: initialData.city,
+    country: initialData.country,
+    logo: initialData.logoUrl ?? "",
+
+    location: {
+  latitude:
+    initialData.id === 0
+      ? ""
+      : String(initialData.location.latitude),
+
+  longitude:
+    initialData.id === 0
+      ? ""
+      : String(initialData.location.longitude),
+},
+  });
+}, [initialData, reset]);
 
   const watchedValues = watch();
-  const workingDays = watch("workingDays");
 
-  function toggleWorkingDay(day: string) {
-    const currentDays = workingDays ?? [];
-
-    if (currentDays.includes(day)) {
-      setValue(
-        "workingDays",
-        currentDays.filter((item) => item !== day),
-        { shouldDirty: true, shouldValidate: true }
-      );
-      return;
-    }
-
-    setValue("workingDays", [...currentDays, day], {
-      shouldDirty: true,
-      shouldValidate: true,
-    });
-  }
 
  function onSubmit(values: GeneralSettingsFormValues) {
-  updateMutation.mutate({
-    ...values,
-    location: {
-      latitude: values.location.latitude
-        ? Number(values.location.latitude)
-        : null,
-      longitude: values.location.longitude
-        ? Number(values.location.longitude)
-        : null,
+  updateMutation.mutate(
+    {
+      schoolName: values.schoolName,
+      shortName: values.shortName,
+      description: values.description,
+
+      phoneNumber: values.phoneNumber,
+      emergencyPhoneNumber: values.emergencyPhoneNumber,
+
+      email: values.email,
+      website: values.website ?? "",
+
+      address: values.address,
+      city: values.city,
+      country: values.country,
+
+      location: {
+        latitude: Number(values.location.latitude),
+        longitude: Number(values.location.longitude),
+      },
+
+logo: values.logo?.trim() || null,    },
+    {
+      onError: (error) => {
+        const validationErrors = getAxiosValidationErrors(error);
+
+        const fieldMappings: Array<{
+          apiField: string;
+          formField:
+          | "logo"
+            | "schoolName"
+            | "shortName"
+            | "description"
+            | "phoneNumber"
+            | "emergencyPhoneNumber"
+            | "email"
+            | "website"
+            | "address"
+            | "city"
+            | "country"
+            | "location.latitude"
+            | "location.longitude";
+        }> = [
+          {
+            apiField: "schoolName",
+            formField: "schoolName",
+          },
+          {
+  apiField: "logo",
+  formField: "logo",
+},
+          {
+            apiField: "shortName",
+            formField: "shortName",
+          },
+          {
+            apiField: "description",
+            formField: "description",
+          },
+          {
+            apiField: "phoneNumber",
+            formField: "phoneNumber",
+          },
+          {
+            apiField: "emergencyPhoneNumber",
+            formField: "emergencyPhoneNumber",
+          },
+          {
+            apiField: "email",
+            formField: "email",
+          },
+          {
+            apiField: "website",
+            formField: "website",
+          },
+          {
+            apiField: "address",
+            formField: "address",
+          },
+          {
+            apiField: "city",
+            formField: "city",
+          },
+          {
+            apiField: "country",
+            formField: "country",
+          },
+          {
+            apiField: "location.latitude",
+            formField: "location.latitude",
+          },
+          {
+            apiField: "location.longitude",
+            formField: "location.longitude",
+          },
+        ];
+
+        for (const mapping of fieldMappings) {
+          const message =
+            validationErrors[mapping.apiField]?.[0];
+
+            
+          if (!message) {
+            continue;
+          }
+
+          setError(mapping.formField, {
+            type: "server",
+            message,
+          });
+        }
+      },
     },
-  });
+  );
 }
 
   return (
@@ -278,11 +310,14 @@ export function GeneralSettingsForm({ initialData }: GeneralSettingsFormProps) {
         </div>
 
         <p className="hidden text-xs font-semibold text-muted-foreground lg:block">
-          Last updated: {new Date(initialData.updatedAt).toLocaleString()}
-        </p>
+  {initialData.updatedAt
+    ? `Last updated: ${new Date(
+        initialData.updatedAt,
+      ).toLocaleString()}`
+    : "School settings have not been initialized yet."}
+</p>
       </div>
 
-      <div className="grid gap-5 xl:grid-cols-[1fr_400px]">
         <div className="space-y-5">
           <section className="rounded-3xl border border-border/70 bg-card p-5">
             <SectionHeader
@@ -292,8 +327,17 @@ export function GeneralSettingsForm({ initialData }: GeneralSettingsFormProps) {
             />
 
             <div className="grid gap-6 lg:grid-cols-[320px_1fr]">
-              <SchoolLogoUpload data={initialData} />
-
+<SchoolLogoUpload
+  value={watchedValues.logo ?? ""}
+  error={errors.logo?.message}
+  disabled={updateMutation.isPending}
+  onChange={(value) => {
+    setValue("logo", value, {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
+  }}
+/>
               <div className="grid gap-5 md:grid-cols-2">
                 <TextInput
                   label="School Name"
@@ -380,17 +424,12 @@ export function GeneralSettingsForm({ initialData }: GeneralSettingsFormProps) {
               />
 
               <div className="grid gap-5 md:grid-cols-2">
-                <SelectInput
-                  label="Country"
-                  required
-                  options={[
-                    "United States",
-                    "Norway",
-                    "United Arab Emirates",
-                  ]}
-                  error={errors.country?.message}
-                  {...register("country")}
-                />
+                <TextInput
+  label="Country"
+  required
+  error={errors.country?.message}
+  {...register("country")}
+/>
 
                 <TextInput
                   label="City"
@@ -425,127 +464,10 @@ export function GeneralSettingsForm({ initialData }: GeneralSettingsFormProps) {
             </section>
           </div>
 
-          <div className="grid gap-5 xl:grid-cols-2">
-            <section className="rounded-3xl border border-border/70 bg-card p-5">
-              <SectionHeader
-                title="School Schedule"
-                description="Set school working days and operating hours."
-                icon={CalendarDays}
-              />
-
-              <div>
-                <span className="mb-2 block text-[11px] font-bold text-foreground/80">
-                  Working Days <span className="text-destructive">*</span>
-                </span>
-
-                <div className="flex flex-wrap gap-2">
-                  {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map(
-                    (day) => (
-                      <DayButton
-                        key={day}
-                        label={day}
-                        active={workingDays?.includes(day)}
-                        onClick={() => toggleWorkingDay(day)}
-                      />
-                    )
-                  )}
-                </div>
-
-                {errors.workingDays?.message ? (
-                  <p className="mt-1 text-[11px] font-semibold text-destructive">
-                    {errors.workingDays.message}
-                  </p>
-                ) : null}
-              </div>
-
-              <div className="mt-5 grid gap-4 md:grid-cols-3">
-                <TextInput
-                  label="Opening Time"
-                  icon={Clock}
-                  error={errors.openingTime?.message}
-                  {...register("openingTime")}
-                />
-
-                <TextInput
-                  label="Closing Time"
-                  icon={Clock}
-                  error={errors.closingTime?.message}
-                  {...register("closingTime")}
-                />
-
-               
-              </div>
-            </section>
-
-            <section className="rounded-3xl border border-border/70 bg-card p-5">
-              <SectionHeader
-                title="System Preferences"
-                description="Configure general system preferences."
-                icon={Settings}
-              />
-
-              <div className="grid gap-5 md:grid-cols-2">
-                <SelectInput
-                  label="Default Language"
-                  required
-                  options={["English", "Arabic", "Norwegian"]}
-                  error={errors.defaultLanguage?.message}
-                  {...register("defaultLanguage")}
-                />
-
-                <SelectInput
-                  label="Timezone"
-                  required
-                  options={[
-                    "(UTC-05:00) Eastern Time",
-                    "(UTC+01:00) Oslo",
-                    "(UTC+04:00) Dubai",
-                  ]}
-                  error={errors.timezone?.message}
-                  {...register("timezone")}
-                />
-
-                <SelectInput
-                  label="Date Format"
-                  required
-                  options={["MM/DD/YYYY", "DD/MM/YYYY", "YYYY-MM-DD"]}
-                  error={errors.dateFormat?.message}
-                  {...register("dateFormat")}
-                />
-
-                <SelectInput
-                  label="Currency"
-                  required
-                  options={[
-                    "USD - US Dollar",
-                    "NOK - Norwegian Krone",
-                    "AED - UAE Dirham",
-                  ]}
-                  error={errors.currency?.message}
-                  {...register("currency")}
-                />
-              </div>
-            </section>
-          </div>
-        </div>
+          
 
         <aside className="space-y-5">
-         <BrandingPreview
-  data={{
-    schoolName: watchedValues.schoolName,
-    shortName: watchedValues.shortName,
-    description: watchedValues.description,
-    phoneNumber: watchedValues.phoneNumber,
-    emergencyPhoneNumber: watchedValues.emergencyPhoneNumber,
-    email: watchedValues.email,
-    website: watchedValues.website,
-    city: watchedValues.city,
-    country: watchedValues.country,
-    logoUrl: initialData.logoUrl,
-    openingTime: watchedValues.openingTime,
-    closingTime: watchedValues.closingTime,
-  }}
-/>
+
           <SchoolGallery images={initialData.images} />
         </aside>
       </div>
@@ -560,9 +482,9 @@ export function GeneralSettingsForm({ initialData }: GeneralSettingsFormProps) {
           Cancel
         </button>
 
-        <button
-          type="submit"
-          disabled={updateMutation.isPending}
+       <button
+  type="submit"
+  disabled={!isDirty || updateMutation.isPending}
           className="flex h-11 items-center gap-2 rounded-2xl bg-primary px-8 text-sm font-bold text-primary-foreground shadow-soft transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-70"
         >
           <Save size={16} />

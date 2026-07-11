@@ -10,6 +10,7 @@ import { Input } from "@/shared/ui/input";
 import { AUTH_ROUTES } from "../constants/auth.constants";
 import { useLogin } from "../hooks/use-login";
 import { loginSchema, type LoginSchema } from "../schemas/login.schema";
+import { getAxiosValidationErrors } from "@/services/axios/axiosError";
 
 export function LoginForm() {
   const navigate = useNavigate();
@@ -25,24 +26,46 @@ export function LoginForm() {
   });
 
   function onSubmit(values: LoginSchema) {
-    loginMutation.mutate(
-      {
-        email: values.email,
-        password: values.password,
-      },
-      {
-        onSuccess: () => {
-          navigate(AUTH_ROUTES.VERIFY_OTP, {
-            state: {
-              email: values.email,
-              isResetFlow: false,
-            },
-          });
-        },
-      }
-    );
-  }
+  form.clearErrors();
 
+  loginMutation.mutate(
+    {
+      email: values.email,
+      password: values.password,
+    },
+    {
+      onSuccess: () => {
+        navigate(AUTH_ROUTES.VERIFY_OTP, {
+          state: {
+            email: values.email,
+            isResetFlow: false,
+          },
+        });
+      },
+
+      onError: (error) => {
+        const validationErrors = getAxiosValidationErrors(error);
+
+        const emailMessage = validationErrors.email?.[0];
+        const passwordMessage = validationErrors.password?.[0];
+
+        if (emailMessage) {
+          form.setError("email", {
+            type: "server",
+            message: emailMessage,
+          });
+        }
+
+        if (passwordMessage) {
+          form.setError("password", {
+            type: "server",
+            message: passwordMessage,
+          });
+        }
+      },
+    },
+  );
+}
   return (
     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
       <div className="space-y-2">

@@ -1,4 +1,8 @@
-import type { AcademicStageType, SchoolDay, SchoolDayScheduleSettings } from "../types/academic-settings.types";
+import type {
+  AcademicStageType,
+  SchoolDay,
+  SchoolScheduleSettings,
+} from "../types/academic-settings.types";
 
 export const schoolDays: SchoolDay[] = [
   "sunday",
@@ -20,24 +24,40 @@ export const schoolDayLabels: Record<SchoolDay, string> = {
   saturday: "Saturday",
 };
 
-export const academicStageLabels: Record<AcademicStageType, string> = {
+export const academicStageLabels: Record<
+  AcademicStageType,
+  string
+> = {
   primary: "Primary",
   middle: "Middle",
   secondary: "Secondary",
 };
 
-export function createId(prefix: string) {
+export function createId(prefix: string): string {
   return `${prefix}-${crypto.randomUUID()}`;
 }
 
-export function getAcademicYearName(startDate: string, endDate: string) {
-  return `${startDate.slice(0, 4)} - ${endDate.slice(0, 4)}`;
+export function getAcademicYearName(
+  startDate: string,
+  endDate: string,
+): string {
+  return `${startDate.slice(0, 4)} - ${endDate.slice(
+    0,
+    4,
+  )}`;
 }
 
-export function formatDateTime(value: string) {
-  if (!value) return "—";
+export function formatDateTime(value: string): string {
+  if (!value) {
+    return "—";
+  }
+
   const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return value;
+
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+
   return new Intl.DateTimeFormat("en", {
     year: "numeric",
     month: "short",
@@ -47,34 +67,83 @@ export function formatDateTime(value: string) {
   }).format(date);
 }
 
-export function addMinutes(time: string, minutes: number) {
-  const [hours, mins] = time.split(":").map(Number);
+export function addMinutes(
+  time: string,
+  minutes: number,
+): string {
+  const [hours = 0, mins = 0] = time
+    .split(":")
+    .map(Number);
+
   const date = new Date();
-  date.setHours(hours, mins + minutes, 0, 0);
+
+  date.setHours(
+    hours,
+    mins + minutes,
+    0,
+    0,
+  );
+
   return date.toTimeString().slice(0, 5);
 }
 
-export function buildSchedulePreview(schedule: SchoolDayScheduleSettings) {
+export function buildSchedulePreview(
+  schedule: SchoolScheduleSettings,
+) {
   const firstDay = schedule.workingDays[0];
-  if (!firstDay) return { items: [], endTime: schedule.dayStartTime };
+
+  if (!firstDay) {
+    return {
+      items: [],
+      endTime: schedule.dayStartTime,
+    };
+  }
 
   let currentTime = schedule.dayStartTime;
-  const items: Array<{ time: string; label: string; type: "period" | "break" }> = [];
 
-  for (let index = 1; index <= firstDay.periodsCount; index += 1) {
-    items.push({ time: currentTime, label: `Period ${index}`, type: "period" });
-    currentTime = addMinutes(currentTime, schedule.periodDurationMinutes);
+  const items: Array<{
+    time: string;
+    label: string;
+    type: "period" | "break";
+  }> = [];
 
-    const breakItem = schedule.breaks.find((item) => item.afterPeriodIndex === index);
+  for (
+    let periodIndex = 1;
+    periodIndex <= firstDay.periodsCount;
+    periodIndex += 1
+  ) {
+    items.push({
+      time: currentTime,
+      label: `Period ${periodIndex}`,
+      type: "period",
+    });
+
+    currentTime = addMinutes(
+      currentTime,
+      schedule.periodDurationMinutes,
+    );
+
+    const breakItem = schedule.breaks.find(
+      (item) =>
+        item.afterPeriodIndex === periodIndex,
+    );
+
     if (breakItem) {
       items.push({
         time: currentTime,
         label: `Break (${breakItem.durationMinutes}m)`,
         type: "break",
       });
-      currentTime = addMinutes(currentTime, breakItem.durationMinutes);
+
+      currentTime = addMinutes(
+        currentTime,
+        breakItem.durationMinutes,
+      );
     }
   }
 
-  return { items, endTime: currentTime };
+  return {
+    items,
+    endTime: currentTime,
+  };
 }

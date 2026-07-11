@@ -14,6 +14,7 @@ import { useVerifyOtp } from "../hooks/use-verify-otp";
 import { useVerifyPasswordOtp } from "../hooks/use-verify-password-otp";
 import { otpSchema, type OtpSchema } from "../schemas/otp.schema";
 import { OtpInput } from "./OtpInput";
+import { getAxiosValidationErrors } from "@/services/axios/axiosError";
 
 type VerifyOtpFormProps = {
   email: string;
@@ -43,22 +44,45 @@ export function VerifyOtpForm({
   const isPending =
     verifyLoginMutation.isPending || verifyPasswordMutation.isPending;
 
-  function onSubmit(values: OtpSchema) {
-    if (isResetFlow) {
-      verifyPasswordMutation.mutate({
+    function handleOtpError(error: unknown) {
+  const validationErrors = getAxiosValidationErrors(error);
+  const otpMessage = validationErrors.otp?.[0];
+
+  if (otpMessage) {
+    form.setError("otp", {
+      type: "server",
+      message: otpMessage,
+    });
+  }
+}
+function onSubmit(values: OtpSchema) {
+  form.clearErrors();
+
+  if (isResetFlow) {
+    verifyPasswordMutation.mutate(
+      {
         email,
         otp: values.otp,
-      });
+      },
+      {
+        onError: handleOtpError,
+      },
+    );
 
-      return;
-    }
+    return;
+  }
 
-    verifyLoginMutation.mutate({
+  verifyLoginMutation.mutate(
+    {
       email,
       otp: values.otp,
       remember_me: values.rememberMe ? "1" : "0",
-    });
-  }
+    },
+    {
+      onError: handleOtpError,
+    },
+  );
+}
 
   function resendResetOtp() {
     if (!isResetFlow || !timer.canResend) return;

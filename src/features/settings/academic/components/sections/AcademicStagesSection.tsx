@@ -2,7 +2,6 @@ import { useState } from "react";
 
 import {
   useCreateAcademicStage,
-  useDeleteAcademicStage,
   useUpdateAcademicStage,
 } from "../../hooks/useAcademicSettings";
 import type { AcademicStage } from "../../types/academic-settings.types";
@@ -22,7 +21,6 @@ export function AcademicStagesSection({ academicStages }: Props) {
 
   const createStage = useCreateAcademicStage();
   const updateStage = useUpdateAcademicStage();
-  const deleteStage = useDeleteAcademicStage();
 
   return (
     <>
@@ -56,10 +54,7 @@ export function AcademicStagesSection({ academicStages }: Props) {
                     setDialogValue(stage);
                     setOpenMenuId(null);
                   }}
-                  onDelete={() => {
-                    deleteStage.mutate(stage.id);
-                    setOpenMenuId(null);
-                  }}
+                  
                 />
               </EntityTd>
             </tr>

@@ -8,6 +8,7 @@ import { Input } from "@/shared/ui/input";
 
 import { AUTH_ROUTES } from "../constants/auth.constants";
 import { useForgotPassword } from "../hooks/use-forgot-password";
+import { getAxiosValidationErrors } from "@/services/axios/axiosError";
 import {
   forgotPasswordSchema,
   type ForgotPasswordSchema,
@@ -22,12 +23,29 @@ export function ForgotPasswordForm() {
       email: "",
     },
   });
+  function onSubmit(values: ForgotPasswordSchema) {
+  form.clearErrors();
+
+  forgotPasswordMutation.mutate(values, {
+    onError: (error) => {
+      const validationErrors = getAxiosValidationErrors(error);
+      const emailMessage = validationErrors.email?.[0];
+
+      if (emailMessage) {
+        form.setError("email", {
+          type: "server",
+          message: emailMessage,
+        });
+      }
+    },
+  });
+}
 
   return (
-    <form
-      onSubmit={form.handleSubmit((values) => forgotPasswordMutation.mutate(values))}
-      className="space-y-5"
-    >
+ <form
+  onSubmit={form.handleSubmit(onSubmit)}
+  className="space-y-5"
+>
       <div className="space-y-2">
         <label htmlFor="email" className="text-sm font-black text-[#17142F]">
           Email

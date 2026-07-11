@@ -7,7 +7,7 @@ export type SchoolDay =
   | "friday"
   | "saturday";
 
-export type AcademicStageType = "primary" | "middle" | "secondary";
+export type AcademicStageType = string;
 
 export type AcademicYear = {
   id: string;
@@ -22,6 +22,7 @@ export type AcademicYear = {
 export type AcademicTerm = {
   id: string;
   academicYearId: string;
+  semesterName: string;
   startDate: string;
   endDate: string;
   order: number;
@@ -49,26 +50,30 @@ export type SchoolDayConfiguration = {
   periodsCount: number;
 };
 
-export type SchoolDayScheduleSettings = {
-  workingDays: SchoolDayConfiguration[];
+export type SchoolScheduleSettings = {
   dayStartTime: string;
   periodDurationMinutes: number;
+  workingDays: SchoolDayConfiguration[];
   breaks: SchoolBreak[];
 };
+
+export type SchoolDayScheduleSettings =
+  SchoolScheduleSettings;
 
 export type AcademicSettings = {
   id: string;
   currentAcademicYearId: string;
-  currentAcademicTermId: string;
-  scheduleSettings: SchoolDayScheduleSettings;
+  currentSemesterId: string;
+  scheduleSettings: SchoolScheduleSettings;
   createdAt: string;
   updatedAt: string;
 };
 
-export type UpdateAcademicSettingsPayload = Omit<
-  AcademicSettings,
-  "id" | "createdAt" | "updatedAt"
->;
+export type UpdateAcademicSettingsPayload = {
+  currentAcademicYearId: number;
+  currentSemesterId: number;
+  scheduleSettings: SchoolScheduleSettings;
+};
 
 export type AcademicSettingsViewData = {
   settings: AcademicSettings;
@@ -83,21 +88,24 @@ export type CreateAcademicYearPayload = {
   isCurrent: boolean;
 };
 
-export type UpdateAcademicYearPayload = Partial<CreateAcademicYearPayload>;
+export type UpdateAcademicYearPayload =
+  Partial<CreateAcademicYearPayload>;
 
 export type CreateAcademicTermPayload = {
-  academicYearId: string;
+  academicYearId: number;
+  semesterName: string;
   startDate: string;
   endDate: string;
-  order: number;
   isCurrent: boolean;
   isFinalTerm: boolean;
 };
 
-export type UpdateAcademicTermPayload = Partial<CreateAcademicTermPayload>;
+export type UpdateAcademicTermPayload =
+  Partial<Omit<CreateAcademicTermPayload, "academicYearId">>;
 
 export type CreateAcademicStagePayload = {
-  type: AcademicStageType;
+  type: string;
 };
 
-export type UpdateAcademicStagePayload = Partial<CreateAcademicStagePayload>;
+export type UpdateAcademicStagePayload =
+  Partial<CreateAcademicStagePayload>;

@@ -11,6 +11,7 @@ import {
   resetPasswordSchema,
   type ResetPasswordSchema,
 } from "../schemas/reset-password.schema";
+import { getAxiosValidationErrors } from "@/services/axios/axiosError";
 
 type ResetPasswordFormProps = {
   email: string;
@@ -46,14 +47,41 @@ export function ResetPasswordForm({
     return score;
   }, [password]);
 
-  function onSubmit(values: ResetPasswordSchema) {
-    resetPasswordMutation.mutate({
+ function onSubmit(values: ResetPasswordSchema) {
+  form.clearErrors();
+
+  resetPasswordMutation.mutate(
+    {
       email,
       tempToken,
       password: values.password,
       password_confirmation: values.passwordConfirmation,
-    });
-  }
+    },
+    {
+      onError: (error) => {
+        const validationErrors = getAxiosValidationErrors(error);
+
+        const passwordMessage = validationErrors.password?.[0];
+        const passwordConfirmationMessage =
+          validationErrors.password_confirmation?.[0];
+
+        if (passwordMessage) {
+          form.setError("password", {
+            type: "server",
+            message: passwordMessage,
+          });
+        }
+
+        if (passwordConfirmationMessage) {
+          form.setError("passwordConfirmation", {
+            type: "server",
+            message: passwordConfirmationMessage,
+          });
+        }
+      },
+    },
+  );
+}
 
   return (
     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">

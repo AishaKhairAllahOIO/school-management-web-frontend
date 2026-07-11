@@ -3,7 +3,6 @@ import { useState } from "react";
 
 import {
   useCreateAcademicYear,
-  useDeleteAcademicYear,
   useUpdateAcademicYear,
 } from "../../hooks/useAcademicSettings";
 import type { AcademicYear } from "../../types/academic-settings.types";
@@ -23,7 +22,6 @@ export function AcademicYearsSection({ academicYears }: Props) {
 
   const createYear = useCreateAcademicYear();
   const updateYear = useUpdateAcademicYear();
-  const deleteYear = useDeleteAcademicYear();
 
   return (
     <>
@@ -73,10 +71,7 @@ export function AcademicYearsSection({ academicYears }: Props) {
                     setDialogValue(year);
                     setOpenMenuId(null);
                   }}
-                  onDelete={() => {
-                    deleteYear.mutate(year.id);
-                    setOpenMenuId(null);
-                  }}
+                 
                 />
               </EntityTd>
             </tr>

@@ -1,11 +1,11 @@
-import { Edit3, MoreVertical, Trash2 } from "lucide-react";
+import { Edit3, MoreVertical } from "lucide-react";
 import { useEffect, useRef } from "react";
 
 type Props = {
-  onEdit: () => void;
-  onDelete: () => void;
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
+  onEdit: () => void;
+  onDelete?: () => void;
 };
 
 export function ActionMenu({ onEdit, onDelete, isOpen, onOpenChange }: Props) {
@@ -41,14 +41,18 @@ export function ActionMenu({ onEdit, onDelete, isOpen, onOpenChange }: Props) {
             <Edit3 size={14} />
             Edit
           </button>
-          <button
-            type="button"
-            onClick={onDelete}
-            className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-xs font-black text-red-500 hover:bg-red-50"
-          >
-            <Trash2 size={14} />
-            Delete
-          </button>
+         {onDelete ? (
+  <button
+    type="button"
+    onClick={() => {
+      onDelete();
+      onOpenChange(false);
+    }}
+    className="..."
+  >
+    Delete
+  </button>
+) : null}
         </div>
       )}
     </div>

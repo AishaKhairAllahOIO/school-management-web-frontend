@@ -2,7 +2,6 @@ import { useMemo, useState } from "react";
 
 import {
   useCreateAcademicTerm,
-  useDeleteAcademicTerm,
   useUpdateAcademicTerm,
 } from "../../hooks/useAcademicSettings";
 import type { AcademicTerm, AcademicYear } from "../../types/academic-settings.types";
@@ -25,7 +24,6 @@ export function AcademicTermsSection({ academicYears, academicTerms, currentAcad
 
   const createTerm = useCreateAcademicTerm();
   const updateTerm = useUpdateAcademicTerm();
-  const deleteTerm = useDeleteAcademicTerm();
 
   const filteredTerms = useMemo(
     () => academicTerms.filter((item) => item.academicYearId === selectedYearId).sort((a, b) => a.order - b.order),
@@ -87,10 +85,7 @@ export function AcademicTermsSection({ academicYears, academicTerms, currentAcad
                     setDialogValue(term);
                     setOpenMenuId(null);
                   }}
-                  onDelete={() => {
-                    deleteTerm.mutate(term.id);
-                    setOpenMenuId(null);
-                  }}
+                 
                 />
               </EntityTd>
             </tr>
