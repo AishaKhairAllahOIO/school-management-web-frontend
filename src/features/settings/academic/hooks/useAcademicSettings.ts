@@ -9,7 +9,6 @@ import { getAxiosErrorMessage } from "@/services/axios/axiosError";
 
 import { academicSettingsApi } from "../api/academicSettings.api";
 import type {
-  AcademicSettingsViewData,
   CreateAcademicStagePayload,
   CreateAcademicTermPayload,
   CreateAcademicYearPayload,
@@ -23,52 +22,146 @@ export const academicSettingsQueryKey = [
   "academic-settings",
 ] as const;
 
+export const academicYearsQueryKey = [
+  "academic-settings",
+  "years",
+] as const;
+
+export const academicTermsQueryKey = [
+  "academic-settings",
+  "terms",
+] as const;
+
+export const academicStagesQueryKey = [
+  "academic-settings",
+  "stages",
+] as const;
+
 export function useAcademicSettings() {
   return useQuery({
     queryKey: academicSettingsQueryKey,
-    queryFn: academicSettingsApi.getViewData,
+
+    queryFn:
+      academicSettingsApi.getViewData,
   });
 }
 
-function useAcademicSettingsCache() {
+export function useAcademicYears() {
+  return useQuery({
+    queryKey: academicYearsQueryKey,
+
+    queryFn:
+      academicSettingsApi.getAcademicYears,
+  });
+}
+
+export function useAcademicYear(
+  id: string | null,
+) {
+  return useQuery({
+    queryKey: [
+      ...academicYearsQueryKey,
+      id,
+    ],
+
+    queryFn: () =>
+      academicSettingsApi.getAcademicYear(id!),
+
+    enabled: id !== null,
+  });
+}
+
+export function useAcademicTerms() {
+  return useQuery({
+    queryKey: academicTermsQueryKey,
+
+    queryFn:
+      academicSettingsApi.getAcademicTerms,
+  });
+}
+
+export function useAcademicTerm(
+  id: string | null,
+) {
+  return useQuery({
+    queryKey: [
+      ...academicTermsQueryKey,
+      id,
+    ],
+
+    queryFn: () =>
+      academicSettingsApi.getAcademicTerm(id!),
+
+    enabled: id !== null,
+  });
+}
+
+export function useAcademicStages() {
+  return useQuery({
+    queryKey: academicStagesQueryKey,
+
+    queryFn:
+      academicSettingsApi.getAcademicStages,
+  });
+}
+
+export function useAcademicStage(
+  id: string | null,
+) {
+  return useQuery({
+    queryKey: [
+      ...academicStagesQueryKey,
+      id,
+    ],
+
+    queryFn: () =>
+      academicSettingsApi.getAcademicStage(id!),
+
+    enabled: id !== null,
+  });
+}
+
+function useRefreshAcademicData() {
   const queryClient = useQueryClient();
 
-  function updateCache(
-    updater: (
-      current: AcademicSettingsViewData,
-    ) => AcademicSettingsViewData,
-  ) {
-    queryClient.setQueryData<AcademicSettingsViewData>(
-      academicSettingsQueryKey,
-      (current) => {
-        if (!current) {
-          return current;
-        }
+  return async () => {
+    await Promise.all([
+      queryClient.invalidateQueries({
+        queryKey:
+          academicSettingsQueryKey,
+      }),
 
-        return updater(current);
-      },
-    );
-  }
+      queryClient.invalidateQueries({
+        queryKey:
+          academicYearsQueryKey,
+      }),
 
-  return {
-    queryClient,
-    updateCache,
+      queryClient.invalidateQueries({
+        queryKey:
+          academicTermsQueryKey,
+      }),
+
+      queryClient.invalidateQueries({
+        queryKey:
+          academicStagesQueryKey,
+      }),
+    ]);
   };
 }
 
 export function useUpdateAcademicSettings() {
-  const { updateCache } = useAcademicSettingsCache();
+  const refresh = useRefreshAcademicData();
 
   return useMutation({
     mutationFn: (
       payload: UpdateAcademicSettingsPayload,
-    ) => academicSettingsApi.updateSettings(payload),
+    ) =>
+      academicSettingsApi.updateSettings(
+        payload,
+      ),
 
-    onSuccess: (settings) => {
-      updateCache((current) => ({
-        ...current,
-        settings,
-      }));
+    onSuccess: async () => {
+      await refresh();
 
       toast.success(
         "Academic settings updated successfully.",
@@ -76,42 +169,52 @@ export function useUpdateAcademicSettings() {
     },
 
     onError: (error) => {
-      toast.error(getAxiosErrorMessage(error));
+      toast.error(
+        getAxiosErrorMessage(error),
+      );
+    },
+  });
+}
+
+export function useDeleteAcademicSettings() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn:
+      academicSettingsApi.deleteSettings,
+
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey:
+          academicSettingsQueryKey,
+      });
+
+      toast.success(
+        "Academic settings deleted successfully.",
+      );
+    },
+
+    onError: (error) => {
+      toast.error(
+        getAxiosErrorMessage(error),
+      );
     },
   });
 }
 
 export function useCreateAcademicYear() {
-  const { updateCache } = useAcademicSettingsCache();
+  const refresh = useRefreshAcademicData();
 
   return useMutation({
     mutationFn: (
       payload: CreateAcademicYearPayload,
     ) =>
-      academicSettingsApi.createAcademicYear(payload),
+      academicSettingsApi.createAcademicYear(
+        payload,
+      ),
 
-    onSuccess: (year) => {
-      updateCache((current) => ({
-        ...current,
-
-        settings: year.isCurrent
-          ? {
-              ...current.settings,
-              currentAcademicYearId: year.id,
-            }
-          : current.settings,
-
-        academicYears: [
-          year,
-          ...current.academicYears
-            .filter((item) => item.id !== year.id)
-            .map((item) =>
-              year.isCurrent
-                ? { ...item, isCurrent: false }
-                : item,
-            ),
-        ],
-      }));
+    onSuccess: async () => {
+      await refresh();
 
       toast.success(
         "Academic year created successfully.",
@@ -119,13 +222,15 @@ export function useCreateAcademicYear() {
     },
 
     onError: (error) => {
-      toast.error(getAxiosErrorMessage(error));
+      toast.error(
+        getAxiosErrorMessage(error),
+      );
     },
   });
 }
 
 export function useUpdateAcademicYear() {
-  const { updateCache } = useAcademicSettingsCache();
+  const refresh = useRefreshAcademicData();
 
   return useMutation({
     mutationFn: ({
@@ -140,29 +245,8 @@ export function useUpdateAcademicYear() {
         payload,
       ),
 
-    onSuccess: (year) => {
-      updateCache((current) => ({
-        ...current,
-
-        settings: year.isCurrent
-          ? {
-              ...current.settings,
-              currentAcademicYearId: year.id,
-            }
-          : current.settings,
-
-        academicYears: current.academicYears.map(
-          (item) => {
-            if (item.id === year.id) {
-              return year;
-            }
-
-            return year.isCurrent
-              ? { ...item, isCurrent: false }
-              : item;
-          },
-        ),
-      }));
+    onSuccess: async () => {
+      await refresh();
 
       toast.success(
         "Academic year updated successfully.",
@@ -170,42 +254,51 @@ export function useUpdateAcademicYear() {
     },
 
     onError: (error) => {
-      toast.error(getAxiosErrorMessage(error));
+      toast.error(
+        getAxiosErrorMessage(error),
+      );
+    },
+  });
+}
+
+export function useDeleteAcademicYear() {
+  const refresh = useRefreshAcademicData();
+
+  return useMutation({
+    mutationFn: (id: string) =>
+      academicSettingsApi.deleteAcademicYear(
+        id,
+      ),
+
+    onSuccess: async () => {
+      await refresh();
+
+      toast.success(
+        "Academic year deleted successfully.",
+      );
+    },
+
+    onError: (error) => {
+      toast.error(
+        getAxiosErrorMessage(error),
+      );
     },
   });
 }
 
 export function useCreateAcademicTerm() {
-  const { updateCache } = useAcademicSettingsCache();
+  const refresh = useRefreshAcademicData();
 
   return useMutation({
     mutationFn: (
       payload: CreateAcademicTermPayload,
     ) =>
-      academicSettingsApi.createAcademicTerm(payload),
+      academicSettingsApi.createAcademicTerm(
+        payload,
+      ),
 
-    onSuccess: (term) => {
-      updateCache((current) => ({
-        ...current,
-
-        settings: term.isCurrent
-          ? {
-              ...current.settings,
-              currentSemesterId: term.id,
-            }
-          : current.settings,
-
-        academicTerms: [
-          term,
-          ...current.academicTerms
-            .filter((item) => item.id !== term.id)
-            .map((item) =>
-              term.isCurrent
-                ? { ...item, isCurrent: false }
-                : item,
-            ),
-        ],
-      }));
+    onSuccess: async () => {
+      await refresh();
 
       toast.success(
         "Academic term created successfully.",
@@ -213,13 +306,15 @@ export function useCreateAcademicTerm() {
     },
 
     onError: (error) => {
-      toast.error(getAxiosErrorMessage(error));
+      toast.error(
+        getAxiosErrorMessage(error),
+      );
     },
   });
 }
 
 export function useUpdateAcademicTerm() {
-  const { updateCache } = useAcademicSettingsCache();
+  const refresh = useRefreshAcademicData();
 
   return useMutation({
     mutationFn: ({
@@ -234,29 +329,8 @@ export function useUpdateAcademicTerm() {
         payload,
       ),
 
-    onSuccess: (term) => {
-      updateCache((current) => ({
-        ...current,
-
-        settings: term.isCurrent
-          ? {
-              ...current.settings,
-              currentSemesterId: term.id,
-            }
-          : current.settings,
-
-        academicTerms: current.academicTerms.map(
-          (item) => {
-            if (item.id === term.id) {
-              return term;
-            }
-
-            return term.isCurrent
-              ? { ...item, isCurrent: false }
-              : item;
-          },
-        ),
-      }));
+    onSuccess: async () => {
+      await refresh();
 
       toast.success(
         "Academic term updated successfully.",
@@ -264,13 +338,40 @@ export function useUpdateAcademicTerm() {
     },
 
     onError: (error) => {
-      toast.error(getAxiosErrorMessage(error));
+      toast.error(
+        getAxiosErrorMessage(error),
+      );
+    },
+  });
+}
+
+export function useDeleteAcademicTerm() {
+  const refresh = useRefreshAcademicData();
+
+  return useMutation({
+    mutationFn: (id: string) =>
+      academicSettingsApi.deleteAcademicTerm(
+        id,
+      ),
+
+    onSuccess: async () => {
+      await refresh();
+
+      toast.success(
+        "Academic term deleted successfully.",
+      );
+    },
+
+    onError: (error) => {
+      toast.error(
+        getAxiosErrorMessage(error),
+      );
     },
   });
 }
 
 export function useCreateAcademicStage() {
-  const { updateCache } = useAcademicSettingsCache();
+  const refresh = useRefreshAcademicData();
 
   return useMutation({
     mutationFn: (
@@ -280,17 +381,8 @@ export function useCreateAcademicStage() {
         payload,
       ),
 
-    onSuccess: (stage) => {
-      updateCache((current) => ({
-        ...current,
-
-        academicStages: [
-          stage,
-          ...current.academicStages.filter(
-            (item) => item.id !== stage.id,
-          ),
-        ],
-      }));
+    onSuccess: async () => {
+      await refresh();
 
       toast.success(
         "Academic stage created successfully.",
@@ -298,13 +390,15 @@ export function useCreateAcademicStage() {
     },
 
     onError: (error) => {
-      toast.error(getAxiosErrorMessage(error));
+      toast.error(
+        getAxiosErrorMessage(error),
+      );
     },
   });
 }
 
 export function useUpdateAcademicStage() {
-  const { updateCache } = useAcademicSettingsCache();
+  const refresh = useRefreshAcademicData();
 
   return useMutation({
     mutationFn: ({
@@ -319,15 +413,8 @@ export function useUpdateAcademicStage() {
         payload,
       ),
 
-    onSuccess: (stage) => {
-      updateCache((current) => ({
-        ...current,
-
-        academicStages:
-          current.academicStages.map((item) =>
-            item.id === stage.id ? stage : item,
-          ),
-      }));
+    onSuccess: async () => {
+      await refresh();
 
       toast.success(
         "Academic stage updated successfully.",
@@ -335,7 +422,34 @@ export function useUpdateAcademicStage() {
     },
 
     onError: (error) => {
-      toast.error(getAxiosErrorMessage(error));
+      toast.error(
+        getAxiosErrorMessage(error),
+      );
+    },
+  });
+}
+
+export function useDeleteAcademicStage() {
+  const refresh = useRefreshAcademicData();
+
+  return useMutation({
+    mutationFn: (id: string) =>
+      academicSettingsApi.deleteAcademicStage(
+        id,
+      ),
+
+    onSuccess: async () => {
+      await refresh();
+
+      toast.success(
+        "Academic stage deleted successfully.",
+      );
+    },
+
+    onError: (error) => {
+      toast.error(
+        getAxiosErrorMessage(error),
+      );
     },
   });
 }
