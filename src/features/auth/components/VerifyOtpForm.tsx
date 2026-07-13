@@ -1,8 +1,13 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowLeft } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  LoaderCircle,
+} from "lucide-react";
 import { Controller, useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
 
+import { getAxiosValidationErrors } from "@/services/axios/axiosError";
 import { Button } from "@/shared/ui/button";
 import { Checkbox } from "@/shared/ui/checkbox";
 import { Label } from "@/shared/ui/label";
@@ -14,7 +19,6 @@ import { useVerifyOtp } from "../hooks/use-verify-otp";
 import { useVerifyPasswordOtp } from "../hooks/use-verify-password-otp";
 import { otpSchema, type OtpSchema } from "../schemas/otp.schema";
 import { OtpInput } from "./OtpInput";
-import { getAxiosValidationErrors } from "@/services/axios/axiosError";
 
 type VerifyOtpFormProps = {
   email: string;
@@ -30,7 +34,6 @@ export function VerifyOtpForm({
   const verifyLoginMutation = useVerifyOtp();
   const verifyPasswordMutation = useVerifyPasswordOtp();
   const resendPasswordMutation = useResendPasswordOtp();
-
   const timer = useResendOtpTimer(initialRemainingTime || 60);
 
   const form = useForm<OtpSchema>({
@@ -44,48 +47,51 @@ export function VerifyOtpForm({
   const isPending =
     verifyLoginMutation.isPending || verifyPasswordMutation.isPending;
 
-    function handleOtpError(error: unknown) {
-  const validationErrors = getAxiosValidationErrors(error);
-  const otpMessage = validationErrors.otp?.[0];
+  function handleOtpError(error: unknown) {
+    const validationErrors = getAxiosValidationErrors(error);
+    const otpMessage = validationErrors.otp?.[0];
 
-  if (otpMessage) {
-    form.setError("otp", {
-      type: "server",
-      message: otpMessage,
-    });
+    if (otpMessage) {
+      form.setError("otp", {
+        type: "server",
+        message: otpMessage,
+      });
+    }
   }
-}
-function onSubmit(values: OtpSchema) {
-  form.clearErrors();
 
-  if (isResetFlow) {
-    verifyPasswordMutation.mutate(
+  function onSubmit(values: OtpSchema) {
+    form.clearErrors();
+
+    if (isResetFlow) {
+      verifyPasswordMutation.mutate(
+        {
+          email,
+          otp: values.otp,
+        },
+        {
+          onError: handleOtpError,
+        },
+      );
+
+      return;
+    }
+
+    verifyLoginMutation.mutate(
       {
         email,
         otp: values.otp,
+        remember_me: values.rememberMe ? "1" : "0",
       },
       {
         onError: handleOtpError,
       },
     );
-
-    return;
   }
 
-  verifyLoginMutation.mutate(
-    {
-      email,
-      otp: values.otp,
-      remember_me: values.rememberMe ? "1" : "0",
-    },
-    {
-      onError: handleOtpError,
-    },
-  );
-}
-
   function resendResetOtp() {
-    if (!isResetFlow || !timer.canResend) return;
+    if (!isResetFlow || !timer.canResend) {
+      return;
+    }
 
     resendPasswordMutation.mutate(
       { email },
@@ -93,12 +99,16 @@ function onSubmit(values: OtpSchema) {
         onSuccess: (response) => {
           timer.restart(response.data.data?.remaining_time ?? 60);
         },
-      }
+      },
     );
   }
 
   return (
-    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+    <form
+      onSubmit={form.handleSubmit(onSubmit)}
+      className="space-y-5"
+      noValidate
+    >
       <Controller
         control={form.control}
         name="otp"
@@ -111,72 +121,85 @@ function onSubmit(values: OtpSchema) {
         )}
       />
 
-      {form.formState.errors.otp && (
-        <p className="text-center text-xs font-bold text-destructive">
+      {form.formState.errors.otp?.message && (
+        <p className="text-center text-sm text-destructive">
           {form.formState.errors.otp.message}
         </p>
       )}
 
       {!isResetFlow && (
-        <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-[0_10px_28px_rgba(15,23,42,0.04)]">
-          <Checkbox
-            id="rememberMe"
-            checked={form.watch("rememberMe")}
-            onCheckedChange={(checked) =>
-              form.setValue("rememberMe", checked === true, {
-                shouldValidate: true,
-              })
-            }
-          />
+        <Controller
+  control={form.control}
+  name="rememberMe"
+  render={({ field }) => (
+    <div className="flex items-center gap-2">
+      <Checkbox
+        id="remember-device"
+        checked={field.value}
+        onCheckedChange={(checked) =>
+          form.setValue("rememberMe", checked === true, {
+            shouldValidate: true,
+          })
+        }
+        className="h-4 w-4 rounded border-input data-[state=checked]:border-primary data-[state=checked]:bg-primary"
+      />
 
-          <Label
-            htmlFor="rememberMe"
-            className="cursor-pointer text-sm font-bold text-slate-600"
-          >
-            Remember me
-          </Label>
-        </div>
+      <Label
+        htmlFor="remember-device"
+        className="cursor-pointer text-sm text-muted-foreground"
+      >
+        Remember me
+      </Label>
+    </div>
+  )}
+/>
       )}
 
       <Button
         type="submit"
-        className="h-14 w-full rounded-2xl primary-gradient text-base font-black text-white shadow-[0_20px_42px_rgba(103,58,244,0.28)]"
         disabled={isPending}
+        className="group h-14 w-full rounded-xl primary-gradient text-base font-semibold text-primary-foreground shadow-sm transition hover:opacity-95"
       >
-        {isPending
-          ? "Verifying..."
-          : isResetFlow
-            ? "Verify"
-            : "Verify & Sign In"}
+        {isPending ? (
+          <>
+            <LoaderCircle className="h-5 w-5 animate-spin" />
+            Verifying...
+          </>
+        ) : (
+          <>
+            {isResetFlow ? "Verify code" : "Verify and sign in"}
+            <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+          </>
+        )}
       </Button>
 
-      <div className="text-center text-sm text-slate-500">
+      <div className="text-center text-sm">
         {isResetFlow ? (
           <button
             type="button"
             onClick={resendResetOtp}
-            disabled={!timer.canResend || resendPasswordMutation.isPending}
-            className="font-extrabold text-primary transition hover:opacity-75 disabled:text-slate-400"
+            disabled={resendPasswordMutation.isPending || !timer.canResend}
+            className="font-semibold text-primary transition-opacity hover:opacity-80 disabled:cursor-not-allowed disabled:text-muted-foreground"
           >
             {resendPasswordMutation.isPending
               ? "Resending..."
               : timer.canResend
-                ? "Resend code"
-                : `Resend in ${timer.seconds}s`}
+                ? "Resend verification code"
+                : `Resend code in ${timer.seconds}s`}
           </button>
         ) : (
-          <span className="font-medium">
+          <p className="text-muted-foreground">
             Check your email for the verification code.
-          </span>
+          </p>
         )}
       </div>
 
       <Link
-        to={isResetFlow ? AUTH_ROUTES.FORGOT_PASSWORD : AUTH_ROUTES.LOGIN}
-        className="mx-auto inline-flex items-center gap-2 text-sm font-extrabold text-muted-foreground transition hover:text-primary"
+        to={AUTH_ROUTES.LOGIN}
+        className="mx-auto flex w-fit items-center gap-2 text-sm font-medium text-muted-foreground transition hover:text-foreground"
       >
         <ArrowLeft className="h-4 w-4" />
-        Back
+        Back to sign in
       </Link>
     </form>
   );

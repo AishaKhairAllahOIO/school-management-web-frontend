@@ -9,9 +9,9 @@ const sizeClasses: Record<
   NonNullable<AuthBrandLogoProps["size"]>,
   string
 > = {
-  sm: "h-14 w-14",
-  md: "h-20 w-20",
-  lg: "h-24 w-24",
+  sm: "h-11 w-11",
+  md: "h-14 w-14",
+  lg: "h-[4.5rem] w-[4.5rem]",
 };
 
 export function AuthBrandLogo({
@@ -19,19 +19,15 @@ export function AuthBrandLogo({
   className = "",
 }: AuthBrandLogoProps) {
   return (
-    <div
+    <img
+      src={schoolLogo}
+      alt="School logo"
+      draggable={false}
       className={[
-        "flex shrink-0 items-center justify-center",
+        "block shrink-0 object-contain",
         sizeClasses[size],
         className,
       ].join(" ")}
-    >
-      <img
-        src={schoolLogo}
-        alt="School logo"
-        className="h-full w-full object-contain"
-        draggable={false}
-      />
-    </div>
+    />
   );
 }

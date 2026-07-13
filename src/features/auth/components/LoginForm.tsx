@@ -7,27 +7,20 @@ import {
   LockKeyhole,
   Mail,
 } from "lucide-react";
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 
 import { getAxiosValidationErrors } from "@/services/axios/axiosError";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
-
+import { useState } from "react";
 import { AUTH_ROUTES } from "../constants/auth.constants";
 import { useLogin } from "../hooks/use-login";
-import {
-  loginSchema,
-  type LoginSchema,
-} from "../schemas/login.schema";
-
+import { loginSchema, type LoginSchema } from "../schemas/login.schema";
 
 export function LoginForm() {
   const navigate = useNavigate();
-
   const loginMutation = useLogin();
-
   const [showPassword, setShowPassword] = useState(false);
 
   const form = useForm<LoginSchema>({
@@ -37,8 +30,6 @@ export function LoginForm() {
       password: "",
     },
   });
-
-  
 
   function onSubmit(values: LoginSchema) {
     form.clearErrors();
@@ -50,7 +41,6 @@ export function LoginForm() {
       },
       {
         onSuccess: () => {
-
           navigate(AUTH_ROUTES.VERIFY_OTP, {
             state: {
               email: values.email,
@@ -58,14 +48,10 @@ export function LoginForm() {
             },
           });
         },
-
         onError: (error) => {
-          const validationErrors =
-            getAxiosValidationErrors(error);
-
+          const validationErrors = getAxiosValidationErrors(error);
           const emailMessage = validationErrors.email?.[0];
-          const passwordMessage =
-            validationErrors.password?.[0];
+          const passwordMessage = validationErrors.password?.[0];
 
           if (emailMessage) {
             form.setError("email", {
@@ -87,10 +73,12 @@ export function LoginForm() {
 
   return (
     <form
-      onSubmit={form.handleSubmit(onSubmit)}
-      className="space-y-6"
-      noValidate
-    >
+  onSubmit={form.handleSubmit(onSubmit)}
+  className="space-y-5"
+  autoComplete="off"
+  noValidate
+>
+  
       <div className="space-y-2">
         <label
           htmlFor="login-email"
@@ -106,16 +94,16 @@ export function LoginForm() {
           />
 
           <Input
-            id="login-email"
-            type="email"
-            autoComplete="email"
-            placeholder="Enter your email"
-            aria-invalid={
-              form.formState.errors.email ? "true" : "false"
-            }
-            className="h-14 rounded-xl border-border bg-background pl-12 pr-4 text-base text-foreground shadow-none outline-none transition placeholder:text-muted-foreground/70 focus-visible:border-primary focus-visible:ring-4 focus-visible:ring-primary/10"
-            {...form.register("email")}
-          />
+  id="login-email"
+  type="email"
+  autoComplete="off"
+  autoCapitalize="none"
+  spellCheck={false}
+  placeholder="Enter your email"
+  aria-invalid={form.formState.errors.email ? "true" : "false"}
+  className="h-14 rounded-xl border-input bg-background pl-12 pr-4 text-base text-foreground shadow-none placeholder:text-muted-foreground/70 focus-visible:border-primary focus-visible:ring-4 focus-visible:ring-primary/10"
+  {...form.register("email")}
+/>
         </div>
 
         {form.formState.errors.email?.message && (
@@ -126,21 +114,12 @@ export function LoginForm() {
       </div>
 
       <div className="space-y-2">
-        <div className="flex items-center justify-between gap-4">
-          <label
-            htmlFor="login-password"
-            className="block text-sm font-medium text-foreground"
-          >
-            Password
-          </label>
-
-          <Link
-            to={AUTH_ROUTES.FORGOT_PASSWORD}
-            className="text-sm font-semibold text-primary transition-opacity hover:opacity-80"
-          >
-            Forgot password?
-          </Link>
-        </div>
+        <label
+          htmlFor="login-password"
+          className="block text-sm font-medium text-foreground"
+        >
+          Password
+        </label>
 
         <div className="relative">
           <LockKeyhole
@@ -148,31 +127,21 @@ export function LoginForm() {
             className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground"
           />
 
-          <Input
-            id="login-password"
-            type={showPassword ? "text" : "password"}
-            autoComplete="current-password"
-            placeholder="Enter your password"
-            aria-invalid={
-              form.formState.errors.password
-                ? "true"
-                : "false"
-            }
-            className="h-14 rounded-xl border-border bg-background pl-12 pr-12 text-base text-foreground shadow-none outline-none transition placeholder:text-muted-foreground/70 focus-visible:border-primary focus-visible:ring-4 focus-visible:ring-primary/10"
-            {...form.register("password")}
-          />
+         <Input
+  id="login-password"
+  type={showPassword ? "text" : "password"}
+  autoComplete="new-password"
+  placeholder="Enter your password"
+  aria-invalid={form.formState.errors.password ? "true" : "false"}
+  className="h-14 rounded-xl border-input bg-background pl-12 pr-12 text-base text-foreground shadow-none placeholder:text-muted-foreground/70 focus-visible:border-primary focus-visible:ring-4 focus-visible:ring-primary/10"
+  {...form.register("password")}
+/>
 
           <button
             type="button"
-            onClick={() =>
-              setShowPassword((current) => !current)
-            }
+            onClick={() => setShowPassword((current) => !current)}
             className="absolute right-4 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-lg text-muted-foreground transition hover:bg-muted hover:text-foreground"
-            aria-label={
-              showPassword
-                ? "Hide password"
-                : "Show password"
-            }
+            aria-label={showPassword ? "Hide password" : "Show password"}
           >
             {showPassword ? (
               <EyeOff className="h-5 w-5" />
@@ -187,6 +156,15 @@ export function LoginForm() {
             {form.formState.errors.password.message}
           </p>
         )}
+
+        <div className="flex justify-end pt-1">
+          <Link
+            to={AUTH_ROUTES.FORGOT_PASSWORD}
+            className="text-sm font-semibold text-primary transition-opacity hover:opacity-80"
+          >
+            Forgot password?
+          </Link>
+        </div>
       </div>
 
       {loginMutation.isError &&
@@ -196,41 +174,34 @@ export function LoginForm() {
             role="alert"
             className="rounded-xl border border-destructive/20 bg-destructive/5 px-4 py-3 text-sm text-destructive"
           >
-            We couldn&apos;t sign you in. Please check your
-            credentials and try again.
+            We couldn&apos;t sign you in. Please check your credentials and try
+            again.
           </div>
         )}
 
       <Button
         type="submit"
         disabled={loginMutation.isPending}
-        className="group h-14 w-full rounded-xl bg-primary text-base font-semibold text-primary-foreground shadow-sm transition hover:bg-primary/90"
+        className="group h-14 w-full rounded-xl primary-gradient text-base font-semibold text-primary-foreground shadow-sm transition hover:opacity-95"
       >
         {loginMutation.isPending ? (
           <>
-            <LoaderCircle
-              aria-hidden="true"
-              className="h-5 w-5 animate-spin"
-            />
+            <LoaderCircle className="h-5 w-5 animate-spin" />
             Signing in...
           </>
         ) : (
           <>
             Sign in
-            <ArrowRight
-              aria-hidden="true"
-              className="h-5 w-5 transition-transform group-hover:translate-x-1"
-            />
+            <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
           </>
         )}
       </Button>
 
       <p className="pt-1 text-center text-sm text-muted-foreground">
-        Don&apos;t have an account?{" "}
-        <span className="font-medium text-primary">
-          Contact your administrator
-        </span>
+        Access is limited to authorized school staff and administrators.
       </p>
     </form>
+    
   );
+  
 }
