@@ -4,15 +4,15 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 import { toast } from "sonner";
-import axios from "axios";
 
-import { createEmptyGeneralSettings } from "../lib/general-settings.defaults";
 import { getAxiosErrorMessage } from "@/services/axios/axiosError";
 
 import { generalSettingsApi } from "../api/general-settings.api";
+import { createEmptyGeneralSettings } from "../lib/general-settings.defaults";
 import type {
-  CreateSchoolImagePayload,
+  CreateSchoolImagesPayload,
   GeneralSettings,
+  SchoolImage,
   UpdateGeneralSettingsPayload,
   UpdateSchoolImagePayload,
 } from "../types/general-settings.types";
@@ -22,116 +22,147 @@ export const generalSettingsQueryKey = [
   "general",
 ] as const;
 
-function isSettingsNotInitializedError(error: unknown): boolean {
-  if (!axios.isAxiosError(error)) {
-    return false;
-  }
-
-  const status = error.response?.status;
-  const responseData = error.response?.data;
-
-  if (
-    typeof responseData !== "object" ||
-    responseData === null ||
-    !("message" in responseData)
-  ) {
-    return false;
-  }
-
-  const message = responseData.message;
-
-  return (
-    status === 404 &&
-    typeof message === "string" &&
-    message === "School settings have not been initialized yet."
-  );
-}
+export const schoolImagesQueryKey = [
+  "settings",
+  "general",
+  "images",
+] as const;
 
 export function useGeneralSettings() {
-  return useQuery({
+  return useQuery<GeneralSettings, Error>({
     queryKey: generalSettingsQueryKey,
-
-    queryFn: async (): Promise<GeneralSettings> => {
-      try {
-        const response = await generalSettingsApi.get();
-        const settings = response.data.data;
-
-        if (!settings) {
-          throw new Error(
-            "General settings data was not returned by the server.",
-          );
-        }
-
-        return settings;
-      } catch (error) {
-        if (isSettingsNotInitializedError(error)) {
-          return createEmptyGeneralSettings();
-        }
-
-        throw error;
-      }
-    },
-
-    retry: (failureCount, error) => {
-      if (isSettingsNotInitializedError(error)) {
-        return false;
-      }
-
-      return failureCount < 1;
-    },
+    queryFn: generalSettingsApi.get,
+    staleTime: 30_000,
+    retry: 1,
   });
 }
 
+export function useSchoolImages(
+  initialImages: SchoolImage[] = [],
+) {
+  return useQuery<SchoolImage[], Error>({
+    queryKey: schoolImagesQueryKey,
+    queryFn: generalSettingsApi.listImages,
+    initialData: initialImages,
+    staleTime: 30_000,
+    retry: 1,
+  });
+}
+
+export function useSchoolImage(
+  imageId: string | null,
+) {
+  return useQuery<SchoolImage, Error>({
+    queryKey: [
+      ...schoolImagesQueryKey,
+      imageId,
+    ],
+    queryFn: () =>
+      generalSettingsApi.getImage(imageId!),
+    enabled: imageId !== null,
+    retry: 1,
+  });
+}
 
 export function useUpdateGeneralSettings() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (
+    mutationFn: (
       payload: UpdateGeneralSettingsPayload,
-    ): Promise<GeneralSettings> => {
-      const response = await generalSettingsApi.update(payload);
-      const settings = response.data.data;
+    ) => generalSettingsApi.update(payload),
 
-      if (!settings) {
-        throw new Error(
-          "Updated general settings were not returned by the server.",
-        );
-      }
-
-      return settings;
-    },
-
-    onSuccess: (settings, _variables, _context) => {
+    onSuccess: (settings) => {
       queryClient.setQueryData(
         generalSettingsQueryKey,
         settings,
       );
 
-      toast.success("School settings updated successfully.");
+      queryClient.setQueryData(
+        schoolImagesQueryKey,
+        settings.images,
+      );
+
+      toast.success(
+        "School settings updated successfully.",
+      );
     },
 
     onError: (error) => {
       toast.error(getAxiosErrorMessage(error));
     },
   });
-  
 }
-export function useAddSchoolImages() {
+
+export function useDeleteGeneralSettings() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (payload: CreateSchoolImagePayload) => {
-      const response = await generalSettingsApi.addImages(payload);
-      return response.data.data ?? [];
-    },
+    mutationFn: generalSettingsApi.delete,
 
     onSuccess: async () => {
+      const emptySettings =
+        createEmptyGeneralSettings();
+
+      queryClient.setQueryData(
+        generalSettingsQueryKey,
+        emptySettings,
+      );
+
+      queryClient.setQueryData(
+        schoolImagesQueryKey,
+        [],
+      );
+
+      queryClient.removeQueries({
+        queryKey: schoolImagesQueryKey,
+        exact: false,
+      });
+
       await queryClient.invalidateQueries({
         queryKey: generalSettingsQueryKey,
       });
 
-      toast.success("School image added successfully.");
+      toast.success(
+        "School settings were reset successfully.",
+      );
+    },
+
+    onError: (error) => {
+      toast.error(getAxiosErrorMessage(error));
+    },
+  });
+}
+
+async function refreshGeneralSettingsData(
+  queryClient: ReturnType<typeof useQueryClient>,
+) {
+  await Promise.all([
+    queryClient.invalidateQueries({
+      queryKey: generalSettingsQueryKey,
+    }),
+    queryClient.invalidateQueries({
+      queryKey: schoolImagesQueryKey,
+    }),
+  ]);
+}
+
+export function useAddSchoolImages() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (
+      payload: CreateSchoolImagesPayload,
+    ) => generalSettingsApi.addImages(payload),
+
+    onSuccess: async () => {
+      await refreshGeneralSettingsData(
+        queryClient,
+      );
+
+      toast.success(
+        "School images uploaded successfully.",
+      );
     },
 
     onError: (error) => {
@@ -144,25 +175,26 @@ export function useUpdateSchoolImage() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (payload: UpdateSchoolImagePayload) => {
-      const response = await generalSettingsApi.updateImage(payload);
-      const image = response.data.data;
+    mutationFn: (
+      payload: UpdateSchoolImagePayload,
+    ) => generalSettingsApi.updateImage(payload),
 
-      if (!image) {
-        throw new Error(
-          "Updated school image was not returned by the server.",
-        );
-      }
+    onSuccess: async (image) => {
+      queryClient.setQueryData(
+        [
+          ...schoolImagesQueryKey,
+          image.id,
+        ],
+        image,
+      );
 
-      return image;
-    },
+      await refreshGeneralSettingsData(
+        queryClient,
+      );
 
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({
-        queryKey: generalSettingsQueryKey,
-      });
-
-      toast.success("School image updated successfully.");
+      toast.success(
+        "School image updated successfully.",
+      );
     },
 
     onError: (error) => {
@@ -178,12 +210,29 @@ export function useDeleteSchoolImage() {
     mutationFn: (imageId: string) =>
       generalSettingsApi.deleteImage(imageId),
 
-    onSuccess: async () => {
+    onSuccess: async (_, deletedId) => {
+      queryClient.setQueryData<SchoolImage[]>(
+        schoolImagesQueryKey,
+        (current = []) =>
+          current.filter(
+            (image) => image.id !== deletedId,
+          ),
+      );
+
+      queryClient.removeQueries({
+        queryKey: [
+          ...schoolImagesQueryKey,
+          deletedId,
+        ],
+      });
+
       await queryClient.invalidateQueries({
         queryKey: generalSettingsQueryKey,
       });
 
-      toast.success("School image deleted successfully.");
+      toast.success(
+        "School image deleted successfully.",
+      );
     },
 
     onError: (error) => {

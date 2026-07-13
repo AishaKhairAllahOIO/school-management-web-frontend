@@ -20,29 +20,34 @@ function requireGrade(
 }
 
 export const gradeApi = {
-  /**
-   * There is currently no documented GET endpoint
-   * for listing grades.
-   *
-   * Do not return mock rows here because their IDs
-   * cannot be used with the real update endpoint.
-   */
   async list(): Promise<Grade[]> {
-    return [];
+    const response = await axiosClient.get<ApiResponse<Grade[]>>(
+      API_ENDPOINTS.SETTINGS.ACADEMIC_GRADES,
+    );
+
+    return response.data.data ?? [];
   },
 
-  async create(
-    payload: CreateGradePayload,
-  ): Promise<Grade> {
-    const response =
-      await axiosClient.post<ApiResponse<Grade>>(
-        API_ENDPOINTS.SETTINGS.ACADEMIC_GRADES,
-        payload,
-      );
+  async getById(id: string): Promise<Grade> {
+    const response = await axiosClient.get<ApiResponse<Grade>>(
+      API_ENDPOINTS.SETTINGS.ACADEMIC_GRADE(id),
+    );
 
     return requireGrade(
       response.data.data,
-      "Created grade was not returned by the server.",
+      "The selected grade was not returned by the server.",
+    );
+  },
+
+  async create(payload: CreateGradePayload): Promise<Grade> {
+    const response = await axiosClient.post<ApiResponse<Grade>>(
+      API_ENDPOINTS.SETTINGS.ACADEMIC_GRADES,
+      payload,
+    );
+
+    return requireGrade(
+      response.data.data,
+      "The created grade was not returned by the server.",
     );
   },
 
@@ -50,15 +55,20 @@ export const gradeApi = {
     id: string,
     payload: UpdateGradePayload,
   ): Promise<Grade> {
-    const response =
-      await axiosClient.post<ApiResponse<Grade>>(
-        API_ENDPOINTS.SETTINGS.ACADEMIC_GRADE(id),
-        payload,
-      );
+    const response = await axiosClient.post<ApiResponse<Grade>>(
+      API_ENDPOINTS.SETTINGS.ACADEMIC_GRADE(id),
+      payload,
+    );
 
     return requireGrade(
       response.data.data,
-      "Updated grade was not returned by the server.",
+      "The updated grade was not returned by the server.",
+    );
+  },
+
+  async delete(id: string): Promise<void> {
+    await axiosClient.delete(
+      API_ENDPOINTS.SETTINGS.ACADEMIC_GRADE(id),
     );
   },
 };

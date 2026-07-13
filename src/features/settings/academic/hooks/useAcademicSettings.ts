@@ -1,3 +1,4 @@
+import axios from "axios";
 import {
   useMutation,
   useQuery,
@@ -5,10 +6,17 @@ import {
 } from "@tanstack/react-query";
 import { toast } from "sonner";
 
-import { getAxiosErrorMessage } from "@/services/axios/axiosError";
+import {
+  getAxiosErrorMessage,
+} from "@/services/axios/axiosError";
 
 import { academicSettingsApi } from "../api/academicSettings.api";
 import type {
+  AcademicSettings,
+  AcademicSettingsViewData,
+  AcademicStage,
+  AcademicTerm,
+  AcademicYear,
   CreateAcademicStagePayload,
   CreateAcademicTermPayload,
   CreateAcademicYearPayload,
@@ -37,85 +45,136 @@ export const academicStagesQueryKey = [
   "stages",
 ] as const;
 
-export function useAcademicSettings() {
-  return useQuery({
-    queryKey: academicSettingsQueryKey,
+type ApiErrorResponse = {
+  status?: boolean;
+  message?: string;
+  errors?: Record<string, unknown>;
+};
 
+function isConflictError(
+  error: unknown,
+): boolean {
+  return (
+    axios.isAxiosError<ApiErrorResponse>(
+      error,
+    ) &&
+    error.response?.status === 409
+  );
+}
+
+function getAcademicDeleteErrorMessage(
+  error: unknown,
+): string {
+  if (isConflictError(error)) {
+    return (
+      error.response?.data?.message ??
+      "Academic settings cannot be reset because they are currently used by student records."
+    );
+  }
+
+  return getAxiosErrorMessage(error);
+}
+
+export function useAcademicSettings() {
+  return useQuery<
+    AcademicSettingsViewData,
+    Error
+  >({
+    queryKey: academicSettingsQueryKey,
     queryFn:
       academicSettingsApi.getViewData,
+
+    staleTime: 30_000,
+
+    retry: (failureCount, error) => {
+      if (
+        axios.isAxiosError(error) &&
+        error.response?.status === 401
+      ) {
+        return false;
+      }
+
+      return failureCount < 1;
+    },
   });
 }
 
 export function useAcademicYears() {
-  return useQuery({
+  return useQuery<AcademicYear[], Error>({
     queryKey: academicYearsQueryKey,
-
     queryFn:
       academicSettingsApi.getAcademicYears,
+    staleTime: 30_000,
   });
 }
 
 export function useAcademicYear(
   id: string | null,
 ) {
-  return useQuery({
+  return useQuery<AcademicYear, Error>({
     queryKey: [
       ...academicYearsQueryKey,
       id,
     ],
 
     queryFn: () =>
-      academicSettingsApi.getAcademicYear(id!),
+      academicSettingsApi.getAcademicYear(
+        id!,
+      ),
 
     enabled: id !== null,
   });
 }
 
 export function useAcademicTerms() {
-  return useQuery({
+  return useQuery<AcademicTerm[], Error>({
     queryKey: academicTermsQueryKey,
-
     queryFn:
       academicSettingsApi.getAcademicTerms,
+    staleTime: 30_000,
   });
 }
 
 export function useAcademicTerm(
   id: string | null,
 ) {
-  return useQuery({
+  return useQuery<AcademicTerm, Error>({
     queryKey: [
       ...academicTermsQueryKey,
       id,
     ],
 
     queryFn: () =>
-      academicSettingsApi.getAcademicTerm(id!),
+      academicSettingsApi.getAcademicTerm(
+        id!,
+      ),
 
     enabled: id !== null,
   });
 }
 
 export function useAcademicStages() {
-  return useQuery({
+  return useQuery<AcademicStage[], Error>({
     queryKey: academicStagesQueryKey,
-
     queryFn:
       academicSettingsApi.getAcademicStages,
+    staleTime: 30_000,
   });
 }
 
 export function useAcademicStage(
   id: string | null,
 ) {
-  return useQuery({
+  return useQuery<AcademicStage, Error>({
     queryKey: [
       ...academicStagesQueryKey,
       id,
     ],
 
     queryFn: () =>
-      academicSettingsApi.getAcademicStage(id!),
+      academicSettingsApi.getAcademicStage(
+        id!,
+      ),
 
     enabled: id !== null,
   });
@@ -150,18 +209,40 @@ function useRefreshAcademicData() {
 }
 
 export function useUpdateAcademicSettings() {
-  const refresh = useRefreshAcademicData();
+  const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: (
-      payload: UpdateAcademicSettingsPayload,
+      payload:
+        UpdateAcademicSettingsPayload,
     ) =>
       academicSettingsApi.updateSettings(
         payload,
       ),
 
-    onSuccess: async () => {
-      await refresh();
+    onSuccess: async (
+      settings: AcademicSettings,
+    ) => {
+      queryClient.setQueryData<
+        AcademicSettingsViewData
+      >(
+        academicSettingsQueryKey,
+        (current) => {
+          if (!current) {
+            return current;
+          }
+
+          return {
+            ...current,
+            settings,
+          };
+        },
+      );
+
+      await queryClient.invalidateQueries({
+        queryKey:
+          academicSettingsQueryKey,
+      });
 
       toast.success(
         "Academic settings updated successfully.",
@@ -184,26 +265,35 @@ export function useDeleteAcademicSettings() {
       academicSettingsApi.deleteSettings,
 
     onSuccess: async () => {
+      queryClient.removeQueries({
+        queryKey:
+          academicSettingsQueryKey,
+        exact: true,
+      });
+
       await queryClient.invalidateQueries({
         queryKey:
           academicSettingsQueryKey,
       });
 
       toast.success(
-        "Academic settings deleted successfully.",
+        "Academic settings reset successfully.",
       );
     },
 
     onError: (error) => {
       toast.error(
-        getAxiosErrorMessage(error),
+        getAcademicDeleteErrorMessage(
+          error,
+        ),
       );
     },
   });
 }
 
 export function useCreateAcademicYear() {
-  const refresh = useRefreshAcademicData();
+  const refresh =
+    useRefreshAcademicData();
 
   return useMutation({
     mutationFn: (
@@ -230,7 +320,8 @@ export function useCreateAcademicYear() {
 }
 
 export function useUpdateAcademicYear() {
-  const refresh = useRefreshAcademicData();
+  const refresh =
+    useRefreshAcademicData();
 
   return useMutation({
     mutationFn: ({
@@ -238,7 +329,8 @@ export function useUpdateAcademicYear() {
       payload,
     }: {
       id: string;
-      payload: UpdateAcademicYearPayload;
+      payload:
+        UpdateAcademicYearPayload;
     }) =>
       academicSettingsApi.updateAcademicYear(
         id,
@@ -262,7 +354,8 @@ export function useUpdateAcademicYear() {
 }
 
 export function useDeleteAcademicYear() {
-  const refresh = useRefreshAcademicData();
+  const refresh =
+    useRefreshAcademicData();
 
   return useMutation({
     mutationFn: (id: string) =>
@@ -287,7 +380,8 @@ export function useDeleteAcademicYear() {
 }
 
 export function useCreateAcademicTerm() {
-  const refresh = useRefreshAcademicData();
+  const refresh =
+    useRefreshAcademicData();
 
   return useMutation({
     mutationFn: (
@@ -314,7 +408,8 @@ export function useCreateAcademicTerm() {
 }
 
 export function useUpdateAcademicTerm() {
-  const refresh = useRefreshAcademicData();
+  const refresh =
+    useRefreshAcademicData();
 
   return useMutation({
     mutationFn: ({
@@ -322,7 +417,8 @@ export function useUpdateAcademicTerm() {
       payload,
     }: {
       id: string;
-      payload: UpdateAcademicTermPayload;
+      payload:
+        UpdateAcademicTermPayload;
     }) =>
       academicSettingsApi.updateAcademicTerm(
         id,
@@ -346,7 +442,8 @@ export function useUpdateAcademicTerm() {
 }
 
 export function useDeleteAcademicTerm() {
-  const refresh = useRefreshAcademicData();
+  const refresh =
+    useRefreshAcademicData();
 
   return useMutation({
     mutationFn: (id: string) =>
@@ -371,11 +468,13 @@ export function useDeleteAcademicTerm() {
 }
 
 export function useCreateAcademicStage() {
-  const refresh = useRefreshAcademicData();
+  const refresh =
+    useRefreshAcademicData();
 
   return useMutation({
     mutationFn: (
-      payload: CreateAcademicStagePayload,
+      payload:
+        CreateAcademicStagePayload,
     ) =>
       academicSettingsApi.createAcademicStage(
         payload,
@@ -398,7 +497,8 @@ export function useCreateAcademicStage() {
 }
 
 export function useUpdateAcademicStage() {
-  const refresh = useRefreshAcademicData();
+  const refresh =
+    useRefreshAcademicData();
 
   return useMutation({
     mutationFn: ({
@@ -406,7 +506,8 @@ export function useUpdateAcademicStage() {
       payload,
     }: {
       id: string;
-      payload: UpdateAcademicStagePayload;
+      payload:
+        UpdateAcademicStagePayload;
     }) =>
       academicSettingsApi.updateAcademicStage(
         id,
@@ -430,7 +531,8 @@ export function useUpdateAcademicStage() {
 }
 
 export function useDeleteAcademicStage() {
-  const refresh = useRefreshAcademicData();
+  const refresh =
+    useRefreshAcademicData();
 
   return useMutation({
     mutationFn: (id: string) =>

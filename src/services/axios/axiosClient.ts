@@ -11,7 +11,6 @@ export const axiosClient = axios.create({
 
   headers: {
     Accept: "application/json",
-    "Content-Type": "application/json",
   },
 });
 
@@ -24,6 +23,22 @@ axiosClient.interceptors.request.use((config) => {
     delete config.headers.Authorization;
   }
 
+  /**
+   * لا نحدد Content-Type يدويًا لطلبات FormData.
+   *
+   * المتصفح يضيف تلقائيًا:
+   * multipart/form-data; boundary=...
+   *
+   * وضع multipart/form-data يدويًا قد يحذف الـ boundary
+   * ويجعل Laravel غير قادر على قراءة الملف.
+   */
+  if (config.data instanceof FormData) {
+    delete config.headers["Content-Type"];
+  } else if (!config.headers["Content-Type"]) {
+    config.headers["Content-Type"] =
+      "application/json";
+  }
+
   return config;
 });
 
@@ -32,12 +47,17 @@ function containsAuthenticationRouteError(
 ): boolean {
   if (typeof value === "string") {
     return (
-      value.includes("Route [login] not defined") ||
+      value.includes(
+        "Route [login] not defined",
+      ) ||
       value.includes("Unauthenticated")
     );
   }
 
-  if (typeof value !== "object" || value === null) {
+  if (
+    typeof value !== "object" ||
+    value === null
+  ) {
     return false;
   }
 
@@ -56,7 +76,9 @@ function isAuthenticationFailure(
 
   return (
     status === 500 &&
-    containsAuthenticationRouteError(responseData)
+    containsAuthenticationRouteError(
+      responseData,
+    )
   );
 }
 
@@ -69,7 +91,8 @@ function redirectToLogin(): void {
 
   authStorage.clear();
 
-  const currentPath = `${window.location.pathname}${window.location.search}`;
+  const currentPath =
+    `${window.location.pathname}${window.location.search}`;
 
   const loginUrl = new URL(
     AUTH_ROUTES.LOGIN,
@@ -78,12 +101,19 @@ function redirectToLogin(): void {
 
   if (
     currentPath &&
-    !currentPath.startsWith(AUTH_ROUTES.LOGIN)
+    !currentPath.startsWith(
+      AUTH_ROUTES.LOGIN,
+    )
   ) {
-    loginUrl.searchParams.set("redirect", currentPath);
+    loginUrl.searchParams.set(
+      "redirect",
+      currentPath,
+    );
   }
 
-  window.location.replace(loginUrl.toString());
+  window.location.replace(
+    loginUrl.toString(),
+  );
 }
 
 axiosClient.interceptors.response.use(
@@ -94,16 +124,23 @@ axiosClient.interceptors.response.use(
       return Promise.reject(error);
     }
 
-    const status = error.response?.status;
+    const status =
+      error.response?.status;
+
     const responseData: unknown =
       error.response?.data;
 
     const isAuthPage =
-      window.location.pathname.startsWith("/auth");
+      window.location.pathname.startsWith(
+        "/auth",
+      );
 
     if (
       !isAuthPage &&
-      isAuthenticationFailure(status, responseData)
+      isAuthenticationFailure(
+        status,
+        responseData,
+      )
     ) {
       redirectToLogin();
     }

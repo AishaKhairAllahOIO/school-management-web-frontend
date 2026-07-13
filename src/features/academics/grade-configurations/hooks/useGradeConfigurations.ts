@@ -20,10 +20,11 @@ export const gradeConfigurationQueryKey = [
 ] as const;
 
 export function useGradeConfigurations() {
-  return useQuery({
+  return useQuery<GradeConfiguration[], Error>({
     queryKey: gradeConfigurationQueryKey,
     queryFn: gradeConfigurationApi.list,
-    staleTime: Infinity,
+    staleTime: 30_000,
+    retry: 1,
   });
 }
 
@@ -31,35 +32,19 @@ export function useCreateGradeConfiguration() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (
-      payload: CreateGradeConfigurationPayload,
-    ) =>
+    mutationFn: (payload: CreateGradeConfigurationPayload) =>
       gradeConfigurationApi.create(payload),
 
-    onSuccess: (configuration) => {
-      queryClient.setQueryData<
-        GradeConfiguration[]
-      >(
-        gradeConfigurationQueryKey,
-        (currentConfigurations = []) => [
-          configuration,
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: gradeConfigurationQueryKey,
+      });
 
-          ...currentConfigurations.filter(
-            (item) =>
-              item.id !== configuration.id,
-          ),
-        ],
-      );
-
-      toast.success(
-        "Grade configuration created successfully.",
-      );
+      toast.success("Grade configuration created successfully.");
     },
 
     onError: (error) => {
-      toast.error(
-        getAxiosErrorMessage(error),
-      );
+      toast.error(getAxiosErrorMessage(error));
     },
   });
 }
@@ -74,34 +59,39 @@ export function useUpdateGradeConfiguration() {
     }: {
       id: string;
       payload: UpdateGradeConfigurationPayload;
-    }) =>
-      gradeConfigurationApi.update(
-        id,
-        payload,
-      ),
+    }) => gradeConfigurationApi.update(id, payload),
 
-    onSuccess: (configuration) => {
-      queryClient.setQueryData<
-        GradeConfiguration[]
-      >(
-        gradeConfigurationQueryKey,
-        (currentConfigurations = []) =>
-          currentConfigurations.map((item) =>
-            item.id === configuration.id
-              ? configuration
-              : item,
-          ),
-      );
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: gradeConfigurationQueryKey,
+      });
 
-      toast.success(
-        "Grade configuration updated successfully.",
-      );
+      toast.success("Grade configuration updated successfully.");
     },
 
     onError: (error) => {
-      toast.error(
-        getAxiosErrorMessage(error),
-      );
+      toast.error(getAxiosErrorMessage(error));
+    },
+  });
+}
+
+export function useDeleteGradeConfiguration() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string) =>
+      gradeConfigurationApi.delete(id),
+
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: gradeConfigurationQueryKey,
+      });
+
+      toast.success("Grade configuration deleted successfully.");
+    },
+
+    onError: (error) => {
+      toast.error(getAxiosErrorMessage(error));
     },
   });
 }

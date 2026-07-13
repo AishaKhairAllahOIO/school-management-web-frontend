@@ -5,12 +5,12 @@ export type SchoolImage = {
 };
 
 export type SchoolGeoLocation = {
-  latitude: number;
-  longitude: number;
+  latitude: number | null;
+  longitude: number | null;
 };
 
 export type GeneralSettings = {
-  id: number;
+  id: string;
 
   schoolName: string;
   shortName: string;
@@ -31,8 +31,8 @@ export type GeneralSettings = {
   logoUrl: string | null;
   images: SchoolImage[];
 
-  createdAt: string;
-  updatedAt: string;
+  createdAt: string | null;
+  updatedAt: string | null;
 };
 
 export type UpdateGeneralSettingsPayload = {
@@ -50,22 +50,25 @@ export type UpdateGeneralSettingsPayload = {
   city: string;
   country: string;
 
-  location: SchoolGeoLocation;
+  location: {
+    latitude: number;
+    longitude: number;
+  };
 
-  logo: string | null;
+  logo?: File;
 };
 
-export type CreateSchoolImagePayload = {
-  images: Array<{
-    url: string;
-    name: string;
-  }>;
+export type SchoolImageUploadItem = {
+  file: File;
+  name: string;
+};
+
+export type CreateSchoolImagesPayload = {
+  images: SchoolImageUploadItem[];
 };
 
 export type UpdateSchoolImagePayload = {
   imageId: string;
-  data: {
-    url: string;
-    name: string;
-  };
+  name?: string;
+  file?: File;
 };

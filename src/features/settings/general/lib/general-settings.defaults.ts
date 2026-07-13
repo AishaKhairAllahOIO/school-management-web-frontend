@@ -2,7 +2,7 @@ import type { GeneralSettings } from "../types/general-settings.types";
 
 export function createEmptyGeneralSettings(): GeneralSettings {
   return {
-    id: 0,
+    id: "",
 
     schoolName: "",
     shortName: "",
@@ -19,14 +19,14 @@ export function createEmptyGeneralSettings(): GeneralSettings {
     country: "",
 
     location: {
-      latitude: 0,
-      longitude: 0,
+      latitude: null,
+      longitude: null,
     },
 
     logoUrl: null,
     images: [],
 
-    createdAt: "",
-    updatedAt: "",
+    createdAt: null,
+    updatedAt: null,
   };
 }

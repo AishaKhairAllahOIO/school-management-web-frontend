@@ -14,21 +14,14 @@ import type {
   UpdateGradePayload,
 } from "../types/grade.types";
 
-export const gradeQueryKey = [
-  "academics",
-  "grades",
-] as const;
+export const gradeQueryKey = ["academics", "grades"] as const;
 
 export function useGrades() {
-  return useQuery({
+  return useQuery<Grade[], Error>({
     queryKey: gradeQueryKey,
     queryFn: gradeApi.list,
-
-    /**
-     * We keep created rows in the Query cache
-     * during the current application session.
-     */
-    staleTime: Infinity,
+    staleTime: 30_000,
+    retry: 1,
   });
 }
 
@@ -39,26 +32,16 @@ export function useCreateGrade() {
     mutationFn: (payload: CreateGradePayload) =>
       gradeApi.create(payload),
 
-    onSuccess: (grade) => {
-      queryClient.setQueryData<Grade[]>(
-        gradeQueryKey,
-        (currentGrades = []) => [
-          grade,
-          ...currentGrades.filter(
-            (item) => item.id !== grade.id,
-          ),
-        ],
-      );
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: gradeQueryKey,
+      });
 
-      toast.success(
-        "Grade created successfully.",
-      );
+      toast.success("Grade created successfully.");
     },
 
     onError: (error) => {
-      toast.error(
-        getAxiosErrorMessage(error),
-      );
+      toast.error(getAxiosErrorMessage(error));
     },
   });
 }
@@ -75,26 +58,36 @@ export function useUpdateGrade() {
       payload: UpdateGradePayload;
     }) => gradeApi.update(id, payload),
 
-    onSuccess: (grade) => {
-      queryClient.setQueryData<Grade[]>(
-        gradeQueryKey,
-        (currentGrades = []) =>
-          currentGrades.map((item) =>
-            item.id === grade.id
-              ? grade
-              : item,
-          ),
-      );
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: gradeQueryKey,
+      });
 
-      toast.success(
-        "Grade updated successfully.",
-      );
+      toast.success("Grade updated successfully.");
     },
 
     onError: (error) => {
-      toast.error(
-        getAxiosErrorMessage(error),
-      );
+      toast.error(getAxiosErrorMessage(error));
+    },
+  });
+}
+
+export function useDeleteGrade() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string) => gradeApi.delete(id),
+
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: gradeQueryKey,
+      });
+
+      toast.success("Grade deleted successfully.");
+    },
+
+    onError: (error) => {
+      toast.error(getAxiosErrorMessage(error));
     },
   });
 }

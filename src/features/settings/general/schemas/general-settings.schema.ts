@@ -22,7 +22,10 @@ export const generalSettingsSchema = z.object({
   description: z
     .string()
     .trim()
-    .min(10, "Description must be at least 10 characters"),
+    .min(
+      10,
+      "Description must be at least 10 characters",
+    ),
 
   phoneNumber: z
     .string()
@@ -46,13 +49,6 @@ export const generalSettingsSchema = z.object({
     .optional()
     .or(z.literal("")),
 
-    logo: z
-  .string()
-  .trim()
-  .url("Invalid logo URL")
-  .optional()
-  .or(z.literal("")),
-
   address: z
     .string()
     .trim()
@@ -72,20 +68,24 @@ export const generalSettingsSchema = z.object({
     latitude: coordinateSchema.refine(
       (value) => {
         const latitude = Number(value);
+
         return latitude >= -90 && latitude <= 90;
       },
       {
-        message: "Latitude must be between -90 and 90",
+        message:
+          "Latitude must be between -90 and 90",
       },
     ),
 
     longitude: coordinateSchema.refine(
       (value) => {
         const longitude = Number(value);
+
         return longitude >= -180 && longitude <= 180;
       },
       {
-        message: "Longitude must be between -180 and 180",
+        message:
+          "Longitude must be between -180 and 180",
       },
     ),
   }),

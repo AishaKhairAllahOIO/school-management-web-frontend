@@ -20,10 +20,11 @@ export const classroomQueryKey = [
 ] as const;
 
 export function useClassrooms() {
-  return useQuery({
+  return useQuery<Classroom[], Error>({
     queryKey: classroomQueryKey,
     queryFn: classroomApi.list,
-    staleTime: Infinity,
+    staleTime: 30_000,
+    retry: 1,
   });
 }
 
@@ -31,30 +32,19 @@ export function useCreateClassroom() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (
-      payload: CreateClassroomPayload,
-    ) => classroomApi.create(payload),
+    mutationFn: (payload: CreateClassroomPayload) =>
+      classroomApi.create(payload),
 
-    onSuccess: (classroom) => {
-      queryClient.setQueryData<Classroom[]>(
-        classroomQueryKey,
-        (currentClassrooms = []) => [
-          classroom,
-          ...currentClassrooms.filter(
-            (item) => item.id !== classroom.id,
-          ),
-        ],
-      );
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: classroomQueryKey,
+      });
 
-      toast.success(
-        "Classroom created successfully.",
-      );
+      toast.success("Classroom created successfully.");
     },
 
     onError: (error) => {
-      toast.error(
-        getAxiosErrorMessage(error),
-      );
+      toast.error(getAxiosErrorMessage(error));
     },
   });
 }
@@ -71,26 +61,36 @@ export function useUpdateClassroom() {
       payload: UpdateClassroomPayload;
     }) => classroomApi.update(id, payload),
 
-    onSuccess: (classroom) => {
-      queryClient.setQueryData<Classroom[]>(
-        classroomQueryKey,
-        (currentClassrooms = []) =>
-          currentClassrooms.map((item) =>
-            item.id === classroom.id
-              ? classroom
-              : item,
-          ),
-      );
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: classroomQueryKey,
+      });
 
-      toast.success(
-        "Classroom updated successfully.",
-      );
+      toast.success("Classroom updated successfully.");
     },
 
     onError: (error) => {
-      toast.error(
-        getAxiosErrorMessage(error),
-      );
+      toast.error(getAxiosErrorMessage(error));
+    },
+  });
+}
+
+export function useDeleteClassroom() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string) => classroomApi.delete(id),
+
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: classroomQueryKey,
+      });
+
+      toast.success("Classroom deleted successfully.");
+    },
+
+    onError: (error) => {
+      toast.error(getAxiosErrorMessage(error));
     },
   });
 }
