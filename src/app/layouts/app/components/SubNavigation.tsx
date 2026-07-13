@@ -300,6 +300,14 @@ function TabItem({
 export function SubNavigation() {
   const location = useLocation();
 
+  const isAcademicsRoute =
+    location.pathname === "/academics" ||
+    location.pathname.startsWith("/academics/");
+
+  if (isAcademicsRoute) {
+    return null;
+  }
+
   const currentSection = subNavigationItems.find((section) =>
     location.pathname.startsWith(section.basePath)
   );

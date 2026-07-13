@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-
+import { GraduationCap } from "lucide-react";
 import { useAcademicStages } from "@/features/settings/academic/hooks/useAcademicSettings";
 
 import { CrudPage } from "../../shared/components/CrudPage";
@@ -94,32 +94,127 @@ export function GradesPage() {
         },
       ]}
       columns={[
-        {
-          key: "name",
-          header: "Grade",
-          render: (row) => (
-            <span className="font-bold">{row.name}</span>
-          ),
-        },
-        {
-          key: "stage",
-          header: "Academic Stage",
-          render: (row) =>
-            stageNameById.get(String(row.academicStageId)) ??
-            `Stage ${row.academicStageId}`,
-        },
-        {
-          key: "level",
-          header: "Level",
-          render: (row) => row.level,
-        },
-        {
-          key: "graduation",
-          header: "Graduation",
-          render: (row) =>
-            row.isGraduationGrade ? "Yes" : "No",
-        },
-      ]}
+  {
+    key: "name",
+    header: "Grade",
+    searchableText: (row) =>
+      row.name,
+    render: (row) => (
+      <div className="flex items-center gap-3">
+        <span
+          className={[
+            "flex h-10 w-10 shrink-0 items-center",
+            "justify-center rounded-2xl",
+            "border border-primary/15",
+            "bg-primary/10 text-primary",
+          ].join(" ")}
+        >
+          <GraduationCap size={17} />
+        </span>
+
+        <div>
+          <p className="font-extrabold text-foreground">
+            {row.name}
+          </p>
+
+          <p className="mt-0.5 text-[10px] font-medium text-muted-foreground">
+            Grade record
+          </p>
+        </div>
+      </div>
+    ),
+  },
+
+  {
+    key: "stage",
+    header: "Academic Stage",
+    searchableText: (row) =>
+      stageNameById.get(
+        String(row.academicStageId),
+      ) ?? "",
+    render: (row) => {
+      const stageName =
+        stageNameById.get(
+          String(row.academicStageId),
+        ) ??
+        `Stage ${row.academicStageId}`;
+
+      return (
+        <span
+          className={[
+            "inline-flex items-center gap-2",
+            "rounded-full border",
+            "border-emerald-200",
+            "bg-emerald-50 px-3 py-1.5",
+            "text-xs font-bold text-emerald-700",
+          ].join(" ")}
+        >
+          <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+          {stageName}
+        </span>
+      );
+    },
+  },
+
+  {
+    key: "level",
+    header: "Level",
+    align: "center",
+    searchableText: (row) =>
+      String(row.level),
+    render: (row) => (
+      <span
+        className={[
+          "inline-flex h-8 min-w-8 items-center",
+          "justify-center rounded-xl",
+          "border border-violet-200",
+          "bg-violet-50 px-2.5",
+          "text-xs font-extrabold text-violet-700",
+        ].join(" ")}
+      >
+        {row.level}
+      </span>
+    ),
+  },
+
+  {
+    key: "graduation",
+    header: "Graduation",
+    align: "center",
+    searchableText: (row) =>
+      row.isGraduationGrade
+        ? "yes graduation"
+        : "no",
+    render: (row) =>
+      row.isGraduationGrade ? (
+        <span
+          className={[
+            "inline-flex items-center gap-1.5",
+            "rounded-full border border-emerald-200",
+            "bg-emerald-50 px-3 py-1.5",
+            "text-xs font-bold text-emerald-700",
+          ].join(" ")}
+        >
+          <span className="flex h-4 w-4 items-center justify-center rounded-full bg-emerald-500 text-[9px] text-white">
+            ✓
+          </span>
+          Yes
+        </span>
+      ) : (
+        <span
+          className={[
+            "inline-flex items-center gap-1.5",
+            "rounded-full border border-slate-200",
+            "bg-slate-50 px-3 py-1.5",
+            "text-xs font-bold text-slate-500",
+          ].join(" ")}
+        >
+          <span className="h-1.5 w-1.5 rounded-full bg-slate-400" />
+          No
+        </span>
+      ),
+  },
+]}
       toFormValues={(row) => ({
         academicStageId: String(row.academicStageId),
         name: row.name,
