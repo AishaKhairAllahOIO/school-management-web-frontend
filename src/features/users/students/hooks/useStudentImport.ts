@@ -8,99 +8,123 @@ import { toast } from "sonner";
 import { getAxiosErrorMessage } from "@/services/axios/axiosError";
 
 import { studentApi } from "../api/student.api";
-import { studentsQueryKey } from "./useStudents";
+import type {
+  EntityId,
+  StudentImportResponse,
+} from "../types/student-api.types";
+import { studentKeys } from "./student.keys";
 
-export const studentImportQueryKey = [
-  "users",
-  "students",
-  "import",
-] as const;
+function getBatchId(
+  response: StudentImportResponse,
+): EntityId {
+  const batchId =
+    response.batchId ??
+    response.batch_id ??
+    response.id;
+
+  if (batchId === undefined) {
+    throw new Error(
+      "لم يُرجع الخادم رقم عملية الاستيراد.",
+    );
+  }
+
+  return batchId;
+}
 
 export function useImportStudents() {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: (file: File) =>
       studentApi.importExcel(file),
 
-    onSuccess: () => {
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey:
+          studentKeys.importHistory(),
+      });
+
       toast.success(
-        "The file was received and is being processed.",
+        "تم استلام الملف وبدأت معالجته.",
       );
     },
 
-    onError: (error) => {
+    onError: (error) =>
       toast.error(
         getAxiosErrorMessage(error),
-      );
-    },
+      ),
   });
 }
 
 export function useStudentImportStatus(
-  batchId: number | null,
+  batchId: EntityId | null,
 ) {
-  const queryClient = useQueryClient();
-
   return useQuery({
-    queryKey: [
-      ...studentImportQueryKey,
-      batchId,
-    ],
-
+    queryKey: studentKeys.importStatus(
+      batchId ?? "disabled",
+    ),
     queryFn: () =>
       studentApi.getImportStatus(batchId!),
-
     enabled: batchId !== null,
 
     refetchInterval: (query) => {
-      const status = query.state.data?.status;
+      const status =
+        query.state.data?.status;
 
       if (
         status === "completed" ||
         status === "failed"
       ) {
-        void queryClient.invalidateQueries({
-          queryKey: studentsQueryKey,
-        });
-
         return false;
       }
 
-      return 2000;
+      return 2_500;
     },
   });
 }
 
-export function useDownloadStudentImportErrors() {
+export function useStudentImportHistory() {
+  return useQuery({
+    queryKey: studentKeys.importHistory(),
+    queryFn: () =>
+      studentApi.getImportHistory(),
+  });
+}
+
+export function useDownloadImportErrors() {
   return useMutation({
-    mutationFn: async (
-      batchId: number | string,
-    ) => {
+    mutationFn: async ({
+      batchId,
+      fileName = "student-import-errors.xlsx",
+    }: {
+      batchId: EntityId;
+      fileName?: string;
+    }) => {
       const blob =
         await studentApi.downloadImportErrors(
           batchId,
         );
 
-      const objectUrl =
+      const url =
         URL.createObjectURL(blob);
 
       const anchor =
         document.createElement("a");
 
-      anchor.href = objectUrl;
-      anchor.download =
-        `student-import-errors-${batchId}.xlsx`;
-
+      anchor.href = url;
+      anchor.download = fileName;
       document.body.appendChild(anchor);
       anchor.click();
       anchor.remove();
 
-      URL.revokeObjectURL(objectUrl);
+      URL.revokeObjectURL(url);
     },
 
-    onError: (error) => {
+    onError: (error) =>
       toast.error(
         getAxiosErrorMessage(error),
-      );
-    },
+      ),
   });
 }
+
+export { getBatchId };

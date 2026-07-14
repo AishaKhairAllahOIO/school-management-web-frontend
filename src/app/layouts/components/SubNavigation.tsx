@@ -232,27 +232,27 @@ const subNavigationItems: SubNavigationSection[] = [
   },
 
   {
-    basePath: "/communication",
+    basePath: "/communications",
 
     items: [
       {
         title: "Announcements",
-        path: "/communication/announcements",
+        path: "/communications/announcements",
         icon: Bell,
       },
       {
         title: "Notifications",
-        path: "/communication/notifications",
+        path: "/communications/notifications",
         icon: Bell,
       },
       {
         title: "Messages",
-        path: "/communication/messages",
+        path: "/communications/messages",
         icon: FileText,
       },
       {
         title: "Complaints",
-        path: "/communication/complaints",
+        path: "/communications/complaints",
         icon: FileText,
       },
     ],

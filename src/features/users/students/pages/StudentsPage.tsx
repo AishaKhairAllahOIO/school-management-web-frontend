@@ -9,18 +9,22 @@ import {
   UserPlus,
 } from "lucide-react";
 import {
+  useEffect,
   useMemo,
+  useRef,
   useState,
+  type ReactNode,
 } from "react";
 
 import { StudentImportPanel } from "../components/StudentImportPanel";
 import { StudentRegistrationDialog } from "../components/StudentRegistrationDialog";
 import {
-  useDeleteStudent,
   useStudents,
-  useToggleStudentStatus,
+  useToggleStudentAccount,
+  useWithdrawStudent,
 } from "../hooks/useStudents";
 import type {
+  EnrollmentStatus,
   StudentListFilters,
   StudentListItem,
 } from "../types/student-api.types";
@@ -29,14 +33,23 @@ export function StudentsPage() {
   const [searchValue, setSearchValue] =
     useState("");
 
-  const [gradeLevelId, setGradeLevelId] =
+  const [debouncedSearch, setDebouncedSearch] =
     useState("");
 
-  const [classroomId, setClassroomId] =
+  const [gradeLevel, setGradeLevel] =
     useState("");
+
+  const [classroomName, setClassroomName] =
+    useState("");
+
+  const [status, setStatus] =
+    useState<EnrollmentStatus | "">("");
 
   const [sort, setSort] =
     useState<"asc" | "desc">("asc");
+
+  const [page, setPage] =
+    useState(1);
 
   const [
     isRegistrationOpen,
@@ -46,58 +59,90 @@ export function StudentsPage() {
   const [isImportOpen, setIsImportOpen] =
     useState(false);
 
+  useEffect(() => {
+    const timeout = window.setTimeout(() => {
+      setDebouncedSearch(searchValue.trim());
+      setPage(1);
+    }, 350);
+
+    return () => {
+      window.clearTimeout(timeout);
+    };
+  }, [searchValue]);
+
   const filters =
     useMemo<StudentListFilters>(
       () => ({
-        search:
-          searchValue.trim() || undefined,
+        query:
+          debouncedSearch || undefined,
 
-        gradeLevelId: gradeLevelId
-          ? Number(gradeLevelId)
+        level: gradeLevel
+          ? Number(gradeLevel)
           : undefined,
 
-        classroomId: classroomId
-          ? Number(classroomId)
-          : undefined,
+        classroomName:
+          classroomName.trim() || undefined,
 
+        status: status || undefined,
         sort,
-        perPage: 25,
+        page,
       }),
       [
-        searchValue,
-        gradeLevelId,
-        classroomId,
+        debouncedSearch,
+        gradeLevel,
+        classroomName,
+        status,
         sort,
+        page,
       ],
     );
 
-  const {
-    data: students = [],
-    isLoading,
-    isError,
-    refetch,
-  } = useStudents(filters);
+  const studentsQuery =
+    useStudents(filters);
 
-  const deleteStudentMutation =
-    useDeleteStudent();
+  const students =
+    studentsQuery.data?.items ?? [];
+
+  const pagination =
+    studentsQuery.data?.meta;
+
+  const withdrawStudentMutation =
+    useWithdrawStudent();
 
   const toggleStatusMutation =
-    useToggleStudentStatus();
+    useToggleStudentAccount();
 
-  function handleDelete(
+  function handleWithdraw(
     student: StudentListItem,
   ) {
     const confirmed = window.confirm(
-      `Remove ${student.fullName} from the system?`,
+      `Withdraw ${student.fullName}'s file? This will suspend the academic enrollment and disable the account without permanently deleting the data.`,
     );
 
     if (!confirmed) {
       return;
     }
 
-    deleteStudentMutation.mutate(
-      student.studentId,
+    withdrawStudentMutation.mutate(
+      student.enrollmentId,
     );
+  }
+
+  function handlePageChange(
+    nextPage: number,
+  ) {
+    const lastPage =
+      pagination?.lastPage ?? 1;
+
+    if (
+      nextPage < 1 ||
+      nextPage > lastPage ||
+      nextPage === page
+    ) {
+      return;
+    }
+
+    setPage(nextPage);
   }
 
   return (
@@ -140,7 +185,7 @@ export function StudentsPage() {
       </header>
 
       <section className="rounded-3xl border border-border/70 bg-card p-5 shadow-soft">
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-[1fr_180px_180px_140px]">
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-[1fr_150px_180px_170px_140px]">
           <label className="relative block">
             <Search
               size={17}
@@ -155,45 +200,74 @@ export function StudentsPage() {
                 )
               }
               placeholder="Search students..."
-              className="h-11 w-full rounded-xl border border-border bg-background pl-10 pr-3 text-sm font-semibold outline-none focus:border-primary/50 focus:ring-4 focus:ring-primary/10"
+              className="h-11 w-full rounded-xl border border-border bg-background pl-10 pr-3 text-sm font-semibold outline-none transition focus:border-primary/50 focus:ring-4 focus:ring-primary/10"
             />
           </label>
 
           <input
             type="number"
             min={1}
-            value={gradeLevelId}
-            onChange={(event) =>
-              setGradeLevelId(
+            value={gradeLevel}
+            onChange={(event) => {
+              setGradeLevel(
                 event.target.value,
-              )
-            }
-            placeholder="Grade ID"
-            className="h-11 rounded-xl border border-border bg-background px-3 text-sm font-semibold outline-none focus:border-primary/50 focus:ring-4 focus:ring-primary/10"
+              );
+              setPage(1);
+            }}
+            placeholder="Grade level"
+            className="h-11 rounded-xl border border-border bg-background px-3 text-sm font-semibold outline-none transition focus:border-primary/50 focus:ring-4 focus:ring-primary/10"
           />
 
           <input
-            type="number"
-            min={1}
-            value={classroomId}
-            onChange={(event) =>
-              setClassroomId(
+            value={classroomName}
+            onChange={(event) => {
+              setClassroomName(
                 event.target.value,
-              )
-            }
-            placeholder="Classroom ID"
-            className="h-11 rounded-xl border border-border bg-background px-3 text-sm font-semibold outline-none focus:border-primary/50 focus:ring-4 focus:ring-primary/10"
+              );
+              setPage(1);
+            }}
+            placeholder="Classroom name"
+            className="h-11 rounded-xl border border-border bg-background px-3 text-sm font-semibold outline-none transition focus:border-primary/50 focus:ring-4 focus:ring-primary/10"
           />
 
           <select
+            value={status}
+            onChange={(event) => {
+              setStatus(
+                event.target
+                  .value as EnrollmentStatus | "",
+              );
+              setPage(1);
+            }}
+            className="h-11 rounded-xl border border-border bg-background px-3 text-sm font-semibold outline-none"
+          >
+            <option value="">
+              All statuses
+            </option>
+
+            <option value="pending">
+              Pending
+            </option>
+
+            <option value="enrolled">
+              Enrolled
+            </option>
+
+            <option value="suspended">
+              Suspended
+            </option>
+          </select>
+
+          <select
             value={sort}
-            onChange={(event) =>
+            onChange={(event) => {
               setSort(
                 event.target.value as
                   | "asc"
                   | "desc",
-              )
-            }
+              );
+              setPage(1);
+            }}
             className="h-11 rounded-xl border border-border bg-background px-3 text-sm font-semibold outline-none"
           >
             <option value="asc">
@@ -207,12 +281,12 @@ export function StudentsPage() {
         </div>
       </section>
 
-      <section className="overflow-hidden rounded-3xl border border-border/70 bg-card shadow-soft">
-        {isLoading ? (
+      <section className="overflow-visible rounded-3xl border border-border/70 bg-card shadow-soft">
+        {studentsQuery.isLoading ? (
           <div className="p-10 text-center text-sm font-semibold text-muted-foreground">
             Loading students...
           </div>
-        ) : isError ? (
+        ) : studentsQuery.isError ? (
           <div className="p-10 text-center">
             <p className="text-sm font-bold text-destructive">
               Failed to load students.
@@ -221,7 +295,7 @@ export function StudentsPage() {
             <button
               type="button"
               onClick={() => {
-                void refetch();
+                void studentsQuery.refetch();
               }}
               className="mt-4 h-10 rounded-xl border border-border px-5 text-xs font-bold text-foreground hover:bg-muted"
             >
@@ -233,102 +307,127 @@ export function StudentsPage() {
             No students found.
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[900px]">
-              <thead className="bg-muted/40">
-                <tr className="border-b border-border text-left">
-                  <TableHeader>
-                    Student
-                  </TableHeader>
+          <>
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[1000px]">
+                <thead className="bg-muted/40">
+                  <tr className="border-b border-border text-left">
+                    <TableHeader>
+                      Student
+                    </TableHeader>
 
-                  <TableHeader>
-                    Grade
-                  </TableHeader>
+                    <TableHeader>
+                      Grade
+                    </TableHeader>
 
-                  <TableHeader>
-                    Classroom
-                  </TableHeader>
+                    <TableHeader>
+                      Classroom
+                    </TableHeader>
 
-                  <TableHeader>
-                    Student ID
-                  </TableHeader>
+                    <TableHeader>
+                      Status
+                    </TableHeader>
 
-                  <TableHeader>
-                    Guardian ID
-                  </TableHeader>
+                    <TableHeader>
+                      Student ID
+                    </TableHeader>
 
-                  <TableHeader>
-                    Enrollment ID
-                  </TableHeader>
+                    <TableHeader>
+                      Guardian ID
+                    </TableHeader>
 
-                  <TableHeader>
-                    Actions
-                  </TableHeader>
-                </tr>
-              </thead>
+                    <TableHeader>
+                      Enrollment ID
+                    </TableHeader>
 
-              <tbody>
-                {students.map((student) => (
-                  <tr
-                    key={student.studentId}
-                    className="border-b border-border/70 last:border-0"
-                  >
-                    <TableCell>
-                      <div>
-                        <p className="font-bold text-foreground">
-                          {student.fullName}
-                        </p>
-
-                        <p className="mt-1 text-xs text-muted-foreground">
-                          User #{student.userId}
-                        </p>
-                      </div>
-                    </TableCell>
-
-                    <TableCell>
-                      {student.grade?.name ??
-                        "—"}
-                    </TableCell>
-
-                    <TableCell>
-                      {student.classroom?.name ??
-                        "—"}
-                    </TableCell>
-
-                    <TableCell>
-                      {student.studentId}
-                    </TableCell>
-
-                    <TableCell>
-                      {student.guardianId}
-                    </TableCell>
-
-                    <TableCell>
-                      {student.enrollmentId}
-                    </TableCell>
-
-                    <TableCell>
-                      <StudentActions
-                        student={student}
-                        disabled={
-                          deleteStudentMutation.isPending ||
-                          toggleStatusMutation.isPending
-                        }
-                        onDelete={() =>
-                          handleDelete(student)
-                        }
-                        onToggleStatus={() =>
-                          toggleStatusMutation.mutate(
-                            student.studentId,
-                          )
-                        }
-                      />
-                    </TableCell>
+                    <TableHeader>
+                      Actions
+                    </TableHeader>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+
+                <tbody>
+                  {students.map((student) => (
+                    <tr
+                      key={student.enrollmentId}
+                      className="border-b border-border/70 last:border-0"
+                    >
+                      <TableCell>
+                        <div>
+                          <p className="font-bold text-foreground">
+                            {student.fullName}
+                          </p>
+
+                          <p className="mt-1 text-xs text-muted-foreground">
+                            User #{student.userId}
+                          </p>
+                        </div>
+                      </TableCell>
+
+                      <TableCell>
+                        {student.grade?.name ??
+                          "—"}
+                      </TableCell>
+
+                      <TableCell>
+                        {student.classroom?.name ??
+                          "—"}
+                      </TableCell>
+
+                      <TableCell>
+                        <StatusBadge
+                          status={student.status}
+                        />
+                      </TableCell>
+
+                      <TableCell>
+                        {student.studentId}
+                      </TableCell>
+
+                      <TableCell>
+                        {student.guardianId}
+                      </TableCell>
+
+                      <TableCell>
+                        {student.enrollmentId}
+                      </TableCell>
+
+                      <TableCell>
+                        <StudentActions
+                          student={student}
+                          disabled={
+                            withdrawStudentMutation.isPending ||
+                            toggleStatusMutation.isPending
+                          }
+                          onWithdraw={() =>
+                            handleWithdraw(student)
+                          }
+                          onToggleStatus={() =>
+                            toggleStatusMutation.mutate(
+                              student.enrollmentId,
+                            )
+                          }
+                        />
+                      </TableCell>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <Pagination
+              currentPage={
+                pagination?.currentPage ?? 1
+              }
+              lastPage={
+                pagination?.lastPage ?? 1
+              }
+              disabled={
+                studentsQuery.isFetching
+              }
+              onPageChange={handlePageChange}
+            />
+          </>
         )}
       </section>
 
@@ -352,47 +451,103 @@ export function StudentsPage() {
 function StudentActions({
   student,
   disabled,
-  onDelete,
+  onWithdraw,
   onToggleStatus,
 }: {
   student: StudentListItem;
   disabled: boolean;
-  onDelete: () => void;
+  onWithdraw: () => void;
   onToggleStatus: () => void;
 }) {
   const [open, setOpen] =
     useState(false);
 
+  const containerRef =
+    useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (!open) {
+      return;
+    }
+
+    function handleOutsideClick(
+      event: MouseEvent,
+    ) {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(
+          event.target as Node,
+        )
+      ) {
+        setOpen(false);
+      }
+    }
+
+    function handleEscape(
+      event: KeyboardEvent,
+    ) {
+      if (event.key === "Escape") {
+        setOpen(false);
+      }
+    }
+
+    document.addEventListener(
+      "mousedown",
+      handleOutsideClick,
+    );
+
+    document.addEventListener(
+      "keydown",
+      handleEscape,
+    );
+
+    return () => {
+      document.removeEventListener(
+        "mousedown",
+        handleOutsideClick,
+      );
+
+      document.removeEventListener(
+        "keydown",
+        handleEscape,
+      );
+    };
+  }, [open]);
+
   return (
-    <div className="relative">
+    <div
+      ref={containerRef}
+      className="relative"
+    >
       <button
         type="button"
-        aria-label="Student actions"
+        aria-label={`Actions for ${student.fullName}`}
+        aria-expanded={open}
         disabled={disabled}
         onClick={() =>
           setOpen((current) => !current)
         }
-        className="flex h-9 w-9 items-center justify-center rounded-xl border border-border text-muted-foreground hover:bg-muted disabled:opacity-50"
+        className="flex h-9 w-9 items-center justify-center rounded-xl border border-border text-muted-foreground hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50"
       >
         <MoreVertical size={17} />
       </button>
 
       {open ? (
-        <div className="absolute right-0 top-11 z-30 w-48 rounded-2xl border border-border bg-card p-2 shadow-xl">
+        <div className="absolute right-0 top-11 z-30 w-52 rounded-2xl border border-border bg-card p-2 shadow-xl">
           <button
             type="button"
             disabled
-            title="Student details will be connected in the next step."
+            title="Connect this action to the full-profile dialog."
             className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-xs font-bold text-muted-foreground opacity-50"
           >
             <Eye size={15} />
-            View Details
+            View Full Profile
           </button>
 
           <button
             type="button"
             disabled
-            title="Student editing will be connected in the next step."
+            title="Connect this action to the student edit dialog."
             className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-xs font-bold text-muted-foreground opacity-50"
           >
             <Edit3 size={15} />
@@ -415,19 +570,89 @@ function StudentActions({
             type="button"
             onClick={() => {
               setOpen(false);
-              onDelete();
+              onWithdraw();
             }}
             className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-xs font-bold text-destructive hover:bg-destructive/10"
           >
             <Trash2 size={15} />
-            Remove Student
+            Withdraw Student File
           </button>
-
-          <p className="sr-only">
-            Student {student.fullName}
-          </p>
         </div>
       ) : null}
+    </div>
+  );
+}
+
+function StatusBadge({
+  status,
+}: {
+  status: EnrollmentStatus;
+}) {
+  const className =
+    status === "enrolled"
+      ? "border-success/20 bg-success/10 text-success"
+      : status === "suspended"
+        ? "border-destructive/20 bg-destructive/10 text-destructive"
+        : "border-warning/20 bg-warning/10 text-warning";
+
+  return (
+    <span
+      className={`inline-flex rounded-full border px-2.5 py-1 text-xs font-bold capitalize ${className}`}
+    >
+      {status}
+    </span>
+  );
+}
+
+function Pagination({
+  currentPage,
+  lastPage,
+  disabled,
+  onPageChange,
+}: {
+  currentPage: number;
+  lastPage: number;
+  disabled: boolean;
+  onPageChange: (page: number) => void;
+}) {
+  if (lastPage <= 1) {
+    return null;
+  }
+
+  return (
+    <div className="flex items-center justify-between gap-3 border-t border-border px-5 py-4">
+      <p className="text-xs font-semibold text-muted-foreground">
+        Page {currentPage} of {lastPage}
+      </p>
+
+      <div className="flex gap-2">
+        <button
+          type="button"
+          disabled={
+            disabled || currentPage <= 1
+          }
+          onClick={() =>
+            onPageChange(currentPage - 1)
+          }
+          className="h-9 rounded-xl border border-border px-4 text-xs font-bold text-foreground transition hover:bg-muted disabled:cursor-not-allowed disabled:opacity-40"
+        >
+          Previous
+        </button>
+
+        <button
+          type="button"
+          disabled={
+            disabled ||
+            currentPage >= lastPage
+          }
+          onClick={() =>
+            onPageChange(currentPage + 1)
+          }
+          className="h-9 rounded-xl border border-border px-4 text-xs font-bold text-foreground transition hover:bg-muted disabled:cursor-not-allowed disabled:opacity-40"
+        >
+          Next
+        </button>
+      </div>
     </div>
   );
 }
@@ -435,7 +660,7 @@ function StudentActions({
 function TableHeader({
   children,
 }: {
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
   return (
     <th className="px-5 py-4 text-xs font-bold text-muted-foreground">
@@ -447,7 +672,7 @@ function TableHeader({
 function TableCell({
   children,
 }: {
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
   return (
     <td className="px-5 py-4 text-sm font-semibold text-foreground">

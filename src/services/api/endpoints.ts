@@ -49,26 +49,41 @@ ACADEMIC_CLASSROOM: (classroomId: string) =>
 
   STUDENTS: {
     REGISTER: "/admin/student/register",
-    IMPORT: "/admin/student/import",
-    IMPORT_STATUS: (batchId: number | string) =>
-      `/admin/student/import-batches/${batchId}/status`,
-    IMPORT_ERRORS: (batchId: number | string) =>
-      `/admin/student/import-batches/${batchId}/errors/export`,
-    LIST: "/admin/students",
-    DETAILS: (studentId: number | string) =>
+
+    SEARCH: "/admin/students/search",
+    FILTER: "/admin/students/filter",
+
+    DETAILS: (studentId: string | number) =>
       `/admin/students/${studentId}`,
-    FULL_PROFILE: (enrollmentId: number | string) =>
+
+    FULL_PROFILE: (enrollmentId: string | number) =>
       `/admin/students/${enrollmentId}/full-profile`,
-    PERSONAL: (studentId: number | string) =>
+
+    PERSONAL: (studentId: string | number) =>
       `/admin/students/${studentId}/personal`,
-    ENROLLMENT: (enrollmentId: number | string) =>
-      `/admin/students/enrollments/${enrollmentId}`,
-    GUARDIAN_PERSONAL: (guardianId: number | string) =>
+
+    GUARDIAN_PERSONAL: (guardianId: string | number) =>
       `/admin/students/guardians/${guardianId}/personal`,
-    DELETE: (studentId: number | string) =>
-      `/admin/students/${studentId}`,
-    TOGGLE_ACCOUNT_STATUS: (studentId: number | string) =>
-      `/admin/students/${studentId}/toggle-account-status`,
+
+    ENROLLMENT: (enrollmentId: string | number) =>
+      `/admin/students/enrollments/${enrollmentId}`,
+
+    TOGGLE_ACCOUNT_STATUS: (enrollmentId: string | number) =>
+      `/admin/students/${enrollmentId}/toggle-account-status`,
+
+    DELETE: (enrollmentId: string | number) =>
+      `/admin/students/${enrollmentId}`,
+
+    IMPORT: "/admin/student/import",
+
+    IMPORT_STATUS: (batchId: string | number) =>
+      `/admin/student/import-batches/${batchId}/status`,
+
+    IMPORT_ERRORS: (batchId: string | number) =>
+      `/admin/student/import-batches/${batchId}/errors/export`,
+
+    IMPORT_HISTORY:
+      "/admin/student/import-batches/history",
   },
   
    FINANCIAL: {

@@ -14,10 +14,16 @@ import {
 } from "react";
 
 import {
-  useDownloadStudentImportErrors,
+  getBatchId,
+  useDownloadImportErrors,
   useImportStudents,
   useStudentImportStatus,
 } from "../hooks/useStudentImport";
+
+import type {
+  EntityId,
+  StudentImportBatchStatus,
+} from "../types/student-api.types";
 
 type StudentImportPanelProps = {
   open: boolean;
@@ -35,7 +41,7 @@ export function StudentImportPanel({
     useState<File | null>(null);
 
   const [batchId, setBatchId] =
-    useState<number | null>(null);
+    useState<EntityId | null>(null);
 
   const importMutation =
     useImportStudents();
@@ -44,20 +50,41 @@ export function StudentImportPanel({
     useStudentImportStatus(batchId);
 
   const downloadErrorsMutation =
-    useDownloadStudentImportErrors();
-
-  if (!open) {
-    return null;
-  }
+    useDownloadImportErrors();
 
   const status = importStatusQuery.data;
 
+  const totalRows = getStatusNumber(
+    status,
+    "totalRows",
+    "total_rows",
+  );
+
+  const processedRows = getStatusNumber(
+    status,
+    "processedRows",
+    "processed_rows",
+  );
+
+  const successfulRows = getStatusNumber(
+    status,
+    "successfulRows",
+    "successful_rows",
+  );
+
+  const failedRows = getStatusNumber(
+    status,
+    "failedRows",
+    "failed_rows",
+  );
+
   const progress =
-    status && status.total_rows > 0
-      ? Math.round(
-          (status.processed_rows /
-            status.total_rows) *
-            100,
+    totalRows > 0
+      ? Math.min(
+          100,
+          Math.round(
+            (processedRows / totalRows) * 100,
+          ),
         )
       : 0;
 
@@ -65,67 +92,117 @@ export function StudentImportPanel({
     status?.status === "completed" ||
     status?.status === "failed";
 
+  const isProcessing =
+    batchId !== null && !isTerminal;
+
+  const isCloseDisabled =
+    importMutation.isPending || isProcessing;
+
+  if (!open) {
+    return null;
+  }
+
   function handleFileChange(
     event: ChangeEvent<HTMLInputElement>,
   ) {
     const file =
       event.target.files?.[0] ?? null;
 
+    if (!file) {
+      setSelectedFile(null);
+      return;
+    }
+
+    const isSupported =
+      file.name.toLowerCase().endsWith(".xlsx") ||
+      file.name.toLowerCase().endsWith(".csv");
+
+    if (!isSupported) {
+      event.target.value = "";
+      setSelectedFile(null);
+      return;
+    }
+
     setSelectedFile(file);
     setBatchId(null);
   }
 
   function handleUpload() {
-    if (!selectedFile) {
+    if (
+      !selectedFile ||
+      importMutation.isPending
+    ) {
       return;
     }
 
     importMutation.mutate(selectedFile, {
       onSuccess: (response) => {
-        setBatchId(response.batch_id);
+        setBatchId(getBatchId(response));
       },
     });
   }
 
-  function handleClose() {
-    if (
-      importMutation.isPending ||
-      (batchId !== null && !isTerminal)
-    ) {
+  function handleDownloadErrors() {
+    if (batchId === null) {
       return;
     }
 
-    setSelectedFile(null);
-    setBatchId(null);
+    downloadErrorsMutation.mutate({
+      batchId,
+      fileName: `student-import-errors-${batchId}.xlsx`,
+    });
+  }
 
+  function handleClose() {
+    if (isCloseDisabled) {
+      return;
+    }
+
+    resetPanel();
     onClose();
   }
 
+  function resetPanel() {
+    setSelectedFile(null);
+    setBatchId(null);
+
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+
+    importMutation.reset();
+    downloadErrorsMutation.reset();
+  }
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="w-full max-w-xl rounded-3xl border border-border bg-card shadow-2xl">
-        <header className="flex items-center justify-between border-b border-border px-6 py-5">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="student-import-title"
+    >
+      <div className="w-full max-w-xl overflow-hidden rounded-3xl border border-border bg-card shadow-2xl">
+        <header className="flex items-start justify-between gap-4 border-b border-border px-6 py-5">
           <div>
-            <h2 className="text-xl font-bold text-foreground">
+            <h2
+              id="student-import-title"
+              className="text-xl font-bold text-foreground"
+            >
               Import Students
             </h2>
 
             <p className="mt-1 text-sm text-muted-foreground">
-              Upload an Excel file and monitor
-              background processing.
+              Upload an Excel or CSV file and
+              monitor the import process.
             </p>
           </div>
 
           <button
             type="button"
-            aria-label="Close"
+            aria-label="Close import panel"
             onClick={handleClose}
-            disabled={
-              importMutation.isPending ||
-              (batchId !== null &&
-                !isTerminal)
-            }
-            className="flex h-10 w-10 items-center justify-center rounded-xl border border-border text-muted-foreground hover:bg-muted disabled:opacity-40"
+            disabled={isCloseDisabled}
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-border text-muted-foreground transition hover:bg-muted disabled:cursor-not-allowed disabled:opacity-40"
           >
             <X size={18} />
           </button>
@@ -149,15 +226,15 @@ export function StudentImportPanel({
             />
 
             <div>
-              <p className="text-sm font-bold text-foreground">
+              <p className="break-all text-sm font-bold text-foreground">
                 {selectedFile
                   ? selectedFile.name
-                  : "Choose an Excel file"}
+                  : "Choose a spreadsheet file"}
               </p>
 
               <p className="mt-1 text-xs text-muted-foreground">
                 Supported file types: .xlsx and
-                .xls
+                .csv
               </p>
             </div>
           </button>
@@ -165,10 +242,17 @@ export function StudentImportPanel({
           <input
             ref={fileInputRef}
             type="file"
-            accept=".xlsx,.xls"
+            accept=".xlsx,.csv"
             className="hidden"
             onChange={handleFileChange}
           />
+
+          {importMutation.isError ? (
+            <StatusMessage
+              variant="error"
+              message="The file could not be uploaded. Please check the file and try again."
+            />
+          ) : null}
 
           {batchId === null ? (
             <button
@@ -198,29 +282,22 @@ export function StudentImportPanel({
           {batchId !== null ? (
             <section className="rounded-2xl border border-border bg-muted/20 p-5">
               <div className="flex items-center gap-3">
-                {status?.status ===
-                "completed" ? (
-                  <CheckCircle2
-                    size={22}
-                    className="text-success"
-                  />
-                ) : status?.status ===
-                  "failed" ? (
-                  <AlertCircle
-                    size={22}
-                    className="text-destructive"
-                  />
-                ) : (
-                  <Loader2
-                    size={22}
-                    className="animate-spin text-primary"
-                  />
-                )}
+                <ImportStatusIcon
+                  status={status?.status}
+                  isError={
+                    importStatusQuery.isError
+                  }
+                />
 
-                <div>
-                  <p className="text-sm font-bold text-foreground">
-                    {status?.status ??
-                      "Waiting for worker"}
+                <div className="min-w-0">
+                  <p className="text-sm font-bold capitalize text-foreground">
+                    {getStatusLabel({
+                      status: status?.status,
+                      isLoading:
+                        importStatusQuery.isLoading,
+                      isError:
+                        importStatusQuery.isError,
+                    })}
                   </p>
 
                   <p className="mt-1 text-xs text-muted-foreground">
@@ -229,57 +306,89 @@ export function StudentImportPanel({
                 </div>
               </div>
 
-              <div className="mt-5 h-2 overflow-hidden rounded-full bg-muted">
+              <div
+                className="mt-5 h-2 overflow-hidden rounded-full bg-muted"
+                role="progressbar"
+                aria-label="Import progress"
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-valuenow={progress}
+              >
                 <div
                   style={{
                     width: `${progress}%`,
                   }}
-                  className="h-full rounded-full bg-primary transition-all"
+                  className="h-full rounded-full bg-primary transition-all duration-300"
                 />
+              </div>
+
+              <div className="mt-2 flex items-center justify-between text-xs text-muted-foreground">
+                <span>
+                  {processedRows} of {totalRows}
+                </span>
+
+                <span>{progress}%</span>
               </div>
 
               <div className="mt-4 grid grid-cols-2 gap-3 text-xs sm:grid-cols-4">
                 <Metric
                   label="Total"
-                  value={status?.total_rows ?? 0}
+                  value={totalRows}
                 />
 
                 <Metric
                   label="Processed"
-                  value={
-                    status?.processed_rows ?? 0
-                  }
+                  value={processedRows}
                 />
 
                 <Metric
                   label="Successful"
-                  value={
-                    status?.successful_rows ?? 0
-                  }
+                  value={successfulRows}
                 />
 
                 <Metric
                   label="Failed"
-                  value={
-                    status?.failed_rows ?? 0
-                  }
+                  value={failedRows}
                 />
               </div>
 
-              {status?.has_errors ? (
+              {importStatusQuery.isError ? (
+                <div className="mt-5">
+                  <StatusMessage
+                    variant="error"
+                    message="The import status could not be retrieved."
+                  />
+                </div>
+              ) : null}
+
+              {isTerminal &&
+              failedRows === 0 &&
+              !importStatusQuery.isError ? (
+                <div className="mt-5">
+                  <StatusMessage
+                    variant="success"
+                    message="The student import was completed successfully."
+                  />
+                </div>
+              ) : null}
+
+              {failedRows > 0 ? (
                 <button
                   type="button"
                   disabled={
                     downloadErrorsMutation.isPending
                   }
-                  onClick={() =>
-                    downloadErrorsMutation.mutate(
-                      batchId,
-                    )
-                  }
-                  className="mt-5 flex h-10 w-full items-center justify-center gap-2 rounded-xl border border-destructive/20 text-xs font-bold text-destructive transition hover:bg-destructive/10 disabled:opacity-60"
+                  onClick={handleDownloadErrors}
+                  className="mt-5 flex h-10 w-full items-center justify-center gap-2 rounded-xl border border-destructive/20 text-xs font-bold text-destructive transition hover:bg-destructive/10 disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  <Download size={15} />
+                  {downloadErrorsMutation.isPending ? (
+                    <Loader2
+                      size={15}
+                      className="animate-spin"
+                    />
+                  ) : (
+                    <Download size={15} />
+                  )}
 
                   {downloadErrorsMutation.isPending
                     ? "Downloading..."
@@ -290,6 +399,129 @@ export function StudentImportPanel({
           ) : null}
         </div>
       </div>
+    </div>
+  );
+}
+
+function getStatusNumber(
+  status: StudentImportBatchStatus | undefined,
+  camelCaseKey:
+    | "totalRows"
+    | "processedRows"
+    | "successfulRows"
+    | "failedRows",
+  snakeCaseKey:
+    | "total_rows"
+    | "processed_rows"
+    | "successful_rows"
+    | "failed_rows",
+): number {
+  const value =
+    status?.[camelCaseKey] ??
+    status?.[snakeCaseKey] ??
+    0;
+
+  return Number(value);
+}
+
+function getStatusLabel({
+  status,
+  isLoading,
+  isError,
+}: {
+  status?: StudentImportBatchStatus["status"];
+  isLoading: boolean;
+  isError: boolean;
+}) {
+  if (isError) {
+    return "Status check failed";
+  }
+
+  if (isLoading) {
+    return "Checking import status";
+  }
+
+  switch (status) {
+    case "pending":
+      return "Waiting for processing";
+
+    case "processing":
+      return "Processing students";
+
+    case "completed":
+      return "Import completed";
+
+    case "failed":
+      return "Import failed";
+
+    default:
+      return "Waiting for worker";
+  }
+}
+
+function ImportStatusIcon({
+  status,
+  isError,
+}: {
+  status?: StudentImportBatchStatus["status"];
+  isError: boolean;
+}) {
+  if (isError || status === "failed") {
+    return (
+      <AlertCircle
+        size={22}
+        className="shrink-0 text-destructive"
+      />
+    );
+  }
+
+  if (status === "completed") {
+    return (
+      <CheckCircle2
+        size={22}
+        className="shrink-0 text-success"
+      />
+    );
+  }
+
+  return (
+    <Loader2
+      size={22}
+      className="shrink-0 animate-spin text-primary"
+    />
+  );
+}
+
+function StatusMessage({
+  variant,
+  message,
+}: {
+  variant: "success" | "error";
+  message: string;
+}) {
+  const isSuccess = variant === "success";
+
+  return (
+    <div
+      className={
+        isSuccess
+          ? "flex items-start gap-2 rounded-xl border border-success/20 bg-success/10 p-3 text-xs text-success"
+          : "flex items-start gap-2 rounded-xl border border-destructive/20 bg-destructive/10 p-3 text-xs text-destructive"
+      }
+    >
+      {isSuccess ? (
+        <CheckCircle2
+          size={16}
+          className="mt-0.5 shrink-0"
+        />
+      ) : (
+        <AlertCircle
+          size={16}
+          className="mt-0.5 shrink-0"
+        />
+      )}
+
+      <p>{message}</p>
     </div>
   );
 }
