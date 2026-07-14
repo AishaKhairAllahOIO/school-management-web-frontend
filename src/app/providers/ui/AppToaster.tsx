@@ -1,15 +1,21 @@
 import { Toaster } from "sonner";
-import { useTheme } from "next-themes";
+
+import { useAppTheme } from "@/app/providers/theme";
 
 export function AppToaster() {
-  const { resolvedTheme } = useTheme();
+  const { resolvedTheme } = useAppTheme();
 
   return (
     <Toaster
-      theme={resolvedTheme as "light" | "dark"}
+      theme={
+        resolvedTheme === "dark"
+          ? "dark"
+          : "light"
+      }
+      position="top-right"
       richColors
       closeButton
-      position="top-right"
+      expand
       toastOptions={{
         duration: 4000,
       }}

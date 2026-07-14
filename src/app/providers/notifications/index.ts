@@ -1,1 +1,1 @@
-export { NotificationsProvider } from "./NotificationsProvider";
+export { NotificationsProvider } from "./notifications-provider";

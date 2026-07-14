@@ -1,5 +1,5 @@
-export { LocaleProvider } from "./LocaleProvider";
-export { useLocale } from "./useLocale";
+export { LocaleProvider } from "./locale-provider";
+export { useLocale } from "./use-locale";
 
 export type {
   AppDirection,

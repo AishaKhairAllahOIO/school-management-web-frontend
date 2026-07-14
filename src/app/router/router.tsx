@@ -1,18 +1,25 @@
 import { createBrowserRouter } from "react-router-dom";
 
-import { AppLayout } from "@/app/layouts/app/AppLayout";
+import { AppLayout } from "@/app/layouts/AppLayout";
 import { ErrorPage, NotFoundPage } from "@/app/pages";
+import { AuthGuard } from "@/features/auth/guards/AuthGuard";
+import { GuestGuard } from "@/features/auth/guards/GuestGuard";
+import { authRoutes } from "@/features/auth/auth.routes";
+
 import { appRoutes } from "./routes";
-import { AuthGuard } from "@/features/auth/components/AuthGuard";
-import { GuestGuard } from "@/features/auth/components/GuestGuard";
-import { authRoutes } from "@/features/auth/routes/auth.routes";
 
 export const router = createBrowserRouter([
   {
     path: "/auth",
     element: <GuestGuard />,
     errorElement: <ErrorPage />,
-    children: authRoutes,
+    children: [
+      ...authRoutes,
+      {
+        path: "*",
+        element: <NotFoundPage />,
+      },
+    ],
   },
   {
     path: "/",
@@ -23,7 +30,10 @@ export const router = createBrowserRouter([
         element: <AppLayout />,
         children: [
           ...appRoutes,
-          { path: "*", element: <NotFoundPage /> },
+          {
+            path: "*",
+            element: <NotFoundPage />,
+          },
         ],
       },
     ],

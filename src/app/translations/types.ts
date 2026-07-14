@@ -47,26 +47,29 @@ export type TranslationDictionary = {
     forbidden: string;
     notFound: string;
   };
+
   layout: {
-  sidebar: {
-    academy: string;
-    schoolWebsite: string;
-    expandSidebar: string;
-    collapseSidebar: string;
+    sidebar: {
+      navigation: string;
+      schoolWebsite: string;
+      expandSidebar: string;
+      collapseSidebar: string;
+      closeSidebar: string;
+    };
+
+    topbar: {
+      openSidebar: string;
+      toggleTheme: string;
+      notifications: string;
+      notificationsTitle: string;
+      unreadUpdates: string;
+      overview: string;
+      online: string;
+      viewProfile: string;
+      changePassword: string;
+      manageUsers: string;
+      logout: string;
+      openProfileMenu: string;
+    };
   };
-   topbar: {
-    openSidebar: string;
-    toggleTheme: string;
-    notifications: string;
-    notificationsTitle: string;
-    unreadUpdates: string;
-    overview: string;
-    online: string;
-    viewProfile: string;
-    changePassword: string;
-    manageUsers: string;
-    logout: string;
-    openProfileMenu: string;
-  };
-};
 };

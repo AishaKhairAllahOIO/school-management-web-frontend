@@ -2,7 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
-import { queryClient } from "@/app/providers/query/queryClient";
+import { queryClient } from "@/app/providers/query/query-client";
 import { unregisterCurrentFirebaseDevice } from "@/features/notifications";
 
 import { authService } from "../api/auth.service";

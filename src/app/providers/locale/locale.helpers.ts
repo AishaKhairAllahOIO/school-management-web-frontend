@@ -1,34 +1,66 @@
 import {
   DEFAULT_LANGUAGE,
-  LANGUAGE_STORAGE_KEY,
   SUPPORTED_LANGUAGES,
-} from "@/app/providers/locale/locale.constants";
-
+} from "./locale.constants";
+import { localeStorage } from "./locale.storage";
 import type {
   AppDirection,
   AppLanguage,
-} from "@/app/providers/locale/locale.types";
+} from "./locale.types";
 
 export function isSupportedLanguage(
-  language: string | null
+  language: string | null | undefined,
 ): language is AppLanguage {
-  return SUPPORTED_LANGUAGES.includes(language as AppLanguage);
+  if (!language) {
+    return false;
+  }
+
+  return SUPPORTED_LANGUAGES.some(
+    (supportedLanguage) =>
+      supportedLanguage === language,
+  );
 }
 
-export function getDirection(language: AppLanguage): AppDirection {
+export function getDirection(
+  language: AppLanguage,
+): AppDirection {
   return language === "ar" ? "rtl" : "ltr";
 }
 
+export function normalizeBrowserLanguage(
+  language: string,
+): string {
+  return language.trim().toLowerCase().split("-")[0] ?? "";
+}
+
+function getBrowserLanguage(): AppLanguage | null {
+  if (
+    typeof navigator === "undefined" ||
+    !navigator.languages
+  ) {
+    return null;
+  }
+
+  for (const browserLanguage of navigator.languages) {
+    const normalizedLanguage =
+      normalizeBrowserLanguage(browserLanguage);
+
+    if (isSupportedLanguage(normalizedLanguage)) {
+      return normalizedLanguage;
+    }
+  }
+
+  return null;
+}
+
 export function getInitialLanguage(): AppLanguage {
-  if (typeof window === "undefined") {
-    return DEFAULT_LANGUAGE;
+  const storedLanguage = localeStorage.get();
+
+  if (isSupportedLanguage(storedLanguage)) {
+    return storedLanguage;
   }
 
-  const savedLanguage = window.localStorage.getItem(LANGUAGE_STORAGE_KEY);
+  const browserLanguage = getBrowserLanguage();
 
-  if (isSupportedLanguage(savedLanguage)) {
-    return savedLanguage;
-  }
-
-  return DEFAULT_LANGUAGE;
+  return browserLanguage ?? DEFAULT_LANGUAGE;
 }
