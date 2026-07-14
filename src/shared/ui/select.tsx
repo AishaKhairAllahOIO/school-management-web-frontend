@@ -1,10 +1,5 @@
 import * as React from "react"
-<<<<<<< HEAD
-import * as SelectPrimitive from "@radix-ui/react-select"
-
-=======
 import * as SelectPrimitive from "@radix-ui/react-select";
->>>>>>> 782e7f79faba457344f587b8dd3c36e639d39e80
 import { cn } from "@/shared/lib/utils"
 import { ChevronDownIcon, CheckIcon, ChevronUpIcon } from "lucide-react"
 
