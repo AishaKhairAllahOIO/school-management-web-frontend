@@ -1,33 +1,50 @@
+import { Languages } from "lucide-react";
+
 import { useLocale } from "@/app/providers/locale";
 
-export function LanguageToggle() {
-  const { language, setLanguage } = useLocale();
+type LanguageToggleProps = {
+  className?: string;
+};
+
+export function LanguageToggle({
+  className = "",
+}: LanguageToggleProps) {
+  const {
+    language,
+    setLanguage,
+  } = useLocale();
+
+  const nextLanguage =
+    language === "en" ? "ar" : "en";
 
   function toggleLanguage() {
-    setLanguage(language === "en" ? "ar" : "en");
+    setLanguage(nextLanguage);
   }
 
   return (
     <button
       type="button"
       onClick={toggleLanguage}
-      aria-label="Toggle language"
-      className="
-        flex h-[44px] w-[44px]
-        items-center justify-center
-        rounded-[14px]
-        bg-white/92
-        text-[#111232]
-        shadow-[0_16px_38px_rgba(46,38,108,0.10)]
-        ring-1 ring-[#EEF0FA]
-        backdrop-blur-xl
-        transition duration-200
-        hover:-translate-y-0.5
-        hover:bg-white
-      "
+      aria-label={
+        language === "en"
+          ? "Switch to Arabic"
+          : "التبديل إلى الإنجليزية"
+      }
+      title={
+        language === "en"
+          ? "العربية"
+          : "English"
+      }
+      className={className}
     >
-      <span className="text-[12px] font-bold uppercase tracking-tight">
-        {language}
+      <Languages
+        aria-hidden="true"
+        size={17}
+        strokeWidth={2.05}
+      />
+
+      <span className="sr-only">
+        {nextLanguage.toUpperCase()}
       </span>
     </button>
   );
