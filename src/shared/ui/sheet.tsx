@@ -1,5 +1,5 @@
 import * as React from "react"
-import { Dialog as SheetPrimitive } from "radix-ui"
+import * as SheetPrimitive from "@radix-ui/react-dialog"
 
 import { cn } from "@/shared/lib/utils"
 import { Button } from "@/shared/ui/button"
