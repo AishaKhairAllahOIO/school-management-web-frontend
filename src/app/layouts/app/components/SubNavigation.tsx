@@ -282,6 +282,11 @@ const subNavigationItems: SubNavigationSection[] = [
         path: "/settings/permissions",
         icon: LockKeyhole,
       },
+      { 
+        title: "Financial",
+        path: "/settings/financial",
+        icon: Wallet 
+      },
     ],
   },
 ];
