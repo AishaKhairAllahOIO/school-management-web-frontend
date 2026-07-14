@@ -1,124 +1,259 @@
-import { Edit3, GraduationCap, Plus, Search, Trash2 } from "lucide-react";
+import { useMemo } from "react";
+import { GraduationCap } from "lucide-react";
+import { useAcademicStages } from "@/features/settings/academic/hooks/useAcademicSettings";
 
-import { useState } from "react";
-
+import { CrudPage } from "../../shared/components/CrudPage";
+import { gradeApi } from "../api/grade.api";
 import {
+  useCreateGrade,
   useDeleteGrade,
   useGrades,
-} from "@/features/academics/grades/hooks/useGrades";
+  useUpdateGrade,
+} from "../hooks/useGrades";
+import type {
+  CreateGradePayload,
+  Grade,
+  UpdateGradePayload,
+} from "../types/grade.types";
+
+const stageLabels = {
+  primary: "Primary",
+  middle: "Middle",
+  secondary: "Secondary",
+} as const;
 
 export function GradesPage() {
-  const { data = [], isLoading, isError } = useGrades();
-  const deleteMutation = useDeleteGrade();
-  const [search, setSearch] = useState("");
+  const gradesQuery = useGrades();
+  const stagesQuery = useAcademicStages();
 
-  const filteredGrades = data.filter((grade) =>
-    `${grade.name} ${grade.code}`
-      .toLowerCase()
-      .includes(search.toLowerCase())
+  const createMutation = useCreateGrade();
+  const updateMutation = useUpdateGrade();
+  const deleteMutation = useDeleteGrade();
+
+  const stageOptions = useMemo(
+    () =>
+      (stagesQuery.data ?? []).map((stage) => ({
+        value: String(stage.id),
+        label: stageLabels[stage.type],
+      })),
+    [stagesQuery.data],
   );
 
-  if (isLoading) {
-    return <div className="soft-card rounded-3xl p-5">Loading grades...</div>;
-  }
-
-  if (isError) {
-    return <div className="soft-card rounded-3xl p-5">Failed to load grades.</div>;
-  }
+  const stageNameById = useMemo(
+    () =>
+      new Map(
+        stageOptions.map((option) => [
+          option.value,
+          option.label,
+        ]),
+      ),
+    [stageOptions],
+  );
 
   return (
-    <div className="soft-card rounded-3xl p-5">
-      <div className="mb-5 flex items-start justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-            <GraduationCap size={22} />
-          </span>
+    <CrudPage<Grade, CreateGradePayload, UpdateGradePayload>
+      title="Grades"
+      description="Manage school grades and connect each grade to an academic stage."
+      addLabel="Add Grade"
+      rows={gradesQuery.data ?? []}
+      isLoading={gradesQuery.isLoading || stagesQuery.isLoading}
+      isError={gradesQuery.isError || stagesQuery.isError}
+      onRetry={() => {
+        void Promise.all([
+          gradesQuery.refetch(),
+          stagesQuery.refetch(),
+        ]);
+      }}
+      loadEntity={gradeApi.getById}
+      createMutation={createMutation}
+      updateMutation={updateMutation}
+      deleteMutation={deleteMutation}
+      fields={[
+        {
+          name: "academicStageId",
+          label: "Academic Stage",
+          type: "select",
+          options: stageOptions,
+          defaultValue: stageOptions[0]?.value ?? "",
+          required: true,
+        },
+        {
+          name: "name",
+          label: "Grade Name",
+          type: "text",
+          defaultValue: "",
+          required: true,
+          helperText:
+            "Do not enter the level separately; the backend calculates it from the grade name.",
+        },
+        {
+          name: "isGraduationGrade",
+          label: "Graduation Grade",
+          type: "checkbox",
+          defaultValue: false,
+        },
+      ]}
+      columns={[
+  {
+    key: "name",
+    header: "Grade",
+    searchableText: (row) =>
+      row.name,
+    render: (row) => (
+      <div className="flex items-center gap-3">
+        <span
+          className={[
+            "flex h-10 w-10 shrink-0 items-center",
+            "justify-center rounded-2xl",
+            "border border-primary/15",
+            "bg-primary/10 text-primary",
+          ].join(" ")}
+        >
+          <GraduationCap size={17} />
+        </span>
 
-          <div>
-            <h1 className="text-[24px] font-bold tracking-[-0.04em] text-foreground">
-              Grades
-            </h1>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Manage school grade levels and academic ordering.
-            </p>
-          </div>
+        <div>
+          <p className="font-extrabold text-foreground">
+            {row.name}
+          </p>
+
+          <p className="mt-0.5 text-[10px] font-medium text-muted-foreground">
+            Grade record
+          </p>
         </div>
-
-        <button className="flex h-10 items-center gap-2 rounded-xl bg-primary px-4 text-xs font-bold text-primary-foreground shadow-soft">
-          <Plus size={15} />
-          Add Grade
-        </button>
       </div>
+    ),
+  },
 
-      <div className="mb-4 flex h-11 items-center gap-3 rounded-2xl border border-border/70 bg-card px-4">
-        <Search size={16} className="text-muted-foreground" />
-        <input
-          value={search}
-          onChange={(event) => setSearch(event.target.value)}
-          placeholder="Search grades..."
-          className="w-full bg-transparent text-sm font-medium text-foreground outline-none placeholder:text-muted-foreground"
-        />
-      </div>
+  {
+    key: "stage",
+    header: "Academic Stage",
+    searchableText: (row) =>
+      stageNameById.get(
+        String(row.academicStageId),
+      ) ?? "",
+    render: (row) => {
+      const stageName =
+        stageNameById.get(
+          String(row.academicStageId),
+        ) ??
+        `Stage ${row.academicStageId}`;
 
-      <div className="overflow-hidden rounded-2xl border border-border/70">
-        <table className="w-full text-left">
-          <thead>
-            <tr className="border-b border-border/70 text-[11px] font-bold text-muted-foreground">
-              <th className="px-4 py-3">Grade</th>
-              <th className="px-4 py-3">Code</th>
-              <th className="px-4 py-3">Order</th>
-              <th className="px-4 py-3">Description</th>
-              <th className="px-4 py-3">Status</th>
-              <th className="px-4 py-3 text-center">Actions</th>
-            </tr>
-          </thead>
+      return (
+        <span
+          className={[
+            "inline-flex items-center gap-2",
+            "rounded-full border",
+            "border-emerald-200",
+            "bg-emerald-50 px-3 py-1.5",
+            "text-xs font-bold text-emerald-700",
+          ].join(" ")}
+        >
+          <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+          {stageName}
+        </span>
+      );
+    },
+  },
 
-          <tbody>
-            {filteredGrades.map((grade) => (
-              <tr key={grade.id} className="border-b border-border/60 last:border-0">
-                <td className="px-4 py-3 text-xs font-bold text-foreground">
-                  {grade.name}
-                </td>
-                <td className="px-4 py-3 text-xs text-muted-foreground">
-                  {grade.code}
-                </td>
-                <td className="px-4 py-3 text-xs text-muted-foreground">
-                  {grade.order}
-                </td>
-                <td className="px-4 py-3 text-xs text-muted-foreground">
-                  {grade.description ?? "—"}
-                </td>
-                <td className="px-4 py-3">
-                  <span className="rounded-full bg-success/10 px-3 py-1 text-[10px] font-bold text-success">
-                    {grade.isActive ? "Active" : "Inactive"}
-                  </span>
-                </td>
-                <td className="px-4 py-3">
-                  <div className="flex justify-center gap-2">
-                    <button className="flex h-8 w-8 items-center justify-center rounded-xl border border-border/70 text-muted-foreground hover:bg-muted">
-                      <Edit3 size={13} />
-                    </button>
-                    <button
-                      onClick={() => deleteMutation.mutate(grade.id)}
-                      className="flex h-8 w-8 items-center justify-center rounded-xl border border-border/70 text-destructive hover:bg-destructive/10"
-                    >
-                      <Trash2 size={13} />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
+  {
+    key: "level",
+    header: "Level",
+    align: "center",
+    searchableText: (row) =>
+      String(row.level),
+    render: (row) => (
+      <span
+        className={[
+          "inline-flex h-8 min-w-8 items-center",
+          "justify-center rounded-xl",
+          "border border-violet-200",
+          "bg-violet-50 px-2.5",
+          "text-xs font-extrabold text-violet-700",
+        ].join(" ")}
+      >
+        {row.level}
+      </span>
+    ),
+  },
 
-            {filteredGrades.length === 0 && (
-              <tr>
-                <td colSpan={6} className="px-4 py-10 text-center text-sm text-muted-foreground">
-                  No grades found.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
-    </div>
+  {
+    key: "graduation",
+    header: "Graduation",
+    align: "center",
+    searchableText: (row) =>
+      row.isGraduationGrade
+        ? "yes graduation"
+        : "no",
+    render: (row) =>
+      row.isGraduationGrade ? (
+        <span
+          className={[
+            "inline-flex items-center gap-1.5",
+            "rounded-full border border-emerald-200",
+            "bg-emerald-50 px-3 py-1.5",
+            "text-xs font-bold text-emerald-700",
+          ].join(" ")}
+        >
+          <span className="flex h-4 w-4 items-center justify-center rounded-full bg-emerald-500 text-[9px] text-white">
+            ✓
+          </span>
+          Yes
+        </span>
+      ) : (
+        <span
+          className={[
+            "inline-flex items-center gap-1.5",
+            "rounded-full border border-slate-200",
+            "bg-slate-50 px-3 py-1.5",
+            "text-xs font-bold text-slate-500",
+          ].join(" ")}
+        >
+          <span className="h-1.5 w-1.5 rounded-full bg-slate-400" />
+          No
+        </span>
+      ),
+  },
+]}
+      toFormValues={(row) => ({
+        academicStageId: String(row.academicStageId),
+        name: row.name,
+        isGraduationGrade: row.isGraduationGrade,
+      })}
+      buildPayload={(values) => ({
+        academicStageId: Number(values.academicStageId),
+        name: String(values.name ?? "").trim(),
+        isGraduationGrade: Boolean(values.isGraduationGrade),
+      })}
+      buildUpdatePayload={(values, row) => {
+        const payload: UpdateGradePayload = {};
+
+        const academicStageId = Number(values.academicStageId);
+        const name = String(values.name ?? "").trim();
+        const isGraduationGrade = Boolean(
+          values.isGraduationGrade,
+        );
+
+        if (academicStageId !== Number(row.academicStageId)) {
+          payload.academicStageId = academicStageId;
+        }
+
+        if (name !== row.name) {
+          payload.name = name;
+        }
+
+        if (isGraduationGrade !== row.isGraduationGrade) {
+          payload.isGraduationGrade = isGraduationGrade;
+        }
+
+        return payload;
+      }}
+      emptyTitle="No grades found"
+      emptyDescription="Create the first grade and connect it to an existing academic stage."
+      deleteTitle="Delete grade?"
+      deleteDescription={(row) =>
+        `The grade "${row.name}" will be permanently deleted.`
+      }
+    />
   );
 }

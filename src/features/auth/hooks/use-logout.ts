@@ -1,47 +1,48 @@
-import { useMutation }
-from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
-import { useNavigate }
-from "react-router-dom";
+import { queryClient } from "@/app/providers/query/queryClient";
+import { unregisterCurrentFirebaseDevice } from "@/features/notifications";
 
-import { logout }
-from "../api/auth.api";
-
-import { useAuthStore }
-from "../store/auth.store";
-
-import { notify }
-from "@/shared/lib/toast";
+import { authService } from "../api/auth.service";
+import { AUTH_ROUTES } from "../constants/auth.constants";
+import { useAuthStore } from "../store/auth.store";
 
 export function useLogout() {
-
   const navigate = useNavigate();
-
-  const logoutStore =
-    useAuthStore(
-      (state) => state.logout
-    );
+  const clearAuth = useAuthStore((state) => state.clearAuth);
 
   return useMutation({
+    mutationFn: async () => {
+      try {
+        await unregisterCurrentFirebaseDevice();
+      } catch {
+        // Device-token deletion failure must not block logout.
+      }
 
-    mutationFn: logout,
+      return authService.logout();
+    },
 
-    onSuccess: () => {
-
-      logoutStore();
-
-      notify.success(
-        "Logged out successfully"
+    onSuccess: (response) => {
+      toast.success(
+        response.data.message || "Logged out successfully.",
       );
-
-      navigate("/login");
     },
 
     onError: () => {
+      toast.error("Session ended locally.");
+    },
 
-      logoutStore();
+    onSettled: async () => {
+      clearAuth();
 
-      navigate("/login");
+      await queryClient.cancelQueries();
+      queryClient.clear();
+
+      navigate(AUTH_ROUTES.LOGIN, {
+        replace: true,
+      });
     },
   });
 }

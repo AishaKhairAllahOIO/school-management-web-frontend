@@ -1,0 +1,381 @@
+{
+  "api_collection": "Finance Settings APIs",
+  "base_url": "http://127.0.0.1:8000/api/admin/finance/settings",
+  "global_auth": {
+    "type": "Bearer Token",
+    "header": "Authorization",
+    "value": "Bearer {token}"
+  },
+  "global_headers": {
+    "Accept": "application/json",
+    "Content-Type": "application/json"
+  },
+  "endpoints": [
+    {
+      "name": "1. Get All Policies",
+      "method": "GET",
+      "endpoint": "/policies",
+      "body": null,
+      "response_example": {
+        "status": true,
+        "message": "تم جلب سياسات التقسيط بنجاح.",
+        "data": [
+          {
+            "id": "1",
+            "name": "تقسيط على دفعتين",
+            "installmentsCount": 2,
+            "items": []
+          }
+        ]
+      }
+    },
+    {
+      "name": "2. Store Policy",
+      "method": "POST",
+      "endpoint": "/policies",
+      "body": {
+        "name": "تقسيط مريح 3 دفعات",
+        "items": [
+          {
+            "title": "الدفعة الأولى",
+            "percentage": 50.00,
+            "dueMonth": 9,
+            "dueDay": 1
+          },
+          {
+            "title": "الدفعة الثانية",
+            "percentage": 50.00,
+            "dueMonth": 2,
+            "dueDay": 1
+          }
+        ]
+      },
+      "response_example": {
+        "status": true,
+        "message": "تم إنشاء سياسة التقسيط بنجاح.",
+        "data": {
+          "id": "2",
+          "name": "تقسيط مريح 3 دفعات",
+          "installmentsCount": 2,
+          "items": []
+        }
+      }
+    },
+    {
+      "name": "3. Show Policy",
+      "method": "GET",
+      "endpoint": "/policies/{id}",
+      "body": null,
+      "response_example": {
+            "status": true,
+    "message": "تم جلب بيانات سياسة التقسيط بنجاح.",
+    "data": {
+        "id": "1",
+        "name": "تقسيط مريح على 2 دفعات",
+        "installmentsCount": 2,
+        "items": [
+            {
+                "id": "1",
+                "installmentNumber": 1,
+                "title": "الدفعة الأولى (التسجيل)",
+                "percentage": 70,
+                "dueMonth": 9,
+                "dueDay": 1,
+                "createdAt": "2026-07-09T22:34:22+00:00",
+                "updatedAt": "2026-07-09T22:34:22+00:00"
+            },
+            {
+                "id": "2",
+                "installmentNumber": 2,
+                "title": "الدفعة الثانية (منتصف العام)",
+                "percentage": 30,
+                "dueMonth": 12,
+                "dueDay": 1,
+                "createdAt": "2026-07-09T22:34:22+00:00",
+                "updatedAt": "2026-07-09T22:34:22+00:00"
+            }
+        ],
+        "createdAt": "2026-07-09T22:34:22+00:00",
+        "updatedAt": "2026-07-09T22:34:22+00:00"
+    }
+      }
+    },
+    {
+      "name": "4. Update Policy",
+      "method": "POST",
+      "endpoint": "/policies/{id}",
+      "body": {
+        "name": "تعديل اسم السياسة",
+        "items": [
+          {
+            "title": "قسط واحد",
+            "percentage": 100.00,
+            "dueMonth": 9,
+            "dueDay": 15
+          }
+        ]
+      },
+      "response_example": {
+        "status": true,
+        "message": "تم تعديل سياسة التقسيط بنجاح.",
+        "data":{
+            "id": 1,
+            "name": "تقسيط مريح على 2 دفعات",
+            "installments_count": 2,
+            "created_at": "2026-07-06T16:19:20.000000Z",
+            "updated_at": "2026-07-06T16:22:06.000000Z",
+            "deleted_at": null,
+            "items": [
+            {
+                "id": 4,
+                "installment_policy_id": 1,
+                "installment_number": 1,
+                "title": "الدفعة الأولى (التسجيل)",
+                "percentage": "40.00",
+                "due_month": 9,
+                "due_day": 1,
+                "created_at": "2026-07-06T16:22:06.000000Z",
+                "updated_at": "2026-07-06T16:22:06.000000Z"
+            }]
+        }
+      }
+    },
+    {
+      "name": "5. Delete Policy",
+      "method": "DELETE",
+      "endpoint": "/policies/{id}",
+      "body": null,
+      "response_example": {
+        "status": true,
+        "message": "تم حذف سياسة التقسيط بنجاح."
+      }
+    },
+    {
+      "name": "6. Get All Fee Plans",
+      "method": "GET",
+      "endpoint": "/fee-plans",
+      "body": null,
+      "response_example": {
+        "status": true,
+        "message": "تم جلب خطط الرسوم المالية بنجاح.",
+        "data": [
+            {
+            "id": 1,
+            "academic_year_id": 1,
+            "grade_level_id": 1,
+            "installment_policy_id": 1,
+            "name": "خطة الصف السابع - النموذجية",
+            "base_amount": "900000.00",
+            "created_at": "2026-07-06T16:45:16.000000Z",
+            "updated_at": "2026-07-06T16:49:16.000000Z",
+            "deleted_at": null,
+            "academic_year": {
+                "id": 1,
+                "year_name": "2025-2026",
+                "start_date": "2025-09-01",
+                "end_date": "2026-06-30",
+                "is_current": false,
+                "created_at": "2026-07-05T23:11:12.000000Z",
+                "updated_at": "2026-07-05T23:11:12.000000Z"
+            },
+            "grade_level": {
+                "id": 1,
+                "academic_stage_id": 1,
+                "name": "الصف السابع",
+                "level": 7,
+                "is_graduation_grade": false,
+                "created_at": "2026-07-05T23:11:12.000000Z",
+                "updated_at": "2026-07-05T23:11:12.000000Z"
+            },
+            "installment_policy": null,
+            "extra_services": []
+        }
+        ]
+      }
+    },
+    {
+      "name": "7. Store Fee Plan",
+      "method": "POST",
+      "endpoint": "/fee-plans",
+      "body": {
+        "academicYearId": 1,
+        "gradeLevelId": 1,
+        "name": "خطة الصف السابع",
+        "baseAmount": 900000.00,
+        "extraServices": [
+          {
+            "type": "books",
+            "name": "كتب المنهاج",
+            "amount": 150000.00
+          }
+        ]
+      },
+      "response_example": {
+    "status": true,
+    "message": "تم جلب بيانات سياسة التقسيط بنجاح.",
+    "data": {
+        "id": "1",
+        "name": "تقسيط مريح على 2 دفعات",
+        "installmentsCount": 2,
+        "items": [
+            {
+                "id": "1",
+                "installmentNumber": 1,
+                "title": "الدفعة الأولى (التسجيل)",
+                "percentage": 70,
+                "dueMonth": 9,
+                "dueDay": 1,
+                "createdAt": "2026-07-09T22:34:22+00:00",
+                "updatedAt": "2026-07-09T22:34:22+00:00"
+            },
+            {
+                "id": "2",
+                "installmentNumber": 2,
+                "title": "الدفعة الثانية (منتصف العام)",
+                "percentage": 30,
+                "dueMonth": 12,
+                "dueDay": 1,
+                "createdAt": "2026-07-09T22:34:22+00:00",
+                "updatedAt": "2026-07-09T22:34:22+00:00"
+            }
+        ],
+        "createdAt": "2026-07-09T22:34:22+00:00",
+        "updatedAt": "2026-07-09T22:34:22+00:00"
+    }
+      }
+    },
+    {
+      "name": "8. Show Fee Plan",
+      "method": "GET",
+      "endpoint": "/fee-plans/{id}",
+      "body": null,
+      "response_example": {
+        "status": true,
+        "message": "تم جلب بيانات الخطة بنجاح."
+      }
+    },
+    {
+      "name": "9. Update Fee Plan",
+      "method": "POST",
+      "endpoint": "/fee-plans/{id}",
+      "body": {
+        "academicYearId": 1,
+        "gradeLevelId": 1,
+        "name": "تعديل الخطة",
+        "baseAmount": 950000.00,
+        "extraServices": []
+      },
+      "response_example": {
+        "status": true,
+        "message": "تم تعديل خطة الرسوم بنجاح."
+      }
+    },
+    {
+      "name": "10. Delete Fee Plan",
+      "method": "DELETE",
+      "endpoint": "/fee-plans/{id}",
+      "body": null,
+      "response_example": {
+        "status": true,
+        "message": "تم حذف خطة الرسوم بنجاح."
+      }
+    },
+    {
+      "name": "11. Show Policy Item",
+      "method": "GET",
+      "endpoint": "/policy-items/{id}",
+      "body": null,
+      "response_example": {
+    "status": true,
+    "message": "تم جلب بيانات الدفعة بنجاح.",
+    "data": {
+        "id": "4",
+        "installmentNumber": 1,
+        "title": "الدفعة الأولى (التسجيل)",
+        "percentage": 40,
+        "dueMonth": 9,
+        "dueDay": 1,
+        "createdAt": "2026-07-06T16:22:06+00:00",
+        "updatedAt": "2026-07-06T16:22:06+00:00"
+    }
+      }
+    },
+    {
+      "name": "12. Update Policy Item",
+      "method": "POST",
+      "endpoint": "/policy-items/{id}",
+      "body": {
+        "title": "الدفعة الأولى (معدل)",
+        "dueMonth": 10,
+        "dueDay": 5
+      },
+      "response_example": {
+    "status": true,
+    "message": "تم تعديل تفاصيل الدفعة بنجاح.",
+    "data": {
+        "id": 4,
+        "installment_policy_id": 1,
+        "installment_number": 1,
+        "title": "الدفعة الأولى (التسجيل)",
+        "percentage": "40.00",
+        "due_month": 9,
+        "due_day": 1,
+        "created_at": "2026-07-06T16:22:06.000000Z",
+        "updated_at": "2026-07-06T16:22:06.000000Z"
+    }
+      }
+    },
+    {
+      "name": "13. Delete Policy Item",
+      "method": "DELETE",
+      "endpoint": "/policy-items/{id}",
+      "body": null,
+      "response_example": {
+        "status": false,
+        "message": "رسالة الخطأ المخصصة التي تمنع الحذف."
+      }
+    },
+    {
+      "name": "14. Show Extra Service",
+      "method": "GET",
+      "endpoint": "/extra-services/{id}",
+      "body": null,
+      "response_example": {
+    "status": true,
+    "message": "تم جلب بيانات الخدمة الإضافية بنجاح.",
+    "data": {
+        "id": "6",
+        "type": "uniform",
+        "name": "الزي المدرسي الشتوي والصيفي",
+        "amount": 75000,
+        "createdAt": "2026-07-06T16:56:38+00:00",
+        "updatedAt": "2026-07-06T16:56:38+00:00"
+    }
+      }
+    },
+    {
+      "name": "15. Update Extra Service",
+      "method": "POST",
+      "endpoint": "/extra-services/{id}",
+      "body": {
+        "type": "books",
+        "name": "كتب معدلة",
+        "amount": 160000.00
+      },
+      "response_example": {
+        "status": true,
+        "message": "تم تعديل الخدمة الإضافية بنجاح."
+      }
+    },
+    {
+      "name": "16. Delete Extra Service",
+      "method": "DELETE",
+      "endpoint": "/extra-services/{id}",
+      "body": null,
+      "response_example": {
+        "status": true,
+        "message": "تم حذف الخدمة الإضافية بنجاح."
+      }
+    }
+  ]
+}

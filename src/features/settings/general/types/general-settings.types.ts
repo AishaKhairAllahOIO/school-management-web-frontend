@@ -18,8 +18,9 @@ export type GeneralSettings = {
 
   phoneNumber: string;
   emergencyPhoneNumber: string;
+
   email: string;
-  website?: string;
+  website: string;
 
   address: string;
   city: string;
@@ -27,25 +28,47 @@ export type GeneralSettings = {
 
   location: SchoolGeoLocation;
 
-  logoUrl?: string | null;
+  logoUrl: string | null;
   images: SchoolImage[];
 
-  defaultLanguage: string;
-  timezone: string;
-  dateFormat: string;
-  currency: string;
-
-  workingDays: string[];
-  openingTime: string;
-  closingTime: string;
-
-  createdAt: string;
-  updatedAt: string;
+  createdAt: string | null;
+  updatedAt: string | null;
 };
 
-export type UpdateGeneralSettingsPayload = Omit<
-  GeneralSettings,
-  "id" | "logoUrl" | "images" | "createdAt" | "updatedAt"
->;
+export type UpdateGeneralSettingsPayload = {
+  schoolName: string;
+  shortName: string;
+  description: string;
 
+  phoneNumber: string;
+  emergencyPhoneNumber: string;
 
+  email: string;
+  website: string;
+
+  address: string;
+  city: string;
+  country: string;
+
+  location: {
+    latitude: number;
+    longitude: number;
+  };
+
+  logo?: File;
+};
+
+export type SchoolImageUploadItem = {
+  file: File;
+  name: string;
+};
+
+export type CreateSchoolImagesPayload = {
+  images: SchoolImageUploadItem[];
+};
+
+export type UpdateSchoolImagePayload = {
+  imageId: string;
+  name?: string;
+  file?: File;
+};

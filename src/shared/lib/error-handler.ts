@@ -1,33 +1,63 @@
 import axios from "axios";
 
-import { notify } from "./toast";
+import type {
+  ApiValidationErrors,
+  LaravelErrorResponse,
+} from "@/services/types/apiResponse";
 
-type ApiErrorResponse = {
-  message?: string;
-  errors?: Record<string, string[]>;
-};
+const DEFAULT_ERROR_MESSAGE = "Something went wrong. Please try again.";
 
-export function handleApiError(error: unknown) {
-  if (!axios.isAxiosError<ApiErrorResponse>(error)) {
-    notify.error("Unexpected error occurred");
-    return;
+function isLaravelErrorResponse(
+  value: unknown,
+): value is LaravelErrorResponse {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    ("message" in value || "errors" in value)
+  );
+}
+
+export function extractApiValidationErrors(
+  error: unknown,
+): ApiValidationErrors {
+  if (!axios.isAxiosError(error)) {
+    return {};
   }
 
-  const response = error.response?.data;
+  const responseData: unknown = error.response?.data;
 
-  if (response?.message) {
-    notify.error(response.message);
-    return;
+  if (!isLaravelErrorResponse(responseData)) {
+    return {};
   }
 
-  const firstValidationError = response?.errors
-    ? Object.values(response.errors).flat()[0]
-    : undefined;
+  return responseData.errors ?? {};
+}
 
-  if (firstValidationError) {
-    notify.error(firstValidationError);
-    return;
+export function extractApiErrorMessage(error: unknown): string {
+  if (!axios.isAxiosError(error)) {
+    return error instanceof Error
+      ? error.message
+      : DEFAULT_ERROR_MESSAGE;
   }
 
-  notify.error("Something went wrong");
+  const responseData: unknown = error.response?.data;
+
+  if (isLaravelErrorResponse(responseData)) {
+    const validationErrors = responseData.errors;
+
+    if (validationErrors) {
+      const firstMessages = Object.values(validationErrors);
+      const firstMessage = firstMessages[0]?.[0];
+
+      if (firstMessage) {
+        return firstMessage;
+      }
+    }
+
+    if (responseData.message) {
+      return responseData.message;
+    }
+  }
+
+  return error.message || DEFAULT_ERROR_MESSAGE;
 }

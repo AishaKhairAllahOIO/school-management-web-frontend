@@ -1,134 +1,192 @@
-import { DoorOpen, Edit3, Plus, Search, Trash2 } from "lucide-react";
+import { useMemo } from "react";
 
-import { useState } from "react";
+import { useAcademicYears } from "@/features/settings/academic/hooks/useAcademicSettings";
 
+import { CrudPage } from "../../shared/components/CrudPage";
+import { useGrades } from "../../grades/hooks/useGrades";
+import { classroomApi } from "../api/classroom.api";
 import {
   useClassrooms,
+  useCreateClassroom,
   useDeleteClassroom,
-} from "@/features/academics/classrooms/hooks/useClassrooms";
-import { useGrades } from "@/features/academics/grades/hooks/useGrades";
+  useUpdateClassroom,
+} from "../hooks/useClassrooms";
+import type {
+  Classroom,
+  CreateClassroomPayload,
+  UpdateClassroomPayload,
+} from "../types/classroom.types";
 
 export function ClassroomsPage() {
-  const { data: classrooms = [], isLoading, isError } = useClassrooms();
-  const { data: grades = [] } = useGrades();
-  const deleteMutation = useDeleteClassroom();
-  const [search, setSearch] = useState("");
+  const classroomsQuery = useClassrooms();
+  const yearsQuery = useAcademicYears();
+  const gradesQuery = useGrades();
 
-  const filteredClassrooms = classrooms.filter((classroom) =>
-    `${classroom.name} ${classroom.code}`
-      .toLowerCase()
-      .includes(search.toLowerCase())
+  const yearOptions = useMemo(
+    () =>
+      (yearsQuery.data ?? []).map((year) => ({
+        value: String(year.id),
+        label: year.name,
+      })),
+    [yearsQuery.data],
   );
 
-  function getGradeName(gradeId: string) {
-    return grades.find((grade) => grade.id === gradeId)?.name ?? "—";
-  }
+  const gradeOptions = useMemo(
+    () =>
+      (gradesQuery.data ?? []).map((grade) => ({
+        value: String(grade.id),
+        label: grade.name,
+      })),
+    [gradesQuery.data],
+  );
 
-  if (isLoading) {
-    return <div className="soft-card rounded-3xl p-5">Loading classrooms...</div>;
-  }
+  const yearNameById = useMemo(
+    () =>
+      new Map(
+        yearOptions.map((option) => [
+          option.value,
+          option.label,
+        ]),
+      ),
+    [yearOptions],
+  );
 
-  if (isError) {
-    return <div className="soft-card rounded-3xl p-5">Failed to load classrooms.</div>;
-  }
+  const gradeNameById = useMemo(
+    () =>
+      new Map(
+        gradeOptions.map((option) => [
+          option.value,
+          option.label,
+        ]),
+      ),
+    [gradeOptions],
+  );
 
   return (
-    <div className="soft-card rounded-3xl p-5">
-      <div className="mb-5 flex items-start justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-            <DoorOpen size={22} />
-          </span>
+    <CrudPage<
+      Classroom,
+      CreateClassroomPayload,
+      UpdateClassroomPayload
+    >
+      title="Classrooms"
+      description="Open and manage classrooms for each grade and academic year."
+      addLabel="Add Classroom"
+      rows={classroomsQuery.data ?? []}
+      isLoading={
+        classroomsQuery.isLoading ||
+        yearsQuery.isLoading ||
+        gradesQuery.isLoading
+      }
+      isError={
+        classroomsQuery.isError ||
+        yearsQuery.isError ||
+        gradesQuery.isError
+      }
+      onRetry={() => {
+        void Promise.all([
+          classroomsQuery.refetch(),
+          yearsQuery.refetch(),
+          gradesQuery.refetch(),
+        ]);
+      }}
+      loadEntity={classroomApi.getById}
+      createMutation={useCreateClassroom()}
+      updateMutation={useUpdateClassroom()}
+      deleteMutation={useDeleteClassroom()}
+      fields={[
+        {
+          name: "academicYearId",
+          label: "Academic Year",
+          type: "select",
+          options: yearOptions,
+          defaultValue: yearOptions[0]?.value ?? "",
+          required: true,
+          disabledOnEdit: true,
+          helperText:
+            "The academic year is fixed after the classroom is opened.",
+        },
+        {
+          name: "gradeId",
+          label: "Grade",
+          type: "select",
+          options: gradeOptions,
+          defaultValue: gradeOptions[0]?.value ?? "",
+          required: true,
+          disabledOnEdit: true,
+          helperText:
+            "The backend generates the classroom name automatically.",
+        },
+        {
+          name: "capacity",
+          label: "Capacity",
+          type: "number",
+          defaultValue: 30,
+          required: true,
+          min: 1,
+        },
+      ]}
+      columns={[
+        {
+          key: "name",
+          header: "Classroom",
+          render: (row) => (
+            <span className="font-bold">{row.name}</span>
+          ),
+        },
+        {
+          key: "year",
+          header: "Academic Year",
+          render: (row) =>
+            yearNameById.get(String(row.academicYearId)) ??
+            row.academicYearId,
+        },
+        {
+          key: "grade",
+          header: "Grade",
+          render: (row) =>
+            gradeNameById.get(String(row.gradeId)) ?? row.gradeId,
+        },
+        {
+          key: "capacity",
+          header: "Capacity",
+          render: (row) => row.capacity,
+        },
+        {
+          key: "students",
+          header: "Current Students",
+          render: (row) => row.currentStudentsCount,
+        },
+        {
+          key: "availableSeats",
+          header: "Available Seats",
+          render: (row) => row.availableSeats,
+        },
+      ]}
+      toFormValues={(row) => ({
+        academicYearId: String(row.academicYearId),
+        gradeId: String(row.gradeId),
+        capacity: row.capacity,
+      })}
+      buildPayload={(values) => ({
+        academicYearId: Number(values.academicYearId),
+        gradeId: Number(values.gradeId),
+        capacity: Number(values.capacity),
+      })}
+      buildUpdatePayload={(values, row) => {
+        const capacity = Number(values.capacity);
 
-          <div>
-            <h1 className="text-[24px] font-bold tracking-[-0.04em] text-foreground">
-              Classrooms
-            </h1>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Manage classrooms, capacity, and grade assignment.
-            </p>
-          </div>
-        </div>
-
-        <button className="flex h-10 items-center gap-2 rounded-xl bg-primary px-4 text-xs font-bold text-primary-foreground shadow-soft">
-          <Plus size={15} />
-          Add Classroom
-        </button>
-      </div>
-
-      <div className="mb-4 flex h-11 items-center gap-3 rounded-2xl border border-border/70 bg-card px-4">
-        <Search size={16} className="text-muted-foreground" />
-        <input
-          value={search}
-          onChange={(event) => setSearch(event.target.value)}
-          placeholder="Search classrooms..."
-          className="w-full bg-transparent text-sm font-medium text-foreground outline-none placeholder:text-muted-foreground"
-        />
-      </div>
-
-      <div className="overflow-hidden rounded-2xl border border-border/70">
-        <table className="w-full text-left">
-          <thead>
-            <tr className="border-b border-border/70 text-[11px] font-bold text-muted-foreground">
-              <th className="px-4 py-3">Classroom</th>
-              <th className="px-4 py-3">Code</th>
-              <th className="px-4 py-3">Grade</th>
-              <th className="px-4 py-3">Capacity</th>
-              <th className="px-4 py-3">Room</th>
-              <th className="px-4 py-3">Status</th>
-              <th className="px-4 py-3 text-center">Actions</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {filteredClassrooms.map((classroom) => (
-              <tr key={classroom.id} className="border-b border-border/60 last:border-0">
-                <td className="px-4 py-3 text-xs font-bold text-foreground">
-                  {classroom.name}
-                </td>
-                <td className="px-4 py-3 text-xs text-muted-foreground">
-                  {classroom.code}
-                </td>
-                <td className="px-4 py-3 text-xs text-muted-foreground">
-                  {getGradeName(classroom.gradeId)}
-                </td>
-                <td className="px-4 py-3 text-xs text-muted-foreground">
-                  {classroom.capacity}
-                </td>
-                <td className="px-4 py-3 text-xs text-muted-foreground">
-                  {classroom.roomNumber ?? "—"}
-                </td>
-                <td className="px-4 py-3">
-                  <span className="rounded-full bg-success/10 px-3 py-1 text-[10px] font-bold text-success">
-                    {classroom.isActive ? "Active" : "Inactive"}
-                  </span>
-                </td>
-                <td className="px-4 py-3">
-                  <div className="flex justify-center gap-2">
-                    <button className="flex h-8 w-8 items-center justify-center rounded-xl border border-border/70 text-muted-foreground hover:bg-muted">
-                      <Edit3 size={13} />
-                    </button>
-                    <button
-                      onClick={() => deleteMutation.mutate(classroom.id)}
-                      className="flex h-8 w-8 items-center justify-center rounded-xl border border-border/70 text-destructive hover:bg-destructive/10"
-                    >
-                      <Trash2 size={13} />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-
-            {filteredClassrooms.length === 0 && (
-              <tr>
-                <td colSpan={7} className="px-4 py-10 text-center text-sm text-muted-foreground">
-                  No classrooms found.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
-    </div>
+        return capacity === row.capacity
+          ? {}
+          : {
+              capacity,
+            };
+      }}
+      emptyTitle="No classrooms found"
+      emptyDescription="Open the first classroom for an academic year and grade."
+      deleteTitle="Delete classroom?"
+      deleteDescription={(row) =>
+        `The classroom "${row.name}" will be permanently deleted.`
+      }
+    />
   );
 }

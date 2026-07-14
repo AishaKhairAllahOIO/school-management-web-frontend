@@ -1,22 +1,21 @@
 export type Classroom = {
   id: string;
-  name: string;
-  code: string;
+  academicYearId: string;
   gradeId: string;
+  name: string;
   capacity: number;
-  roomNumber?: string | null;
-  isActive: boolean;
-  createdAt: string;
-  updatedAt: string;
+  currentStudentsCount: number;
+  availableSeats: number;
+  createdAt?: string;
+  updatedAt?: string;
 };
 
 export type CreateClassroomPayload = {
-  name: string;
-  code: string;
-  gradeId: string;
+  academicYearId: number;
+  gradeId: number;
   capacity: number;
-  roomNumber?: string | null;
-  isActive: boolean;
 };
 
-export type UpdateClassroomPayload = Partial<CreateClassroomPayload>;
+export type UpdateClassroomPayload = {
+  capacity?: number;
+};

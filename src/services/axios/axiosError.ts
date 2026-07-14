@@ -1,17 +1,12 @@
-import { AxiosError } from "axios";
-
-type ApiErrorResponse = {
-  message?: string;
-  error?: string;
-};
+import {
+  extractApiErrorMessage,
+  extractApiValidationErrors,
+} from "@/shared/lib/error-handler";
 
 export function getAxiosErrorMessage(error: unknown): string {
-  const axiosError = error as AxiosError<ApiErrorResponse>;
+  return extractApiErrorMessage(error);
+}
 
-  return (
-    axiosError.response?.data?.message ||
-    axiosError.response?.data?.error ||
-    axiosError.message ||
-    "Something went wrong"
-  );
+export function getAxiosValidationErrors(error: unknown) {
+  return extractApiValidationErrors(error);
 }

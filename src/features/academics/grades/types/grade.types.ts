@@ -1,20 +1,21 @@
 export type Grade = {
   id: string;
+  academicStageId: string;
   name: string;
-  code: string;
-  order: number;
-  description?: string | null;
-  isActive: boolean;
-  createdAt: string;
-  updatedAt: string;
+  level: number;
+  isGraduationGrade: boolean;
+  createdAt?: string;
+  updatedAt?: string;
 };
 
 export type CreateGradePayload = {
+  academicStageId: number;
   name: string;
-  code: string;
-  order: number;
-  description?: string | null;
-  isActive: boolean;
+  isGraduationGrade: boolean;
 };
 
-export type UpdateGradePayload = Partial<CreateGradePayload>;
+export type UpdateGradePayload = {
+  academicStageId?: number;
+  name?: string;
+  isGraduationGrade?: boolean;
+};

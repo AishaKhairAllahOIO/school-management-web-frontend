@@ -1,60 +1,43 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-import {
-  createSubject,
-  deleteSubject,
-  getSubjects,
-  updateSubject,
-} from "@/features/academics/subjects/api/subjects.api";
-import type {
-  CreateSubjectPayload,
-  UpdateSubjectPayload,
-} from "@/features/academics/subjects/types/subject.types";
+import { subjectApi } from "../api/subject.api";
+import type { CreateSubjectPayload, UpdateSubjectPayload } from "../types/subject.types";
 
-export const subjectsQueryKey = ["academics", "subjects"];
+export const subjectQueryKey = ["academics", "subjects"];
 
 export function useSubjects() {
   return useQuery({
-    queryKey: subjectsQueryKey,
-    queryFn: getSubjects,
+    queryKey: subjectQueryKey,
+    queryFn: subjectApi.list,
   });
 }
 
-export function useCreateSubject() {
+function useRefreshSubjects() {
   const queryClient = useQueryClient();
+  return () => queryClient.invalidateQueries({ queryKey: subjectQueryKey });
+}
 
+export function useCreateSubject() {
+  const refresh = useRefreshSubjects();
   return useMutation({
-    mutationFn: (payload: CreateSubjectPayload) => createSubject(payload),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: subjectsQueryKey });
-    },
+    mutationFn: (payload: CreateSubjectPayload) => subjectApi.create(payload),
+    onSuccess: refresh,
   });
 }
 
 export function useUpdateSubject() {
-  const queryClient = useQueryClient();
-
+  const refresh = useRefreshSubjects();
   return useMutation({
-    mutationFn: ({
-      subjectId,
-      payload,
-    }: {
-      subjectId: string;
-      payload: UpdateSubjectPayload;
-    }) => updateSubject(subjectId, payload),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: subjectsQueryKey });
-    },
+    mutationFn: ({ id, payload }: { id: string; payload: UpdateSubjectPayload }) =>
+      subjectApi.update(id, payload),
+    onSuccess: refresh,
   });
 }
 
 export function useDeleteSubject() {
-  const queryClient = useQueryClient();
-
+  const refresh = useRefreshSubjects();
   return useMutation({
-    mutationFn: deleteSubject,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: subjectsQueryKey });
-    },
+    mutationFn: subjectApi.remove,
+    onSuccess: refresh,
   });
 }

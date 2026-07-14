@@ -1,115 +1,68 @@
-import { useMutation }
-from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
-import { useNavigate }
-from "react-router-dom";
-
-import { verifyOtp }
-from "../api/auth.api";
-
-import { useAuthStore }
-from "../store/auth.store";
-
-import { notify }
-from "@/shared/lib/toast";
-
-import { handleApiError }
-from "@/shared/lib/error-handler";
-
-import { rolesConfig }
-from "@/shared/constants/roles.config";
-
-import type { UserRole }
-from "@/shared/constants/roles.config";
+import { getAxiosErrorMessage } from "@/services/axios/axiosError";
+import { registerCurrentFirebaseDevice } from "@/features/notifications";
+import { authService } from "../api/auth.service";
+import { AUTH_ROUTES } from "../constants/auth.constants";
+import { isAllowedWebUser } from "../lib/auth.utils";
+import { useAuthStore } from "../store/auth.store";
+import type { VerifyLoginOtpPayload } from "../types/auth.types";
 
 export function useVerifyOtp() {
-
   const navigate = useNavigate();
 
-  const setAuth =
-    useAuthStore(
-      (state) => state.setAuth
-    );
+  const setAuth = useAuthStore((state) => state.setAuth);
+  const clearAuth = useAuthStore((state) => state.clearAuth);
 
   return useMutation({
+    mutationFn: (payload: VerifyLoginOtpPayload) =>
+      authService.verifyLoginOtp(payload),
 
-    mutationFn: verifyOtp,
+    onSuccess: async (response, variables) => {
+      const authData = response.data.data;
 
-    onSuccess: (data) => {
-    console.log("VERIFY OTP DATA:", data);
-    console.log("USER:", data.user);
-    console.log("ROLE:", data.user?.role);
-      const {
-        token,
-        user,
-      } = data;
+      if (!authData?.token || !authData.user) {
+  clearAuth();
 
-      const allowedRoles: UserRole[] = [
-        rolesConfig.SUPER_ADMIN,
-        rolesConfig.ADVISOR,
-        rolesConfig.SECRETARY,
-      ];
+  toast.error("Invalid login response. Please try again.");
 
-      if (
-        !allowedRoles.includes(user.role)
-      ) {
+  navigate(AUTH_ROUTES.LOGIN, {
+    replace: true,
+  });
 
-        notify.error(
-          "هذا الحساب مخصص للموبايل فقط"
-        );
+  return;
+}
 
+      if (!isAllowedWebUser(authData.user)) {
+        clearAuth();
+        toast.error("Your account role is not allowed to access the dashboard.");
+        navigate(AUTH_ROUTES.LOGIN, { replace: true });
         return;
       }
 
-      setAuth(
-        token,
-        user,   
-        [] // permissions
-      );
+      const rememberMe = variables.remember_me === "1";
 
-      notify.success(
-        "Login successful"
-      );
+      setAuth({
+        token: authData.token,
+        user: authData.user,
+        permissions: authData.user.permissions,
+        rememberMe,
+      });
 
-      setTimeout(() => {
-      if (
-        user.role ===
-        rolesConfig.SUPER_ADMIN
-      ) {
-
-        navigate(
-          "/"
-        );
+      try {
+        await registerCurrentFirebaseDevice();
+      } catch {
+        // Notification registration failure must not block login.
       }
 
-      else if (
-        user.role ===
-        rolesConfig.ADVISOR
-      ) {
-
-        navigate(
-          "/"
-        );
-      }
-
-      else if (
-        user.role ===
-        rolesConfig.SECRETARY
-      ) {
-
-        navigate(
-          "/"
-        );
-      }
-    
- 
-     }, 1200);
-
-      },
+      toast.success(response.data.message || "Logged in successfully.");
+      navigate(AUTH_ROUTES.DASHBOARD, { replace: true });
+    },
 
     onError: (error) => {
-
-      handleApiError(error);
+      toast.error(getAxiosErrorMessage(error));
     },
   });
 }

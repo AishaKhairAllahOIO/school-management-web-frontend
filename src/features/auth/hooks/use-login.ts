@@ -1,45 +1,23 @@
 import { useMutation } from "@tanstack/react-query";
+import { toast } from "sonner";
 
-import { useNavigate } from "react-router-dom";
+import { getAxiosErrorMessage } from "@/services/axios/axiosError";
 
-import { login } from "../api/auth.api";
-
-import { notify } from "@/shared/lib/toast";
-
-import { handleApiError } from "@/shared/lib/error-handler";
+import { authService } from "../api/auth.service";
+import type { LoginPayload } from "../types/auth.types";
 
 export function useLogin() {
-
-  const navigate = useNavigate();
-
   return useMutation({
+    mutationFn: (payload: LoginPayload) => authService.login(payload),
 
-    mutationFn: login,
-
-    onSuccess: (_, variables) => {
-
-      notify.success(
-        "OTP sent successfully"
-      );
-
-      navigate(
-        "/verify-otp",
-        {
-          state: {
-            email: variables.email,
-            rememberMe:
-              variables.rememberMe,
-          },
-        }
+    onSuccess: (response) => {
+      toast.success(
+        response.data.message || "Verification code sent successfully."
       );
     },
 
-   onError: (error) => {
-
-  console.log("LOGIN ERROR:", error);
-
-  handleApiError(error);
-},
+    onError: (error) => {
+      toast.error(getAxiosErrorMessage(error));
+    },
   });
 }
- 

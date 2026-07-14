@@ -1,16 +1,16 @@
-import { motion } from "framer-motion";
-
+import { AuthFormShell } from "../components/AuthFormShell";
+import { AuthLayout } from "../components/AuthLayout";
 import { LoginForm } from "../components/LoginForm";
 
 export function LoginPage() {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4 }}
-      className="w-full max-w-md"
-    >
-      <LoginForm />
-    </motion.div>
+    <AuthLayout>
+      <AuthFormShell
+        title="Welcome back"
+        description="Sign in to continue to your school dashboard."
+      >
+        <LoginForm />
+      </AuthFormShell>
+    </AuthLayout>
   );
 }

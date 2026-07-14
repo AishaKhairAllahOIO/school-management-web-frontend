@@ -5,6 +5,4 @@ export type SecretaryUser = BaseUser & EmploymentInformation & {
     category: "secretary";
 
     secretaryCode: string;
-
-    secretaryEmail: string;
 };

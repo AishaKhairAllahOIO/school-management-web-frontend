@@ -1,157 +1,110 @@
+import { zodResolver } from "@hookform/resolvers/zod";
+import { ArrowLeft, ArrowRight, LoaderCircle, Mail } from "lucide-react";
 import { useForm } from "react-hook-form";
-
-import { zodResolver }
-from "@hookform/resolvers/zod";
-
-import { ArrowLeft } from "lucide-react";
-
 import { Link } from "react-router-dom";
 
+import { getAxiosValidationErrors } from "@/services/axios/axiosError";
+import { Button } from "@/shared/ui/button";
+import { Input } from "@/shared/ui/input";
+
+import { AUTH_ROUTES } from "../constants/auth.constants";
+import { useForgotPassword } from "../hooks/use-forgot-password";
 import {
   forgotPasswordSchema,
   type ForgotPasswordSchema,
 } from "../schemas/forgot-password.schema";
 
-import { Button } from "@/shared/ui/button";
-import { Input } from "@/shared/ui/input";
-import { Label } from "@/shared/ui/label";
-
-import { useForgotPassword }
-from "../hooks/use-forgot-password";
-
 export function ForgotPasswordForm() {
+  const forgotPasswordMutation = useForgotPassword();
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<ForgotPasswordSchema>({
-    resolver:
-      zodResolver(
-        forgotPasswordSchema
-      ),
+  const form = useForm<ForgotPasswordSchema>({
+    resolver: zodResolver(forgotPasswordSchema),
+    defaultValues: {
+      email: "",
+    },
   });
 
-  const forgotPasswordMutation =
-    useForgotPassword();
+  function onSubmit(values: ForgotPasswordSchema) {
+    form.clearErrors();
 
-  function onSubmit(
-    values: ForgotPasswordSchema
-  ) {
+    forgotPasswordMutation.mutate(values, {
+      onError: (error) => {
+        const validationErrors = getAxiosValidationErrors(error);
+        const emailMessage = validationErrors.email?.[0];
 
-    forgotPasswordMutation.mutate({
-      email: values.email,
+        if (emailMessage) {
+          form.setError("email", {
+            type: "server",
+            message: emailMessage,
+          });
+        }
+      },
     });
   }
 
   return (
-
-    <div
-      className="
-        rounded-[32px]
-        border
-        border-border
-        bg-card/80
-        p-15
-        shadow-soft-lg
-        backdrop-blur-xl
-      "
+    <form
+      onSubmit={form.handleSubmit(onSubmit)}
+      className="space-y-5"
+      noValidate
     >
+      <div className="space-y-2">
+        <label
+          htmlFor="forgot-email"
+          className="block text-sm font-medium text-foreground"
+        >
+          Email address
+        </label>
 
-      <Link
-        to="/login"
-        className="
-          mb-15
-          inline-flex
-          items-center
-          gap-2
-          text-sm
-          text-muted-foreground
-          transition-colors
-          hover:text-primary
-        "
-      >
-        <ArrowLeft size={18} />
-
-        Back to login
-      </Link>
-
-      <h1
-        className="
-          text-3xl
-          font-bold
-          text-foreground
-        "
-      >
-        Forgot Password
-      </h1>
-
-      <p
-        className="
-          mt-3
-          text-sm
-          leading-6
-          text-muted-foreground
-        "
-      >
-        Enter your email address and we
-        will send you an OTP code.
-      </p>
-
-      <form
-        onSubmit={handleSubmit(onSubmit)}
-        className="
-          mt-8
-          space-y-10
-        "
-      >
-
-        <div className="space-y-5">
-
-          <Label>
-            Email
-          </Label>
-
-          <Input
-            type="email"
-            placeholder="admin@school.com"
-            {...register("email")}
+        <div className="relative">
+          <Mail
+            aria-hidden="true"
+            className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground"
           />
 
-          {errors.email && (
-
-            <p
-              className="
-                text-sm
-                text-destructive
-              "
-            >
-              {errors.email.message}
-            </p>
-          )}
+          <Input
+            id="forgot-email"
+            type="email"
+            autoComplete="email"
+            placeholder="Enter your email"
+            aria-invalid={form.formState.errors.email ? "true" : "false"}
+            className="h-14 rounded-xl border-input bg-background pl-12 pr-4 text-base text-foreground shadow-none placeholder:text-muted-foreground/70 focus-visible:border-primary focus-visible:ring-4 focus-visible:ring-primary/10"
+            {...form.register("email")}
+          />
         </div>
 
-        <Button
-          type="submit"
-          disabled={
-            forgotPasswordMutation.isPending
-          }
-          size="lg"
-          className="
-            h-12
-            w-full
-            rounded-2xl
-            shadow-soft
-            hover:shadow-soft-lg
-          "
-        >
-          {
-            forgotPasswordMutation.isPending
-              ? "Sending..."
-              : "Send OTP"
-          }
-        </Button>
-      </form>
-    </div>
+        {form.formState.errors.email?.message && (
+          <p className="text-sm text-destructive">
+            {form.formState.errors.email.message}
+          </p>
+        )}
+      </div>
+
+      <Button
+        type="submit"
+        disabled={forgotPasswordMutation.isPending}
+        className="group h-14 w-full rounded-xl primary-gradient text-base font-semibold text-primary-foreground shadow-sm transition hover:opacity-95"
+      >
+        {forgotPasswordMutation.isPending ? (
+          <>
+            <LoaderCircle className="h-5 w-5 animate-spin" />
+            Sending code...
+          </>
+        ) : (
+          <>
+            Send verification code
+            <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+          </>
+        )}
+      </Button>
+
+      <Link
+        to={AUTH_ROUTES.LOGIN}
+        className="mx-auto flex w-fit items-center gap-2 text-sm font-medium text-muted-foreground transition hover:text-foreground"
+      >
+        <ArrowLeft className="h-4 w-4" />
+        Back to sign in
+      </Link>
+    </form>
   );
 }

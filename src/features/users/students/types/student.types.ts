@@ -1,16 +1,18 @@
-import type { BaseUser } from "../../shared/types/base-user.types";
-
+import type { BaseUser } from "@/features/users/shared/types/base-user.types";
 
 export type StudentUser = BaseUser & {
   category: "student";
 
-  studentCode: string;
-
   parentId: string;
-
-
-  gradeId: string;
-
-  classroomId: string;
-
 };
+
+export type StudentFormData = Omit<
+  StudentUser,
+  | "id"
+  | "category"
+  | "recordStatus"
+  | "accountStatus"
+  | "createdAt"
+  | "updatedAt"
+  | "deletedAt"
+>;

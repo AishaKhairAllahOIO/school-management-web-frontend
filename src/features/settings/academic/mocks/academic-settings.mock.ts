@@ -1,103 +1,133 @@
-import type { AcademicSettings } from "@/features/settings/academic/types/academic-settings.types";
+import type { AcademicSettingsViewData } from "../types/academic-settings.types";
 
-export const academicSettingsMock: AcademicSettings = {
-  id: "academic-settings-001",
+const now = "2026-06-29T10:00:00.000Z";
 
-  currentAcademicYearId: "year-2024-2025",
+export const academicSettingsMock: AcademicSettingsViewData = {
+  settings: {
+    id: "1",
+    currentAcademicYearId: "1",
+    currentSemesterId: "1",
+
+    scheduleSettings: {
+      workingDays: [
+        {
+          day: "sunday",
+          periodsCount: 7,
+        },
+        {
+          day: "monday",
+          periodsCount: 7,
+        },
+        {
+          day: "tuesday",
+          periodsCount: 6,
+        },
+        {
+          day: "wednesday",
+          periodsCount: 7,
+        },
+        {
+          day: "thursday",
+          periodsCount: 5,
+        },
+      ],
+
+      dayStartTime: "08:00",
+      periodDurationMinutes: 45,
+
+      breaks: [
+        {
+          id: "break-1",
+          afterPeriodIndex: 3,
+          durationMinutes: 20,
+        },
+        {
+          id: "break-2",
+          afterPeriodIndex: 6,
+          durationMinutes: 15,
+        },
+      ],
+    },
+
+    createdAt: now,
+    updatedAt: now,
+  },
 
   academicYears: [
     {
-      id: "year-2024-2025",
-      name: "2024 - 2025",
-      startDate: "2024-08-01",
-      endDate: "2025-07-31",
-      isCurrent: true,
-    },
-    {
-      id: "year-2025-2026",
+      id: "1",
       name: "2025 - 2026",
-      startDate: "2025-08-01",
-      endDate: "2026-07-31",
+      startDate: "2025-09-01",
+      endDate: "2026-08-31",
+      isCurrent: true,
+      createdAt: now,
+      updatedAt: now,
+    },
+    {
+      id: "2",
+      name: "2026 - 2027",
+      startDate: "2026-09-01",
+      endDate: "2027-08-31",
       isCurrent: false,
+      createdAt: now,
+      updatedAt: now,
+    },
+    {
+      id: "3",
+      name: "2024 - 2025",
+      startDate: "2024-09-01",
+      endDate: "2025-08-31",
+      isCurrent: false,
+      createdAt: now,
+      updatedAt: now,
     },
   ],
 
-  terms: [
+  academicTerms: [
     {
-      id: "term-1",
-      name: "First Term",
-      startDate: "2024-08-01",
-      endDate: "2024-10-31",
-      status: "active",
+      id: "1",
+      academicYearId: "1",
+      semesterName: "First_Term",
+      startDate: "2025-09-01",
+      endDate: "2026-01-15",
+      order: 1,
+      isCurrent: true,
+      isFinalTerm: false,
+      createdAt: now,
+      updatedAt: now,
     },
     {
-      id: "term-2",
-      name: "Second Term",
-      startDate: "2024-11-01",
-      endDate: "2025-01-31",
-      status: "upcoming",
-    },
-    {
-      id: "term-3",
-      name: "Third Term",
-      startDate: "2025-02-01",
-      endDate: "2025-04-30",
-      status: "upcoming",
-    },
-  ],
-
-  gradeScale: [
-    {
-      id: "grade-a",
-      grade: "A",
-      minimumScore: 90,
-      maximumScore: 100,
-      description: "Excellent",
-    },
-    {
-      id: "grade-b",
-      grade: "B",
-      minimumScore: 80,
-      maximumScore: 89,
-      description: "Very Good",
-    },
-    {
-      id: "grade-c",
-      grade: "C",
-      minimumScore: 70,
-      maximumScore: 79,
-      description: "Good",
-    },
-    {
-      id: "grade-d",
-      grade: "D",
-      minimumScore: 60,
-      maximumScore: 69,
-      description: "Pass",
-    },
-    {
-      id: "grade-f",
-      grade: "F",
-      minimumScore: 0,
-      maximumScore: 59,
-      description: "Fail",
+      id: "2",
+      academicYearId: "1",
+      semesterName: "Second_Term",
+      startDate: "2026-01-16",
+      endDate: "2026-06-15",
+      order: 2,
+      isCurrent: false,
+      isFinalTerm: true,
+      createdAt: now,
+      updatedAt: now,
     },
   ],
 
-  preferences: {
-    autoPromoteStudents: true,
-    allowStudentRepeating: true,
-    calculateGpa: true,
-    rankStudents: true,
-    useAttendanceInPromotion: false,
-  },
-
-  passingGrade: "D",
-  maximumGrade: 100,
-  gpaScale: "4.0",
-  minimumAttendancePercentage: 75,
-  promotionThreshold: 60,
-
-  createdAt: "2024-05-15T10:00:00.000Z",
-  updatedAt: "2025-05-20T10:45:00.000Z",
+  academicStages: [
+    {
+      id: "1",
+      type: "primary",
+      createdAt: now,
+      updatedAt: now,
+    },
+    {
+      id: "2",
+      type: "middle",
+      createdAt: now,
+      updatedAt: now,
+    },
+    {
+      id: "3",
+      type: "secondary",
+      createdAt: now,
+      updatedAt: now,
+    },
+  ],
 };

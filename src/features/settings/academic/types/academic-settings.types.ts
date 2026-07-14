@@ -1,57 +1,145 @@
-export type AcademicTermStatus = "active" | "upcoming" | "completed";
+export type SchoolDay =
+  | "sunday"
+  | "monday"
+  | "tuesday"
+  | "wednesday"
+  | "thursday"
+  | "friday"
+  | "saturday";
+
+export type AcademicStageType =
+  | "primary"
+  | "middle"
+  | "secondary";
 
 export type AcademicYear = {
   id: string;
+
   name: string;
+
   startDate: string;
   endDate: string;
+
   isCurrent: boolean;
-};
-
-export type AcademicTerm = {
-  id: string;
-  name: string;
-  startDate: string;
-  endDate: string;
-  status: AcademicTermStatus;
-};
-
-export type GradeScaleItem = {
-  id: string;
-  grade: string;
-  minimumScore: number;
-  maximumScore: number;
-  description: string;
-};
-
-export type AcademicPreferences = {
-  autoPromoteStudents: boolean;
-  allowStudentRepeating: boolean;
-  calculateGpa: boolean;
-  rankStudents: boolean;
-  useAttendanceInPromotion: boolean;
-};
-
-export type AcademicSettings = {
-  id: string;
-
-  currentAcademicYearId: string;
-  academicYears: AcademicYear[];
-  terms: AcademicTerm[];
-  gradeScale: GradeScaleItem[];
-  preferences: AcademicPreferences;
-
-  passingGrade: string;
-  maximumGrade: number;
-  gpaScale: "4.0" | "5.0" | "100";
-  minimumAttendancePercentage: number;
-  promotionThreshold: number;
 
   createdAt: string;
   updatedAt: string;
 };
 
-export type UpdateAcademicSettingsPayload = Omit<
-  AcademicSettings,
-  "id" | "createdAt" | "updatedAt"
->;
+export type AcademicTerm = {
+  id: string;
+
+  academicYearId: string;
+  semesterName: string;
+
+  startDate: string;
+  endDate: string;
+
+  order: number;
+
+  isCurrent: boolean;
+  isFinalTerm: boolean;
+
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type AcademicStage = {
+  id: string;
+
+  type: AcademicStageType;
+
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type SchoolBreak = {
+  id: string;
+
+  afterPeriodIndex: number;
+  durationMinutes: number;
+};
+
+export type SchoolDayConfiguration = {
+  day: SchoolDay;
+  periodsCount: number;
+};
+
+export type SchoolScheduleSettings = {
+  dayStartTime: string;
+
+  periodDurationMinutes: number;
+
+  workingDays: SchoolDayConfiguration[];
+
+  breaks: SchoolBreak[];
+};
+
+/**
+ * Compatibility alias for existing UI components.
+ */
+export type SchoolDayScheduleSettings =
+  SchoolScheduleSettings;
+
+export type AcademicSettings = {
+  id: string;
+
+  currentAcademicYearId: string;
+  currentSemesterId: string;
+
+  scheduleSettings: SchoolScheduleSettings;
+
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type UpdateAcademicSettingsPayload = {
+  currentAcademicYearId: number;
+
+  currentSemesterId: number;
+
+  scheduleSettings: SchoolScheduleSettings;
+};
+
+export type AcademicSettingsViewData = {
+  settings: AcademicSettings;
+
+  academicYears: AcademicYear[];
+
+  academicTerms: AcademicTerm[];
+
+  academicStages: AcademicStage[];
+};
+
+export type CreateAcademicYearPayload = {
+  startDate: string;
+
+  endDate: string;
+
+  isCurrent: boolean;
+};
+
+export type UpdateAcademicYearPayload =
+  Partial<CreateAcademicYearPayload>;
+
+export type CreateAcademicTermPayload = {
+  academicYearId: number;
+
+  semesterName: string;
+
+  startDate: string;
+  endDate: string;
+
+  isCurrent: boolean;
+  isFinalTerm: boolean;
+};
+
+export type UpdateAcademicTermPayload =
+  Partial<CreateAcademicTermPayload>;
+
+export type CreateAcademicStagePayload = {
+  type: AcademicStageType;
+};
+
+export type UpdateAcademicStagePayload =
+  Partial<CreateAcademicStagePayload>;

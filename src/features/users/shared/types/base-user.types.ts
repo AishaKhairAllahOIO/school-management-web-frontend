@@ -21,6 +21,7 @@ export type BaseUser = {
   nationality: UserNationality;
 
   address: string;
+
   phoneNumber: string;
 
   photoUrl: string;

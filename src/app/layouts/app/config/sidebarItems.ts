@@ -26,7 +26,7 @@ export const sidebarItems: SidebarItem[] = [
   },
   {
     titleKey: "academics",
-    path: "/academics/classes",
+    path: "/academics/grades",
     icon: GraduationCap,
   },
   {
@@ -56,7 +56,7 @@ export const sidebarItems: SidebarItem[] = [
   },
   {
     titleKey: "settings",
-    path: "/settings/roles",
+    path: "/settings/general",
     icon: Settings,
   },
 ];

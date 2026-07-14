@@ -1,172 +1,286 @@
-import { generalSettingsMock } from "@/features/settings/general/mocks/general-settings.mock";
+import { API_ENDPOINTS } from "@/services/api/endpoints";
+import { axiosClient } from "@/services/axios/axiosClient";
+import type { ApiResponse } from "@/services/types/apiResponse";
 
 import type {
+  CreateSchoolImagesPayload,
   GeneralSettings,
   SchoolImage,
   UpdateGeneralSettingsPayload,
-} from "@/features/settings/general/types/general-settings.types";
+  UpdateSchoolImagePayload,
+} from "../types/general-settings.types";
 
-const USE_MOCK_API = true;
+type GeneralSettingsApiData = {
+  id?: string | number | null;
 
-let mockDatabase: GeneralSettings = generalSettingsMock;
+  schoolName?: string | null;
+  shortName?: string | null;
+  description?: string | null;
 
-function wait(ms = 450) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+  phoneNumber?: string | null;
+  emergencyPhoneNumber?: string | null;
+
+  email?: string | null;
+  website?: string | null;
+
+  address?: string | null;
+  city?: string | null;
+  country?: string | null;
+
+  location?: {
+    latitude?: number | string | null;
+    longitude?: number | string | null;
+  } | null;
+
+  logoUrl?: string | null;
+
+  images?: Array<{
+    id: string | number;
+    url?: string | null;
+    name?: string | null;
+  }> | null;
+
+  createdAt?: string | null;
+  updatedAt?: string | null;
+};
+
+function normalizeString(
+  value: string | null | undefined,
+): string {
+  return value ?? "";
 }
 
-export async function getGeneralSettings(): Promise<GeneralSettings> {
-  if (USE_MOCK_API) {
-    await wait();
-    return mockDatabase;
+function normalizeNumber(
+  value: number | string | null | undefined,
+): number | null {
+  if (
+    value === null ||
+    value === undefined ||
+    value === ""
+  ) {
+    return null;
   }
 
-  const response = await fetch("/api/settings/general");
+  const parsedValue = Number(value);
 
-  if (!response.ok) {
-    throw new Error("Failed to fetch general settings");
-  }
-
-  return response.json();
+  return Number.isFinite(parsedValue)
+    ? parsedValue
+    : null;
 }
 
-export async function updateGeneralSettings(
-  payload: UpdateGeneralSettingsPayload
-): Promise<GeneralSettings> {
-  if (USE_MOCK_API) {
-    await wait();
-
-    mockDatabase = {
-      ...mockDatabase,
-      ...payload,
-      updatedAt: new Date().toISOString(),
-    };
-
-    return mockDatabase;
+function normalizeImages(
+  images: GeneralSettingsApiData["images"],
+): SchoolImage[] {
+  if (!Array.isArray(images)) {
+    return [];
   }
 
-  const response = await fetch("/api/settings/general", {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
+  return images.map((image) => ({
+    id: String(image.id),
+    url: image.url ?? "",
+    name: image.name ?? "",
+  }));
+}
+
+export function normalizeGeneralSettings(
+  data: GeneralSettingsApiData | null | undefined,
+): GeneralSettings {
+  const source = data ?? {};
+
+  return {
+    id:
+      source.id === null ||
+      source.id === undefined
+        ? ""
+        : String(source.id),
+
+    schoolName: normalizeString(source.schoolName),
+    shortName: normalizeString(source.shortName),
+    description: normalizeString(source.description),
+
+    phoneNumber: normalizeString(source.phoneNumber),
+    emergencyPhoneNumber: normalizeString(
+      source.emergencyPhoneNumber,
+    ),
+
+    email: normalizeString(source.email),
+    website: normalizeString(source.website),
+
+    address: normalizeString(source.address),
+    city: normalizeString(source.city),
+    country: normalizeString(source.country),
+
+    location: {
+      latitude: normalizeNumber(source.location?.latitude),
+      longitude: normalizeNumber(source.location?.longitude),
     },
-    body: JSON.stringify(payload),
-  });
 
-  if (!response.ok) {
-    throw new Error("Failed to update general settings");
-  }
+    logoUrl: source.logoUrl ?? null,
+    images: normalizeImages(source.images),
 
-  return response.json();
+    createdAt: source.createdAt ?? null,
+    updatedAt: source.updatedAt ?? null,
+  };
 }
 
-export async function uploadSchoolLogo(file: File): Promise<GeneralSettings> {
-  if (USE_MOCK_API) {
-    await wait();
-
-    mockDatabase = {
-      ...mockDatabase,
-      logoUrl: URL.createObjectURL(file),
-      updatedAt: new Date().toISOString(),
-    };
-
-    return mockDatabase;
-  }
-
+function buildGeneralSettingsFormData(
+  payload: UpdateGeneralSettingsPayload,
+): FormData {
   const formData = new FormData();
-  formData.append("logo", file);
 
-  const response = await fetch("/api/settings/general/logo", {
-    method: "POST",
-    body: formData,
-  });
+  formData.append("schoolName", payload.schoolName);
+  formData.append("shortName", payload.shortName);
+  formData.append("description", payload.description);
+  formData.append("phoneNumber", payload.phoneNumber);
+  formData.append(
+    "emergencyPhoneNumber",
+    payload.emergencyPhoneNumber,
+  );
+  formData.append("email", payload.email);
+  formData.append("website", payload.website);
+  formData.append("address", payload.address);
+  formData.append("city", payload.city);
+  formData.append("country", payload.country);
+  formData.append(
+    "location[latitude]",
+    String(payload.location.latitude),
+  );
+  formData.append(
+    "location[longitude]",
+    String(payload.location.longitude),
+  );
 
-  if (!response.ok) {
-    throw new Error("Failed to upload school logo");
+  if (payload.logo) {
+    formData.append("logo", payload.logo);
   }
 
-  return response.json();
+  return formData;
 }
 
-export async function deleteSchoolLogo(): Promise<GeneralSettings> {
-  if (USE_MOCK_API) {
-    await wait();
-
-    mockDatabase = {
-      ...mockDatabase,
-      logoUrl: null,
-      updatedAt: new Date().toISOString(),
-    };
-
-    return mockDatabase;
-  }
-
-  const response = await fetch("/api/settings/general/logo", {
-    method: "DELETE",
-  });
-
-  if (!response.ok) {
-    throw new Error("Failed to delete school logo");
-  }
-
-  return response.json();
-}
-
-export async function uploadSchoolImage(file: File): Promise<GeneralSettings> {
-  if (USE_MOCK_API) {
-    await wait();
-
-    const image: SchoolImage = {
-      id: crypto.randomUUID(),
-      url: URL.createObjectURL(file),
-      name: file.name,
-    };
-
-    mockDatabase = {
-      ...mockDatabase,
-      images: [...mockDatabase.images, image],
-      updatedAt: new Date().toISOString(),
-    };
-
-    return mockDatabase;
-  }
-
+function buildImagesFormData(
+  payload: CreateSchoolImagesPayload,
+): FormData {
   const formData = new FormData();
-  formData.append("image", file);
 
-  const response = await fetch("/api/settings/general/images", {
-    method: "POST",
-    body: formData,
+  payload.images.forEach((image, index) => {
+    formData.append(`images[${index}][file]`, image.file);
+    formData.append(`images[${index}][name]`, image.name);
   });
 
-  if (!response.ok) {
-    throw new Error("Failed to upload school image");
-  }
-
-  return response.json();
+  return formData;
 }
 
-export async function deleteSchoolImage(
-  imageId: string
-): Promise<GeneralSettings> {
-  if (USE_MOCK_API) {
-    await wait();
+function buildUpdateImageFormData(
+  payload: UpdateSchoolImagePayload,
+): FormData {
+  const formData = new FormData();
 
-    mockDatabase = {
-      ...mockDatabase,
-      images: mockDatabase.images.filter((image) => image.id !== imageId),
-      updatedAt: new Date().toISOString(),
-    };
-
-    return mockDatabase;
+  if (payload.file) {
+    formData.append("file", payload.file);
   }
 
-  const response = await fetch(`/api/settings/general/images/${imageId}`, {
-    method: "DELETE",
-  });
-
-  if (!response.ok) {
-    throw new Error("Failed to delete school image");
+  if (payload.name !== undefined) {
+    formData.append("name", payload.name);
   }
 
-  return response.json();
+  return formData;
 }
+
+export const generalSettingsApi = {
+  async get(): Promise<GeneralSettings> {
+    const response = await axiosClient.get<
+      ApiResponse<GeneralSettingsApiData>
+    >(API_ENDPOINTS.SETTINGS.GENERAL);
+
+    return normalizeGeneralSettings(response.data.data);
+  },
+
+  async update(
+    payload: UpdateGeneralSettingsPayload,
+  ): Promise<GeneralSettings> {
+    const response = await axiosClient.post<
+      ApiResponse<GeneralSettingsApiData>
+    >(
+      API_ENDPOINTS.SETTINGS.GENERAL,
+      buildGeneralSettingsFormData(payload),
+    );
+
+    return normalizeGeneralSettings(response.data.data);
+  },
+
+  async delete(): Promise<void> {
+    await axiosClient.delete(
+      API_ENDPOINTS.SETTINGS.GENERAL,
+    );
+  },
+
+  async listImages(): Promise<SchoolImage[]> {
+    const response = await axiosClient.get<
+      ApiResponse<SchoolImage[]>
+    >(API_ENDPOINTS.SETTINGS.GENERAL_IMAGES);
+
+    return response.data.data ?? [];
+  },
+
+  async addImages(
+    payload: CreateSchoolImagesPayload,
+  ): Promise<SchoolImage[]> {
+    const response = await axiosClient.post<
+      ApiResponse<SchoolImage[]>
+    >(
+      API_ENDPOINTS.SETTINGS.GENERAL_IMAGES,
+      buildImagesFormData(payload),
+    );
+
+    return response.data.data ?? [];
+  },
+
+  async getImage(
+    imageId: string,
+  ): Promise<SchoolImage> {
+    const response = await axiosClient.get<
+      ApiResponse<SchoolImage>
+    >(
+      API_ENDPOINTS.SETTINGS.GENERAL_IMAGE(imageId),
+    );
+
+    const image = response.data.data;
+
+    if (!image) {
+      throw new Error(
+        "School image was not returned by the server.",
+      );
+    }
+
+    return image;
+  },
+
+  async updateImage(
+    payload: UpdateSchoolImagePayload,
+  ): Promise<SchoolImage> {
+    const response = await axiosClient.post<
+      ApiResponse<SchoolImage>
+    >(
+      API_ENDPOINTS.SETTINGS.GENERAL_IMAGE(
+        payload.imageId,
+      ),
+      buildUpdateImageFormData(payload),
+    );
+
+    const image = response.data.data;
+
+    if (!image) {
+      throw new Error(
+        "Updated school image was not returned by the server.",
+      );
+    }
+
+    return image;
+  },
+
+  async deleteImage(imageId: string): Promise<void> {
+    await axiosClient.delete(
+      API_ENDPOINTS.SETTINGS.GENERAL_IMAGE(imageId),
+    );
+  },
+};

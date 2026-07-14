@@ -1,242 +1,206 @@
-import { useState } from "react";
-
-import { motion }
-from "framer-motion";
-
-import { ArrowLeft }
-from "lucide-react";
-
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  Link,
-  useLocation,
-} from "react-router-dom";
+  ArrowLeft,
+  ArrowRight,
+  LoaderCircle,
+} from "lucide-react";
+import { Controller, useForm } from "react-hook-form";
+import { Link } from "react-router-dom";
 
-import { Button }
-from "@/shared/ui/button";
+import { getAxiosValidationErrors } from "@/services/axios/axiosError";
+import { Button } from "@/shared/ui/button";
+import { Checkbox } from "@/shared/ui/checkbox";
+import { Label } from "@/shared/ui/label";
 
-import { OtpInput }
-from "./OtpInput";
+import { AUTH_ROUTES } from "../constants/auth.constants";
+import { useResendOtpTimer } from "../hooks/use-resend-otp-timer";
+import { useResendPasswordOtp } from "../hooks/use-resend-password-otp";
+import { useVerifyOtp } from "../hooks/use-verify-otp";
+import { useVerifyPasswordOtp } from "../hooks/use-verify-password-otp";
+import { otpSchema, type OtpSchema } from "../schemas/otp.schema";
+import { OtpInput } from "./OtpInput";
 
-import { useResendOtpTimer }
-from "../hooks/use-resend-otp-timer";
+type VerifyOtpFormProps = {
+  email: string;
+  isResetFlow?: boolean;
+  initialRemainingTime?: number;
+};
 
-import { useVerifyPasswordOtp }
-from "../hooks/use-verify-password-otp";
+export function VerifyOtpForm({
+  email,
+  isResetFlow = false,
+  initialRemainingTime = 60,
+}: VerifyOtpFormProps) {
+  const verifyLoginMutation = useVerifyOtp();
+  const verifyPasswordMutation = useVerifyPasswordOtp();
+  const resendPasswordMutation = useResendPasswordOtp();
+  const timer = useResendOtpTimer(initialRemainingTime || 60);
 
-import { useVerifyOtp }
-from "../hooks/use-verify-otp";
+  const form = useForm<OtpSchema>({
+    resolver: zodResolver(otpSchema),
+    defaultValues: {
+      otp: "",
+      rememberMe: false,
+    },
+  });
 
-import { useResendPasswordOtp }
-from "../hooks/useResendPasswordOtp";
+  const isPending =
+    verifyLoginMutation.isPending || verifyPasswordMutation.isPending;
 
-export function VerifyOtpForm() {
+  function handleOtpError(error: unknown) {
+    const validationErrors = getAxiosValidationErrors(error);
+    const otpMessage = validationErrors.otp?.[0];
 
-  const location = useLocation();
-
-  const {
-    email,
-    rememberMe,
-    isResetFlow,
-  } = location.state || {};
-
-  const [otp, setOtp] =
-    useState("");
-
-  const {
-    timeLeft,
-    canResend,
-    resetTimer,
-  } = useResendOtpTimer(60);
-
-  const verifyOtpMutation =
-    useVerifyOtp();
-
-  const verifyPasswordOtpMutation =
-    useVerifyPasswordOtp();
-
-  const resendPasswordOtpMutation =
-    useResendPasswordOtp();
-
-  function handleComplete(
-    value: string
-  ) {
-
-    setOtp(value);
+    if (otpMessage) {
+      form.setError("otp", {
+        type: "server",
+        message: otpMessage,
+      });
+    }
   }
 
-  function handleSubmit() {
-
-    if (!email) return;
+  function onSubmit(values: OtpSchema) {
+    form.clearErrors();
 
     if (isResetFlow) {
-
-      verifyPasswordOtpMutation.mutate({
-        email,
-        otp,
-      });
+      verifyPasswordMutation.mutate(
+        {
+          email,
+          otp: values.otp,
+        },
+        {
+          onError: handleOtpError,
+        },
+      );
 
       return;
     }
 
-    verifyOtpMutation.mutate({
-      email,
-      otp,
-      remember_me:
-        rememberMe || false,
-    });
+    verifyLoginMutation.mutate(
+      {
+        email,
+        otp: values.otp,
+        remember_me: values.rememberMe ? "1" : "0",
+      },
+      {
+        onError: handleOtpError,
+      },
+    );
   }
 
-  function handleResendOtp() {
-
-    if (!canResend || !email)
-      return;
-
-    if (isResetFlow) {
-
-      resendPasswordOtpMutation.mutate({
-        email,
-      });
-
-      resetTimer();
-
+  function resendResetOtp() {
+    if (!isResetFlow || !timer.canResend) {
       return;
     }
+
+    resendPasswordMutation.mutate(
+      { email },
+      {
+        onSuccess: (response) => {
+          timer.restart(response.data.data?.remaining_time ?? 60);
+        },
+      },
+    );
   }
 
   return (
-    <motion.div
-      initial={{
-        opacity: 0,
-        y: 20,
-      }}
-      animate={{
-        opacity: 1,
-        y: 0,
-      }}
-      transition={{
-        duration: 0.4,
-      }}
-      className="
-        w-full
-        max-w-md
-        rounded-[32px]
-        border
-        border-border
-        bg-card/80
-        p-8
-        shadow-soft-lg
-        backdrop-blur-xl
-      "
+    <form
+      onSubmit={form.handleSubmit(onSubmit)}
+      className="space-y-5"
+      noValidate
     >
+      <Controller
+        control={form.control}
+        name="otp"
+        render={({ field }) => (
+          <OtpInput
+            value={field.value}
+            onChange={field.onChange}
+            disabled={isPending}
+          />
+        )}
+      />
 
-      <Link
-        to={
-          isResetFlow
-            ? "/forgot-password"
-            : "/login"
+      {form.formState.errors.otp?.message && (
+        <p className="text-center text-sm text-destructive">
+          {form.formState.errors.otp.message}
+        </p>
+      )}
+
+      {!isResetFlow && (
+        <Controller
+  control={form.control}
+  name="rememberMe"
+  render={({ field }) => (
+    <div className="flex items-center gap-2">
+      <Checkbox
+        id="remember-device"
+        checked={field.value}
+        onCheckedChange={(checked) =>
+          form.setValue("rememberMe", checked === true, {
+            shouldValidate: true,
+          })
         }
-        className="
-          mb-6
-          inline-flex
-          items-center
-          gap-2
-          text-sm
-          text-muted-foreground
-          transition-colors
-          hover:text-primary
-        "
+        className="h-4 w-4 rounded border-input data-[state=checked]:border-primary data-[state=checked]:bg-primary"
+      />
+
+      <Label
+        htmlFor="remember-device"
+        className="cursor-pointer text-sm text-muted-foreground"
       >
-        <ArrowLeft size={16} />
-
-        Back
-      </Link>
-
-      <h1
-        className="
-          text-3xl
-          font-bold
-          text-foreground
-        "
-      >
-        Verify OTP
-      </h1>
-
-      <p
-        className="
-          mt-3
-          text-sm
-          leading-6
-          text-muted-foreground
-        "
-      >
-        Enter the 6-digit code
-        sent to your email.
-      </p>
-
-      <div className="mt-8">
-
-        <OtpInput
-          onComplete={
-            handleComplete
-          }
-        />
-      </div>
+        Remember me
+      </Label>
+    </div>
+  )}
+/>
+      )}
 
       <Button
-        onClick={handleSubmit}
-        disabled={
-          otp.length < 6 ||
-          verifyOtpMutation.isPending ||
-          verifyPasswordOtpMutation.isPending
-        }
-        size="lg"
-        className="
-          mt-8
-          w-full
-          rounded-2xl
-          shadow-soft
-          hover:shadow-soft-lg
-        "
+        type="submit"
+        disabled={isPending}
+        className="group h-14 w-full rounded-xl primary-gradient text-base font-semibold text-primary-foreground shadow-sm transition hover:opacity-95"
       >
-        {
-          verifyOtpMutation.isPending ||
-          verifyPasswordOtpMutation.isPending
-            ? "Verifying..."
-            : "Verify OTP"
-        }
+        {isPending ? (
+          <>
+            <LoaderCircle className="h-5 w-5 animate-spin" />
+            Verifying...
+          </>
+        ) : (
+          <>
+            {isResetFlow ? "Verify code" : "Verify and sign in"}
+            <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+          </>
+        )}
       </Button>
 
-      <div
-        className="
-          mt-6
-          text-center
-          text-sm
-          text-muted-foreground
-        "
-      >
-        Didn’t receive the code?
+      <div className="text-center text-sm">
+        {isResetFlow ? (
+          <button
+            type="button"
+            onClick={resendResetOtp}
+            disabled={resendPasswordMutation.isPending || !timer.canResend}
+            className="font-semibold text-primary transition-opacity hover:opacity-80 disabled:cursor-not-allowed disabled:text-muted-foreground"
+          >
+            {resendPasswordMutation.isPending
+              ? "Resending..."
+              : timer.canResend
+                ? "Resend verification code"
+                : `Resend code in ${timer.seconds}s`}
+          </button>
+        ) : (
+          <p className="text-muted-foreground">
+            Check your email for the verification code.
+          </p>
+        )}
       </div>
 
-      <button
-        onClick={handleResendOtp}
-        disabled={!canResend}
-        className="
-          mt-2
-          w-full
-          text-sm
-          font-medium
-          text-primary
-          transition-colors
-          hover:text-primary/80
-          disabled:text-muted-foreground
-        "
+      <Link
+        to={AUTH_ROUTES.LOGIN}
+        className="mx-auto flex w-fit items-center gap-2 text-sm font-medium text-muted-foreground transition hover:text-foreground"
       >
-        {
-          timeLeft > 0
-            ? `Resend in ${timeLeft}s`
-            : "Resend OTP"
-        }
-      </button>
-    </motion.div>
+        <ArrowLeft className="h-4 w-4" />
+        Back to sign in
+      </Link>
+    </form>
   );
 }

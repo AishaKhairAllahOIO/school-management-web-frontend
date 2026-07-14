@@ -1,315 +1,207 @@
-import { useState } from "react";
-
-import { Eye, EyeOff } from "lucide-react";
-
-import { useForm } from "react-hook-form";
-
 import { zodResolver } from "@hookform/resolvers/zod";
-
 import {
-  loginSchema,
-  type LoginSchema,
-} from "../schemas/login.schema";
+  ArrowRight,
+  Eye,
+  EyeOff,
+  LoaderCircle,
+  LockKeyhole,
+  Mail,
+} from "lucide-react";
+import { useForm } from "react-hook-form";
+import { Link, useNavigate } from "react-router-dom";
 
-import { useLogin } from "../hooks/use-login";
-
+import { getAxiosValidationErrors } from "@/services/axios/axiosError";
 import { Button } from "@/shared/ui/button";
-
 import { Input } from "@/shared/ui/input";
-
-import { Label } from "@/shared/ui/label";
-
-import { Checkbox } from "@/shared/ui/checkbox";
-
-import { Link } from "react-router-dom";
+import { useState } from "react";
+import { AUTH_ROUTES } from "../constants/auth.constants";
+import { useLogin } from "../hooks/use-login";
+import { loginSchema, type LoginSchema } from "../schemas/login.schema";
 
 export function LoginForm() {
-
-  const [showPassword, setShowPassword] =
-    useState(false);
-
+  const navigate = useNavigate();
   const loginMutation = useLogin();
+  const [showPassword, setShowPassword] = useState(false);
 
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    watch,
-    formState: { errors },
-  } = useForm<LoginSchema>({
+  const form = useForm<LoginSchema>({
     resolver: zodResolver(loginSchema),
-
     defaultValues: {
       email: "",
       password: "",
-      rememberMe: false,
     },
   });
 
-  const rememberMe = watch("rememberMe");
-
   function onSubmit(values: LoginSchema) {
+    form.clearErrors();
 
-    loginMutation.mutate(values);
+    loginMutation.mutate(
+      {
+        email: values.email,
+        password: values.password,
+      },
+      {
+        onSuccess: () => {
+          navigate(AUTH_ROUTES.VERIFY_OTP, {
+            state: {
+              email: values.email,
+              isResetFlow: false,
+            },
+          });
+        },
+        onError: (error) => {
+          const validationErrors = getAxiosValidationErrors(error);
+          const emailMessage = validationErrors.email?.[0];
+          const passwordMessage = validationErrors.password?.[0];
+
+          if (emailMessage) {
+            form.setError("email", {
+              type: "server",
+              message: emailMessage,
+            });
+          }
+
+          if (passwordMessage) {
+            form.setError("password", {
+              type: "server",
+              message: passwordMessage,
+            });
+          }
+        },
+      },
+    );
   }
 
   return (
-    <div
-      className="
-        w-full
-        max-w-md
-      "
-    >
-
-      {/* Header */}
-      <div className="mb-8">
-
-        <div
-          className="
-            mb-6
-            flex
-            items-center
-            gap-3
-          "
+    <form
+  onSubmit={form.handleSubmit(onSubmit)}
+  className="space-y-5"
+  autoComplete="off"
+  noValidate
+>
+  
+      <div className="space-y-2">
+        <label
+          htmlFor="login-email"
+          className="block text-sm font-medium text-foreground"
         >
+          Email address
+        </label>
 
-          {/* Logo */}
-          <div
-            className="
-              flex
-              h-14
-              w-14
-              items-center
-              justify-center
-              rounded-2xl
-              bg-primary
-              text-primary-foreground
-              text-xl
-              font-bold
-              shadow-soft
-            "
-          >
-            S
-          </div>
-
-          <div>
-
-            <h1
-              className="
-                text-3xl
-                font-bold
-                text-foreground
-              "
-            >
-              Welcome to login system
-            </h1>
-          </div>
-        </div>
-
-        <p
-          className="
-            mt-2
-            text-sm
-            leading-6
-            text-muted-foreground
-          "
-        >
-          Login to continue managing
-          your school system.
-        </p>
-      </div>
-
-      {/* Form */}
-      <form
-        onSubmit={handleSubmit(onSubmit)}
-        className="space-y-5"
-      >
-
-        {/* Email */}
-        <div className="space-y-2">
-
-          <Label htmlFor="email">
-            Email
-          </Label>
-
-          <Input
-            id="email"
-            type="email"
-            placeholder="admin@school.com"
-            autoComplete="email"
-            className="
-            focus-visible:ring-2
-            focus-visible:ring-primary/50
-            focus-visible:border-primary
-          "
-            {...register("email")}
+        <div className="relative">
+          <Mail
+            aria-hidden="true"
+            className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground"
           />
 
-          {errors.email && (
-            <p
-              className="
-                text-sm
-                text-destructive
-              "
-            >
-              {errors.email.message}
-            </p>
-          )}
+          <Input
+  id="login-email"
+  type="email"
+  autoComplete="off"
+  autoCapitalize="none"
+  spellCheck={false}
+  placeholder="Enter your email"
+  aria-invalid={form.formState.errors.email ? "true" : "false"}
+  className="h-14 rounded-xl border-input bg-background pl-12 pr-4 text-base text-foreground shadow-none placeholder:text-muted-foreground/70 focus-visible:border-primary focus-visible:ring-4 focus-visible:ring-primary/10"
+  {...form.register("email")}
+/>
         </div>
 
-        {/* Password */}
-        <div className="space-y-2">
+        {form.formState.errors.email?.message && (
+          <p className="text-sm text-destructive">
+            {form.formState.errors.email.message}
+          </p>
+        )}
+      </div>
 
-          <Label htmlFor="password">
-            Password
-          </Label>
-
-          <div className="relative">
-
-            <Input
-              id="password"
-              type={
-                showPassword
-                  ? "text"
-                  : "password"
-              }
-              placeholder="Enter your password"
-              autoComplete="current-password"
-              className="
-                pr-12
-                focus-visible:ring-2
-                focus-visible:ring-primary/50
-                focus-visible:border-primary
-              "
-              {...register("password")}
-            />
-
-            <button
-              type="button"
-              onClick={() =>
-                setShowPassword(
-                  !showPassword
-                )
-              }
-              className="
-                absolute
-                right-3
-                top-1/2
-                -translate-y-1/2
-                text-muted-foreground
-                transition-colors
-                hover:text-primary
-              "
-            >
-              {
-                showPassword
-                  ? <EyeOff size={18} />
-                  : <Eye size={18} />
-              }
-            </button>
-          </div>
-
-          {errors.password && (
-            <p
-              className="
-                text-sm
-                text-destructive
-              "
-            >
-              {errors.password.message}
-            </p>
-          )}
-        </div>
-
-        {/* Remember Me + Forgot */}
-        <div
-          className="
-            flex
-            items-center
-            justify-between
-          "
+      <div className="space-y-2">
+        <label
+          htmlFor="login-password"
+          className="block text-sm font-medium text-foreground"
         >
+          Password
+        </label>
 
-          <div
-            className="
-              flex
-              items-center
-              gap-2
-            "
+        <div className="relative">
+          <LockKeyhole
+            aria-hidden="true"
+            className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground"
+          />
+
+         <Input
+  id="login-password"
+  type={showPassword ? "text" : "password"}
+  autoComplete="new-password"
+  placeholder="Enter your password"
+  aria-invalid={form.formState.errors.password ? "true" : "false"}
+  className="h-14 rounded-xl border-input bg-background pl-12 pr-12 text-base text-foreground shadow-none placeholder:text-muted-foreground/70 focus-visible:border-primary focus-visible:ring-4 focus-visible:ring-primary/10"
+  {...form.register("password")}
+/>
+
+          <button
+            type="button"
+            onClick={() => setShowPassword((current) => !current)}
+            className="absolute right-4 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-lg text-muted-foreground transition hover:bg-muted hover:text-foreground"
+            aria-label={showPassword ? "Hide password" : "Show password"}
           >
+            {showPassword ? (
+              <EyeOff className="h-5 w-5" />
+            ) : (
+              <Eye className="h-5 w-5" />
+            )}
+          </button>
+        </div>
 
-            <Checkbox
-              id="rememberMe"
-              checked={rememberMe}
-              onCheckedChange={(checked: boolean) => {
+        {form.formState.errors.password?.message && (
+          <p className="text-sm text-destructive">
+            {form.formState.errors.password.message}
+          </p>
+        )}
 
-                setValue(
-                  "rememberMe",
-                  Boolean(checked)
-                );
-              }}
-            />
-
-            <Label
-              htmlFor="rememberMe"
-              className="
-                cursor-pointer
-                text-sm
-                text-muted-foreground
-              "
-            >
-              Remember me
-            </Label>
-          </div>
-
+        <div className="flex justify-end pt-1">
           <Link
-            to="/forgot-password"
-            className="
-              text-sm
-              font-medium
-              text-primary
-              transition-colors
-              hover:text-primary-dark
-              hover:underline
-            "
+            to={AUTH_ROUTES.FORGOT_PASSWORD}
+            className="text-sm font-semibold text-primary transition-opacity hover:opacity-80"
           >
-            Forgot Password?
+            Forgot password?
           </Link>
         </div>
-
-        {/* Submit */}
-        <Button
-          type="submit"
-          disabled={loginMutation.isPending}
-          size="lg"
-          className="
-            h-13
-            w-full
-            rounded-xl
-            shadow-soft
-            hover:shadow-soft-lg
-          "
-        >
-          {
-            loginMutation.isPending
-              ? "Signing In..."
-              : "Sign In"
-          }
-        </Button>
-      </form>
-
-      {/* Footer */}
-      <div
-        className="
-          mt-8
-          text-center
-          text-sm
-          text-muted-foreground
-        "
-      >
-        © 2026 School Desk.
-        All rights reserved.
       </div>
-    </div>
+
+      {loginMutation.isError &&
+        !form.formState.errors.email &&
+        !form.formState.errors.password && (
+          <div
+            role="alert"
+            className="rounded-xl border border-destructive/20 bg-destructive/5 px-4 py-3 text-sm text-destructive"
+          >
+            We couldn&apos;t sign you in. Please check your credentials and try
+            again.
+          </div>
+        )}
+
+      <Button
+        type="submit"
+        disabled={loginMutation.isPending}
+        className="group h-14 w-full rounded-xl primary-gradient text-base font-semibold text-primary-foreground shadow-sm transition hover:opacity-95"
+      >
+        {loginMutation.isPending ? (
+          <>
+            <LoaderCircle className="h-5 w-5 animate-spin" />
+            Signing in...
+          </>
+        ) : (
+          <>
+            Sign in
+            <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+          </>
+        )}
+      </Button>
+
+      <p className="pt-1 text-center text-sm text-muted-foreground">
+        Access is limited to authorized school staff and administrators.
+      </p>
+    </form>
+    
   );
+  
 }

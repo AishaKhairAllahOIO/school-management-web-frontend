@@ -1,22 +1,30 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-
 import {
-  createClassroom,
-  deleteClassroom,
-  getClassrooms,
-  updateClassroom,
-} from "@/features/academics/classrooms/api/classrooms.api";
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
+import { toast } from "sonner";
+
+import { getAxiosErrorMessage } from "@/services/axios/axiosError";
+
+import { classroomApi } from "../api/classroom.api";
 import type {
+  Classroom,
   CreateClassroomPayload,
   UpdateClassroomPayload,
-} from "@/features/academics/classrooms/types/classroom.types";
+} from "../types/classroom.types";
 
-export const classroomsQueryKey = ["academics", "classrooms"];
+export const classroomQueryKey = [
+  "academics",
+  "classrooms",
+] as const;
 
 export function useClassrooms() {
-  return useQuery({
-    queryKey: classroomsQueryKey,
-    queryFn: getClassrooms,
+  return useQuery<Classroom[], Error>({
+    queryKey: classroomQueryKey,
+    queryFn: classroomApi.list,
+    staleTime: 30_000,
+    retry: 1,
   });
 }
 
@@ -24,9 +32,19 @@ export function useCreateClassroom() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (payload: CreateClassroomPayload) => createClassroom(payload),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: classroomsQueryKey });
+    mutationFn: (payload: CreateClassroomPayload) =>
+      classroomApi.create(payload),
+
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: classroomQueryKey,
+      });
+
+      toast.success("Classroom created successfully.");
+    },
+
+    onError: (error) => {
+      toast.error(getAxiosErrorMessage(error));
     },
   });
 }
@@ -36,14 +54,23 @@ export function useUpdateClassroom() {
 
   return useMutation({
     mutationFn: ({
-      classroomId,
+      id,
       payload,
     }: {
-      classroomId: string;
+      id: string;
       payload: UpdateClassroomPayload;
-    }) => updateClassroom(classroomId, payload),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: classroomsQueryKey });
+    }) => classroomApi.update(id, payload),
+
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: classroomQueryKey,
+      });
+
+      toast.success("Classroom updated successfully.");
+    },
+
+    onError: (error) => {
+      toast.error(getAxiosErrorMessage(error));
     },
   });
 }
@@ -52,9 +79,18 @@ export function useDeleteClassroom() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: deleteClassroom,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: classroomsQueryKey });
+    mutationFn: (id: string) => classroomApi.delete(id),
+
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: classroomQueryKey,
+      });
+
+      toast.success("Classroom deleted successfully.");
+    },
+
+    onError: (error) => {
+      toast.error(getAxiosErrorMessage(error));
     },
   });
 }

@@ -1,6 +1,10 @@
 import * as React from "react"
+<<<<<<< HEAD
 import * as DialogPrimitive from "@radix-ui/react-dialog"
 
+=======
+import * as DialogPrimitive from "@radix-ui/react-dialog";
+>>>>>>> 782e7f79faba457344f587b8dd3c36e639d39e80
 import { cn } from "@/shared/lib/utils"
 import { Button } from "@/shared/ui/button"
 import { XIcon } from "lucide-react"
