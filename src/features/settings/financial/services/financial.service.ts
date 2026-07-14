@@ -1,5 +1,6 @@
-import { httpService } from "@/services/api/httpService";
-import { apiEndpoints } from "@/services/api/apiEndpoints";
+import { API_ENDPOINTS } from "@/services/api/endpoints";
+import { axiosClient } from "@/services/axios/axiosClient";
+import type { ApiResponse } from "@/services/types/apiResponse";
 
 import type { FeePlan } from "../types/feePlan.types";
 import type { InstallmentPolicy } from "../types/installmentPolicy.types";
@@ -19,22 +20,22 @@ export const financialService = {
   // ==========================================
 
   getInstallmentPolicies() {
-    return httpService.get<InstallmentPolicy[]>(
-      apiEndpoints.FINANCIAL.POLICIES
+    return axiosClient.get<InstallmentPolicy[]>(
+      API_ENDPOINTS.FINANCIAL.POLICIES
     );
   },
 
   getInstallmentPolicy(id: number) {
-    return httpService.get<InstallmentPolicy>(
-      `${apiEndpoints.FINANCIAL.POLICIES}/${id}`
+    return axiosClient.get<InstallmentPolicy>(
+      `${API_ENDPOINTS.FINANCIAL.POLICIES}/${id}`
     );
   },
 
   createInstallmentPolicy(
     payload: CreateInstallmentPolicyPayload
   ) {
-    return httpService.post<InstallmentPolicy>(
-      apiEndpoints.FINANCIAL.POLICIES,
+    return axiosClient.post<InstallmentPolicy>(
+      API_ENDPOINTS.FINANCIAL.POLICIES,
       payload
     );
   },
@@ -43,15 +44,15 @@ export const financialService = {
     id: number,
     payload: UpdateInstallmentPolicyPayload
   ) {
-    return httpService.post<InstallmentPolicy>(
-      `${apiEndpoints.FINANCIAL.POLICIES}/${id}`,
+    return axiosClient.post<InstallmentPolicy>(
+      `${API_ENDPOINTS.FINANCIAL.POLICIES}/${id}`,
       payload
     );
   },
 
   deleteInstallmentPolicy(id: number) {
-    return httpService.delete<void>(
-      `${apiEndpoints.FINANCIAL.POLICIES}/${id}`
+    return axiosClient.delete<void>(
+      `${API_ENDPOINTS.FINANCIAL.POLICIES}/${id}`
     );
   },
 
@@ -59,23 +60,35 @@ export const financialService = {
   // Fee Plans
   // ==========================================
 
-  getFeePlans() {
-    return httpService.get<FeePlan[]>(
-      apiEndpoints.FINANCIAL.FEE_PLANS
-    );
+  getFeePlans : async () =>{
+    const response =
+    await axiosClient.get<ApiResponse<FeePlan[]>>(
+        API_ENDPOINTS.FINANCIAL.FEE_PLANS,
+    )
+     return response.data.data ?? []
+    // return axiosClient.get<FeePlan[]>(
+    //   API_ENDPOINTS.FINANCIAL.FEE_PLANS
+    // );
   },
 
-  getFeePlan(id: number) {
-    return httpService.get<FeePlan>(
-      `${apiEndpoints.FINANCIAL.FEE_PLANS}/${id}`
-    );
+   getFeePlan: async(id: number)=>{
+    const response = await axiosClient.get<ApiResponse<FeePlan>>(
+      `${API_ENDPOINTS.FINANCIAL.FEE_PLANS}/${id}`
+    )
+    return response.data.data ?? []
   },
+  // getFeePlan:(id: number) {
+  //   return axiosClient.get<FeePlan>(
+  //     `${API_ENDPOINTS.FINANCIAL.FEE_PLANS}/${id}`
+  //   );
+  // },
+
 
   createFeePlan(
     payload: CreateFeePlanPayload
   ) {
-    return httpService.post<FeePlan>(
-      apiEndpoints.FINANCIAL.FEE_PLANS,
+    return axiosClient.post<FeePlan>(
+      API_ENDPOINTS.FINANCIAL.FEE_PLANS,
       payload
     );
   },
@@ -84,23 +97,23 @@ export const financialService = {
     id: number,
     payload: UpdateFeePlanPayload
   ) {
-    return httpService.post<FeePlan>(
-      `${apiEndpoints.FINANCIAL.FEE_PLANS}/${id}`,
+    return axiosClient.post<FeePlan>(
+      `${API_ENDPOINTS.FINANCIAL.FEE_PLANS}/${id}`,
       payload
     );
   },
 
   deleteFeePlan(id: number) {
-    return httpService.delete<void>(
-      `${apiEndpoints.FINANCIAL.FEE_PLANS}/${id}`
+    return axiosClient.delete<void>(
+      `${API_ENDPOINTS.FINANCIAL.FEE_PLANS}/${id}`
     );
   },
   // ==========================================
   // Extra Services
   // ==========================================
  getExtraServices(){
-    return httpService.get<ExtraService[]>(
-      apiEndpoints.FINANCIAL.EXTRA_SERVICES,
+    return axiosClient.get<ExtraService[]>(
+      API_ENDPOINTS.FINANCIAL.EXTRA_SERVICES,
     );
  },
 
@@ -108,16 +121,16 @@ export const financialService = {
   id: string,
   payload: UpdateExtraServicePayload,
  ){
-  return httpService.post<ExtraService>(
-      `${apiEndpoints.FINANCIAL.EXTRA_SERVICES}/${id}`,
+  return axiosClient.post<ExtraService>(
+      `${API_ENDPOINTS.FINANCIAL.EXTRA_SERVICES}/${id}`,
       payload
     );
  },
  deleteExtraService(
   id: string,
  ){
-   return httpService.delete<void>(
-      `${apiEndpoints.FINANCIAL.EXTRA_SERVICES}/${id}`
+   return axiosClient.delete<void>(
+      `${API_ENDPOINTS.FINANCIAL.EXTRA_SERVICES}/${id}`
     );
  }
 

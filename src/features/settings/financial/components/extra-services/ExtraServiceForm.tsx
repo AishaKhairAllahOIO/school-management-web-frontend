@@ -14,7 +14,6 @@ import {
 
 import {
   extraServiceSchema,
-  type ExtraServiceFormInput,
   type ExtraServiceFormValues,
 } from "../../schemas/extraService.schema";
 
@@ -31,7 +30,7 @@ export function ExtraServiceForm({ defaultValues, feePlans, isLoading = false, o
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<ExtraServiceFormInput, unknown, ExtraServiceFormValues>({
+  } = useForm<ExtraServiceFormValues>({
     resolver: zodResolver(extraServiceSchema),
     defaultValues: {
       feePlanId: defaultValues?.feePlanId ?? "",

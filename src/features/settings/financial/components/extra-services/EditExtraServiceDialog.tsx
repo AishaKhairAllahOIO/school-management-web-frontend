@@ -8,13 +8,13 @@ import {
 
 import { ExtraServiceForm } from "./ExtraServiceForm";
 
-import type { FeePlanExtraService } from "../../types/feePlan.types";
+import type { ExtraService } from "../../types/extraService.types";
 import type { ExtraServiceFormValues } from "../../schemas/extraService.schema";
 
 type Props = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  service: FeePlanExtraService;
+  service: ExtraService;
   feePlans: { id: string; name: string }[];
   isLoading?: boolean;
   onSubmit: (values: ExtraServiceFormValues) => void;
@@ -30,7 +30,7 @@ export function EditExtraServiceDialog({ open, onOpenChange, service, feePlans, 
         </DialogHeader>
         <ExtraServiceForm
           defaultValues={{
-            feePlanId: service.feePlanId,
+            feePlanId: service.feePlanId?.toString() ?? "",
             type: service.type,
             name: service.name,
             amount: service.amount,
