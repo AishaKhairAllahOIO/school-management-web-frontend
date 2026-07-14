@@ -4,7 +4,7 @@ import {
   isSupported,
   onMessage,
   type MessagePayload,
-} from "firebase/messaging";
+} from ;
 
 import { firebaseVapidKey } from "./firebase.config";
 import { firebaseApp } from "./firebase.app";

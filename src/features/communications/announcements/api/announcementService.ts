@@ -1,6 +1,6 @@
-import { axiosClient } from "@/services/axios/axiosClient";
+import { httpService } from "@/services/api/httpService";
+import { apiEndpoints } from "@/services/api/apiEndpoints";
 import {
-  announcementEndpoints,
   type CreateAnnouncementPayload,
   type UpdateAnnouncementPayload,
 } from "./announcementEndpoints";
@@ -8,51 +8,51 @@ import type { Announcement } from "../types/announcement.types";
 
 export const announcementService = {
   async listAnnouncements(): Promise<Announcement[]> {
-    const response = await axiosClient.get(announcementEndpoints.list);
-    return response.data;
+    return httpService.get<Announcement[]>(
+      apiEndpoints.COMMUNICATIONS.AUTH_ANNOUNCEMENTS
+    );
   },
 
   async createAnnouncement(
     payload: CreateAnnouncementPayload
   ): Promise<Announcement> {
-    const response = await axiosClient.post(
-      announcementEndpoints.create,
+    return httpService.post<Announcement>(
+      apiEndpoints.COMMUNICATIONS.AUTH_ANNOUNCEMENTS,
       payload
     );
-    return response.data;
   },
 
   async getAnnouncement(id: string): Promise<Announcement> {
-    const response = await axiosClient.get(announcementEndpoints.get(id));
-    return response.data;
+    return httpService.get<Announcement>(
+      `${apiEndpoints.COMMUNICATIONS.AUTH_ANNOUNCEMENTS}/${id}`
+    );
   },
 
   async updateAnnouncement(
     id: string,
     payload: UpdateAnnouncementPayload
   ): Promise<Announcement> {
-    const response = await axiosClient.put(
-      announcementEndpoints.update(id),
+    return httpService.put<Announcement>(
+      `${apiEndpoints.COMMUNICATIONS.AUTH_ANNOUNCEMENTS}/${id}`,
       payload
     );
-    return response.data;
   },
 
   async deleteAnnouncement(id: string): Promise<void> {
-    await axiosClient.delete(announcementEndpoints.delete(id));
+    return httpService.delete<void>(
+      `${apiEndpoints.COMMUNICATIONS.AUTH_ANNOUNCEMENTS}/${id}`
+    );
   },
 
   async publishAnnouncement(id: string): Promise<Announcement> {
-    const response = await axiosClient.post(
-      announcementEndpoints.publish(id)
+    return httpService.post<Announcement>(
+      `${apiEndpoints.COMMUNICATIONS.AUTH_ANNOUNCEMENTS}/${id}/publish`
     );
-    return response.data;
   },
 
   async unpublishAnnouncement(id: string): Promise<Announcement> {
-    const response = await axiosClient.post(
-      announcementEndpoints.unpublish(id)
+    return httpService.post<Announcement>(
+      `${apiEndpoints.COMMUNICATIONS.AUTH_ANNOUNCEMENTS}/${id}/unpublish`
     );
-    return response.data;
   },
 };

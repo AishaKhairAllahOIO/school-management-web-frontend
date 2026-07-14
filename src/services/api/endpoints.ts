@@ -70,4 +70,17 @@ ACADEMIC_CLASSROOM: (classroomId: string) =>
     TOGGLE_ACCOUNT_STATUS: (studentId: number | string) =>
       `/admin/students/${studentId}/toggle-account-status`,
   },
+  
+   FINANCIAL: {
+
+    BASE: "/admin/finance/settings",
+
+    POLICIES: "/admin/finance/settings/policies",
+
+    FEE_PLANS: "/admin/finance/settings/fee-plans",
+
+    POLICY_ITEMS: "/admin/finance/settings/policy-items",
+
+    EXTRA_SERVICES: "/admin/finance/settings/extra-services",
+},
 } as const;
