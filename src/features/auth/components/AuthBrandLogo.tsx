@@ -1,4 +1,4 @@
-import schoolLogo from "@/assets/images/school-logo.svg";
+import schoolLogo from "@/assets/images/school_logo.png";
 
 type AuthBrandLogoProps = {
   size?: "sm" | "md" | "lg";

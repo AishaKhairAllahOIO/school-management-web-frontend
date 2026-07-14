@@ -72,8 +72,7 @@ export function Sidebar() {
           sidebarRadiusClass,
         ].join(" ")}
         style={{
-          backgroundImage: `url(${sidebar})`,
-          backgroundPosition: "center",
+backgroundImage: `url(${sidebar})`,          backgroundPosition: "center",
           backgroundRepeat: "repeat",
           backgroundSize: "350px",
           opacity: 0.12,
@@ -126,7 +125,6 @@ export function Sidebar() {
                 >
                   {schoolDisplayName}
                 </h1>
-
                 <p className="truncate text-[10px] font-medium text-white/50">
                   {t.layout.sidebar.academy}
                 </p>
