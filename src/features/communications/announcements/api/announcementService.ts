@@ -1,58 +1,79 @@
-import { httpService } from "@/services/api/httpService";
-import { apiEndpoints } from "@/services/api/apiEndpoints";
-import {
-  type CreateAnnouncementPayload,
-  type UpdateAnnouncementPayload,
+import { axiosClient } from "@/services/axios/axiosClient";
+
+import { announcementEndpoints } from "./announcementEndpoints";
+import type {
+  CreateAnnouncementPayload,
+  UpdateAnnouncementPayload,
 } from "./announcementEndpoints";
 import type { Announcement } from "../types/announcement.types";
 
 export const announcementService = {
   async listAnnouncements(): Promise<Announcement[]> {
-    return httpService.get<Announcement[]>(
-      apiEndpoints.COMMUNICATIONS.AUTH_ANNOUNCEMENTS
+    const response = await axiosClient.get<Announcement[]>(
+      announcementEndpoints.list,
     );
+
+    return response.data;
   },
 
   async createAnnouncement(
-    payload: CreateAnnouncementPayload
+    payload: CreateAnnouncementPayload,
   ): Promise<Announcement> {
-    return httpService.post<Announcement>(
-      apiEndpoints.COMMUNICATIONS.AUTH_ANNOUNCEMENTS,
-      payload
+    const response = await axiosClient.post<Announcement>(
+      announcementEndpoints.create,
+      payload,
     );
+
+    return response.data;
   },
 
-  async getAnnouncement(id: string): Promise<Announcement> {
-    return httpService.get<Announcement>(
-      `${apiEndpoints.COMMUNICATIONS.AUTH_ANNOUNCEMENTS}/${id}`
+  async getAnnouncement(
+    id: string,
+  ): Promise<Announcement> {
+    const response = await axiosClient.get<Announcement>(
+      announcementEndpoints.get(id),
     );
+
+    return response.data;
   },
 
   async updateAnnouncement(
     id: string,
-    payload: UpdateAnnouncementPayload
+    payload: UpdateAnnouncementPayload,
   ): Promise<Announcement> {
-    return httpService.put<Announcement>(
-      `${apiEndpoints.COMMUNICATIONS.AUTH_ANNOUNCEMENTS}/${id}`,
-      payload
+    const response = await axiosClient.put<Announcement>(
+      announcementEndpoints.update(id),
+      payload,
+    );
+
+    return response.data;
+  },
+
+  async deleteAnnouncement(
+    id: string,
+  ): Promise<void> {
+    await axiosClient.delete(
+      announcementEndpoints.delete(id),
     );
   },
 
-  async deleteAnnouncement(id: string): Promise<void> {
-    return httpService.delete<void>(
-      `${apiEndpoints.COMMUNICATIONS.AUTH_ANNOUNCEMENTS}/${id}`
+  async publishAnnouncement(
+    id: string,
+  ): Promise<Announcement> {
+    const response = await axiosClient.post<Announcement>(
+      announcementEndpoints.publish(id),
     );
+
+    return response.data;
   },
 
-  async publishAnnouncement(id: string): Promise<Announcement> {
-    return httpService.post<Announcement>(
-      `${apiEndpoints.COMMUNICATIONS.AUTH_ANNOUNCEMENTS}/${id}/publish`
+  async unpublishAnnouncement(
+    id: string,
+  ): Promise<Announcement> {
+    const response = await axiosClient.post<Announcement>(
+      announcementEndpoints.unpublish(id),
     );
-  },
 
-  async unpublishAnnouncement(id: string): Promise<Announcement> {
-    return httpService.post<Announcement>(
-      `${apiEndpoints.COMMUNICATIONS.AUTH_ANNOUNCEMENTS}/${id}/unpublish`
-    );
+    return response.data;
   },
 };
