@@ -46,15 +46,55 @@
   --warning: 245 158 11;
   --info: 59 130 246;
 
-  --gradient-primary: linear-gradient(135deg, #5b4fc7 0%, #6d5fdb 45%, #8b5cf6 100%);
-  --gradient-sidebar: linear-gradient(180deg, #100d3b 0%, #151044 48%, #090721 100%);
-  --gradient-card: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(248, 247, 255, 0.88));
-  --gradient-soft-purple: linear-gradient(135deg, rgba(103, 58, 244, 0.14), rgba(139, 92, 246, 0.06));
-  --gradient-hero-overlay: linear-gradient(90deg, rgba(38, 24, 117, 0.92), rgba(70, 50, 170, 0.72), rgba(17, 14, 54, 0.18));
+  --gradient-primary:
+    linear-gradient(
+      135deg,
+      #5b4fc7 0%,
+      #6d5fdb 45%,
+      #8b5cf6 100%
+    );
 
-  --shadow-soft: 0 18px 45px rgba(39, 32, 92, 0.1);
-  --shadow-card: 0 12px 30px rgba(31, 25, 78, 0.08);
-  --shadow-floating: 0 24px 70px rgba(31, 25, 78, 0.16);
+  --gradient-sidebar:
+    linear-gradient(
+      180deg,
+      #100d3b 0%,
+      #151044 48%,
+      #090721 100%
+    );
+
+  --gradient-card:
+    linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.95),
+      rgba(248, 247, 255, 0.88)
+    );
+
+  --gradient-soft-purple:
+    linear-gradient(
+      135deg,
+      rgba(103, 58, 244, 0.14),
+      rgba(139, 92, 246, 0.06)
+    );
+
+  --gradient-hero-overlay:
+    linear-gradient(
+      90deg,
+      rgba(38, 24, 117, 0.92),
+      rgba(70, 50, 170, 0.72),
+      rgba(17, 14, 54, 0.18)
+    );
+
+  --shadow-soft:
+    0 18px 45px rgba(39, 32, 92, 0.1);
+
+  --shadow-card:
+    0 12px 30px rgba(31, 25, 78, 0.08);
+
+  --shadow-floating:
+    0 24px 70px rgba(31, 25, 78, 0.16);
+
+  --shadow-auth-button:
+    0 12px 28px rgb(var(--primary) / 0.22);
 
   --topbar-surface: 255 255 255;
   --topbar-foreground: 8 10 42;
@@ -121,15 +161,55 @@
   --warning: 251 191 36;
   --info: 96 165 250;
 
-  --gradient-primary: linear-gradient(135deg, #6d5fdb 0%, #8b5cf6 50%, #a78bfa 100%);
-  --gradient-sidebar: linear-gradient(180deg, #090721 0%, #120d3a 55%, #060515 100%);
-  --gradient-card: linear-gradient(135deg, rgba(24, 21, 58, 0.96), rgba(15, 13, 41, 0.9));
-  --gradient-soft-purple: linear-gradient(135deg, rgba(139, 92, 246, 0.22), rgba(91, 79, 199, 0.08));
-  --gradient-hero-overlay: linear-gradient(90deg, rgba(16, 12, 59, 0.94), rgba(65, 44, 155, 0.72), rgba(8, 7, 28, 0.24));
+  --gradient-primary:
+    linear-gradient(
+      135deg,
+      #6d5fdb 0%,
+      #8b5cf6 50%,
+      #a78bfa 100%
+    );
 
-  --shadow-soft: 0 18px 45px rgba(0, 0, 0, 0.28);
-  --shadow-card: 0 12px 30px rgba(0, 0, 0, 0.22);
-  --shadow-floating: 0 24px 70px rgba(0, 0, 0, 0.36);
+  --gradient-sidebar:
+    linear-gradient(
+      180deg,
+      #090721 0%,
+      #120d3a 55%,
+      #060515 100%
+    );
+
+  --gradient-card:
+    linear-gradient(
+      135deg,
+      rgba(24, 21, 58, 0.96),
+      rgba(15, 13, 41, 0.9)
+    );
+
+  --gradient-soft-purple:
+    linear-gradient(
+      135deg,
+      rgba(139, 92, 246, 0.22),
+      rgba(91, 79, 199, 0.08)
+    );
+
+  --gradient-hero-overlay:
+    linear-gradient(
+      90deg,
+      rgba(16, 12, 59, 0.94),
+      rgba(65, 44, 155, 0.72),
+      rgba(8, 7, 28, 0.24)
+    );
+
+  --shadow-soft:
+    0 18px 45px rgba(0, 0, 0, 0.28);
+
+  --shadow-card:
+    0 12px 30px rgba(0, 0, 0, 0.22);
+
+  --shadow-floating:
+    0 24px 70px rgba(0, 0, 0, 0.36);
+
+  --shadow-auth-button:
+    0 12px 30px rgb(var(--primary) / 0.28);
 
   --topbar-surface: 24 21 58;
   --topbar-foreground: 246 245 255;
@@ -178,7 +258,8 @@
   --color-accent-foreground: rgb(var(--accent-foreground));
 
   --color-destructive: rgb(var(--destructive));
-  --color-destructive-foreground: rgb(var(--destructive-foreground));
+  --color-destructive-foreground:
+    rgb(var(--destructive-foreground));
 
   --color-border: rgb(var(--border));
   --color-input: rgb(var(--input));
@@ -188,7 +269,8 @@
   --color-sidebar-foreground: rgb(var(--sidebar-foreground));
   --color-sidebar-muted: rgb(var(--sidebar-muted));
   --color-sidebar-active: rgb(var(--sidebar-active));
-  --color-sidebar-active-foreground: rgb(var(--sidebar-active-foreground));
+  --color-sidebar-active-foreground:
+    rgb(var(--sidebar-active-foreground));
 
   --color-success: rgb(var(--success));
   --color-warning: rgb(var(--warning));
@@ -231,9 +313,18 @@
   body {
     min-height: 100vh;
     background:
-      radial-gradient(circle at top left, rgba(139, 92, 246, 0.13), transparent 34rem),
-      radial-gradient(circle at top right, rgba(91, 79, 199, 0.1), transparent 30rem),
+      radial-gradient(
+        circle at top left,
+        rgba(139, 92, 246, 0.13),
+        transparent 34rem
+      ),
+      radial-gradient(
+        circle at top right,
+        rgba(91, 79, 199, 0.1),
+        transparent 30rem
+      ),
       rgb(var(--background));
+
     color: rgb(var(--foreground));
     font-feature-settings: "rlig" 1, "calt" 1;
     text-rendering: optimizeLegibility;
@@ -252,8 +343,16 @@
 @layer utilities {
   .app-shell-bg {
     background:
-      radial-gradient(circle at 20% 0%, rgba(139, 92, 246, 0.14), transparent 28rem),
-      radial-gradient(circle at 80% 10%, rgba(91, 79, 199, 0.12), transparent 28rem),
+      radial-gradient(
+        circle at 20% 0%,
+        rgba(139, 92, 246, 0.14),
+        transparent 28rem
+      ),
+      radial-gradient(
+        circle at 80% 10%,
+        rgba(91, 79, 199, 0.12),
+        transparent 28rem
+      ),
       rgb(var(--background));
   }
 
@@ -323,35 +422,150 @@
       0 16px 34px rgba(var(--primary), 0.34),
       inset 0 1px 0 rgba(255, 255, 255, 0.18);
   }
+
   .auth-hero-overlay {
-  background:
-    linear-gradient(
-      90deg,
-      rgb(var(--sidebar) / 0.9) 0%,
-      rgb(var(--sidebar) / 0.68) 42%,
-      rgb(var(--sidebar) / 0.24) 72%,
-      transparent 100%
-    ),
-    linear-gradient(
-      180deg,
-      rgb(var(--sidebar) / 0.08) 0%,
-      transparent 48%,
-      rgb(var(--sidebar) / 0.28) 100%
-    );
+    background:
+      linear-gradient(
+        90deg,
+        rgb(var(--sidebar) / 0.84) 0%,
+        rgb(var(--sidebar) / 0.6) 42%,
+        rgb(var(--sidebar) / 0.2) 72%,
+        transparent 100%
+      ),
+      linear-gradient(
+        180deg,
+        rgb(var(--sidebar) / 0.05) 0%,
+        transparent 48%,
+        rgb(var(--sidebar) / 0.2) 100%
+      );
+  }
+
+  .auth-hero-pattern {
+    opacity: 0.13;
+    background-image:
+      radial-gradient(
+        circle at center,
+        rgb(255 255 255 / 0.18) 1px,
+        transparent 1px
+      );
+    background-size: 28px 28px;
+    mask-image:
+      linear-gradient(
+        90deg,
+        black,
+        rgb(0 0 0 / 0.35) 58%,
+        transparent
+      );
+  }
+
+  .auth-hero-copy {
+    text-shadow:
+      0 2px 22px rgb(var(--sidebar) / 0.22);
+  }
+
+  .auth-hero-image {
+    object-position: center;
+    filter:
+      saturate(0.95)
+      contrast(1)
+      brightness(0.96);
+    transform: scale(1.015);
+  }
+
+  .auth-input {
+    height: 3.5rem;
+    border-radius: var(--radius-xl);
+    border-color: rgb(var(--input));
+    background: rgb(var(--card));
+    color: rgb(var(--foreground));
+    font-size: 1rem;
+    box-shadow:
+      0 1px 2px rgb(var(--foreground) / 0.02);
+    transition:
+      border-color 180ms ease,
+      box-shadow 180ms ease,
+      background-color 180ms ease;
+  }
+
+  .auth-input::placeholder {
+    color: rgb(var(--muted-foreground) / 0.7);
+  }
+
+  .auth-input:hover:not(:disabled) {
+    border-color: rgb(var(--primary) / 0.35);
+  }
+
+  .auth-input:focus-visible {
+    border-color: rgb(var(--primary));
+    box-shadow:
+      0 0 0 4px rgb(var(--primary) / 0.1);
+  }
+
+  .auth-input:disabled {
+    cursor: not-allowed;
+    opacity: 0.65;
+  }
+
+  .auth-primary-button {
+    height: 3.5rem;
+    width: 100%;
+    border-radius: var(--radius-xl);
+    background: var(--gradient-primary);
+    color: rgb(var(--primary-foreground));
+    font-size: 1rem;
+    font-weight: 600;
+    box-shadow: var(--shadow-auth-button);
+    transition:
+      transform 180ms ease,
+      box-shadow 180ms ease,
+      opacity 180ms ease;
+  }
+
+  .auth-primary-button:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow:
+      0 16px 34px rgb(var(--primary) / 0.28);
+  }
+
+  .auth-primary-button:active:not(:disabled) {
+    transform: translateY(0);
+  }
+
+  .auth-primary-button:focus-visible {
+    outline: none;
+    box-shadow:
+      0 0 0 4px rgb(var(--primary) / 0.14),
+      var(--shadow-auth-button);
+  }
+
+  .auth-primary-button:disabled {
+    cursor: not-allowed;
+    opacity: 0.65;
+    box-shadow: none;
+  }
+
+  .topbar-item-shadow {
+    box-shadow: var(--shadow-topbar);
+  }
+
+  .topbar-menu-shadow {
+    box-shadow: var(--shadow-topbar-menu);
+  }
 }
 
-.auth-hero-copy {
-  text-shadow: 0 2px 22px rgb(var(--sidebar) / 0.22);
+@media (max-width: 1023px) {
+  .auth-input {
+    background: rgb(var(--card));
+  }
 }
 
-.auth-hero-image {
-  filter: saturate(0.9) contrast(0.96) brightness(0.92);
-}
-.topbar-item-shadow {
-  box-shadow: var(--shadow-topbar);
-}
+@media (prefers-reduced-motion: reduce) {
+  .auth-input,
+  .auth-primary-button {
+    transition: none;
+  }
 
-.topbar-menu-shadow {
-  box-shadow: var(--shadow-topbar-menu);
-}
+  .auth-primary-button:hover:not(:disabled) {
+    transform: none;
+  }
 }

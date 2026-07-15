@@ -1,33 +1,46 @@
-import schoolLogo from "@/assets/images/school_logo.png";
+import { GraduationCap } from "lucide-react";
 
 type AuthBrandLogoProps = {
   size?: "sm" | "md" | "lg";
   className?: string;
 };
 
-const sizeClasses: Record<
-  NonNullable<AuthBrandLogoProps["size"]>,
-  string
-> = {
-  sm: "h-11 w-11",
-  md: "h-14 w-14",
-  lg: "h-[4.5rem] w-[4.5rem]",
+const sizes = {
+  sm: {
+    container: "h-14 w-14",
+    icon: "h-7 w-7",
+  },
+  md: {
+    container: "h-16 w-16",
+    icon: "h-8 w-8",
+  },
+  lg: {
+    container: "h-20 w-20",
+    icon: "h-10 w-10",
+  },
 };
 
 export function AuthBrandLogo({
-  size = "md",
+  size = "lg",
   className = "",
 }: AuthBrandLogoProps) {
   return (
-    <img
-      src={schoolLogo}
-      alt="School logo"
-      draggable={false}
+    <div
       className={[
-        "block shrink-0 object-contain",
-        sizeClasses[size],
+        "mx-auto flex items-center justify-center rounded-3xl",
+        "bg-primary/8",
+        "border border-primary/10",
+        sizes[size].container,
         className,
       ].join(" ")}
-    />
+    >
+      <GraduationCap
+        strokeWidth={2.2}
+        className={[
+          "text-primary",
+          sizes[size].icon,
+        ].join(" ")}
+      />
+    </div>
   );
 }
