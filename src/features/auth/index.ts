@@ -1,4 +1,4 @@
-export { authRoutes } from "./auth.routes";
+export { authRoutes } from "./routes";
 export { AuthGuard } from "./guards/AuthGuard";
 export { GuestGuard } from "./guards/GuestGuard";
 export { PermissionGuard } from "./guards/PermissionGuard";

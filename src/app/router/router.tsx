@@ -4,7 +4,7 @@ import { AppLayout } from "@/app/layouts/AppLayout";
 import { ErrorPage, NotFoundPage } from "@/app/pages";
 import { AuthGuard } from "@/features/auth/guards/AuthGuard";
 import { GuestGuard } from "@/features/auth/guards/GuestGuard";
-import { authRoutes } from "@/features/auth/auth.routes";
+import { authRoutes } from "@/features/auth/routes";
 
 import { appRoutes } from "./routes";
 

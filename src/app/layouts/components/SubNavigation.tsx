@@ -17,7 +17,7 @@ import {
   Wallet,
   type LucideIcon,
 } from "lucide-react";
-
+import { UsersOverviewPage } from "@/features/users/shared/pages/UsersOverviewPage"
 import {
   useEffect,
   useRef,
@@ -901,18 +901,16 @@ export function SubNavigation() {
     return null;
   }
 
-  const isUsersRoute =
-    pathname === "/users" ||
-    pathname.startsWith(
-      "/users/",
-    );
+ if (pathname === "/users") {
+  return null;
+}
 
-  if (isUsersRoute) {
-    return (
-      <UsersFolderNavigation />
-    );
-  }
+const isUsersChildRoute =
+  pathname.startsWith("/users/");
 
+if (isUsersChildRoute) {
+  return  <UsersOverviewPage />;
+}
   const currentSection =
     subNavigationItems.find(
       (section) =>
