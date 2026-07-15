@@ -24,9 +24,8 @@ export function useFeePlans() {
   const create = useMutation({
     mutationFn: (payload: CreateFeePlanPayload) =>
       financialService.createFeePlan(payload),
-
     onSuccess: async () => {
-    await queryClient.invalidateQueries({
+      await queryClient.invalidateQueries({
         queryKey: QUERY_KEY,
       });
     },
@@ -39,37 +38,30 @@ export function useFeePlans() {
     }: {
       id: number;
       payload: UpdateFeePlanPayload;
-    }) =>
-      financialService.updateFeePlan(id, payload),
-
-   onSuccess: async () => {
-   await queryClient.invalidateQueries({
-    queryKey: QUERY_KEY,
-  });
-},
-   onError(error) {
-  console.error(error);
-}
+    }) => financialService.updateFeePlan(id, payload),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: QUERY_KEY,
+      });
+    },
+    onError(error) {
+      console.error(error);
+    },
   });
 
   const remove = useMutation({
-    mutationFn: (id: number) =>
-      financialService.deleteFeePlan(id),
-
-    onSuccess: async() => {
-     await queryClient.invalidateQueries({
+    mutationFn: (id: number) => financialService.deleteFeePlan(id),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
         queryKey: QUERY_KEY,
       });
     },
   });
 
   return {
-    ...query,
-
+    ...query, 
     createFeePlan: create,
-
     updateFeePlan: update,
-
     deleteFeePlan: remove,
   };
 }

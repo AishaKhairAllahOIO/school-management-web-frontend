@@ -15,7 +15,7 @@ const feePlanExtraServiceSchema = z.object({
 export const feePlanSchema = z.object({
   academicYearId: z.coerce.number().min(1, "Academic Year is required"),
   gradeLevelId: z.coerce.number().min(1, "Grade Level is required"),
-  // تم حذف installmentPolicyId من هنا
+
   
   name: z.string().min(2, "Name is required"),
   baseAmount: z.coerce.number().min(0, "Base Amount is required"),
