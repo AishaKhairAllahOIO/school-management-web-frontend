@@ -4,7 +4,6 @@ import {
   X,
 } from "lucide-react";
 
-import sidebarPattern from "@/assets/images/sidebar.png";
 import { SidebarMenu } from "@/app/layouts/components/SidebarMenu";
 import { useLayoutStore } from "@/app/layouts/store/layoutStore";
 import { useLocale } from "@/app/providers/locale";
@@ -178,7 +177,6 @@ export function MobileSidebar() {
           <div
             className="sidebar-pattern absolute inset-0"
             style={{
-              backgroundImage: `url(${sidebarPattern})`,
               backgroundPosition: "center",
               backgroundRepeat: "repeat",
               backgroundSize: "350px",

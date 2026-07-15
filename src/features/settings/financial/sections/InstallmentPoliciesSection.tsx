@@ -20,6 +20,11 @@ import type { InstallmentPolicy } from "../types/installmentPolicy.types";
 
 import type { InstallmentPolicyFormValues } from "../schemas/installmentPolicy.schema";
 
+import {
+  mapInstallmentPolicyFormToCreatePayload,
+  mapInstallmentPolicyFormToUpdatePayload,
+} from "../lib/mappers/installmentPolicy.mapper"; 
+
 export function InstallmentPoliciesSection() {
 
  const {
@@ -47,33 +52,31 @@ export function InstallmentPoliciesSection() {
   const [selectedPolicy, setSelectedPolicy] =
     useState<InstallmentPolicy | null>(null);
 
-  function handleCreate(
-    values: InstallmentPolicyFormValues
-  ) {
-    createPolicy.mutate(values, {
-  onSuccess: () => {
-    setCreateOpen(false);
-  },
-});
+  function handleCreate(values: InstallmentPolicyFormValues) {
+    // استخدم المابر هون
+    createPolicy.mutate(mapInstallmentPolicyFormToCreatePayload(values), {
+      onSuccess: () => {
+        setCreateOpen(false);
+      },
+    });
   }
 
-  function handleEdit(
-    values: InstallmentPolicyFormValues
-  ) {
+  function handleEdit(values: InstallmentPolicyFormValues) {
     if (!selectedPolicy) return;
 
-   updatePolicy.mutate(
-  {
-    id: selectedPolicy.id,
-    payload: values,
-  },
-  {
-    onSuccess: () => {
-      setEditOpen(false);
-      setSelectedPolicy(null);
-    },
-  }
-);
+    updatePolicy.mutate(
+      {
+        id: selectedPolicy.id,
+
+        payload: mapInstallmentPolicyFormToUpdatePayload(values),
+      },
+      {
+        onSuccess: () => {
+          setEditOpen(false);
+          setSelectedPolicy(null);
+        },
+      }
+    );
   }
 
   function handleDelete() {

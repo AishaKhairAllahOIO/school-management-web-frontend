@@ -15,6 +15,12 @@ import { useFeePlans } from "../hooks/useFeePlans";
 import type { FeePlan } from "../types/feePlan.types";
 import type { FeePlanFormValues } from "../schemas/feePlan.schema";
 
+import { 
+  mapFeePlanFormToCreatePayload, 
+  mapFeePlanFormToUpdatePayload 
+} from 
+ "../lib/mappers/feePlan.mapper";
+
 type Option = {
   id: number;
   name: string;
@@ -23,11 +29,13 @@ type Option = {
 type Props = {
   academicYears: Option[];
   gradeLevels: Option[];
+  installmentPolicies: Option[];
 };
 
 export function FeePlansSection({
   academicYears,
   gradeLevels,
+  installmentPolicies,
 }: Props) {
   const {
     data: feePlans = [],
@@ -51,34 +59,32 @@ export function FeePlansSection({
   const [selectedPlan, setSelectedPlan] =
     useState<FeePlan | null>(null);
 
-  function handleCreate(
-    values: FeePlanFormValues
-  ) {
-    createFeePlan.mutate(values, {
+function handleCreate(values: FeePlanFormValues) {
+ 
+  createFeePlan.mutate(mapFeePlanFormToCreatePayload(values), {
+    onSuccess: () => {
+      setCreateOpen(false);
+    },
+  });
+}
+
+function handleEdit(values: FeePlanFormValues) {
+  if (!selectedPlan) return;
+
+  updateFeePlan.mutate(
+    {
+      id: selectedPlan.id,
+      
+      payload: mapFeePlanFormToUpdatePayload(values),
+    },
+    {
       onSuccess: () => {
-        setCreateOpen(false);
+        setEditOpen(false);
+        setSelectedPlan(null);
       },
-    });
-  }
-
-  function handleEdit(
-    values: FeePlanFormValues
-  ) {
-    if (!selectedPlan) return;
-
-    updateFeePlan.mutate(
-      {
-        id: selectedPlan.id,
-        payload: values,
-      },
-      {
-        onSuccess: () => {
-          setEditOpen(false);
-          setSelectedPlan(null);
-        },
-      }
-    );
-  }
+    }
+  );
+}
 
   function handleDelete() {
     if (!selectedPlan) return;
@@ -148,6 +154,7 @@ export function FeePlansSection({
         onOpenChange={setCreateOpen}
         academicYears={academicYears}
         gradeLevels={gradeLevels}
+        installmentPolicies={installmentPolicies}
         isLoading={createFeePlan.isPending}
         onSubmit={handleCreate}
       />
@@ -158,6 +165,7 @@ export function FeePlansSection({
           onOpenChange={setEditOpen}
           academicYears={academicYears}
           gradeLevels={gradeLevels}
+          installmentPolicies={installmentPolicies}
           defaultValues={{
             academicYearId:
               selectedPlan.academicYearId,
@@ -165,8 +173,9 @@ export function FeePlansSection({
             gradeLevelId:
               selectedPlan.gradeLevelId,
 
-           
             name: selectedPlan.name,
+
+            installmentPolicyId: selectedPlan.installmentPolicyId ?? 0,
 
             baseAmount:
               selectedPlan.baseAmount,
@@ -174,8 +183,8 @@ export function FeePlansSection({
             extraServices:
               selectedPlan.extraServices.map(
                 (service) => ({
-                  feePlanId:
-                    service.feePlanId.toString(),
+                  
+                  feePlanId:service.feePlanId,
 
                   type: service.type,
 

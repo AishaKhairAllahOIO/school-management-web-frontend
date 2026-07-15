@@ -19,31 +19,29 @@ export const financialService = {
   // Installment Policies
   // ==========================================
 
-  getInstallmentPolicies() {
-    return axiosClient.get<InstallmentPolicy[]>(
+  getInstallmentPolicies: async () => {
+    // تعديل: غالباً الباك إند بيرجعها مغلفة بـ ApiResponse بناءً على ملف الـ JSON
+    const response = await axiosClient.get<ApiResponse<InstallmentPolicy[]>>(
       API_ENDPOINTS.FINANCIAL.POLICIES
     );
+    return response.data.data ?? [];
   },
 
-  getInstallmentPolicy(id: number) {
-    return axiosClient.get<InstallmentPolicy>(
+  getInstallmentPolicy: async (id: number) => {
+    const response = await axiosClient.get<ApiResponse<InstallmentPolicy>>(
       `${API_ENDPOINTS.FINANCIAL.POLICIES}/${id}`
     );
+    return response.data.data;
   },
 
-  createInstallmentPolicy(
-    payload: CreateInstallmentPolicyPayload
-  ) {
+  createInstallmentPolicy(payload: CreateInstallmentPolicyPayload) {
     return axiosClient.post<InstallmentPolicy>(
       API_ENDPOINTS.FINANCIAL.POLICIES,
       payload
     );
   },
 
-  updateInstallmentPolicy(
-    id: number,
-    payload: UpdateInstallmentPolicyPayload
-  ) {
+  updateInstallmentPolicy(id: number, payload: UpdateInstallmentPolicyPayload) {
     return axiosClient.post<InstallmentPolicy>(
       `${API_ENDPOINTS.FINANCIAL.POLICIES}/${id}`,
       payload
@@ -60,43 +58,29 @@ export const financialService = {
   // Fee Plans
   // ==========================================
 
-  getFeePlans : async () =>{
-    const response =
-    await axiosClient.get<ApiResponse<FeePlan[]>>(
-        API_ENDPOINTS.FINANCIAL.FEE_PLANS,
-    )
-     return response.data.data ?? []
-    // return axiosClient.get<FeePlan[]>(
-    //   API_ENDPOINTS.FINANCIAL.FEE_PLANS
-    // );
+  // تمت إعادة دالة getFeePlans
+  getFeePlans: async () => {
+    const response = await axiosClient.get<ApiResponse<FeePlan[]>>(
+      API_ENDPOINTS.FINANCIAL.FEE_PLANS
+    );
+    return response.data.data ?? [];
   },
 
-   getFeePlan: async(id: number)=>{
+  getFeePlan: async (id: number) => {
     const response = await axiosClient.get<ApiResponse<FeePlan>>(
       `${API_ENDPOINTS.FINANCIAL.FEE_PLANS}/${id}`
-    )
-    return response.data.data ?? []
+    );
+    return response.data.data;
   },
-  // getFeePlan:(id: number) {
-  //   return axiosClient.get<FeePlan>(
-  //     `${API_ENDPOINTS.FINANCIAL.FEE_PLANS}/${id}`
-  //   );
-  // },
 
-
-  createFeePlan(
-    payload: CreateFeePlanPayload
-  ) {
+  createFeePlan(payload: CreateFeePlanPayload) {
     return axiosClient.post<FeePlan>(
       API_ENDPOINTS.FINANCIAL.FEE_PLANS,
       payload
     );
   },
 
-  updateFeePlan(
-    id: number,
-    payload: UpdateFeePlanPayload
-  ) {
+  updateFeePlan(id: number, payload: UpdateFeePlanPayload) {
     return axiosClient.post<FeePlan>(
       `${API_ENDPOINTS.FINANCIAL.FEE_PLANS}/${id}`,
       payload
@@ -108,30 +92,28 @@ export const financialService = {
       `${API_ENDPOINTS.FINANCIAL.FEE_PLANS}/${id}`
     );
   },
+
   // ==========================================
   // Extra Services
   // ==========================================
- getExtraServices(){
-    return axiosClient.get<ExtraService[]>(
-      API_ENDPOINTS.FINANCIAL.EXTRA_SERVICES,
+  getExtraServices: async () => {
+    // تعديل: لضمان التوافق مع هيكلية الردود
+    const response = await axiosClient.get<ApiResponse<ExtraService[]>>(
+      API_ENDPOINTS.FINANCIAL.EXTRA_SERVICES
     );
- },
+    return response.data.data ?? [];
+  },
 
- updateExtraService(
-  id: string,
-  payload: UpdateExtraServicePayload,
- ){
-  return axiosClient.post<ExtraService>(
+  updateExtraService(id: string, payload: UpdateExtraServicePayload) {
+    return axiosClient.post<ExtraService>(
       `${API_ENDPOINTS.FINANCIAL.EXTRA_SERVICES}/${id}`,
       payload
     );
- },
- deleteExtraService(
-  id: string,
- ){
-   return axiosClient.delete<void>(
+  },
+  
+  deleteExtraService(id: string) {
+    return axiosClient.delete<void>(
       `${API_ENDPOINTS.FINANCIAL.EXTRA_SERVICES}/${id}`
     );
- }
-
+  },
 };

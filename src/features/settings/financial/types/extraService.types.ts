@@ -8,7 +8,7 @@ export type ExtraServiceType =
 export type ExtraService = {
   id: number;
 
-  feePlanId?: number;
+  feePlanId: number;
 
   type: ExtraServiceType;
 

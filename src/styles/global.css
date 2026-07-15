@@ -41,6 +41,7 @@
   --sidebar-muted: 171 166 214;
   --sidebar-active: 103 58 244;
   --sidebar-active-foreground: 255 255 255;
+  --sidebar-divider: 255 255 255;
 
   --success: 34 197 94;
   --warning: 245 158 11;
@@ -156,6 +157,7 @@
   --sidebar-muted: 160 154 203;
   --sidebar-active: 124 86 255;
   --sidebar-active-foreground: 255 255 255;
+  --sidebar-divider: 255 255 255;
 
   --success: 74 222 128;
   --warning: 251 191 36;
@@ -266,39 +268,86 @@
   --color-ring: rgb(var(--ring));
 
   --color-sidebar: rgb(var(--sidebar));
-  --color-sidebar-foreground: rgb(var(--sidebar-foreground));
-  --color-sidebar-muted: rgb(var(--sidebar-muted));
-  --color-sidebar-active: rgb(var(--sidebar-active));
+  --color-sidebar-foreground:
+    rgb(var(--sidebar-foreground));
+  --color-sidebar-muted:
+    rgb(var(--sidebar-muted));
+  --color-sidebar-active:
+    rgb(var(--sidebar-active));
   --color-sidebar-active-foreground:
     rgb(var(--sidebar-active-foreground));
+  --color-sidebar-divider:
+    rgb(var(--sidebar-divider));
 
   --color-success: rgb(var(--success));
   --color-warning: rgb(var(--warning));
   --color-info: rgb(var(--info));
 
-  --radius-sm: calc(var(--radius) - 0.25rem);
-  --radius-md: calc(var(--radius) - 0.125rem);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 0.25rem);
-  --radius-2xl: calc(var(--radius) + 0.5rem);
-  --radius-3xl: calc(var(--radius) + 1rem);
+  --radius-sm:
+    calc(var(--radius) - 0.25rem);
 
-  --color-topbar-surface: rgb(var(--topbar-surface));
-  --color-topbar-foreground: rgb(var(--topbar-foreground));
-  --color-topbar-title: rgb(var(--topbar-title));
-  --color-topbar-text: rgb(var(--topbar-text));
-  --color-topbar-subtle: rgb(var(--topbar-subtle));
-  --color-topbar-muted: rgb(var(--topbar-muted));
-  --color-topbar-border: rgb(var(--topbar-border));
-  --color-topbar-soft: rgb(var(--topbar-soft));
-  --color-topbar-soft-hover: rgb(var(--topbar-soft-hover));
-  --color-topbar-divider: rgb(var(--topbar-divider));
-  --color-topbar-success: rgb(var(--topbar-success));
-  --color-topbar-danger: rgb(var(--topbar-danger));
-  --color-topbar-danger-soft: rgb(var(--topbar-danger-soft));
-  --color-topbar-danger-icon: rgb(var(--topbar-danger-icon));
-  --color-topbar-warning: rgb(var(--topbar-warning));
-  --color-topbar-info: rgb(var(--topbar-info));
+  --radius-md:
+    calc(var(--radius) - 0.125rem);
+
+  --radius-lg:
+    var(--radius);
+
+  --radius-xl:
+    calc(var(--radius) + 0.25rem);
+
+  --radius-2xl:
+    calc(var(--radius) + 0.5rem);
+
+  --radius-3xl:
+    calc(var(--radius) + 1rem);
+
+  --color-topbar-surface:
+    rgb(var(--topbar-surface));
+
+  --color-topbar-foreground:
+    rgb(var(--topbar-foreground));
+
+  --color-topbar-title:
+    rgb(var(--topbar-title));
+
+  --color-topbar-text:
+    rgb(var(--topbar-text));
+
+  --color-topbar-subtle:
+    rgb(var(--topbar-subtle));
+
+  --color-topbar-muted:
+    rgb(var(--topbar-muted));
+
+  --color-topbar-border:
+    rgb(var(--topbar-border));
+
+  --color-topbar-soft:
+    rgb(var(--topbar-soft));
+
+  --color-topbar-soft-hover:
+    rgb(var(--topbar-soft-hover));
+
+  --color-topbar-divider:
+    rgb(var(--topbar-divider));
+
+  --color-topbar-success:
+    rgb(var(--topbar-success));
+
+  --color-topbar-danger:
+    rgb(var(--topbar-danger));
+
+  --color-topbar-danger-soft:
+    rgb(var(--topbar-danger-soft));
+
+  --color-topbar-danger-icon:
+    rgb(var(--topbar-danger-icon));
+
+  --color-topbar-warning:
+    rgb(var(--topbar-warning));
+
+  --color-topbar-info:
+    rgb(var(--topbar-info));
 }
 
 @layer base {
@@ -312,6 +361,7 @@
 
   body {
     min-height: 100vh;
+
     background:
       radial-gradient(
         circle at top left,
@@ -326,8 +376,13 @@
       rgb(var(--background));
 
     color: rgb(var(--foreground));
-    font-feature-settings: "rlig" 1, "calt" 1;
+
+    font-feature-settings:
+      "rlig" 1,
+      "calt" 1;
+
     text-rendering: optimizeLegibility;
+
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
@@ -357,130 +412,225 @@
   }
 
   .sidebar-gradient {
-    background: var(--gradient-sidebar);
+    background:
+      var(--gradient-sidebar);
   }
 
   .primary-gradient {
-    background: var(--gradient-primary);
+    background:
+      var(--gradient-primary);
   }
 
   .card-gradient {
-    background: var(--gradient-card);
+    background:
+      var(--gradient-card);
   }
 
   .soft-purple-gradient {
-    background: var(--gradient-soft-purple);
+    background:
+      var(--gradient-soft-purple);
   }
 
   .hero-overlay-gradient {
-    background: var(--gradient-hero-overlay);
+    background:
+      var(--gradient-hero-overlay);
   }
 
   .glass-card {
-    background: rgba(var(--card), 0.78);
-    border: 1px solid rgba(var(--border), 0.72);
-    box-shadow: var(--shadow-card);
-    backdrop-filter: blur(18px);
+    background:
+      rgba(var(--card), 0.78);
+
+    border:
+      1px solid rgba(var(--border), 0.72);
+
+    box-shadow:
+      var(--shadow-card);
+
+    backdrop-filter:
+      blur(18px);
   }
 
   .floating-card {
-    background: rgb(var(--card));
-    border: 1px solid rgba(var(--border), 0.82);
-    box-shadow: var(--shadow-floating);
+    background:
+      rgb(var(--card));
+
+    border:
+      1px solid rgba(var(--border), 0.82);
+
+    box-shadow:
+      var(--shadow-floating);
   }
 
   .soft-card {
-    background: rgb(var(--card));
-    border: 1px solid rgba(var(--border), 0.78);
-    box-shadow: var(--shadow-soft);
+    background:
+      rgb(var(--card));
+
+    border:
+      1px solid rgba(var(--border), 0.78);
+
+    box-shadow:
+      var(--shadow-soft);
   }
 
   .soft-divider {
-    border-color: rgba(var(--border), 0.72);
+    border-color:
+      rgba(var(--border), 0.72);
   }
 
   .sidebar-shell {
     box-shadow:
-      0 26px 80px rgba(12, 8, 48, 0.36),
-      inset -1px 0 0 rgba(255, 255, 255, 0.1);
+      0 26px 80px rgb(12 8 48 / 0.32),
+      inset -1px 0 0
+        rgb(var(--sidebar-foreground) / 0.1);
+  }
+
+  .sidebar-divider {
+    border-color:
+      rgb(var(--sidebar-divider) / 0.2);
   }
 
   .sidebar-pattern {
-    opacity: 0.1;
-    mix-blend-mode: screen;
-    filter: brightness(1.25) contrast(0.9);
+    display: none;
   }
 
   .sidebar-logo-glow {
-    box-shadow:
-      0 16px 34px rgba(var(--primary), 0.38),
-      inset 0 1px 0 rgba(255, 255, 255, 0.28);
+    box-shadow: none;
   }
 
   .sidebar-active-glow {
     box-shadow:
-      0 16px 34px rgba(var(--primary), 0.34),
-      inset 0 1px 0 rgba(255, 255, 255, 0.18);
+      0 14px 30px
+        rgb(var(--sidebar-active) / 0.28),
+      inset 0 1px 0
+        rgb(var(--sidebar-active-foreground) / 0.14);
+  }
+
+  /*
+   * دعم الروابط النشطة التي تستخدم aria-current.
+   */
+  .sidebar-shell a[aria-current="page"] {
+    color:
+      rgb(var(--sidebar-active-foreground));
+  }
+
+  .sidebar-shell a[aria-current="page"] svg {
+    color:
+      rgb(var(--sidebar-active-foreground));
+
+    stroke:
+      currentColor;
+  }
+
+  .sidebar-shell a[aria-current="page"] span {
+    color:
+      rgb(var(--sidebar-active-foreground));
+  }
+
+  /*
+   * دعم العناصر النشطة التي تستخدم data-active.
+   */
+  .sidebar-shell [data-active="true"] {
+    color:
+      rgb(var(--sidebar-active-foreground));
+  }
+
+  .sidebar-shell [data-active="true"] svg {
+    color:
+      rgb(var(--sidebar-active-foreground));
+
+    stroke:
+      currentColor;
+  }
+
+  .sidebar-shell [data-active="true"] span {
+    color:
+      rgb(var(--sidebar-active-foreground));
+  }
+
+  /*
+   * دعم shadcn/Radix الذي يستخدم data-state.
+   */
+  .sidebar-shell [data-state="active"] {
+    color:
+      rgb(var(--sidebar-active-foreground));
+  }
+
+  .sidebar-shell [data-state="active"] svg {
+    color:
+      rgb(var(--sidebar-active-foreground));
+
+    stroke:
+      currentColor;
+  }
+
+  .sidebar-shell [data-state="active"] span {
+    color:
+      rgb(var(--sidebar-active-foreground));
   }
 
   .auth-hero-overlay {
     background:
       linear-gradient(
         90deg,
-        rgb(var(--sidebar) / 0.84) 0%,
-        rgb(var(--sidebar) / 0.6) 42%,
-        rgb(var(--sidebar) / 0.2) 72%,
-        transparent 100%
+        rgb(var(--sidebar) / 0.9) 0%,
+        rgb(var(--sidebar) / 0.74) 38%,
+        rgb(var(--sidebar) / 0.34) 70%,
+        rgb(var(--sidebar) / 0.08) 100%
       ),
       linear-gradient(
         180deg,
-        rgb(var(--sidebar) / 0.05) 0%,
-        transparent 48%,
-        rgb(var(--sidebar) / 0.2) 100%
+        rgb(var(--sidebar) / 0.08) 0%,
+        transparent 46%,
+        rgb(var(--sidebar) / 0.34) 100%
       );
   }
 
   .auth-hero-pattern {
-    opacity: 0.13;
-    background-image:
-      radial-gradient(
-        circle at center,
-        rgb(255 255 255 / 0.18) 1px,
-        transparent 1px
-      );
-    background-size: 28px 28px;
-    mask-image:
-      linear-gradient(
-        90deg,
-        black,
-        rgb(0 0 0 / 0.35) 58%,
-        transparent
-      );
+    display: none;
   }
 
   .auth-hero-copy {
     text-shadow:
-      0 2px 22px rgb(var(--sidebar) / 0.22);
+      0 2px 22px
+        rgb(var(--sidebar) / 0.28);
   }
 
   .auth-hero-image {
-    object-position: center;
+    object-position:
+      center;
+
     filter:
-      saturate(0.95)
-      contrast(1)
-      brightness(0.96);
-    transform: scale(1.015);
+      saturate(0.92)
+      contrast(1.02)
+      brightness(0.9);
+
+    transform:
+      scale(1.015);
   }
 
   .auth-input {
-    height: 3.5rem;
-    border-radius: var(--radius-xl);
-    border-color: rgb(var(--input));
-    background: rgb(var(--card));
-    color: rgb(var(--foreground));
-    font-size: 1rem;
+    height:
+      3.5rem;
+
+    border-radius:
+      var(--radius-xl);
+
+    border-color:
+      rgb(var(--input));
+
+    background:
+      rgb(var(--card));
+
+    color:
+      rgb(var(--foreground));
+
+    font-size:
+      1rem;
+
     box-shadow:
-      0 1px 2px rgb(var(--foreground) / 0.02);
+      0 1px 2px
+        rgb(var(--foreground) / 0.02);
+
     transition:
       border-color 180ms ease,
       box-shadow 180ms ease,
@@ -488,33 +638,57 @@
   }
 
   .auth-input::placeholder {
-    color: rgb(var(--muted-foreground) / 0.7);
+    color:
+      rgb(var(--muted-foreground) / 0.7);
   }
 
   .auth-input:hover:not(:disabled) {
-    border-color: rgb(var(--primary) / 0.35);
+    border-color:
+      rgb(var(--primary) / 0.35);
   }
 
   .auth-input:focus-visible {
-    border-color: rgb(var(--primary));
+    border-color:
+      rgb(var(--primary));
+
     box-shadow:
-      0 0 0 4px rgb(var(--primary) / 0.1);
+      0 0 0 4px
+        rgb(var(--primary) / 0.1);
   }
 
   .auth-input:disabled {
-    cursor: not-allowed;
-    opacity: 0.65;
+    cursor:
+      not-allowed;
+
+    opacity:
+      0.65;
   }
 
   .auth-primary-button {
-    height: 3.5rem;
-    width: 100%;
-    border-radius: var(--radius-xl);
-    background: var(--gradient-primary);
-    color: rgb(var(--primary-foreground));
-    font-size: 1rem;
-    font-weight: 600;
-    box-shadow: var(--shadow-auth-button);
+    height:
+      3.5rem;
+
+    width:
+      100%;
+
+    border-radius:
+      var(--radius-xl);
+
+    background:
+      var(--gradient-primary);
+
+    color:
+      rgb(var(--primary-foreground));
+
+    font-size:
+      1rem;
+
+    font-weight:
+      600;
+
+    box-shadow:
+      var(--shadow-auth-button);
+
     transition:
       transform 180ms ease,
       box-shadow 180ms ease,
@@ -522,50 +696,67 @@
   }
 
   .auth-primary-button:hover:not(:disabled) {
-    transform: translateY(-1px);
+    transform:
+      translateY(-1px);
+
     box-shadow:
-      0 16px 34px rgb(var(--primary) / 0.28);
+      0 16px 34px
+        rgb(var(--primary) / 0.28);
   }
 
   .auth-primary-button:active:not(:disabled) {
-    transform: translateY(0);
+    transform:
+      translateY(0);
   }
 
   .auth-primary-button:focus-visible {
-    outline: none;
+    outline:
+      none;
+
     box-shadow:
-      0 0 0 4px rgb(var(--primary) / 0.14),
+      0 0 0 4px
+        rgb(var(--primary) / 0.14),
       var(--shadow-auth-button);
   }
 
   .auth-primary-button:disabled {
-    cursor: not-allowed;
-    opacity: 0.65;
-    box-shadow: none;
+    cursor:
+      not-allowed;
+
+    opacity:
+      0.65;
+
+    box-shadow:
+      none;
   }
 
   .topbar-item-shadow {
-    box-shadow: var(--shadow-topbar);
+    box-shadow:
+      var(--shadow-topbar);
   }
 
   .topbar-menu-shadow {
-    box-shadow: var(--shadow-topbar-menu);
+    box-shadow:
+      var(--shadow-topbar-menu);
   }
 }
 
 @media (max-width: 1023px) {
   .auth-input {
-    background: rgb(var(--card));
+    background:
+      rgb(var(--card));
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .auth-input,
   .auth-primary-button {
-    transition: none;
+    transition:
+      none;
   }
 
   .auth-primary-button:hover:not(:disabled) {
-    transform: none;
+    transform:
+      none;
   }
 }

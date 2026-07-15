@@ -5,19 +5,13 @@ type AuthBrandLogoProps = {
   className?: string;
 };
 
-const sizes = {
-  sm: {
-    container: "h-14 w-14",
-    icon: "h-7 w-7",
-  },
-  md: {
-    container: "h-16 w-16",
-    icon: "h-8 w-8",
-  },
-  lg: {
-    container: "h-20 w-20",
-    icon: "h-10 w-10",
-  },
+const sizeClasses: Record<
+  NonNullable<AuthBrandLogoProps["size"]>,
+  string
+> = {
+  sm: "h-8 w-8",
+  md: "h-10 w-10",
+  lg: "h-12 w-12",
 };
 
 export function AuthBrandLogo({
@@ -25,22 +19,14 @@ export function AuthBrandLogo({
   className = "",
 }: AuthBrandLogoProps) {
   return (
-    <div
+    <GraduationCap
+      aria-hidden="true"
+      strokeWidth={1.8}
       className={[
-        "mx-auto flex items-center justify-center rounded-3xl",
-        "bg-primary/8",
-        "border border-primary/10",
-        sizes[size].container,
+        "block shrink-0 text-primary",
+        sizeClasses[size],
         className,
       ].join(" ")}
-    >
-      <GraduationCap
-        strokeWidth={2.2}
-        className={[
-          "text-primary",
-          sizes[size].icon,
-        ].join(" ")}
-      />
-    </div>
+    />
   );
 }
