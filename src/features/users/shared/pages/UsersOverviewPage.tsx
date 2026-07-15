@@ -13,28 +13,11 @@ import type { UsersOverviewCounts } from "../types/users-overview.types";
 const emptyCounts: UsersOverviewCounts = {};
 
 export function UsersOverviewPage() {
-  /*
-   * سنستبدل emptyCounts لاحقًا بنتيجة hook واحدة:
-   *
-   * const { data: counts } = useUsersOverviewCounts();
-   *
-   * لا أربط endpoint الآن لأن مساره وشكل response
-   * غير ظاهرين في ملفات المستودع الحالية، وتخمينهما
-   * قد يسبب ربطًا خاطئًا.
-   */
+ 
   const counts = emptyCounts;
 
   return (
     <section className="space-y-7">
-      <header>
-        <h1 className="text-3xl font-bold tracking-[-0.04em] text-foreground">
-          Users
-        </h1>
-
-        <p className="mt-2 text-base leading-7 text-muted-foreground">
-          Manage school users by category.
-        </p>
-      </header>
 
       <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
         <UserCategoryCard

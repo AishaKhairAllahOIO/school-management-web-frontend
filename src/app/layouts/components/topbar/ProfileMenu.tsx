@@ -144,7 +144,7 @@ export function ProfileMenu({
                 icon={Settings}
                 onClick={() =>
                   navigateAndClose(
-                    "/users/students",
+                    "/users",
                   )
                 }
               />
