@@ -41,7 +41,7 @@ export function AuthLayout({ children }: AuthLayoutProps) {
                 <span>Inspiring </span>
 
                 <span className="text-sidebar-active">
-                  futures.
+                  Futures.
                 </span>
               </h1>
 
