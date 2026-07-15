@@ -44,7 +44,7 @@ export function useInstallmentPolicies() {
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: QUERY_KEY });
     },
-    // تمت إضافة معالجة الأخطاء هنا
+
     onError: (error: any) => {
       const serverMessage = error.response?.data?.message;
       alert("الباك إند رفض التعديل! السبب: \n" + (serverMessage || "تأكد هل الراوت POST أو PUT في api.php"));
@@ -57,7 +57,7 @@ export function useInstallmentPolicies() {
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: QUERY_KEY });
     },
-    // تمت إضافة معالجة الأخطاء هنا
+
     onError: (error: any) => {
       const serverMessage = error.response?.data?.message;
       alert("الباك إند رفض الحذف! السبب: \n" + (serverMessage || "غالباً السياسة مرتبطة بخطة رسوم ولا يمكن حذفها."));

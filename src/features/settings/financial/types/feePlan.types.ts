@@ -10,8 +10,6 @@ export type FeePlan = {
 
   gradeLevelId: number;
 
-  installmentPolicyId: number | null;
-
   name: string;
 
   baseAmount: number;
@@ -29,5 +27,4 @@ export type FeePlan = {
   extraServices: ExtraService[];
 };
 
-// هذا فقط حتى لا ينكسر أي Component عندك
 export type FeePlanExtraService = ExtraService;

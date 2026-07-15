@@ -76,7 +76,7 @@ export function InstallmentPolicyForm({
           </Button>
         </div>
 
-        {/* 🔴 الإضافة الجديدة هنا: طباعة خطأ الـ 100% ليراه المستخدم */}
+
         {(errors.items?.message || errors.items?.root?.message) && (
           <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm font-medium text-red-600">
             {errors.items?.message || errors.items?.root?.message}

@@ -30,7 +30,6 @@ export type CreateFeePlanPayload = {
 
   gradeLevelId: number;
   
-  installmentPolicyId: number; // تمت الإضافة
   
   name: string;
   
@@ -45,7 +44,6 @@ export type UpdateFeePlanPayload = {
  
   gradeLevelId?: number;
  
-  installmentPolicyId?: number; // تمت الإضافة
  
   name?: string;
  

@@ -18,7 +18,7 @@ export const installmentItemSchema = z.object({
 
 export const installmentPolicySchema = z.object({
   name: z.string().min(2, "Name is required"),
-  items: z.array(installmentItemSchema) // تم تصحيح الاسم هنا ليتطابق مع الـ Schema أعلاه
+  items: z.array(installmentItemSchema) 
 }).refine((data) => {
   const totalPercentage = data.items.reduce((sum, item) => sum + item.percentage, 0);
   return totalPercentage === 100;

@@ -7,10 +7,10 @@ import { InstallmentPoliciesSection } from "../sections/InstallmentPoliciesSecti
 import { useInstallmentPolicies } from "../hooks/useInstallmentPolicies";
 
 export const FinancialDashboard = () => {
-  // حالة (State) للتحكم بالقسم المعروض حالياً (قسمين فقط)
+
   const [activeTab, setActiveTab] = useState<"fee-plans" | "policies">("fee-plans");
 
-  // 1. جلب سياسات التقسيط الحقيقية
+
   const { data: policies = [], isLoading: isLoadingPolicies } = useInstallmentPolicies();
   
   const installmentPoliciesOptions = policies.map((policy) => ({
@@ -18,21 +18,21 @@ export const FinancialDashboard = () => {
     name: policy.name,
   }));
 
-  // 2. جلب السنوات الدراسية الحقيقية من الـ API
+
   const { data: academicYears = [], isLoading: isLoadingYears } = useQuery({
     queryKey: ["academic-years"],
     queryFn: async () => {
-      // تنويه: تأكد أن هذا المسار يطابق مسار الباك إند لديك
+
       const response = await axiosClient.get(API_ENDPOINTS.SETTINGS.ACADEMIC_YEARS);;
       return response.data.data ?? [];
     },
   });
 
-  // 3. جلب المراحل الدراسية الحقيقية من الـ API
+
   const { data: gradeLevels = [], isLoading: isLoadingGrades } = useQuery({
     queryKey: ["grade-levels"],
     queryFn: async () => {
-      // تنويه: تأكد أن هذا المسار يطابق مسار الباك إند لديك
+
       const response = await axiosClient.get(API_ENDPOINTS.SETTINGS.ACADEMIC_GRADES);
       return response.data.data ?? [];
     },
@@ -43,7 +43,7 @@ export const FinancialDashboard = () => {
   return (
     <div className="mt-8 space-y-8">
       
-      {/* شريط التبويبات (Tabs) - مقسم لعمودين فقط */}
+
       <div className="grid w-full max-w-md grid-cols-2 rounded-2xl border border-border/50 bg-muted/30 p-1 shadow-sm">
         <button
           onClick={() => setActiveTab("fee-plans")}
@@ -68,7 +68,7 @@ export const FinancialDashboard = () => {
         </button>
       </div>
 
-      {/* محتوى كل قسم بناءً على التبويبة النشطة */}
+
       <div className="rounded-3xl border border-border/70 bg-white p-8 shadow-sm min-h-[400px]">
         
         {activeTab === "fee-plans" && (

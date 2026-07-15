@@ -141,16 +141,26 @@ export function InstallmentPoliciesSection() {
       />
        {selectedPolicy && (
         <EditInstallmentPolicyDialog
-          open={editOpen}
-          onOpenChange={setEditOpen}
-          defaultValues={{
-            name: selectedPolicy.name,
- 
-            items: selectedPolicy.items?.map((item) => ({ ...item })) ?? [],
-          }}
-          isLoading={updatePolicy.isPending}
-          onSubmit={handleEdit}
-        />
+        open={editOpen}
+        onOpenChange={setEditOpen}
+        defaultValues={{
+          name: selectedPolicy.name,
+          items: selectedPolicy.items?.map((item) => ({ ...item })) ?? [],
+        }}
+        isLoading={updatePolicy.isPending}
+        onSubmit={(values) => {
+         
+          updatePolicy.mutate(
+            { id: selectedPolicy.id, payload: values },
+            {
+              onSuccess: () => {
+                setEditOpen(false); 
+                setSelectedPolicy(null); 
+              },
+            }
+          );
+        }}
+      />
       )}
               
 
