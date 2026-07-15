@@ -25,26 +25,32 @@ export type UpdateExtraServicePayload = {
 // =====================================
 
 export type CreateFeePlanPayload = {
+
   academicYearId: number;
 
   gradeLevelId: number;
-
+  
+  installmentPolicyId: number; // تمت الإضافة
+  
   name: string;
-
+  
   baseAmount: number;
-
+  
   extraServices: CreateExtraServicePayload[];
 };
 
 export type UpdateFeePlanPayload = {
+ 
   academicYearId?: number;
-
+ 
   gradeLevelId?: number;
-
+ 
+  installmentPolicyId?: number; // تمت الإضافة
+ 
   name?: string;
-
+ 
   baseAmount?: number;
-
+ 
   extraServices?: UpdateExtraServicePayload[];
 };
 
@@ -69,7 +75,7 @@ export type CreateInstallmentPolicyPayload = {
 };
 
 export type UpdateInstallmentPolicyPayload = {
-  name: string;
+  name?: string;
 
-  items: InstallmentPolicyItemPayload[];
+  items?: InstallmentPolicyItemPayload[];
 };

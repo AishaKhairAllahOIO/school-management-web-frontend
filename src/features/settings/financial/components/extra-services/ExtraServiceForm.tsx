@@ -19,21 +19,27 @@ import {
 
 type Props = {
   defaultValues?: Partial<ExtraServiceFormValues>;
-  feePlans: { id: string; name: string }[];
+  feePlans: { id: number; name: string }[];
   isLoading?: boolean;
   onSubmit: (values: ExtraServiceFormValues) => void;
 };
 
-export function ExtraServiceForm({ defaultValues, feePlans, isLoading = false, onSubmit }: Props) {
+export function ExtraServiceForm({
+  defaultValues,
+  feePlans,
+  onSubmit,
+  isLoading = false,
+}: Props) {
+  // تركنا useForm بدون Generic عشان الـ Resolver يستنتج الأنواع براحته ويطابقها مع onSubmit
   const {
     control,
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<ExtraServiceFormValues>({
+  } = useForm({
     resolver: zodResolver(extraServiceSchema),
     defaultValues: {
-      feePlanId: defaultValues?.feePlanId ?? "",
+      feePlanId: defaultValues?.feePlanId ?? 0,
       type: defaultValues?.type ?? "other",
       name: defaultValues?.name ?? "",
       amount: defaultValues?.amount ?? 0,
@@ -41,20 +47,23 @@ export function ExtraServiceForm({ defaultValues, feePlans, isLoading = false, o
   });
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+    <form onSubmit={handleSubmit((data) => onSubmit(data as ExtraServiceFormValues))} className="space-y-6">
       <div className="space-y-2">
         <label className="text-sm font-medium text-foreground">Fee Plan</label>
         <Controller
           control={control}
           name="feePlanId"
           render={({ field }) => (
-            <Select value={field.value} onValueChange={field.onChange}>
+            <Select
+              value={field.value ? String(field.value) : ""}
+              onValueChange={(value) => field.onChange(Number(value))}
+            >
               <SelectTrigger className="h-11 w-full rounded-xl border-border/70 bg-background">
                 <SelectValue placeholder="Select fee plan" />
               </SelectTrigger>
               <SelectContent>
                 {feePlans.map((plan) => (
-                  <SelectItem key={plan.id} value={plan.id}>
+                  <SelectItem key={plan.id} value={String(plan.id)}>
                     {plan.name}
                   </SelectItem>
                 ))}
@@ -62,7 +71,9 @@ export function ExtraServiceForm({ defaultValues, feePlans, isLoading = false, o
             </Select>
           )}
         />
-        {errors.feePlanId && <p className="text-sm text-red-500">{errors.feePlanId.message}</p>}
+        {errors.feePlanId && (
+          <p className="text-sm text-red-500">{String(errors.feePlanId.message)}</p>
+        )}
       </div>
 
       <div className="space-y-2">
@@ -71,12 +82,14 @@ export function ExtraServiceForm({ defaultValues, feePlans, isLoading = false, o
           control={control}
           name="type"
           render={({ field }) => (
-            <Select value={field.value} onValueChange={field.onChange}>
+            <Select value={String(field.value)} onValueChange={field.onChange}>
               <SelectTrigger className="h-11 w-full rounded-xl border-border/70 bg-background">
                 <SelectValue placeholder="Select type" />
               </SelectTrigger>
               <SelectContent>
-                {(["uniform", "books", "activities", "insurance", "other"] as const).map((type) => (
+                {(
+                  ["uniform", "books", "activities", "insurance", "other"] as const
+                ).map((type) => (
                   <SelectItem key={type} value={type}>
                     {type}
                   </SelectItem>
@@ -85,23 +98,51 @@ export function ExtraServiceForm({ defaultValues, feePlans, isLoading = false, o
             </Select>
           )}
         />
-        {errors.type && <p className="text-sm text-red-500">{errors.type.message}</p>}
+        {errors.type && (
+          <p className="text-sm text-red-500">{String(errors.type.message)}</p>
+        )}
       </div>
 
       <div className="space-y-2">
-        <label className="text-sm font-medium text-foreground">Service Name</label>
-        <Input placeholder="Uniform" className="h-11 rounded-xl border-border/70 bg-background" {...register("name")} />
-        {errors.name && <p className="text-sm text-red-500">{errors.name.message}</p>}
+        <label className="text-sm font-medium text-foreground">
+          Service Name
+        </label>
+        <Input
+          placeholder="Uniform"
+          className="h-11 rounded-xl border-border/70 bg-background"
+          {...register("name")}
+        />
+        {errors.name && (
+          <p className="text-sm text-red-500">{String(errors.name.message)}</p>
+        )}
       </div>
 
       <div className="space-y-2">
         <label className="text-sm font-medium text-foreground">Amount</label>
-        <Input type="number" className="h-11 rounded-xl border-border/70 bg-background" {...register("amount")} />
-        {errors.amount && <p className="text-sm text-red-500">{errors.amount.message}</p>}
+        <Input
+          type="number"
+          min={0}
+          step={1}
+          className="h-11 rounded-xl border-border/70 bg-background"
+          {...register("amount")}
+        />
+        {errors.amount && (
+          <p className="text-sm text-red-500">{String(errors.amount.message)}</p>
+        )}
       </div>
 
-      <Button type="submit" disabled={isLoading} className="h-12 w-full rounded-2xl bg-violet-600 text-white shadow-sm hover:bg-violet-700">
-        {isLoading ? "Saving..." : <><Plus className="mr-2 h-4 w-4" /> Save Service</>}
+      <Button
+        type="submit"
+        disabled={isLoading}
+        className="h-12 w-full rounded-2xl bg-violet-600 text-white shadow-sm hover:bg-violet-700"
+      >
+        {isLoading ? (
+          "Saving..."
+        ) : (
+          <>
+            <Plus className="mr-2 h-4 w-4" /> Save Service
+          </>
+        )}
       </Button>
     </form>
   );

@@ -3,7 +3,6 @@ import type { GradeLevel } from "./gradeLevel.types";
 import type { InstallmentPolicy } from "./installmentPolicy.types";
 import type { ExtraService } from "./extraService.types";
 
-
 export type FeePlan = {
   id: number;
 
@@ -29,3 +28,6 @@ export type FeePlan = {
 
   extraServices: ExtraService[];
 };
+
+// هذا فقط حتى لا ينكسر أي Component عندك
+export type FeePlanExtraService = ExtraService;

@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const extraServiceSchema = z.object({
-  feePlanId: z.string().min(1, "Fee Plan is required"),
+  feePlanId: z.coerce.number(),
 
   type: z.enum([
     "uniform",
@@ -15,12 +15,13 @@ export const extraServiceSchema = z.object({
     .string()
     .min(2, "Name is required"),
 
-  amount: z
-    .number({
-      message: "Amount is required",
-    })
+  amount: z.coerce
+    .number()
     .min(0),
 });
 
 export type ExtraServiceFormValues =
   z.infer<typeof extraServiceSchema>;
+
+export type ExtraServiceFormInput =
+  z.input<typeof extraServiceSchema>;

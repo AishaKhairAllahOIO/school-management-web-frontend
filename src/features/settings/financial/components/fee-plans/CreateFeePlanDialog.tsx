@@ -24,6 +24,8 @@ type Props = {
 
   gradeLevels: Option[];
 
+  installmentPolicies: Option[];
+
   isLoading?: boolean;
 
   onSubmit: (
@@ -36,6 +38,7 @@ export function CreateFeePlanDialog({
   onOpenChange,
   academicYears,
   gradeLevels,
+  installmentPolicies,
   onSubmit,
   isLoading,
 }: Props) {
@@ -66,6 +69,7 @@ export function CreateFeePlanDialog({
         <FeePlanForm
           academicYears={academicYears}
           gradeLevels={gradeLevels}
+          installmentPolicies={installmentPolicies}
           isLoading={isLoading}
           onSubmit={handleSubmit}
         />

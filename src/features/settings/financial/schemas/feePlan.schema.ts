@@ -25,6 +25,7 @@ export const feePlanSchema = z.object({
 
   gradeLevelId: z.number(),
 
+  installmentPolicyId: z.number(), // تمت الإضافة
   name: z
     .string()
     .min(2),

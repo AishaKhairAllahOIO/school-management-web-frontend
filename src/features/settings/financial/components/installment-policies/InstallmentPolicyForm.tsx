@@ -108,14 +108,12 @@ export function InstallmentPolicyForm({
           </Button>
 
         </div>
-
-        {fields.map((field, index) => (
+         {fields.map((field, index) => (
           <div
             key={field.id}
             className="rounded-xl border p-5 space-y-4 bg-card"
           >
             <div className="flex items-center justify-between">
-
               <h4 className="font-medium">
                 Installment #{index + 1}
               </h4>
@@ -130,118 +128,78 @@ export function InstallmentPolicyForm({
                   Remove
                 </Button>
               )}
-
             </div>
 
             {/* Title */}
-
             <div className="space-y-1">
-
               <Input
                 placeholder="Installment Title"
-                {...register(
-                  `items.${index}.title`
-                )}
+                {...register(`items.${index}.title`)}
               />
-
               {errors.items?.[index]?.title && (
                 <p className="text-sm text-destructive">
-                  {
-                    errors.items[index]?.title
-                      ?.message
-                  }
+                  {/* تم إضافة ?. قبل [index] */}
+                  {errors.items?.[index]?.title?.message} 
                 </p>
               )}
-
             </div>
 
             {/* Percentage */}
-
             <div className="space-y-1">
-
               <Input
                 type="number"
                 min={1}
                 max={100}
                 placeholder="Percentage"
-                {...register(
-                  `items.${index}.percentage`,
-                  {
-                    valueAsNumber: true,
-                  }
-                )}
+                {...register(`items.${index}.percentage`, {
+                  valueAsNumber: true,
+                })}
               />
-
-              {errors.items?.[index]
-                ?.percentage && (
+              {errors.items?.[index]?.percentage && (
                 <p className="text-sm text-destructive">
-                  {
-                    errors.items[index]
-                      ?.percentage?.message
-                  }
+                  {/* تم إضافة ?. قبل [index] */}
+                  {errors.items?.[index]?.percentage?.message}
                 </p>
               )}
-
             </div>
 
             {/* Month */}
-
             <div className="space-y-1">
-
               <Input
                 type="number"
                 min={1}
                 max={12}
                 placeholder="Due Month"
-                {...register(
-                  `items.${index}.dueMonth`,
-                  {
-                    valueAsNumber: true,
-                  }
-                )}
+                {...register(`items.${index}.dueMonth`, {
+                  valueAsNumber: true,
+                })}
               />
-
-              {errors.items?.[index]
-                ?.dueMonth && (
+              {errors.items?.[index]?.dueMonth && (
                 <p className="text-sm text-destructive">
-                  {
-                    errors.items[index]
-                      ?.dueMonth?.message
-                  }
+                  {/* تم إضافة ?. قبل [index] */}
+                  {errors.items?.[index]?.dueMonth?.message}
                 </p>
               )}
-
             </div>
 
             {/* Day */}
-
             <div className="space-y-1">
-
               <Input
                 type="number"
                 min={1}
                 max={31}
                 placeholder="Due Day"
-                {...register(
-                  `items.${index}.dueDay`,
-                  {
-                    valueAsNumber: true,
-                  }
-                )}
+                {...register(`items.${index}.dueDay`, {
+                  valueAsNumber: true,
+                })}
               />
-
-              {errors.items?.[index]
-                ?.dueDay && (
+              {errors.items?.[index]?.dueDay && (
                 <p className="text-sm text-destructive">
-                  {
-                    errors.items[index]
-                      ?.dueDay?.message
-                  }
+                  {/* تم إضافة ?. قبل [index] */}
+                  {errors.items?.[index]?.dueDay?.message}
                 </p>
               )}
-
             </div>
-
           </div>
         ))}
 

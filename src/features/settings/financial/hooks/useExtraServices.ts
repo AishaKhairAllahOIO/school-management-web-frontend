@@ -6,9 +6,7 @@ import {
 
 import { financialService } from "../services/financial.service";
 
-import type {
-  UpdateExtraServicePayload,
-} from "../types/payloads.types";
+import type { UpdateExtraServicePayload } from "../types/payloads.types";
 
 const QUERY_KEY = ["extra-services"];
 
@@ -17,8 +15,8 @@ export function useExtraServices() {
 
   const query = useQuery({
     queryKey: QUERY_KEY,
-   queryFn: () =>
-    financialService.getFeePlans(),
+    // التعديل هنا: استدعاء الدالة الصحيحة
+    queryFn: () => financialService.getExtraServices(), 
   });
 
   const update = useMutation({
@@ -28,11 +26,7 @@ export function useExtraServices() {
     }: {
       id: number;
       payload: UpdateExtraServicePayload;
-    }) =>
-      financialService.updateExtraService(
-        id.toString(),
-        payload
-      ),
+    }) => financialService.updateExtraService(id.toString(), payload),
 
     onSuccess: async () => {
       await queryClient.invalidateQueries({
@@ -50,16 +44,14 @@ export function useExtraServices() {
         queryKey: QUERY_KEY,
       });
     },
-    onError(error){
-    console.error(error);
-}
+    onError(error) {
+      console.error(error);
+    },
   });
 
   return {
     ...query,
-
     updateExtraService: update,
-
     deleteExtraService: remove,
   };
 }
