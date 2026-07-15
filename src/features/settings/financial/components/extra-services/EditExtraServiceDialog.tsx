@@ -15,7 +15,6 @@ type Props = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   service: ExtraService;
-  // التعديل هنا: تحويل نوع الـ id إلى number ليتطابق مع الـ Form
   feePlans: { id: number; name: string }[]; 
   isLoading?: boolean;
   onSubmit: (values: ExtraServiceFormValues) => void;
@@ -31,7 +30,7 @@ export function EditExtraServiceDialog({
 }: Props) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-xl">
+      <DialogContent className="sm:max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Edit extra service</DialogTitle>
           <DialogDescription>

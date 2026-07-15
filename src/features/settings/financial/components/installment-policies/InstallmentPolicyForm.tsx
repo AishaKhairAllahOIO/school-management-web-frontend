@@ -11,12 +11,8 @@ import { Input } from "@/shared/ui/input";
 
 type Props = {
   defaultValues?: Partial<InstallmentPolicyFormValues>;
-
   isLoading?: boolean;
-
-  onSubmit: (
-    values: InstallmentPolicyFormValues
-  ) => void;
+  onSubmit: (values: InstallmentPolicyFormValues) => void;
 };
 
 export function InstallmentPolicyForm({
@@ -30,68 +26,40 @@ export function InstallmentPolicyForm({
     handleSubmit,
     formState: { errors },
   } = useForm<InstallmentPolicyFormValues>({
-    resolver: zodResolver(
-      installmentPolicySchema
-    ),
-
+    resolver: zodResolver(installmentPolicySchema),
     defaultValues: {
       name: defaultValues?.name ?? "",
-
-      items:
-        defaultValues?.items ?? [
-          {
-            title: "",
-            percentage: 100,
-            dueMonth: 9,
-            dueDay: 1,
-          },
-        ],
+      items: defaultValues?.items ?? [
+        {
+          title: "",
+          percentage: 100,
+          dueMonth: 9,
+          dueDay: 1,
+        },
+      ],
     },
   });
 
-  const {
-    fields,
-    append,
-    remove,
-  } = useFieldArray({
+  const { fields, append, remove } = useFieldArray({
     control,
     name: "items",
   });
 
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit)}
-      className="space-y-6"
-    >
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       {/* Policy Name */}
-
       <div className="space-y-2">
-        <label className="text-sm font-medium">
-          Policy Name
-        </label>
-
-        <Input
-          placeholder="Installment Policy"
-          {...register("name")}
-        />
-
+        <label className="text-sm font-medium">Policy Name</label>
+        <Input placeholder="Installment Policy" {...register("name")} />
         {errors.name && (
-          <p className="text-sm text-destructive">
-            {errors.name.message}
-          </p>
+          <p className="text-sm text-red-500">{errors.name.message}</p>
         )}
       </div>
 
       {/* Installments */}
-
       <div className="space-y-4">
-
         <div className="flex items-center justify-between">
-
-          <h3 className="font-semibold text-lg">
-            Installments
-          </h3>
-
+          <h3 className="text-lg font-semibold">Installments</h3>
           <Button
             type="button"
             variant="outline"
@@ -106,18 +74,19 @@ export function InstallmentPolicyForm({
           >
             + Add Installment
           </Button>
-
         </div>
-         {fields.map((field, index) => (
-          <div
-            key={field.id}
-            className="rounded-xl border p-5 space-y-4 bg-card"
-          >
-            <div className="flex items-center justify-between">
-              <h4 className="font-medium">
-                Installment #{index + 1}
-              </h4>
 
+        {/* 🔴 الإضافة الجديدة هنا: طباعة خطأ الـ 100% ليراه المستخدم */}
+        {(errors.items?.message || errors.items?.root?.message) && (
+          <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm font-medium text-red-600">
+            {errors.items?.message || errors.items?.root?.message}
+          </div>
+        )}
+
+        {fields.map((field, index) => (
+          <div key={field.id} className="space-y-4 rounded-xl border bg-card p-5">
+            <div className="flex items-center justify-between">
+              <h4 className="font-medium">Installment #{index + 1}</h4>
               {fields.length > 1 && (
                 <Button
                   type="button"
@@ -137,9 +106,8 @@ export function InstallmentPolicyForm({
                 {...register(`items.${index}.title`)}
               />
               {errors.items?.[index]?.title && (
-                <p className="text-sm text-destructive">
-                  {/* تم إضافة ?. قبل [index] */}
-                  {errors.items?.[index]?.title?.message} 
+                <p className="text-sm text-red-500">
+                  {errors.items[index]?.title?.message}
                 </p>
               )}
             </div>
@@ -156,9 +124,8 @@ export function InstallmentPolicyForm({
                 })}
               />
               {errors.items?.[index]?.percentage && (
-                <p className="text-sm text-destructive">
-                  {/* تم إضافة ?. قبل [index] */}
-                  {errors.items?.[index]?.percentage?.message}
+                <p className="text-sm text-red-500">
+                  {errors.items[index]?.percentage?.message}
                 </p>
               )}
             </div>
@@ -175,9 +142,8 @@ export function InstallmentPolicyForm({
                 })}
               />
               {errors.items?.[index]?.dueMonth && (
-                <p className="text-sm text-destructive">
-                  {/* تم إضافة ?. قبل [index] */}
-                  {errors.items?.[index]?.dueMonth?.message}
+                <p className="text-sm text-red-500">
+                  {errors.items[index]?.dueMonth?.message}
                 </p>
               )}
             </div>
@@ -194,27 +160,18 @@ export function InstallmentPolicyForm({
                 })}
               />
               {errors.items?.[index]?.dueDay && (
-                <p className="text-sm text-destructive">
-                  {/* تم إضافة ?. قبل [index] */}
-                  {errors.items?.[index]?.dueDay?.message}
+                <p className="text-sm text-red-500">
+                  {errors.items[index]?.dueDay?.message}
                 </p>
               )}
             </div>
           </div>
         ))}
-
       </div>
 
-      <Button
-        type="submit"
-        disabled={isLoading}
-        className="w-full"
-      >
-        {isLoading
-          ? "Saving..."
-          : "Save Policy"}
+      <Button type="submit" disabled={isLoading} className="w-full">
+        {isLoading ? "Saving..." : "Save Policy"}
       </Button>
-
     </form>
   );
 }

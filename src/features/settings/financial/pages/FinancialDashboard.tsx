@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { axiosClient } from "@/services/axios/axiosClient";
-
+import { API_ENDPOINTS } from "@/services/api/endpoints"; // تأكد من مسار الاستيراد حسب مجلداتك
 import { FeePlansSection } from "../sections/FeePlansSection";
 import { InstallmentPoliciesSection } from "../sections/InstallmentPoliciesSection";
 import { useInstallmentPolicies } from "../hooks/useInstallmentPolicies";
@@ -23,7 +23,7 @@ export const FinancialDashboard = () => {
     queryKey: ["academic-years"],
     queryFn: async () => {
       // تنويه: تأكد أن هذا المسار يطابق مسار الباك إند لديك
-      const response = await axiosClient.get("/api/admin/academic-years");
+      const response = await axiosClient.get(API_ENDPOINTS.SETTINGS.ACADEMIC_YEARS);;
       return response.data.data ?? [];
     },
   });
@@ -33,7 +33,7 @@ export const FinancialDashboard = () => {
     queryKey: ["grade-levels"],
     queryFn: async () => {
       // تنويه: تأكد أن هذا المسار يطابق مسار الباك إند لديك
-      const response = await axiosClient.get("/api/admin/grade-levels");
+      const response = await axiosClient.get(API_ENDPOINTS.SETTINGS.ACADEMIC_GRADES);
       return response.data.data ?? [];
     },
   });

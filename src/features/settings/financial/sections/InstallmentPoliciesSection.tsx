@@ -139,14 +139,14 @@ export function InstallmentPoliciesSection() {
         isLoading={createPolicy.isPending}
         onSubmit={handleCreate}
       />
-
-      {selectedPolicy && (
+       {selectedPolicy && (
         <EditInstallmentPolicyDialog
           open={editOpen}
           onOpenChange={setEditOpen}
           defaultValues={{
             name: selectedPolicy.name,
-            items: selectedPolicy.items.map((item) => ({ ...item })),
+ 
+            items: selectedPolicy.items?.map((item) => ({ ...item })) ?? [],
           }}
           isLoading={updatePolicy.isPending}
           onSubmit={handleEdit}

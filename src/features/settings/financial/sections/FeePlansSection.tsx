@@ -167,36 +167,19 @@ function handleEdit(values: FeePlanFormValues) {
           gradeLevels={gradeLevels}
           installmentPolicies={installmentPolicies}
           defaultValues={{
-            academicYearId:
-              selectedPlan.academicYearId,
-
-            gradeLevelId:
-              selectedPlan.gradeLevelId,
-
-            name: selectedPlan.name,
-
+            academicYearId: selectedPlan.academicYearId,
+            gradeLevelId: selectedPlan.gradeLevelId,
             installmentPolicyId: selectedPlan.installmentPolicyId ?? 0,
-
-            baseAmount:
-              selectedPlan.baseAmount,
-
-            extraServices:
-              selectedPlan.extraServices.map(
-                (service) => ({
-                  
-                  feePlanId:service.feePlanId,
-
-                  type: service.type,
-
-                  name: service.name,
-
-                  amount: service.amount,
-                })
-              ),
+            name: selectedPlan.name,
+            baseAmount: selectedPlan.baseAmount,
+            
+             extraServices: selectedPlan.extraServices?.map((service) => ({
+              type: service.type,
+              name: service.name,
+              amount: service.amount,
+            })) ?? [],
           }}
-          isLoading={
-            updateFeePlan.isPending
-          }
+          isLoading={updateFeePlan.isPending}
           onSubmit={handleEdit}
         />
       )}
