@@ -21,7 +21,7 @@ export const sidebarItems = [
   },
   {
     titleKey: "users",
-    path: "/users/students",
+    path: "/users",
     icon: Users,
   },
   {
