@@ -5,6 +5,7 @@ import { AcademicSettingsPage } from "@/features/settings/academic/pages/Academi
 import { GeneralSettingsPage } from "@/features/settings/general/pages/GeneralSettingsPage";
 import { PermissionsPage } from "@/features/settings/permissions/pages/PermissionsPage";
 import { RolesPage } from "@/features/settings/roles/pages/RolesPage";
+import { FinancialSettingsPage } from "@/features/settings/financial/pages/FinancialSettingsPage";
 
 export const settingsRoutes = [
   {
@@ -29,6 +30,10 @@ export const settingsRoutes = [
       {
         path: "permissions",
         element: <PermissionsPage />,
+      },
+      {
+        path: "financial",
+        element: <FinancialSettingsPage />
       },
     ],
   },
