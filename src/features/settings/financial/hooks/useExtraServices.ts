@@ -17,7 +17,8 @@ export function useExtraServices() {
 
   const query = useQuery({
     queryKey: QUERY_KEY,
-    queryFn: financialService.getExtraServices,
+   queryFn: () =>
+    financialService.getFeePlans(),
   });
 
   const update = useMutation({
@@ -25,11 +26,11 @@ export function useExtraServices() {
       id,
       payload,
     }: {
-      id: string;
+      id: number;
       payload: UpdateExtraServicePayload;
     }) =>
       financialService.updateExtraService(
-        id,
+        id.toString(),
         payload
       ),
 
@@ -41,14 +42,17 @@ export function useExtraServices() {
   });
 
   const remove = useMutation({
-    mutationFn: (id: string) =>
-      financialService.deleteExtraService(id),
+    mutationFn: (id: number) =>
+      financialService.deleteExtraService(id.toString()),
 
     onSuccess: async () => {
       await queryClient.invalidateQueries({
         queryKey: QUERY_KEY,
       });
     },
+    onError(error){
+    console.error(error);
+}
   });
 
   return {

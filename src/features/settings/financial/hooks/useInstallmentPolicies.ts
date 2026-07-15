@@ -70,6 +70,9 @@ export function useInstallmentPolicies() {
         queryKey: QUERY_KEY,
       });
     },
+    onError(error){
+    console.error(error);
+}
   });
 
   return {
