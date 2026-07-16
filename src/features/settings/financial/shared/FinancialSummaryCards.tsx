@@ -2,14 +2,17 @@ import { Banknote, Receipt, TrendingUp } from "lucide-react";
 
 import { useFeePlans } from "../hooks/useFeePlans";
 import { useInstallmentPolicies } from "../hooks/useInstallmentPolicies";
-import { useExtraServices } from "../hooks/useExtraServices";
+
 
 export function FinancialSummaryCards() {
-
   const { data: feePlans = [], isLoading: isLoadingFeePlans } = useFeePlans();
   const { data: policies = [], isLoading: isLoadingPolicies } = useInstallmentPolicies();
-  const { data: extraServices = [], isLoading: isLoadingExtraServices } = useExtraServices();
 
+
+  const totalExtraServices = feePlans.reduce(
+    (total, plan) => total + (plan.extraServices?.length || 0), 
+    0
+  );
 
   const cards = [
     { 
@@ -19,7 +22,8 @@ export function FinancialSummaryCards() {
     },
     { 
       title: "Extra Services", 
-      value: isLoadingExtraServices ? "..." : extraServices.length.toString(), 
+
+      value: isLoadingFeePlans ? "..." : totalExtraServices.toString(), 
       icon: Banknote 
     },
     { 
