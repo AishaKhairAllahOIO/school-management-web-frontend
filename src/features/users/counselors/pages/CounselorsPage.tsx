@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 
-import { UsersToolbar } from "@/features/users/shared/components/UsersToolbar";
-import { UsersTable } from "@/features/users/shared/components/UsersTable";
+import { UsersToolbar } from "@/features/users/components/UsersToolbar";
+import { UsersTable } from "@/features/users/components/UsersTable";
 import { counselorCsvColumns } from "@/features/users/shared/config/userCsvColumns";
 import {
   exportDataToCsv,

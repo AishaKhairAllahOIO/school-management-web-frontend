@@ -1,325 +1,125 @@
-import { API_ENDPOINTS } from "@/services/api/endpoints";
-import { axiosClient } from "@/services/axios/axiosClient";
-import type { ApiResponse } from "@/services/types/apiResponse";
-
-import {
-  createPersonalUpdateFormData,
-  createRegisterStudentFormData,
-} from "./student.form-data";
-
-import {
-  mapImportHistoryPayload,
-  mapStudentListPayload,
-} from "./student.mappers";
-
+import type { AxiosInstance } from "axios";
+import type { ApiId, ApiResponse } from "../../shared/types/api.types";
+import { buildStudentRegistrationFormData } from "./student-form-data";
+import { studentEndpoints } from "./student.endpoints";
 import type {
-  ApiEnrollment,
-  ApiPerson,
-  EntityId,
-  RegisterStudentPayload,
-  RegisterStudentResponse,
-  StudentDetailsResponse,
-  StudentFilterApiPayload,
-  StudentFullProfileResponse,
-  StudentImportBatchStatus,
-  StudentImportHistoryItem,
-  StudentImportHistoryResult,
-  StudentImportResponse,
-  StudentListFilters,
-  StudentListResult,
-  ToggleStudentStatusResponse,
-  UpdateGuardianPersonalPayload,
-  UpdateStudentEnrollmentPayload,
-  UpdateStudentPersonalPayload,
-} from "../types/student-api.types";
+  ImportBatchStatus,
+  RegisterStudentFormValues,
+  StudentFilters,
+  StudentListResponse,
+  StudentProfile,
+  UpdateEnrollmentPayload,
+} from "../types/student.types";
 
-function requireResponseData<T>(
-  data: T | undefined,
-  errorMessage: string,
-): T {
-  if (data === undefined) {
-    throw new Error(errorMessage);
-  }
-
-  return data;
-}
-
-function compactParams(
-  params: Record<string, unknown>,
-): Record<string, unknown> {
-  return Object.fromEntries(
-    Object.entries(params).filter(
-      ([, value]) =>
-        value !== undefined &&
-        value !== null &&
-        value !== "",
-    ),
-  );
-}
-
-function toFilterParams(filters: StudentListFilters) {
-  return compactParams({
-    level: filters.level,
-    name_classroom: filters.classroomName,
-    status: filters.status,
-    sort: filters.sort,
-    page: filters.page,
-  });
-}
-
-function toEnrollmentPayload(
-  payload: UpdateStudentEnrollmentPayload,
-) {
-  return compactParams({
-    academic_year_id: payload.academicYearId,
-    grade_level_id: payload.gradeLevelId,
-    class_room_id: payload.classroomId,
-    enrollment_status: payload.enrollmentStatus,
-  });
-}
-
-export const studentApi = {
-  async list(
-    filters: StudentListFilters = {},
-  ): Promise<StudentListResult> {
-    const normalizedQuery = filters.query?.trim();
-
-    if (normalizedQuery) {
-      const response = await axiosClient.get<
-        ApiResponse<StudentFilterApiPayload>
-      >(API_ENDPOINTS.STUDENTS.SEARCH, {
-        params: {
-          q: normalizedQuery,
-          page: filters.page,
-        },
-      });
-
-      return mapStudentListPayload(
-        requireResponseData(
-          response.data.data,
-          "Students were not returned by the server.",
-        ),
+export function createStudentApi(client: AxiosInstance) {
+  return {
+    async list(filters: StudentFilters = {}) {
+      const response = await client.get<ApiResponse<StudentListResponse>>(
+        studentEndpoints.filter,
+        { params: filters },
       );
-    }
+      return response.data.data;
+    },
 
-    const response = await axiosClient.get<
-      ApiResponse<StudentFilterApiPayload>
-    >(API_ENDPOINTS.STUDENTS.FILTER, {
-      params: toFilterParams(filters),
-    });
+    async search(query: string) {
+      const response = await client.get<ApiResponse<StudentListResponse>>(
+        studentEndpoints.search,
+        { params: { q: query } },
+      );
+      return response.data.data;
+    },
 
-    return mapStudentListPayload(
-      requireResponseData(
-        response.data.data,
-        "Students were not returned by the server.",
-      ),
-    );
-  },
+    async getDetails(studentId: ApiId) {
+      const response = await client.get<ApiResponse<StudentProfile>>(
+        studentEndpoints.details(studentId),
+      );
+      return response.data.data;
+    },
 
-  async register(
-    payload: RegisterStudentPayload,
-  ): Promise<RegisterStudentResponse> {
-    const formData =
-      createRegisterStudentFormData(payload);
+    async getFullProfile(enrollmentId: ApiId) {
+      const response = await client.get<ApiResponse<StudentProfile>>(
+        studentEndpoints.fullProfile(enrollmentId),
+      );
+      return response.data.data;
+    },
 
-    const response = await axiosClient.post<
-      ApiResponse<RegisterStudentResponse>
-    >(
-      API_ENDPOINTS.STUDENTS.REGISTER,
-      formData,
-    );
+    async register(values: RegisterStudentFormValues) {
+      const response = await client.post<ApiResponse<StudentProfile>>(
+        studentEndpoints.register,
+        buildStudentRegistrationFormData(values),
+      );
+      return response.data.data;
+    },
 
-    return requireResponseData(
-      response.data.data,
-      "Registered student data was not returned by the server.",
-    );
-  },
+    async updatePersonal(studentId: ApiId, values: Record<string, unknown>) {
+      const formData = new FormData();
+      Object.entries(values).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== "") {
+          formData.append(key, value instanceof File ? value : String(value));
+        }
+      });
+      const response = await client.post<ApiResponse<StudentProfile["student"]>>(
+        studentEndpoints.personal(studentId),
+        formData,
+      );
+      return response.data.data;
+    },
 
-  async getDetails(
-    studentId: EntityId,
-  ): Promise<StudentDetailsResponse> {
-    const response = await axiosClient.get<
-      ApiResponse<StudentDetailsResponse>
-    >(
-      API_ENDPOINTS.STUDENTS.DETAILS(studentId),
-    );
+    async updateGuardian(guardianId: ApiId, values: Record<string, unknown>) {
+      const formData = new FormData();
+      Object.entries(values).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== "") {
+          formData.append(key, value instanceof File ? value : String(value));
+        }
+      });
+      const response = await client.post<ApiResponse<StudentProfile["guardian"]>>(
+        studentEndpoints.guardianPersonal(guardianId),
+        formData,
+      );
+      return response.data.data;
+    },
 
-    return requireResponseData(
-      response.data.data,
-      "Student details were not returned by the server.",
-    );
-  },
+    async updateEnrollment(enrollmentId: ApiId, payload: UpdateEnrollmentPayload) {
+      const response = await client.post<ApiResponse<StudentProfile["enrollment"]>>(
+        studentEndpoints.enrollment(enrollmentId),
+        payload,
+      );
+      return response.data.data;
+    },
 
-  async getFullProfile(
-    enrollmentId: EntityId,
-  ): Promise<StudentFullProfileResponse> {
-    const response = await axiosClient.get<
-      ApiResponse<StudentFullProfileResponse>
-    >(
-      API_ENDPOINTS.STUDENTS.FULL_PROFILE(
-        enrollmentId,
-      ),
-    );
+    async toggleAccount(enrollmentId: ApiId) {
+      const response = await client.post<ApiResponse<{ account_status: string }>>(
+        studentEndpoints.toggleAccount(enrollmentId),
+      );
+      return response.data.data;
+    },
 
-    return requireResponseData(
-      response.data.data,
-      "Student full profile was not returned by the server.",
-    );
-  },
+    async remove(enrollmentId: ApiId) {
+      await client.delete(studentEndpoints.remove(enrollmentId));
+    },
 
-  async updatePersonal(
-    studentId: EntityId,
-    payload: UpdateStudentPersonalPayload,
-  ): Promise<ApiPerson> {
-    const response = await axiosClient.post<
-      ApiResponse<ApiPerson>
-    >(
-      API_ENDPOINTS.STUDENTS.PERSONAL(studentId),
-      createPersonalUpdateFormData(payload),
-    );
+    async importFile(file: File) {
+      const formData = new FormData();
+      formData.append("excel_file", file);
+      const response = await client.post<ApiResponse<{ batch_id: ApiId }>>(
+        studentEndpoints.import,
+        formData,
+      );
+      return response.data.data;
+    },
 
-    return requireResponseData(
-      response.data.data,
-      "Updated student data was not returned by the server.",
-    );
-  },
+    async getImportStatus(batchId: ApiId) {
+      const response = await client.get<ApiResponse<ImportBatchStatus>>(
+        studentEndpoints.importStatus(batchId),
+      );
+      return response.data.data;
+    },
 
-  async updateGuardian(
-    guardianId: EntityId,
-    payload: UpdateGuardianPersonalPayload,
-  ): Promise<ApiPerson> {
-    const response = await axiosClient.post<
-      ApiResponse<ApiPerson>
-    >(
-      API_ENDPOINTS.STUDENTS.GUARDIAN_PERSONAL(
-        guardianId,
-      ),
-      createPersonalUpdateFormData(payload),
-    );
-
-    return requireResponseData(
-      response.data.data,
-      "Updated guardian data was not returned by the server.",
-    );
-  },
-
-  async updateEnrollment(
-    enrollmentId: EntityId,
-    payload: UpdateStudentEnrollmentPayload,
-  ): Promise<ApiEnrollment> {
-    const response = await axiosClient.post<
-      ApiResponse<ApiEnrollment>
-    >(
-      API_ENDPOINTS.STUDENTS.ENROLLMENT(
-        enrollmentId,
-      ),
-      toEnrollmentPayload(payload),
-    );
-
-    return requireResponseData(
-      response.data.data,
-      "Updated enrollment data was not returned by the server.",
-    );
-  },
-
-  async remove(
-    enrollmentId: EntityId,
-  ): Promise<void> {
-    await axiosClient.delete<ApiResponse<never>>(
-      API_ENDPOINTS.STUDENTS.DELETE(enrollmentId),
-    );
-  },
-
-  async toggleAccountStatus(
-    enrollmentId: EntityId,
-  ): Promise<ToggleStudentStatusResponse> {
-    const response = await axiosClient.post<
-      ApiResponse<ToggleStudentStatusResponse>
-    >(
-      API_ENDPOINTS.STUDENTS
-        .TOGGLE_ACCOUNT_STATUS(enrollmentId),
-    );
-
-    return requireResponseData(
-      response.data.data,
-      "Updated account status was not returned by the server.",
-    );
-  },
-
-  async importExcel(
-    file: File,
-  ): Promise<StudentImportResponse> {
-    const formData = new FormData();
-    formData.append("file", file);
-
-    const response = await axiosClient.post<
-      ApiResponse<StudentImportResponse>
-    >(
-      API_ENDPOINTS.STUDENTS.IMPORT,
-      formData,
-    );
-
-    return requireResponseData(
-      response.data.data,
-      "Import batch ID was not returned by the server.",
-    );
-  },
-
-  async getImportStatus(
-    batchId: EntityId,
-  ): Promise<StudentImportBatchStatus> {
-    const response = await axiosClient.get<
-      ApiResponse<StudentImportBatchStatus>
-    >(
-      API_ENDPOINTS.STUDENTS.IMPORT_STATUS(
-        batchId,
-      ),
-    );
-
-    return requireResponseData(
-      response.data.data,
-      "Student import status was not returned by the server.",
-    );
-  },
-
-  async getImportHistory(): Promise<StudentImportHistoryResult> {
-    const response = await axiosClient.get<
-      ApiResponse<
-        | StudentImportHistoryItem[]
-        | {
-            data: StudentImportHistoryItem[];
-            meta?: {
-              current_page: number;
-              last_page: number;
-              per_page?: number;
-              total?: number;
-            };
-          }
-      >
-    >(
-      API_ENDPOINTS.STUDENTS.IMPORT_HISTORY,
-    );
-
-    return mapImportHistoryPayload(
-      requireResponseData(
-        response.data.data,
-        "Import history was not returned by the server.",
-      ),
-    );
-  },
-
-  async downloadImportErrors(
-    batchId: EntityId,
-  ): Promise<Blob> {
-    const response = await axiosClient.get<Blob>(
-      API_ENDPOINTS.STUDENTS.IMPORT_ERRORS(
-        batchId,
-      ),
-      {
+    async exportImportErrors(batchId: ApiId) {
+      const response = await client.get<Blob>(studentEndpoints.importErrors(batchId), {
         responseType: "blob",
-      },
-    );
-
-    return response.data;
-  },
-};
+      });
+      return response.data;
+    },
+  };
+}

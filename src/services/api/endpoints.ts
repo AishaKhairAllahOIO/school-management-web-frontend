@@ -47,45 +47,77 @@ ACADEMIC_CLASSROOM: (classroomId: string) =>
   `/admin/settings/classrooms/${classroomId}`,
   },
 
-  STUDENTS: {
-    REGISTER: "/admin/student/register",
+ STUDENTS: {
+  REGISTER: "/admin/student/register",
 
-    SEARCH: "/admin/students/search",
-    FILTER: "/admin/students/filter",
+  IMPORT: "/admin/student/import",
 
-    DETAILS: (studentId: string | number) =>
-      `/admin/students/${studentId}`,
+  IMPORT_STATUS: (batchId: ApiId) =>
+    `/admin/student/import-batches/${batchId}/status`,
 
-    FULL_PROFILE: (enrollmentId: string | number) =>
-      `/admin/students/${enrollmentId}/full-profile`,
+  IMPORT_ERRORS: (batchId: ApiId) =>
+    `/admin/student/import-batches/${batchId}/errors/export`,
 
-    PERSONAL: (studentId: string | number) =>
-      `/admin/students/${studentId}/personal`,
+  IMPORT_HISTORY: "/admin/student/import-batches/history",
 
-    GUARDIAN_PERSONAL: (guardianId: string | number) =>
-      `/admin/students/guardians/${guardianId}/personal`,
+  FILTER: "/admin/students/filter",
 
-    ENROLLMENT: (enrollmentId: string | number) =>
-      `/admin/students/enrollments/${enrollmentId}`,
+  SEARCH: "/admin/students/search",
 
-    TOGGLE_ACCOUNT_STATUS: (enrollmentId: string | number) =>
-      `/admin/students/${enrollmentId}/toggle-account-status`,
+  DETAILS: (studentId: ApiId) =>
+    `/admin/students/${studentId}`,
 
-    DELETE: (enrollmentId: string | number) =>
-      `/admin/students/${enrollmentId}`,
+  FULL_PROFILE: (enrollmentId: ApiId) =>
+    `/admin/students/${enrollmentId}/full-profile`,
 
-    IMPORT: "/admin/student/import",
+  PERSONAL: (studentId: ApiId) =>
+    `/admin/students/${studentId}/personal`,
 
-    IMPORT_STATUS: (batchId: string | number) =>
-      `/admin/student/import-batches/${batchId}/status`,
+  GUARDIAN_PERSONAL: (guardianId: ApiId) =>
+    `/admin/students/guardians/${guardianId}/personal`,
 
-    IMPORT_ERRORS: (batchId: string | number) =>
-      `/admin/student/import-batches/${batchId}/errors/export`,
+  ENROLLMENT: (enrollmentId: ApiId) =>
+    `/admin/students/enrollments/${enrollmentId}`,
 
-    IMPORT_HISTORY:
-      "/admin/student/import-batches/history",
-  },
-  
+  TOGGLE_ACCOUNT_STATUS: (enrollmentId: ApiId) =>
+    `/admin/students/${enrollmentId}/toggle-account-status`,
+
+  DELETE: (enrollmentId: ApiId) =>
+    `/admin/students/${enrollmentId}`,
+},
+
+STAFF: {
+  REGISTER: "/admin/staff/register",
+
+  IMPORT: "/admin/staff/import",
+
+  IMPORT_STATUS: (batchId: ApiId) =>
+    `/admin/staff/import-batches/${batchId}/status`,
+
+  IMPORT_ERRORS: (batchId: ApiId) =>
+    `/admin/staff/import-batches/${batchId}/errors/export`,
+
+  LIST: "/admin/staff/showAllStaff",
+
+  SEARCH: "/admin/staff/search",
+
+  ALPHABETICAL: "/admin/staff/alphabetical",
+
+  DETAILS: (staffId: ApiId) =>
+    `/admin/staff/showStaff/${staffId}`,
+
+  PERSONAL: (staffId: ApiId) =>
+    `/admin/staff/${staffId}/personal`,
+
+  EMPLOYMENT: (staffId: ApiId) =>
+    `/admin/staff/${staffId}/employment`,
+
+  TOGGLE_STATUS: (staffId: ApiId) =>
+    `/admin/staff/${staffId}/toggle-status`,
+
+  DELETE: (staffId: ApiId) =>
+    `/admin/staff/${staffId}`,
+},
    FINANCIAL: {
 
     BASE: "/admin/finance/settings",

@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 
-import { UsersToolbar } from "@/features/users/shared/components/UsersToolbar";
-import { UsersTable } from "@/features/users/shared/components/UsersTable";
+import { UsersToolbar } from "@/features/users/components/UsersToolbar";
+import { UsersTable } from "@/features/users/components/UsersTable";
 import { secretaryCsvColumns } from "@/features/users/shared/config/userCsvColumns";
 import {
   exportDataToCsv,
@@ -27,7 +27,6 @@ export function SecretariesPage() {
         fullName.includes(search) ||
         secretary.phoneNumber.toLowerCase().includes(search) ||
         secretary.secretaryCode.toLowerCase().includes(search) ||
-        secretary.secretaryEmail.toLowerCase().includes(search) ||
         secretary.specialization.toLowerCase().includes(search)
       );
     });
