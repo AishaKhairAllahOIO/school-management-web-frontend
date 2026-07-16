@@ -30,7 +30,7 @@ export function ExtraServiceForm({
   onSubmit,
   isLoading = false,
 }: Props) {
-  // تركنا useForm بدون Generic عشان الـ Resolver يستنتج الأنواع براحته ويطابقها مع onSubmit
+
   const {
     control,
     register,

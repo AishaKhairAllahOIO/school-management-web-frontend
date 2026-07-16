@@ -20,7 +20,7 @@ export const financialService = {
   // ==========================================
 
   getInstallmentPolicies: async () => {
-    // تعديل: غالباً الباك إند بيرجعها مغلفة بـ ApiResponse بناءً على ملف الـ JSON
+
     const response = await axiosClient.get<ApiResponse<InstallmentPolicy[]>>(
       API_ENDPOINTS.FINANCIAL.POLICIES
     );
@@ -97,7 +97,7 @@ export const financialService = {
   // Extra Services
   // ==========================================
   getExtraServices: async () => {
-    // تعديل: لضمان التوافق مع هيكلية الردود
+
     const response = await axiosClient.get<ApiResponse<ExtraService[]>>(
       API_ENDPOINTS.FINANCIAL.EXTRA_SERVICES
     );

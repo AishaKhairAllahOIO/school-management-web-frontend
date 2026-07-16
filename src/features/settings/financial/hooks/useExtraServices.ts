@@ -15,8 +15,7 @@ export function useExtraServices() {
 
   const query = useQuery({
     queryKey: QUERY_KEY,
-    // التعديل هنا: استدعاء الدالة الصحيحة
-    queryFn: () => financialService.getExtraServices(), 
+     queryFn: () => financialService.getExtraServices(), 
   });
 
   const update = useMutation({

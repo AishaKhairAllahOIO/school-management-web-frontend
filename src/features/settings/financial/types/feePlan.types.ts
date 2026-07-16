@@ -1,4 +1,4 @@
-import type { AcademicYear } from "./academicYear.types";
+import type { AcademicYear } from "../../academic/types/academic-settings.types";
 import type { GradeLevel } from "./gradeLevel.types";
 import type { InstallmentPolicy } from "./installmentPolicy.types";
 import type { ExtraService } from "./extraService.types";
@@ -9,8 +9,6 @@ export type FeePlan = {
   academicYearId: number;
 
   gradeLevelId: number;
-
-  installmentPolicyId: number | null;
 
   name: string;
 
@@ -29,5 +27,4 @@ export type FeePlan = {
   extraServices: ExtraService[];
 };
 
-// هذا فقط حتى لا ينكسر أي Component عندك
 export type FeePlanExtraService = ExtraService;

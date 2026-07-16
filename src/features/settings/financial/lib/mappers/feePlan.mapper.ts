@@ -12,15 +12,9 @@ export function mapFeePlanFormToCreatePayload(
 ): CreateFeePlanPayload {
   return {
     academicYearId: values.academicYearId,
-
     gradeLevelId: values.gradeLevelId,
-
-    installmentPolicyId: values.installmentPolicyId,
-    
     name: values.name,
-
     baseAmount: values.baseAmount,
-
     extraServices: values.extraServices.map(
       (service) => ({
         type: service.type,
@@ -36,13 +30,9 @@ export function mapFeePlanFormToUpdatePayload(
 ): UpdateFeePlanPayload {
   return {
     academicYearId: values.academicYearId,
-
     gradeLevelId: values.gradeLevelId,
-
     name: values.name,
-
     baseAmount: values.baseAmount,
-
     extraServices: values.extraServices.map(
       (service) => ({
         type: service.type,

@@ -17,20 +17,11 @@ type Option = {
 
 type Props = {
   open: boolean;
-
   onOpenChange: (open: boolean) => void;
-
   academicYears: Option[];
-
   gradeLevels: Option[];
-
-  installmentPolicies: Option[];
-
   isLoading?: boolean;
-
-  onSubmit: (
-    values: FeePlanFormValues
-  ) => void;
+  onSubmit: (values: FeePlanFormValues) => void;
 };
 
 export function CreateFeePlanDialog({
@@ -38,29 +29,19 @@ export function CreateFeePlanDialog({
   onOpenChange,
   academicYears,
   gradeLevels,
-  installmentPolicies,
   onSubmit,
   isLoading,
 }: Props) {
-  function handleSubmit(
-    values: FeePlanFormValues
-  ) {
+  function handleSubmit(values: FeePlanFormValues) {
     onSubmit(values);
-
     onOpenChange(false);
   }
 
   return (
-    <Dialog
-      open={open}
-      onOpenChange={onOpenChange}
-    >
-      <DialogContent className="sm:max-w-3xl">
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>
-            Create Fee Plan
-          </DialogTitle>
-
+          <DialogTitle>Create Fee Plan</DialogTitle>
           <DialogDescription>
             Create a tuition fee configuration.
           </DialogDescription>
@@ -69,7 +50,6 @@ export function CreateFeePlanDialog({
         <FeePlanForm
           academicYears={academicYears}
           gradeLevels={gradeLevels}
-          installmentPolicies={installmentPolicies}
           isLoading={isLoading}
           onSubmit={handleSubmit}
         />
