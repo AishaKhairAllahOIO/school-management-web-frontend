@@ -41,7 +41,7 @@ export const sidebarItems = [
   },
   {
     titleKey: "finance",
-    path: "/finance/fees",
+    path: "/finance",
     icon: Wallet,
   },
   {

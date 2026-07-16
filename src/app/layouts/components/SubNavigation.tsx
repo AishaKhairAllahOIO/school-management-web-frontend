@@ -83,36 +83,11 @@ const subNavigationSections: SubNavigationSection[] = [
     basePath: "/finance",
     items: [
       {
-        title: "Fees",
-        path: "/finance/fees",
+        title: "Operations", 
+        path: "/finance",
         icon: Wallet,
       },
-      {
-        title: "Payments",
-        path: "/finance/payments",
-        icon: Wallet,
-      },
-      {
-        title: "Installments",
-        path: "/finance/installments",
-        icon: Wallet,
-      },
-      {
-        title: "Payroll History",
-        path: "/finance/payroll-history",
-        icon: Wallet,
-      },
-      {
-        title: "Salaries",
-        path: "/finance/salaries",
-        icon: Briefcase,
-      },
-      {
-        title: "Deductions",
-        path: "/finance/deductions",
-        icon: Wallet,
-      },
-    ],
+     ],
   },
   {
     basePath: "/communications",
