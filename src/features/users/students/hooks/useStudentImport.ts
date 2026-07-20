@@ -10,19 +10,29 @@ import { getAxiosErrorMessage } from "@/services/axios/axiosError";
 import { studentApi } from "../api/student.api";
 import type {
   EntityId,
-  StudentImportResponse,
-} from "../types/student-api.types";
+  ImportBatchStatus,
+} from "../types/student.types";
+
 import { studentKeys } from "./student.keys";
 
+type ImportResponse = {
+  batch_id?: EntityId;
+  batchId?: EntityId;
+  id?: EntityId;
+};
+
 function getBatchId(
-  response: StudentImportResponse,
+  response: ImportResponse,
 ): EntityId {
   const batchId =
     response.batchId ??
     response.batch_id ??
     response.id;
 
-  if (batchId === undefined) {
+  if (
+    batchId === undefined ||
+    batchId === null
+  ) {
     throw new Error(
       "لم يُرجع الخادم رقم عملية الاستيراد.",
     );
@@ -31,12 +41,22 @@ function getBatchId(
   return batchId;
 }
 
+function isImportFinished(
+  status: ImportBatchStatus["status"] | undefined,
+): boolean {
+  return (
+    status === "completed" ||
+    status === "failed"
+  );
+}
+
 export function useImportStudents() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (file: File) =>
-      studentApi.importExcel(file),
+    mutationFn: (
+      file: File,
+    ) => studentApi.importFile(file),
 
     onSuccess: async () => {
       await queryClient.invalidateQueries({
@@ -49,45 +69,54 @@ export function useImportStudents() {
       );
     },
 
-    onError: (error) =>
+    onError: (error) => {
       toast.error(
         getAxiosErrorMessage(error),
-      ),
+      );
+    },
   });
 }
 
 export function useStudentImportStatus(
-  batchId: EntityId | null,
+  batchId: EntityId | null | undefined,
 ) {
   return useQuery({
     queryKey: studentKeys.importStatus(
       batchId ?? "disabled",
     ),
+
     queryFn: () =>
       studentApi.getImportStatus(batchId!),
-    enabled: batchId !== null,
+
+    enabled:
+      batchId !== null &&
+      batchId !== undefined &&
+      batchId !== "",
 
     refetchInterval: (query) => {
       const status =
         query.state.data?.status;
 
-      if (
-        status === "completed" ||
-        status === "failed"
-      ) {
+      if (isImportFinished(status)) {
         return false;
       }
 
       return 2_500;
     },
+
+    refetchIntervalInBackground: true,
   });
 }
 
 export function useStudentImportHistory() {
   return useQuery({
-    queryKey: studentKeys.importHistory(),
+    queryKey:
+      studentKeys.importHistory(),
+
     queryFn: () =>
       studentApi.getImportHistory(),
+
+    staleTime: 30_000,
   });
 }
 
@@ -95,7 +124,8 @@ export function useDownloadImportErrors() {
   return useMutation({
     mutationFn: async ({
       batchId,
-      fileName = "student-import-errors.xlsx",
+      fileName =
+        "student-import-errors.xlsx",
     }: {
       batchId: EntityId;
       fileName?: string;
@@ -105,26 +135,38 @@ export function useDownloadImportErrors() {
           batchId,
         );
 
-      const url =
+      const objectUrl =
         URL.createObjectURL(blob);
 
       const anchor =
         document.createElement("a");
 
-      anchor.href = url;
+      anchor.href = objectUrl;
       anchor.download = fileName;
+
       document.body.appendChild(anchor);
+
       anchor.click();
       anchor.remove();
 
-      URL.revokeObjectURL(url);
+      URL.revokeObjectURL(objectUrl);
     },
 
-    onError: (error) =>
+    onSuccess: () => {
+      toast.success(
+        "تم تنزيل ملف الأخطاء بنجاح.",
+      );
+    },
+
+    onError: (error) => {
       toast.error(
         getAxiosErrorMessage(error),
-      ),
+      );
+    },
   });
 }
 
-export { getBatchId };
+export {
+  getBatchId,
+  isImportFinished,
+};

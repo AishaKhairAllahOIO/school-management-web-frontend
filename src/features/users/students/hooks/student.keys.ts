@@ -1,45 +1,52 @@
 import type {
-  EntityId,
-  StudentListFilters,
-} from "../types/student-api.types";
+  StudentFilters,
+} from "../types/student.types";
+
+type ApiId = string | number;
 
 export const studentKeys = {
-  all: ["users", "students"] as const,
+  all: ["students"] as const,
 
   lists: () =>
     [...studentKeys.all, "list"] as const,
 
-  list: (filters: StudentListFilters) =>
+  list: (filters: StudentFilters) =>
     [...studentKeys.lists(), filters] as const,
 
-  details: () =>
-    [...studentKeys.all, "details"] as const,
+  searches: () =>
+    [...studentKeys.all, "search"] as const,
 
-  detail: (studentId: EntityId) =>
+  search: (query: string) =>
+    [...studentKeys.searches(), query] as const,
+
+  details: () =>
+    [...studentKeys.all, "detail"] as const,
+
+  detail: (studentId: ApiId) =>
     [...studentKeys.details(), studentId] as const,
 
-  profiles: () =>
+  fullProfiles: () =>
     [...studentKeys.all, "full-profile"] as const,
 
-  fullProfile: (enrollmentId: EntityId) =>
+  fullProfile: (enrollmentId: ApiId) =>
     [
-      ...studentKeys.profiles(),
+      ...studentKeys.fullProfiles(),
       enrollmentId,
     ] as const,
 
-  imports: () =>
-    [...studentKeys.all, "imports"] as const,
+  import: () =>
+    [...studentKeys.all, "import"] as const,
 
-  importStatus: (batchId: EntityId) =>
+  importStatus: (batchId: ApiId) =>
     [
-      ...studentKeys.imports(),
+      ...studentKeys.import(),
       "status",
       batchId,
     ] as const,
 
   importHistory: () =>
     [
-      ...studentKeys.imports(),
+      ...studentKeys.import(),
       "history",
     ] as const,
 };
