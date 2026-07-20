@@ -129,5 +129,27 @@ export const API_ENDPOINTS = {
     POLICY_ITEMS: "/admin/finance/settings/policy-items",
 
     EXTRA_SERVICES: "/admin/finance/settings/extra-services",
+<<<<<<< HEAD
   },
 } as const;
+=======
+},
+FINANCE_OPERATIONS: {
+    ACCOUNTS: "/admin/finance/contracts/accounts", // [cite: 11, 15]
+    ACCOUNT: (studentId: string | number) =>
+      `/admin/finance/contracts/accounts/${studentId}`, // [cite: 61, 65]
+    
+    FINALIZE_CONTRACT: "/admin/finance/contracts/finalize", // [cite: 113, 117]
+    UPDATE_CONTRACT: (studentId: string | number) =>
+      `/admin/finance/contracts/${studentId}`, // [cite: 210, 214]
+    
+    INSTALLMENTS: "/admin/finance/contracts/installments", // [cite: 260, 262]
+    INSTALLMENT: (id: string | number) =>
+      `/admin/finance/contracts/installments/${id}`, // [cite: 293, 295]
+    
+    PAYMENTS: "/admin/finance/contracts/payments", // [cite: 324, 326, 385, 387]
+    PAYMENT: (id: string | number) =>
+      `/admin/finance/contracts/payments/${id}`, // [cite: 355, 358, 451, 456, 497, 500]
+  },
+} as const;
+>>>>>>> 4c33aa0bb0599ed41df0717b21f604f764adeb0c

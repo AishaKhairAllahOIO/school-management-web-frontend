@@ -1,48 +1,50 @@
-export type GradeFee = {
-  grade: string;
-  className: string;
-  annualFee: string;
-  collected: string;
-  outstanding: string;
-};
+export type PaymentStatus = "unpaid" | "partially_paid" | "paid";
 
-export type RemainingBalance = {
-  student: string;
-  grade: string;
-  className: string;
-  balance: string;
-  nextDue: string;
-};
-
-export type PaymentRecord = {
+export type FinancialAccount = {
   id: string;
-  student: string;
-  amount: string;
-  method: string;
-  status: "Completed" | "Pending" | "Overdue";
-  date: string;
-  overdue: boolean;
+  studentId: string;
+  academicYearId: string;
+  totalRequiredAmount: number;
+  remainingBalance: number;
+  paymentStatus: PaymentStatus;
+  contractActivationSnapshot: string | null;
+  feePlan: {
+    id: string;
+    academicYearId: string;
+    gradeLevelId: string;
+    name: string;
+    baseAmount: number;
+  };
+  installmentPolicy: {
+    id: string;
+    name: string;
+    installmentsCount: number;
+  };
+  createdAt: string;
+  updatedAt: string;
 };
 
-export type InstallmentSchedule = {
+export type Installment = {
   id: string;
-  student: string;
-  grade: string;
-  nextPaymentDate: string;
-  amount: string;
-  status: "Pending" | "Paid" | "Delayed";
+  installmentNumber: number;
+  title: string;
+  amountDue: number;
+  amountPaid: number;
+  dueDate: string;
+  status: "pending" | "paid" | "overdue"; 
+  createdAt: string;
+  updatedAt: string;
 };
 
-export type OverdueSummary = {
-  totalOverdue: string;
-  overdueAccounts: number;
-  averageDelay: string;
-};
+export type PaymentMethod = "cash" | "bank_transfer" | "cheque" | "electronic_wallet";
 
-export type FinanceData = {
-  gradeFees: GradeFee[];
-  remainingBalances: RemainingBalance[];
-  payments: PaymentRecord[];
-  overdueSummary: OverdueSummary;
-  installments: InstallmentSchedule[];
+export type PaymentReceipt = {
+  id: string;
+  paidAmount: number;
+  paymentMethod: PaymentMethod;
+  paperReceiptNo: string | null;
+  digitalReference: string | null;
+  cashierName?: string;
+  paymentDate?: string;
+  user_id?: number;
 };
