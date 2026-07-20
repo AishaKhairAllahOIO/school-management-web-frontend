@@ -3,83 +3,143 @@ import type {
   PaginatedData,
 } from "../../shared/types/api.types";
 
-export type EntityId = ApiId;
+/*
+|--------------------------------------------------------------------------
+| Common enums
+|--------------------------------------------------------------------------
+*/
 
-export type Gender = "male" | "female";
+export type UserGender = "male" | "female";
 
-export type Nationality =
-  | "syrian"
-  | "lebanese"
-  | "palestinian"
-  | "jordanian"
-  | "other";
+export type UserNationality = "syrian" | string;
 
-export type AccountStatus = "enabled" | "disabled";
+export type AccountStatus =
+  | "enabled"
+  | "disabled"
+  | "active"
+  | "inactive";
 
-export type RecordStatus = "active" | "inactive";
+export type RecordStatus =
+  | "active"
+  | "inactive"
+  | "deleted";
 
 export type EnrollmentStatus =
   | "pending"
   | "enrolled"
   | "suspended"
-  | "withdrawn";
+  | "withdrawn"
+  | "completed";
 
-export type SortDirection = "asc" | "desc";
+/*
+|--------------------------------------------------------------------------
+| Shared API models
+|--------------------------------------------------------------------------
+*/
 
-export type StudentApiResponse<T> = {
-  status: boolean;
-  message: string;
-  data: T;
-};
-
-export type Nullable<T> = T | null;
-
-export type SelectOption = {
-  id: EntityId;
+export type NamedEntity = {
+  id: ApiId;
   name: string;
 };
 
+export type GradeReference = NamedEntity & {
+  level?: number | null;
+};
+
+export type ClassroomReference = NamedEntity;
+
+export type AcademicYearReference = NamedEntity & {
+  startDate?: string | null;
+  endDate?: string | null;
+};
+
 export type PersonProfile = {
-  id: EntityId;
-  userId: EntityId;
+  id: ApiId;
+  userId: ApiId;
 
   firstName?: string;
   lastName?: string;
   fullName: string;
 
-  fatherName: string;
-  motherName: string;
+  fatherName: string | null;
+  motherName: string | null;
 
-  birthDate: string;
-  birthPlace: string;
+  birthDate: string | null;
+  birthPlace: string | null;
 
-  address: string;
+  gender: UserGender | null;
+  nationality: UserNationality | null;
 
-  gender: Gender;
-  nationality: Nationality | null;
-
-  phoneNumber: string;
+  address: string | null;
+  phoneNumber: string | null;
   photoUrl: string | null;
 
   accountStatus: AccountStatus;
   recordStatus: RecordStatus;
 };
 
-export type StudentUser = PersonProfile & {
-  role?: "student";
+/*
+|--------------------------------------------------------------------------
+| Student list
+|--------------------------------------------------------------------------
+*/
+
+export type StudentListItem = {
+  studentId: ApiId;
+  userId: ApiId;
+  guardianId: ApiId | null;
+  enrollmentId: ApiId;
+
+  fullName: string;
+
+  grade: GradeReference | null;
+  classroom: ClassroomReference | null;
+
+  status: EnrollmentStatus;
+
+  photoUrl?: string | null;
+  phoneNumber?: string | null;
+  accountStatus?: AccountStatus;
 };
 
-export type StudentEnrollment = {
-  id: EntityId;
-  studentId: EntityId;
+export type StudentListFilters = {
+  page?: number;
+  per_page?: number;
 
-  academicYearId: EntityId;
-  gradeId: EntityId;
-  classroomId: EntityId | null;
+  level?: number | ApiId;
+  grade_level_id?: ApiId;
+  class_room_id?: ApiId;
+
+  name_classroom?: string;
+  status?: EnrollmentStatus;
+
+  sort?: "asc" | "desc";
+};
+
+export type StudentListResponse =
+  PaginatedData<StudentListItem>;
+
+/*
+|--------------------------------------------------------------------------
+| Student profile
+|--------------------------------------------------------------------------
+*/
+
+export type StudentEnrollment = {
+  id: ApiId;
+  studentId: ApiId;
+
+  academicYearId: ApiId;
+  gradeId: ApiId;
+  classroomId: ApiId | null;
+
+  academicYear?: AcademicYearReference | null;
+  grade?: GradeReference | null;
+  classroom?: ClassroomReference | null;
 
   enrollmentStatus: EnrollmentStatus;
-
   enrollmentDate: string | null;
+
   completedAt: string | null;
 
   isDeleted?: boolean;
@@ -89,10 +149,9 @@ export type StudentEnrollment = {
   updatedAt?: string | null;
 };
 
-export type StudentProfile = {
+export type StudentDetails = {
   student: PersonProfile;
   guardian: PersonProfile | null;
-  enrollment?: StudentEnrollment | null;
 };
 
 export type StudentFullProfile = {
@@ -101,60 +160,13 @@ export type StudentFullProfile = {
   enrollment: StudentEnrollment;
 };
 
-export type StudentGradeSummary = {
-  id: EntityId;
-  name: string;
-  level: number | null;
-};
+/*
+|--------------------------------------------------------------------------
+| Register student
+|--------------------------------------------------------------------------
+*/
 
-export type StudentClassroomSummary = {
-  id: EntityId;
-  name: string;
-};
-
-export type StudentAcademicYearSummary = {
-  id: EntityId;
-  name: string;
-};
-
-export type StudentListItem = {
-  studentId: EntityId;
-  userId: EntityId;
-
-  guardianId: EntityId | null;
-  enrollmentId: EntityId;
-
-  fullName: string;
-
-  phoneNumber?: string | null;
-  photoUrl?: string | null;
-
-  grade: StudentGradeSummary | null;
-  classroom: StudentClassroomSummary | null;
-  academicYear?: StudentAcademicYearSummary | null;
-
-  status: EnrollmentStatus;
-  accountStatus?: AccountStatus;
-  recordStatus?: RecordStatus;
-};
-
-export type StudentFilters = {
-  page?: number;
-  per_page?: number;
-
-  level?: number;
-  name_classroom?: string;
-  status?: EnrollmentStatus;
-
-  search?: string;
-  sort?: SortDirection;
-};
-
-export type StudentListFilters = StudentFilters;
-
-export type StudentListResponse = PaginatedData<StudentListItem>;
-
-export type StudentPersonalFormValues = {
+export type StudentPersonalPayload = {
   first_name: string;
   last_name: string;
 
@@ -164,16 +176,16 @@ export type StudentPersonalFormValues = {
   birth_date: string;
   birth_place: string;
 
+  gender: UserGender;
+  nationality: UserNationality;
+
   address: string;
   phone_number: string;
 
-  gender: Gender;
-  nationality: Nationality | "";
-
-  photo_url?: File | null;
+  url_photo?: File | null;
 };
 
-export type GuardianPersonalFormValues = {
+export type GuardianPersonalPayload = {
   first_name: string;
   last_name: string;
 
@@ -183,95 +195,137 @@ export type GuardianPersonalFormValues = {
   birth_date: string;
   birth_place: string;
 
+  gender: UserGender;
+  nationality: UserNationality;
+
   address: string;
   phone_number: string;
 
-  gender: Gender;
-  nationality: Nationality | "";
-
-  photo_url?: File | null;
-
-  token_fcm?: string;
+  url_photo?: File | null;
+  token_fcm?: string | null;
 };
 
-export type EnrollmentFormValues = {
-  academic_year_id: EntityId | "";
-  grade_level_id: EntityId | "";
-  class_room_id: EntityId | "";
+export type StudentEnrollmentPayload = {
+  academic_year_id: ApiId;
+  grade_level_id: ApiId;
+  class_room_id?: ApiId | null;
 };
 
-export type RegisterStudentFormValues = {
-  guardian: GuardianPersonalFormValues;
-  student: StudentPersonalFormValues;
-  enrollment: EnrollmentFormValues;
+export type RegisterStudentPayload = {
+  student: StudentPersonalPayload;
+  guardian: GuardianPersonalPayload;
+  enrollment: StudentEnrollmentPayload;
 };
 
-export type RegisterStudentPayload = RegisterStudentFormValues;
+/*
+|--------------------------------------------------------------------------
+| Update student
+|--------------------------------------------------------------------------
+*/
 
-export type UpdateStudentPersonalPayload = Partial<
-  Omit<StudentPersonalFormValues, "photo_url">
-> & {
-  photo_url?: File | null;
-};
+export type UpdateStudentPersonalPayload =
+  Partial<StudentPersonalPayload>;
 
-export type UpdateGuardianPersonalPayload = Partial<
-  Omit<GuardianPersonalFormValues, "photo_url">
-> & {
-  photo_url?: File | null;
-};
+export type UpdateGuardianPersonalPayload =
+  Partial<GuardianPersonalPayload>;
 
-export type UpdateEnrollmentPayload = {
-  academic_year_id?: EntityId;
-  grade_level_id?: EntityId;
-  class_room_id?: EntityId | null;
+export type UpdateStudentEnrollmentPayload = {
+  academic_year_id?: ApiId;
+  grade_level_id?: ApiId;
+  class_room_id?: ApiId | null;
   enrollment_status?: EnrollmentStatus;
 };
 
-export type UpdateStudentEnrollmentPayload = UpdateEnrollmentPayload;
+/*
+|--------------------------------------------------------------------------
+| Search
+|--------------------------------------------------------------------------
+*/
 
-export type StudentImportFile = {
-  file: File;
+export type StudentSearchParams = {
+  q: string;
+  page?: number;
+  per_page?: number;
 };
 
-export type StudentImportRowError = {
-  row: number;
-  field?: string;
-  message: string;
+/*
+|--------------------------------------------------------------------------
+| Mutations responses
+|--------------------------------------------------------------------------
+*/
+
+export type ToggleStudentAccountResponse = {
+  enrollmentId?: ApiId;
+  accountStatus?: AccountStatus;
+  status?: AccountStatus;
 };
 
-export type ImportBatchStatusValue =
+export type DeleteStudentResponse = {
+  id?: ApiId;
+};
+
+/*
+|--------------------------------------------------------------------------
+| Student import
+|--------------------------------------------------------------------------
+*/
+
+export type StudentImportBatchStatusValue =
   | "pending"
   | "processing"
   | "completed"
   | "failed";
 
-export type ImportBatchStatus = {
-  batch_id?: EntityId;
-  status: ImportBatchStatusValue;
+export type StudentImportStartResponse = {
+  batchId?: ApiId;
+  batch_id?: ApiId;
 
+  status: StudentImportBatchStatusValue;
+
+  totalRows?: number;
+  total_rows?: number;
+};
+
+export type StudentImportBatchStatus = {
+  batchId?: ApiId;
+  batch_id?: ApiId;
+
+  status: StudentImportBatchStatusValue;
+
+  successfulRows?: number;
   successful_rows?: number;
+
+  failedRows?: number;
   failed_rows?: number;
+
+  totalRows?: number;
   total_rows?: number;
 
-  errors?: StudentImportRowError[];
+  processedRows?: number;
+  processed_rows?: number;
+
+  message?: string | null;
 };
 
-export type StudentImportResult = {
-  batchId?: EntityId;
-  status: ImportBatchStatusValue;
+export type StudentImportHistoryItem = {
+  id: ApiId;
+  status: StudentImportBatchStatusValue;
 
-  successfulRows: number;
-  failedRows: number;
-  totalRows: number;
+  fileName?: string | null;
+  file_name?: string | null;
 
-  errors: StudentImportRowError[];
+  successfulRows?: number;
+  successful_rows?: number;
+
+  failedRows?: number;
+  failed_rows?: number;
+
+  totalRows?: number;
+  total_rows?: number;
+
+  createdAt?: string | null;
+  created_at?: string | null;
 };
 
-export type ToggleStudentAccountResponse = {
-  accountStatus: AccountStatus;
-};
-
-export type DeleteStudentResponse = {
-  enrollmentId: EntityId;
-  deleted: boolean;
-};
+export type StudentImportHistoryResponse =
+  PaginatedData<StudentImportHistoryItem>;

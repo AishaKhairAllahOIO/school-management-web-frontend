@@ -47,44 +47,66 @@ export const API_ENDPOINTS = {
   },
 
   STUDENTS: {
-    REGISTER: "/admin/student/register",
+  REGISTER:
+    "/admin/student/register",
 
-    IMPORT: "/admin/student/import",
+  IMPORT:
+    "/admin/student/import",
 
-    IMPORT_STATUS: (batchId: ApiId) =>
-      `/admin/student/import-batches/${batchId}/status`,
+  IMPORT_STATUS: (
+    batchId: ApiId,
+  ) =>
+    `/admin/student/import-batches/${batchId}/status`,
 
-    IMPORT_ERRORS: (batchId: ApiId) =>
-      `/admin/student/import-batches/${batchId}/errors/export`,
+  IMPORT_ERRORS: (
+    batchId: ApiId,
+  ) =>
+    `/admin/student/import-batches/${batchId}/errors/export`,
 
-    IMPORT_HISTORY:
-      "/admin/student/import-batches/history",
+  IMPORT_HISTORY:
+    "/admin/student/import-batches/history",
 
-    FILTER: "/admin/students/filter",
+  FILTER:
+    "/admin/students/filter",
 
-    SEARCH: "/admin/students/search",
+  SEARCH:
+    "/admin/students/search",
 
-    DETAILS: (studentId: ApiId) =>
-      `/admin/students/${studentId}`,
+  DETAILS: (
+    studentId: ApiId,
+  ) =>
+    `/admin/students/${studentId}`,
 
-    FULL_PROFILE: (enrollmentId: ApiId) =>
-      `/admin/students/${enrollmentId}/full-profile`,
+  FULL_PROFILE: (
+    enrollmentId: ApiId,
+  ) =>
+    `/admin/students/${enrollmentId}/full-profile`,
 
-    PERSONAL: (studentId: ApiId) =>
-      `/admin/students/${studentId}/personal`,
+  PERSONAL: (
+    studentId: ApiId,
+  ) =>
+    `/admin/students/${studentId}/personal`,
 
-    GUARDIAN_PERSONAL: (guardianId: ApiId) =>
-      `/admin/students/guardians/${guardianId}/personal`,
+  GUARDIAN_PERSONAL: (
+    guardianId: ApiId,
+  ) =>
+    `/admin/students/guardians/${guardianId}/personal`,
 
-    ENROLLMENT: (enrollmentId: ApiId) =>
-      `/admin/students/enrollments/${enrollmentId}`,
+  ENROLLMENT: (
+    enrollmentId: ApiId,
+  ) =>
+    `/admin/students/enrollments/${enrollmentId}`,
 
-    TOGGLE_ACCOUNT_STATUS: (enrollmentId: ApiId) =>
-      `/admin/students/${enrollmentId}/toggle-account-status`,
+  TOGGLE_ACCOUNT_STATUS: (
+    enrollmentId: ApiId,
+  ) =>
+    `/admin/students/${enrollmentId}/toggle-account-status`,
 
-    DELETE: (enrollmentId: ApiId) =>
-      `/admin/students/${enrollmentId}`,
-  },
+  DELETE: (
+    studentId: ApiId,
+  ) =>
+    `/admin/students/${studentId}`,
+},
 
   STAFF: {
     REGISTER: "/admin/staff/register",
@@ -129,11 +151,9 @@ export const API_ENDPOINTS = {
     POLICY_ITEMS: "/admin/finance/settings/policy-items",
 
     EXTRA_SERVICES: "/admin/finance/settings/extra-services",
-<<<<<<< HEAD
   },
-} as const;
-=======
-},
+
+
 FINANCE_OPERATIONS: {
     ACCOUNTS: "/admin/finance/contracts/accounts", // [cite: 11, 15]
     ACCOUNT: (studentId: string | number) =>
@@ -152,4 +172,3 @@ FINANCE_OPERATIONS: {
       `/admin/finance/contracts/payments/${id}`, // [cite: 355, 358, 451, 456, 497, 500]
   },
 } as const;
->>>>>>> 4c33aa0bb0599ed41df0717b21f604f764adeb0c

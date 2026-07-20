@@ -7,65 +7,49 @@ import { toast } from "sonner";
 
 import { getAxiosErrorMessage } from "@/services/axios/axiosError";
 
+import type { ApiId } from "../../shared/types/api.types";
 import { studentApi } from "../api/student.api";
 import type {
-  EntityId,
-  ImportBatchStatus,
+  StudentImportBatchStatusValue,
+  StudentImportStartResponse,
 } from "../types/student.types";
-
 import { studentKeys } from "./student.keys";
 
-type ImportResponse = {
-  batch_id?: EntityId;
-  batchId?: EntityId;
-  id?: EntityId;
-};
+const FINAL_IMPORT_STATUSES: StudentImportBatchStatusValue[] = [
+  "completed",
+  "failed",
+];
 
-function getBatchId(
-  response: ImportResponse,
-): EntityId {
+export function getStudentImportBatchId(
+  response: StudentImportStartResponse,
+): ApiId {
   const batchId =
     response.batchId ??
-    response.batch_id ??
-    response.id;
+    response.batch_id;
 
-  if (
-    batchId === undefined ||
-    batchId === null
-  ) {
+  if (batchId === undefined || batchId === null) {
     throw new Error(
-      "لم يُرجع الخادم رقم عملية الاستيراد.",
+      "لم يُرجع الخادم رقم عملية استيراد الطلاب.",
     );
   }
 
   return batchId;
 }
 
-function isImportFinished(
-  status: ImportBatchStatus["status"] | undefined,
-): boolean {
-  return (
-    status === "completed" ||
-    status === "failed"
-  );
-}
-
 export function useImportStudents() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (
-      file: File,
-    ) => studentApi.importFile(file),
+    mutationFn: (file: File) =>
+      studentApi.importFile(file),
 
     onSuccess: async () => {
       await queryClient.invalidateQueries({
-        queryKey:
-          studentKeys.importHistory(),
+        queryKey: studentKeys.imports(),
       });
 
       toast.success(
-        "تم استلام الملف وبدأت معالجته.",
+        "تم رفع الملف وبدأت معالجة بيانات الطلاب.",
       );
     },
 
@@ -78,7 +62,7 @@ export function useImportStudents() {
 }
 
 export function useStudentImportStatus(
-  batchId: EntityId | null | undefined,
+  batchId: ApiId | null | undefined,
 ) {
   return useQuery({
     queryKey: studentKeys.importStatus(
@@ -90,48 +74,50 @@ export function useStudentImportStatus(
 
     enabled:
       batchId !== null &&
-      batchId !== undefined &&
-      batchId !== "",
+      batchId !== undefined,
 
     refetchInterval: (query) => {
       const status =
         query.state.data?.status;
 
-      if (isImportFinished(status)) {
+      if (
+        status &&
+        FINAL_IMPORT_STATUSES.includes(status)
+      ) {
         return false;
       }
 
       return 2_500;
     },
-
-    refetchIntervalInBackground: true,
   });
 }
 
-export function useStudentImportHistory() {
+export function useStudentImportHistory(
+  page = 1,
+) {
   return useQuery({
     queryKey:
-      studentKeys.importHistory(),
+      studentKeys.importHistory(page),
 
     queryFn: () =>
-      studentApi.getImportHistory(),
+      studentApi.getImportHistory(page),
 
-    staleTime: 30_000,
+    placeholderData: (previousData) =>
+      previousData,
   });
 }
 
-export function useDownloadImportErrors() {
+export function useDownloadStudentImportErrors() {
   return useMutation({
     mutationFn: async ({
       batchId,
-      fileName =
-        "student-import-errors.xlsx",
+      fileName = "student-import-errors.xlsx",
     }: {
-      batchId: EntityId;
+      batchId: ApiId;
       fileName?: string;
     }) => {
       const blob =
-        await studentApi.downloadImportErrors(
+        await studentApi.exportImportErrors(
           batchId,
         );
 
@@ -145,7 +131,6 @@ export function useDownloadImportErrors() {
       anchor.download = fileName;
 
       document.body.appendChild(anchor);
-
       anchor.click();
       anchor.remove();
 
@@ -154,7 +139,7 @@ export function useDownloadImportErrors() {
 
     onSuccess: () => {
       toast.success(
-        "تم تنزيل ملف الأخطاء بنجاح.",
+        "تم تنزيل ملف أخطاء الاستيراد.",
       );
     },
 
@@ -165,8 +150,3 @@ export function useDownloadImportErrors() {
     },
   });
 }
-
-export {
-  getBatchId,
-  isImportFinished,
-};

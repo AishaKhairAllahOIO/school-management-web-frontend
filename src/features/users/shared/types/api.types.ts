@@ -13,18 +13,18 @@ export type ApiMessageResponse = {
 
 export type PaginationLinks = {
   first: string | null;
-  last?: string | null;
-  prev?: string | null;
+  last: string | null;
+  prev: string | null;
   next: string | null;
 };
 
 export type PaginationMeta = {
   current_page: number;
-  from?: number | null;
+  from: number | null;
   last_page: number;
-  path?: string;
+  path: string;
   per_page: number;
-  to?: number | null;
+  to: number | null;
   total: number;
 };
 
@@ -34,50 +34,29 @@ export type PaginatedData<T> = {
   meta: PaginationMeta;
 };
 
-export type PaginatedApiResponse<T> =
-  ApiResponse<PaginatedData<T>>;
+export type LaravelPaginationResponse<T> = {
+  data: T[];
+  current_page: number;
+  first_page_url: string;
+  from: number | null;
+  last_page: number;
+  last_page_url: string;
+  links: Array<{
+    url: string | null;
+    label: string;
+    active: boolean;
+  }>;
+  next_page_url: string | null;
+  path: string;
+  per_page: number;
+  prev_page_url: string | null;
+  to: number | null;
+  total: number;
+};
 
-export type SortDirection = "asc" | "desc";
+export type ValidationErrors = Record<string, string[]>;
 
-export type LaravelValidationErrors =
-  Record<string, string[]>;
-
-export type LaravelValidationErrorResponse = {
+export type ApiValidationError = {
   message: string;
-  errors: LaravelValidationErrors;
+  errors: ValidationErrors;
 };
-
-export type ImportBatchStatus =
-  | "pending"
-  | "processing"
-  | "completed"
-  | "failed";
-
-export type ImportBatchCreatedData = {
-  batch_id: ApiId;
-};
-
-export type ImportBatchProgress = {
-  batchId?: ApiId;
-  batch_id?: ApiId;
-
-  status: ImportBatchStatus;
-
-  totalRows?: number;
-  total_rows?: number;
-
-  processedRows?: number;
-  processed_rows?: number;
-
-  successfulRows?: number;
-  successful_rows?: number;
-
-  failedRows?: number;
-  failed_rows?: number;
-
-  progress?: number;
-
-  message?: string;
-};
-
-export type Nullable<T> = T | null;

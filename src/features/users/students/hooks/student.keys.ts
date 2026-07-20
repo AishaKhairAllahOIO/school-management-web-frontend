@@ -1,52 +1,98 @@
+import type { ApiId } from "../../shared/types/api.types";
+
 import type {
-  StudentFilters,
+  StudentListFilters,
+  StudentSearchParams,
 } from "../types/student.types";
 
-type ApiId = string | number;
-
 export const studentKeys = {
-  all: ["students"] as const,
+  all: [
+    "users",
+    "students",
+  ] as const,
 
   lists: () =>
-    [...studentKeys.all, "list"] as const,
+    [
+      ...studentKeys.all,
+      "list",
+    ] as const,
 
-  list: (filters: StudentFilters) =>
-    [...studentKeys.lists(), filters] as const,
+  list: (
+    filters: StudentListFilters,
+  ) =>
+    [
+      ...studentKeys.lists(),
+      filters,
+    ] as const,
 
   searches: () =>
-    [...studentKeys.all, "search"] as const,
+    [
+      ...studentKeys.all,
+      "search",
+    ] as const,
 
-  search: (query: string) =>
-    [...studentKeys.searches(), query] as const,
+  search: (
+    params: StudentSearchParams,
+  ) =>
+    [
+      ...studentKeys.searches(),
+      params,
+    ] as const,
 
   details: () =>
-    [...studentKeys.all, "detail"] as const,
-
-  detail: (studentId: ApiId) =>
-    [...studentKeys.details(), studentId] as const,
-
-  fullProfiles: () =>
-    [...studentKeys.all, "full-profile"] as const,
-
-  fullProfile: (enrollmentId: ApiId) =>
     [
-      ...studentKeys.fullProfiles(),
+      ...studentKeys.all,
+      "details",
+    ] as const,
+
+  detail: (
+    studentId: ApiId,
+  ) =>
+    [
+      ...studentKeys.details(),
+      studentId,
+    ] as const,
+
+  profiles: () =>
+    [
+      ...studentKeys.all,
+      "full-profile",
+    ] as const,
+
+  fullProfile: (
+    enrollmentId: ApiId,
+  ) =>
+    [
+      ...studentKeys.profiles(),
       enrollmentId,
     ] as const,
 
-  import: () =>
-    [...studentKeys.all, "import"] as const,
-
-  importStatus: (batchId: ApiId) =>
+  imports: () =>
     [
-      ...studentKeys.import(),
+      ...studentKeys.all,
+      "imports",
+    ] as const,
+
+  importStatuses: () =>
+    [
+      ...studentKeys.imports(),
       "status",
+    ] as const,
+
+  importStatus: (
+    batchId: ApiId,
+  ) =>
+    [
+      ...studentKeys.importStatuses(),
       batchId,
     ] as const,
 
-  importHistory: () =>
+  importHistory: (
+    page: number,
+  ) =>
     [
-      ...studentKeys.import(),
+      ...studentKeys.imports(),
       "history",
+      page,
     ] as const,
 };

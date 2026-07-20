@@ -1,11 +1,12 @@
 import type {
+  GuardianPersonalPayload,
   RegisterStudentPayload,
-  UpdateEnrollmentPayload,
+  StudentPersonalPayload,
   UpdateGuardianPersonalPayload,
   UpdateStudentPersonalPayload,
 } from "../types/student.types";
 
-type FormDataValue =
+type FormDataPrimitive =
   | string
   | number
   | boolean
@@ -13,97 +14,99 @@ type FormDataValue =
   | null
   | undefined;
 
-type FormDataRecord = Record<string, FormDataValue>;
+function appendValue(
+  formData: FormData,
+  key: string,
+  value: FormDataPrimitive,
+): void {
+  if (
+    value === undefined ||
+    value === null ||
+    value === ""
+  ) {
+    return;
+  }
 
-const appendObjectToFormData = (
+  if (value instanceof File) {
+    formData.append(key, value);
+    return;
+  }
+
+  formData.append(key, String(value));
+}
+
+function appendNestedRecord(
   formData: FormData,
   prefix: string,
-  values: FormDataRecord,
-): void => {
+  values: Record<string, FormDataPrimitive>,
+): void {
   Object.entries(values).forEach(([key, value]) => {
-    if (
-      value === undefined ||
-      value === null ||
-      value === ""
-    ) {
-      return;
-    }
-
-    const fieldName = `${prefix}[${key}]`;
-
-    if (value instanceof File) {
-      formData.append(fieldName, value);
-      return;
-    }
-
-    formData.append(fieldName, String(value));
+    appendValue(
+      formData,
+      `${prefix}[${key}]`,
+      value,
+    );
   });
-};
+}
 
-export const createStudentRegistrationFormData = (
+export function buildStudentRegistrationFormData(
   payload: RegisterStudentPayload,
-): FormData => {
+): FormData {
   const formData = new FormData();
 
-  appendObjectToFormData(
+  appendNestedRecord(
     formData,
     "student",
-    payload.student as FormDataRecord,
+    payload.student,
   );
 
-  appendObjectToFormData(
+  appendNestedRecord(
     formData,
     "guardian",
-    payload.guardian as FormDataRecord,
+    payload.guardian,
   );
 
-  appendObjectToFormData(
+  appendNestedRecord(
     formData,
     "enrollment",
-    payload.enrollment as FormDataRecord,
+    payload.enrollment,
   );
 
   return formData;
-};
+}
 
-export const createStudentUpdateFormData = (
-  payload: UpdateStudentPersonalPayload,
-): FormData => {
+export function buildStudentPersonalFormData(
+  payload:
+    | StudentPersonalPayload
+    | UpdateStudentPersonalPayload,
+): FormData {
   const formData = new FormData();
 
-  appendObjectToFormData(
-    formData,
-    "student",
-    payload as FormDataRecord,
-  );
+  Object.entries(payload).forEach(([key, value]) => {
+    appendValue(
+      formData,
+      key,
+      value as FormDataPrimitive,
+    );
+  });
 
   return formData;
-};
+}
 
-export const createGuardianUpdateFormData = (
-  payload: UpdateGuardianPersonalPayload,
-): FormData => {
+export function buildGuardianPersonalFormData(
+  payload:
+    | GuardianPersonalPayload
+    | UpdateGuardianPersonalPayload,
+): FormData {
   const formData = new FormData();
 
-  appendObjectToFormData(
-    formData,
-    "guardian",
-    payload as FormDataRecord,
-  );
+  Object.entries(payload).forEach(([key, value]) => {
+    appendValue(
+      formData,
+      key,
+      value as FormDataPrimitive,
+    );
+  });
 
   return formData;
-};
-
-export const createEnrollmentUpdateFormData = (
-  payload: UpdateEnrollmentPayload,
-): FormData => {
-  const formData = new FormData();
-
-  appendObjectToFormData(
-    formData,
-    "enrollment",
-    payload as FormDataRecord,
-  );
-
-  return formData;
-};
+}

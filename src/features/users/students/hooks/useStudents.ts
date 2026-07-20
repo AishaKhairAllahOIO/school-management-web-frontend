@@ -3,104 +3,146 @@ import {
   useQuery,
   useQueryClient,
 } from "@tanstack/react-query";
+
 import { toast } from "sonner";
 
 import { getAxiosErrorMessage } from "@/services/axios/axiosError";
 
+import type { ApiId } from "../../shared/types/api.types";
+
 import { studentApi } from "../api/student.api";
+
 import type {
-  RegisterStudentFormValues,
-  StudentFilters,
-  UpdateEnrollmentPayload,
+  RegisterStudentPayload,
+  StudentListFilters,
+  StudentSearchParams,
   UpdateGuardianPersonalPayload,
+  UpdateStudentEnrollmentPayload,
   UpdateStudentPersonalPayload,
 } from "../types/student.types";
 
 import { studentKeys } from "./student.keys";
 
-type EntityId = string | number;
+export const studentsQueryKey =
+  studentKeys.all;
+
+/*
+|--------------------------------------------------------------------------
+| Queries
+|--------------------------------------------------------------------------
+*/
 
 export function useStudents(
-  filters: StudentFilters = {},
+  filters: StudentListFilters = {},
 ) {
   return useQuery({
-    queryKey: studentKeys.list(filters),
-    queryFn: () => studentApi.list(filters),
+    queryKey:
+      studentKeys.list(filters),
 
-    placeholderData: (previousData) => previousData,
+    queryFn: () =>
+      studentApi.list(filters),
 
-    staleTime: 30_000,
+    placeholderData: (
+      previousData,
+    ) => previousData,
   });
 }
 
 export function useStudentSearch(
-  searchQuery: string,
+  params: StudentSearchParams,
 ) {
-  const normalizedSearchQuery = searchQuery.trim();
+  const normalizedQuery =
+    params.q.trim();
 
   return useQuery({
-    queryKey: studentKeys.search(normalizedSearchQuery),
+    queryKey:
+      studentKeys.search({
+        ...params,
+        q: normalizedQuery,
+      }),
 
     queryFn: () =>
-      studentApi.search(normalizedSearchQuery),
+      studentApi.search({
+        ...params,
+        q: normalizedQuery,
+      }),
 
-    enabled: normalizedSearchQuery.length > 0,
+    enabled:
+      normalizedQuery.length >= 2,
 
-    staleTime: 30_000,
+    placeholderData: (
+      previousData,
+    ) => previousData,
   });
 }
 
 export function useStudentDetails(
-  studentId: EntityId | null | undefined,
+  studentId: ApiId | null | undefined,
 ) {
   return useQuery({
-    queryKey: studentKeys.detail(
-      studentId ?? "disabled",
-    ),
+    queryKey:
+      studentKeys.detail(
+        studentId ?? "disabled",
+      ),
 
     queryFn: () =>
-      studentApi.getDetails(studentId!),
+      studentApi.getDetails(
+        studentId!,
+      ),
 
     enabled:
       studentId !== null &&
-      studentId !== undefined &&
-      studentId !== "",
+      studentId !== undefined,
   });
 }
 
 export function useStudentFullProfile(
-  enrollmentId: EntityId | null | undefined,
+  enrollmentId:
+    | ApiId
+    | null
+    | undefined,
 ) {
   return useQuery({
-    queryKey: studentKeys.fullProfile(
-      enrollmentId ?? "disabled",
-    ),
+    queryKey:
+      studentKeys.fullProfile(
+        enrollmentId ?? "disabled",
+      ),
 
     queryFn: () =>
-      studentApi.getFullProfile(enrollmentId!),
+      studentApi.getFullProfile(
+        enrollmentId!,
+      ),
 
     enabled:
       enrollmentId !== null &&
-      enrollmentId !== undefined &&
-      enrollmentId !== "",
+      enrollmentId !== undefined,
   });
 }
 
+/*
+|--------------------------------------------------------------------------
+| Registration
+|--------------------------------------------------------------------------
+*/
+
 export function useRegisterStudent() {
-  const queryClient = useQueryClient();
+  const queryClient =
+    useQueryClient();
 
   return useMutation({
     mutationFn: (
-      payload: RegisterStudentFormValues,
-    ) => studentApi.register(payload),
+      payload: RegisterStudentPayload,
+    ) =>
+      studentApi.register(payload),
 
     onSuccess: async () => {
       await queryClient.invalidateQueries({
-        queryKey: studentKeys.lists(),
+        queryKey:
+          studentKeys.lists(),
       });
 
       toast.success(
-        "Student registered successfully.",
+        "تم تسجيل الطالب وربطه بولي الأمر والقيد الدراسي بنجاح.",
       );
     },
 
@@ -112,15 +154,24 @@ export function useRegisterStudent() {
   });
 }
 
-export function useUpdateStudentPersonal() {
-  const queryClient = useQueryClient();
+/*
+|--------------------------------------------------------------------------
+| Personal data
+|--------------------------------------------------------------------------
+*/
+
+export function useUpdateStudentPersonal(
+  enrollmentId?: ApiId,
+) {
+  const queryClient =
+    useQueryClient();
 
   return useMutation({
     mutationFn: ({
       studentId,
       payload,
     }: {
-      studentId: EntityId;
+      studentId: ApiId;
       payload: UpdateStudentPersonalPayload;
     }) =>
       studentApi.updatePersonal(
@@ -132,24 +183,39 @@ export function useUpdateStudentPersonal() {
       _data,
       variables,
     ) => {
-      await Promise.all([
+      const invalidations = [
         queryClient.invalidateQueries({
-          queryKey: studentKeys.lists(),
+          queryKey:
+            studentKeys.lists(),
         }),
 
         queryClient.invalidateQueries({
-          queryKey: studentKeys.detail(
-            variables.studentId,
-          ),
+          queryKey:
+            studentKeys.detail(
+              variables.studentId,
+            ),
         }),
+      ];
 
-        queryClient.invalidateQueries({
-          queryKey: studentKeys.fullProfiles(),
-        }),
-      ]);
+      if (
+        enrollmentId !== undefined
+      ) {
+        invalidations.push(
+          queryClient.invalidateQueries({
+            queryKey:
+              studentKeys.fullProfile(
+                enrollmentId,
+              ),
+          }),
+        );
+      }
+
+      await Promise.all(
+        invalidations,
+      );
 
       toast.success(
-        "Student information updated successfully.",
+        "تم تحديث بيانات الطالب بنجاح.",
       );
     },
 
@@ -161,15 +227,18 @@ export function useUpdateStudentPersonal() {
   });
 }
 
-export function useUpdateStudentGuardian() {
-  const queryClient = useQueryClient();
+export function useUpdateGuardian(
+  enrollmentId?: ApiId,
+) {
+  const queryClient =
+    useQueryClient();
 
   return useMutation({
     mutationFn: ({
       guardianId,
       payload,
     }: {
-      guardianId: EntityId;
+      guardianId: ApiId;
       payload: UpdateGuardianPersonalPayload;
     }) =>
       studentApi.updateGuardian(
@@ -178,22 +247,19 @@ export function useUpdateStudentGuardian() {
       ),
 
     onSuccess: async () => {
-      await Promise.all([
-        queryClient.invalidateQueries({
-          queryKey: studentKeys.lists(),
-        }),
-
-        queryClient.invalidateQueries({
-          queryKey: studentKeys.details(),
-        }),
-
-        queryClient.invalidateQueries({
-          queryKey: studentKeys.fullProfiles(),
-        }),
-      ]);
+      if (
+        enrollmentId !== undefined
+      ) {
+        await queryClient.invalidateQueries({
+          queryKey:
+            studentKeys.fullProfile(
+              enrollmentId,
+            ),
+        });
+      }
 
       toast.success(
-        "Guardian information updated successfully.",
+        "تم تحديث بيانات ولي الأمر بنجاح.",
       );
     },
 
@@ -205,16 +271,23 @@ export function useUpdateStudentGuardian() {
   });
 }
 
+/*
+|--------------------------------------------------------------------------
+| Enrollment
+|--------------------------------------------------------------------------
+*/
+
 export function useUpdateStudentEnrollment() {
-  const queryClient = useQueryClient();
+  const queryClient =
+    useQueryClient();
 
   return useMutation({
     mutationFn: ({
       enrollmentId,
       payload,
     }: {
-      enrollmentId: EntityId;
-      payload: UpdateEnrollmentPayload;
+      enrollmentId: ApiId;
+      payload: UpdateStudentEnrollmentPayload;
     }) =>
       studentApi.updateEnrollment(
         enrollmentId,
@@ -227,22 +300,20 @@ export function useUpdateStudentEnrollment() {
     ) => {
       await Promise.all([
         queryClient.invalidateQueries({
-          queryKey: studentKeys.lists(),
+          queryKey:
+            studentKeys.lists(),
         }),
 
         queryClient.invalidateQueries({
-          queryKey: studentKeys.details(),
-        }),
-
-        queryClient.invalidateQueries({
-          queryKey: studentKeys.fullProfile(
-            variables.enrollmentId,
-          ),
+          queryKey:
+            studentKeys.fullProfile(
+              variables.enrollmentId,
+            ),
         }),
       ]);
 
       toast.success(
-        "Student enrollment updated successfully.",
+        "تم تحديث القيد الدراسي بنجاح.",
       );
     },
 
@@ -254,50 +325,44 @@ export function useUpdateStudentEnrollment() {
   });
 }
 
-export function useDeleteStudent() {
-  const queryClient = useQueryClient();
+/*
+|--------------------------------------------------------------------------
+| Account status
+|--------------------------------------------------------------------------
+*/
+
+export function useToggleStudentAccount() {
+  const queryClient =
+    useQueryClient();
 
   return useMutation({
     mutationFn: (
-      enrollmentId: EntityId,
-    ) => studentApi.remove(enrollmentId),
-
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({
-        queryKey: studentKeys.all,
-      });
-
-      toast.success(
-        "Student removed successfully.",
-      );
-    },
-
-    onError: (error) => {
-      toast.error(
-        getAxiosErrorMessage(error),
-      );
-    },
-  });
-}
-
-export function useToggleStudentStatus() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: (
-      enrollmentId: EntityId,
+      enrollmentId: ApiId,
     ) =>
-      studentApi.toggleAccount(
+      studentApi.toggleAccountStatus(
         enrollmentId,
       ),
 
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({
-        queryKey: studentKeys.all,
-      });
+    onSuccess: async (
+      _data,
+      enrollmentId,
+    ) => {
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey:
+            studentKeys.lists(),
+        }),
+
+        queryClient.invalidateQueries({
+          queryKey:
+            studentKeys.fullProfile(
+              enrollmentId,
+            ),
+        }),
+      ]);
 
       toast.success(
-        "Student status updated successfully.",
+        "تم تغيير حالة حساب الطالب بنجاح.",
       );
     },
 
@@ -308,3 +373,51 @@ export function useToggleStudentStatus() {
     },
   });
 }
+
+/*
+|--------------------------------------------------------------------------
+| Delete / withdraw
+|--------------------------------------------------------------------------
+*/
+
+export function useDeleteStudent() {
+  const queryClient =
+    useQueryClient();
+
+  return useMutation({
+    mutationFn: (
+      studentId: ApiId,
+    ) =>
+      studentApi.remove(studentId),
+
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey:
+          studentKeys.lists(),
+      });
+
+      toast.success(
+        "تم حذف الطالب من النظام بنجاح.",
+      );
+    },
+
+    onError: (error) => {
+      toast.error(
+        getAxiosErrorMessage(error),
+      );
+    },
+  });
+}
+
+/*
+|--------------------------------------------------------------------------
+| Backward-compatible alias
+|--------------------------------------------------------------------------
+|
+| هذا الاسم موجود في بعض الواجهات القديمة.
+| يمكن حذفه بعد استبدال الاستخدامات بـ useDeleteStudent.
+|
+*/
+
+export const useWithdrawStudent =
+  useDeleteStudent;
