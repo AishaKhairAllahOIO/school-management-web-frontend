@@ -1,5 +1,6 @@
 import {
   GraduationCap,
+  IdCard,
   Phone,
   UserRound,
 } from "lucide-react";
@@ -15,63 +16,77 @@ type StudentProfileHeroProps = {
   enrollment: StudentEnrollment;
 };
 
+function gradeLabel(
+  enrollment: StudentEnrollment,
+) {
+  if (enrollment.grade?.name) {
+    return enrollment.grade.name;
+  }
+
+  if (
+    enrollment.gradeId !== null &&
+    enrollment.gradeId !== undefined
+  ) {
+    return `Grade #${enrollment.gradeId}`;
+  }
+
+  return "Grade not assigned";
+}
+
 export function StudentProfileHero({
   student,
   enrollment,
 }: StudentProfileHeroProps) {
   return (
-    <section className="relative overflow-hidden rounded-[34px] bg-gradient-to-br from-rose-100 via-white to-orange-100 p-6 shadow-[0_20px_70px_rgba(15,23,42,0.09)] sm:p-8">
-      <div className="pointer-events-none absolute -left-16 -top-20 h-64 w-64 rounded-full bg-white/70 blur-3xl" />
+    <section className="relative overflow-hidden rounded-[34px] border border-border/70 bg-card shadow-[var(--shadow-floating)]">
+      <div className="soft-purple-gradient absolute inset-0 opacity-80" />
+      <div className="absolute -right-16 -top-16 h-64 w-64 rounded-full bg-primary/15 blur-3xl" />
 
-      <div className="relative flex flex-col items-center gap-6 text-center lg:flex-row lg:text-right">
-        {student.photoUrl ? (
-          <img
-            src={student.photoUrl}
-            alt={student.fullName}
-            className="h-44 w-44 rounded-[38px] object-cover shadow-2xl ring-8 ring-white/80"
+      <div className="relative grid gap-6 p-5 sm:p-7 lg:grid-cols-[260px_1fr] lg:items-end">
+        <div className="relative overflow-hidden rounded-[30px] border border-card/70 bg-muted shadow-[var(--shadow-floating)]">
+          {student.photoUrl ? (
+            <img
+              src={student.photoUrl}
+              alt={student.fullName}
+              className="h-72 w-full object-cover lg:h-[330px]"
+            />
+          ) : (
+            <div className="flex h-72 items-center justify-center bg-card/60 lg:h-[330px]">
+              <div className="flex h-28 w-28 items-center justify-center rounded-[34px] bg-primary/10 text-primary">
+                <UserRound className="h-14 w-14" />
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="min-w-0 pb-1">
+          <StudentStatusBadge
+            status={enrollment.enrollmentStatus}
           />
-        ) : (
-          <div className="flex h-44 w-44 items-center justify-center rounded-[38px] bg-white text-rose-400 shadow-xl">
-            <UserRound className="h-16 w-16" />
-          </div>
-        )}
 
-        <div className="flex-1">
-          <div className="flex flex-wrap items-center justify-center gap-2 lg:justify-start">
-            <StudentStatusBadge
-              status={
-                enrollment.enrollmentStatus
-              }
-            />
-
-            <StudentStatusBadge
-              status={student.accountStatus}
-            />
-          </div>
-
-          <h1 className="mt-4 text-3xl font-black text-slate-950 sm:text-4xl">
+          <h1 className="mt-4 text-3xl font-black tracking-[-0.04em] text-foreground sm:text-4xl lg:text-5xl">
             {student.fullName}
           </h1>
 
-          <p className="mt-2 text-sm font-medium text-slate-500">
-            رقم الطالب: {student.id}
-          </p>
+          <div className="mt-6 flex flex-wrap gap-2">
+            <span className="inline-flex items-center gap-2 rounded-2xl border border-border bg-card/75 px-4 py-2.5 text-sm font-bold text-foreground backdrop-blur">
+              <IdCard className="h-4 w-4 text-primary" />
+              Student #{student.id}
+            </span>
 
-          <div className="mt-6 flex flex-wrap justify-center gap-3 lg:justify-start">
-            <div className="inline-flex items-center gap-2 rounded-2xl bg-white/75 px-4 py-3 text-sm font-bold text-slate-700 backdrop-blur">
-              <GraduationCap className="h-4 w-4 text-rose-500" />
-              {enrollment.grade?.name ??
-                "الصف غير محدد"}
-            </div>
+            <span className="inline-flex items-center gap-2 rounded-2xl border border-border bg-card/75 px-4 py-2.5 text-sm font-bold text-foreground backdrop-blur">
+              <GraduationCap className="h-4 w-4 text-primary" />
+              {gradeLabel(enrollment)}
+            </span>
 
             {student.phoneNumber ? (
-              <div className="inline-flex items-center gap-2 rounded-2xl bg-white/75 px-4 py-3 text-sm font-bold text-slate-700 backdrop-blur">
-                <Phone className="h-4 w-4 text-blue-500" />
-
-                <span dir="ltr">
-                  {student.phoneNumber}
-                </span>
-              </div>
+              <span
+                dir="ltr"
+                className="inline-flex items-center gap-2 rounded-2xl border border-border bg-card/75 px-4 py-2.5 text-sm font-bold text-foreground backdrop-blur"
+              >
+                <Phone className="h-4 w-4 text-primary" />
+                {student.phoneNumber}
+              </span>
             ) : null}
           </div>
         </div>

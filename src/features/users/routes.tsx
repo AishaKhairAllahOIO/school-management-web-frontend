@@ -1,4 +1,3 @@
-
 import type { RouteObject } from "react-router-dom";
 
 import {
@@ -14,7 +13,9 @@ import { UserTypePlaceholderPage } from "@/features/users/pages/UserTypePlacehol
 
 import { StudentsPage } from "@/features/users/students/pages/StudentsPage";
 import { StudentRegistrationPage } from "@/features/users/students/pages/StudentRegistrationPage";
+import { StudentImportPage } from "@/features/users/students/pages/StudentImportPage";
 import { StudentProfilePage } from "@/features/users/students/pages/StudentProfilePage";
+import { StudentEditPage } from "@/features/users/students/pages/StudentEditPage";
 
 export const usersRoutes = [
   {
@@ -40,6 +41,23 @@ export const usersRoutes = [
       {
         path: "students/new",
         element: <StudentRegistrationPage />,
+      },
+
+      /*
+       * يجب وضع import قبل :enrollmentId
+       * حتى لا يعتبر React Router كلمة import معرف طالب.
+       */
+      {
+        path: "students/import",
+        element: <StudentImportPage />,
+      },
+
+      /*
+       * يجب وضع edit قبل صفحة البروفايل العامة.
+       */
+      {
+        path: "students/:enrollmentId/edit",
+        element: <StudentEditPage />,
       },
 
       {

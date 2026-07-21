@@ -7,6 +7,16 @@ type ProfileInfoCardProps = {
   className?: string;
 };
 
+function hasDisplayValue(
+  value: ReactNode,
+) {
+  return (
+    value !== null &&
+    value !== undefined &&
+    value !== ""
+  );
+}
+
 export function ProfileInfoCard({
   icon,
   label,
@@ -14,27 +24,31 @@ export function ProfileInfoCard({
   className = "",
 }: ProfileInfoCardProps) {
   return (
-    <div
+    <article
       className={[
-        "rounded-[24px] border border-slate-100 bg-slate-50/80 p-4",
+        "group rounded-[24px] border border-border/70 bg-card/75 p-4",
+        "shadow-[var(--shadow-soft)] backdrop-blur transition",
+        "hover:-translate-y-0.5 hover:border-primary/20 hover:shadow-[var(--shadow-card)]",
         className,
       ].join(" ")}
     >
       <div className="flex items-start gap-3">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[15px] bg-white text-slate-600 shadow-sm">
+        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-primary transition group-hover:bg-primary group-hover:text-primary-foreground">
           {icon}
         </div>
 
         <div className="min-w-0">
-          <p className="text-xs font-semibold text-slate-400">
+          <p className="text-[11px] font-black uppercase tracking-[0.1em] text-muted-foreground">
             {label}
           </p>
 
-          <div className="mt-1 truncate text-sm font-black text-slate-800">
-            {value || "غير محدد"}
+          <div className="mt-1 break-words text-sm font-bold leading-6 text-foreground">
+            {hasDisplayValue(value)
+              ? value
+              : "Not specified"}
           </div>
         </div>
       </div>
-    </div>
+    </article>
   );
 }

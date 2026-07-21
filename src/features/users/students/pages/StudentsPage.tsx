@@ -82,7 +82,7 @@ export function StudentsPage() {
 
   async function deleteStudent(student: StudentListItem) {
     const confirmed = window.confirm(
-      `Delete "${student.fullName}"? This action cannot be undone.`,
+      `Withdraw "${student.fullName}" from the school? The enrollment will be removed and the account will be disabled.`,
     );
 
     if (!confirmed) {
@@ -90,16 +90,22 @@ export function StudentsPage() {
     }
 
     try {
-      setPendingDeleteId(student.studentId);
-      await deleteMutation.mutateAsync(student.studentId);
+      setPendingDeleteId(student.enrollmentId);
+      await deleteMutation.mutateAsync(student.enrollmentId);
     } finally {
       setPendingDeleteId(undefined);
     }
   }
 
   async function toggleStudent(student: StudentListItem) {
+    const isEnabled =
+      student.accountStatus === "enabled" ||
+      student.accountStatus === "active";
+
+    const nextAction = isEnabled ? "disable" : "enable";
+
     const confirmed = window.confirm(
-      `Change the account status for "${student.fullName}"?`,
+      `Are you sure you want to ${nextAction} "${student.fullName}"'s account?`,
     );
 
     if (!confirmed) {
@@ -234,7 +240,7 @@ export function StudentsPage() {
                 student={student}
                 index={index}
                 isDeleting={
-                  pendingDeleteId === student.studentId
+                  pendingDeleteId === student.enrollmentId
                 }
                 isToggling={
                   pendingToggleId ===

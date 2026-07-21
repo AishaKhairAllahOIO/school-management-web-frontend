@@ -18,7 +18,7 @@ import {
   fieldClassName,
   FormField,
   FormSection,
-} from "../components/forms/StudentFormPrimitives";
+} from "../components/form/StudentFormPrimitives";
 import { StudentPageHeader } from "../components/shared/StudentPageHeader";
 import { useRegisterStudent } from "../hooks/useStudents";
 import type {
