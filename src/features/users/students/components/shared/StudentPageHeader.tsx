@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { ArrowRight } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 type StudentPageHeaderProps = {
@@ -20,48 +20,45 @@ export function StudentPageHeader({
   const navigate = useNavigate();
 
   return (
-    <header className="relative overflow-hidden rounded-[32px] border border-white/80 bg-white px-5 py-6 shadow-[0_20px_70px_rgba(15,23,42,0.07)] sm:px-8 sm:py-8">
-      <div className="pointer-events-none absolute -left-14 -top-16 h-52 w-52 rounded-full bg-rose-100/70 blur-3xl" />
+    <header className="relative overflow-hidden rounded-[34px] border border-border/70 bg-card px-5 py-6 shadow-[var(--shadow-card)] sm:px-7">
+      <div className="soft-purple-gradient pointer-events-none absolute inset-0 opacity-65" />
+      <div className="pointer-events-none absolute -right-16 -top-20 h-56 w-56 rounded-full bg-primary/10 blur-3xl" />
 
-      <div className="pointer-events-none absolute -bottom-20 right-1/4 h-48 w-48 rounded-full bg-blue-100/70 blur-3xl" />
-
-      <div className="relative flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
-        <div className="flex items-start gap-4">
+      <div className="relative flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+        <div className="flex min-w-0 items-start gap-3 sm:items-center">
           {showBackButton ? (
             <button
               type="button"
               onClick={() => navigate(-1)}
-              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-600 shadow-sm transition hover:-translate-y-0.5 hover:bg-slate-50"
-              aria-label="رجوع"
+              className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-border bg-card/80 text-foreground shadow-[var(--shadow-soft)] backdrop-blur transition hover:-translate-y-0.5 hover:border-primary/25 hover:bg-secondary focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/10"
+              aria-label="Go back"
             >
-              <ArrowRight className="h-5 w-5" />
+              <ArrowLeft className="h-5 w-5" />
             </button>
           ) : null}
 
           {icon ? (
-            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[20px] bg-slate-950 text-white shadow-lg shadow-slate-300">
+            <div className="primary-gradient flex h-14 w-14 shrink-0 items-center justify-center rounded-[20px] text-primary-foreground shadow-[var(--shadow-auth-button)]">
               {icon}
             </div>
           ) : null}
 
-          <div>
-            <h1 className="text-2xl font-black tracking-tight text-slate-950 sm:text-3xl">
+          <div className="min-w-0">
+            <p className="text-xs font-black uppercase tracking-[0.16em] text-primary">
+              Student management
+            </p>
+            <h1 className="mt-1 truncate text-3xl font-black tracking-[-0.04em] text-foreground sm:text-4xl">
               {title}
             </h1>
-
             {description ? (
-              <p className="mt-2 max-w-2xl text-sm leading-7 text-slate-500">
+              <p className="mt-2 max-w-3xl text-sm font-medium leading-6 text-muted-foreground sm:text-base">
                 {description}
               </p>
             ) : null}
           </div>
         </div>
 
-        {actions ? (
-          <div className="flex flex-wrap items-center gap-3">
-            {actions}
-          </div>
-        ) : null}
+        {actions ? <div className="flex flex-wrap items-center gap-2">{actions}</div> : null}
       </div>
     </header>
   );

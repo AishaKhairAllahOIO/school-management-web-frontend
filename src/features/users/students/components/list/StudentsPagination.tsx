@@ -1,7 +1,4 @@
-import {
-  ChevronLeft,
-  ChevronRight,
-} from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 type StudentsPaginationProps = {
   currentPage: number;
@@ -13,33 +10,13 @@ type StudentsPaginationProps = {
   onPageChange: (page: number) => void;
 };
 
-function createPages(
-  currentPage: number,
-  lastPage: number,
-) {
+function createPages(currentPage: number, lastPage: number) {
   if (lastPage <= 5) {
-    return Array.from(
-      {
-        length: lastPage,
-      },
-      (_, index) => index + 1,
-    );
+    return Array.from({ length: lastPage }, (_, index) => index + 1);
   }
 
-  const start = Math.max(
-    1,
-    Math.min(
-      currentPage - 2,
-      lastPage - 4,
-    ),
-  );
-
-  return Array.from(
-    {
-      length: 5,
-    },
-    (_, index) => start + index,
-  );
+  const start = Math.max(1, Math.min(currentPage - 2, lastPage - 4));
+  return Array.from({ length: 5 }, (_, index) => start + index);
 }
 
 export function StudentsPagination({
@@ -51,44 +28,32 @@ export function StudentsPagination({
   disabled = false,
   onPageChange,
 }: StudentsPaginationProps) {
-  if (total === 0) {
-    return null;
-  }
+  if (total === 0) return null;
 
-  const pages = createPages(
-    currentPage,
-    lastPage,
-  );
+  const pages = createPages(currentPage, lastPage);
+  const buttonBase =
+    "flex h-11 min-w-11 items-center justify-center rounded-2xl text-sm font-bold transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/10 disabled:cursor-not-allowed disabled:opacity-35";
 
   return (
-    <div className="flex flex-col gap-4 rounded-[26px] border border-white bg-white px-5 py-4 shadow-[0_12px_40px_rgba(15,23,42,0.06)] sm:flex-row sm:items-center sm:justify-between">
-      <p className="text-sm text-slate-500">
-        عرض{" "}
-        <strong className="text-slate-900">
-          {from ?? 0}
-        </strong>{" "}
-        إلى{" "}
-        <strong className="text-slate-900">
-          {to ?? 0}
-        </strong>{" "}
-        من أصل{" "}
-        <strong className="text-slate-900">
-          {total}
-        </strong>
+    <nav
+      aria-label="Students pagination"
+      className="flex flex-col gap-4 rounded-[28px] border border-border/70 bg-card/80 p-4 shadow-[var(--shadow-card)] backdrop-blur sm:flex-row sm:items-center sm:justify-between"
+    >
+      <p className="text-center text-sm font-semibold text-muted-foreground sm:text-left">
+        Showing <strong className="text-foreground">{from ?? 0}</strong> to{" "}
+        <strong className="text-foreground">{to ?? 0}</strong> of{" "}
+        <strong className="text-foreground">{total}</strong> students
       </p>
 
-      <div className="flex items-center gap-1">
+      <div className="flex items-center justify-center gap-1.5">
         <button
           type="button"
-          disabled={
-            disabled || currentPage <= 1
-          }
-          onClick={() =>
-            onPageChange(currentPage - 1)
-          }
-          className="flex h-10 w-10 items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-500 transition hover:bg-slate-50 disabled:opacity-30"
+          disabled={disabled || currentPage <= 1}
+          onClick={() => onPageChange(currentPage - 1)}
+          className={`${buttonBase} border border-border bg-card text-muted-foreground hover:border-primary/25 hover:bg-secondary hover:text-foreground`}
+          aria-label="Previous page"
         >
-          <ChevronRight className="h-4 w-4" />
+          <ChevronLeft className="h-4 w-4" />
         </button>
 
         {pages.map((page) => (
@@ -97,12 +62,12 @@ export function StudentsPagination({
             type="button"
             disabled={disabled}
             onClick={() => onPageChange(page)}
-            className={[
-              "flex h-10 min-w-10 items-center justify-center rounded-2xl px-3 text-sm font-bold transition",
+            aria-current={page === currentPage ? "page" : undefined}
+            className={`${buttonBase} ${
               page === currentPage
-                ? "bg-slate-950 text-white shadow-lg shadow-slate-300"
-                : "border border-slate-200 bg-white text-slate-600 hover:bg-slate-50",
-            ].join(" ")}
+                ? "primary-gradient text-primary-foreground shadow-[var(--shadow-auth-button)]"
+                : "border border-border bg-card text-muted-foreground hover:border-primary/25 hover:bg-secondary hover:text-foreground"
+            }`}
           >
             {page}
           </button>
@@ -110,18 +75,14 @@ export function StudentsPagination({
 
         <button
           type="button"
-          disabled={
-            disabled ||
-            currentPage >= lastPage
-          }
-          onClick={() =>
-            onPageChange(currentPage + 1)
-          }
-          className="flex h-10 w-10 items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-500 transition hover:bg-slate-50 disabled:opacity-30"
+          disabled={disabled || currentPage >= lastPage}
+          onClick={() => onPageChange(currentPage + 1)}
+          className={`${buttonBase} border border-border bg-card text-muted-foreground hover:border-primary/25 hover:bg-secondary hover:text-foreground`}
+          aria-label="Next page"
         >
-          <ChevronLeft className="h-4 w-4" />
+          <ChevronRight className="h-4 w-4" />
         </button>
       </div>
-    </div>
+    </nav>
   );
 }

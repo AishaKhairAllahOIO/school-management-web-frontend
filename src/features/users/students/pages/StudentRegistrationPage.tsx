@@ -1,10 +1,10 @@
 import {
   type ChangeEvent,
   type FormEvent,
+  useMemo,
   useState,
 } from "react";
 import {
-  BookOpen,
   Camera,
   GraduationCap,
   Save,
@@ -14,43 +14,35 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
+import {
+  fieldClassName,
+  FormField,
+  FormSection,
+} from "../components/forms/StudentFormPrimitives";
 import { StudentPageHeader } from "../components/shared/StudentPageHeader";
 import { useRegisterStudent } from "../hooks/useStudents";
-
 import type {
   RegisterStudentPayload,
   UserGender,
 } from "../types/student.types";
 
+type PersonState = {
+  first_name: string;
+  last_name: string;
+  father_name: string;
+  mother_name: string;
+  birth_date: string;
+  birth_place: string;
+  gender: UserGender;
+  nationality: string;
+  address: string;
+  phone_number: string;
+  url_photo: File | null;
+};
+
 type FormState = {
-  student: {
-    first_name: string;
-    last_name: string;
-    father_name: string;
-    mother_name: string;
-    birth_date: string;
-    birth_place: string;
-    gender: UserGender;
-    nationality: string;
-    address: string;
-    phone_number: string;
-    url_photo: File | null;
-  };
-
-  guardian: {
-    first_name: string;
-    last_name: string;
-    father_name: string;
-    mother_name: string;
-    birth_date: string;
-    birth_place: string;
-    gender: UserGender;
-    nationality: string;
-    address: string;
-    phone_number: string;
-    url_photo: File | null;
-  };
-
+  student: PersonState;
+  guardian: PersonState;
   enrollment: {
     academic_year_id: string;
     grade_level_id: string;
@@ -58,35 +50,23 @@ type FormState = {
   };
 };
 
+const emptyPerson: PersonState = {
+  first_name: "",
+  last_name: "",
+  father_name: "",
+  mother_name: "",
+  birth_date: "",
+  birth_place: "",
+  gender: "male",
+  nationality: "syrian",
+  address: "",
+  phone_number: "",
+  url_photo: null,
+};
+
 const initialState: FormState = {
-  student: {
-    first_name: "",
-    last_name: "",
-    father_name: "",
-    mother_name: "",
-    birth_date: "",
-    birth_place: "",
-    gender: "male",
-    nationality: "syrian",
-    address: "",
-    phone_number: "",
-    url_photo: null,
-  },
-
-  guardian: {
-    first_name: "",
-    last_name: "",
-    father_name: "",
-    mother_name: "",
-    birth_date: "",
-    birth_place: "",
-    gender: "male",
-    nationality: "syrian",
-    address: "",
-    phone_number: "",
-    url_photo: null,
-  },
-
+  student: { ...emptyPerson },
+  guardian: { ...emptyPerson },
   enrollment: {
     academic_year_id: "",
     grade_level_id: "",
@@ -94,172 +74,60 @@ const initialState: FormState = {
   },
 };
 
-type InputProps = {
-  label: string;
-  value: string;
-  type?: string;
-  required?: boolean;
-  placeholder?: string;
-  onChange: (value: string) => void;
-};
-
-function FormInput({
-  label,
-  value,
-  type = "text",
-  required = false,
-  placeholder,
-  onChange,
-}: InputProps) {
-  return (
-    <label className="block">
-      <span className="mb-2 block text-sm font-bold text-slate-700">
-        {label}
-
-        {required ? (
-          <span className="mr-1 text-rose-500">
-            *
-          </span>
-        ) : null}
-      </span>
-
-      <input
-        type={type}
-        value={value}
-        required={required}
-        placeholder={placeholder}
-        onChange={(event) =>
-          onChange(event.target.value)
-        }
-        className="h-12 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-medium text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-rose-300 focus:bg-white focus:ring-4 focus:ring-rose-100"
-      />
-    </label>
-  );
-}
-
-function FormSelect({
-  label,
-  value,
-  required = false,
-  children,
-  onChange,
-}: {
-  label: string;
-  value: string;
-  required?: boolean;
-  children: React.ReactNode;
-  onChange: (value: string) => void;
-}) {
-  return (
-    <label className="block">
-      <span className="mb-2 block text-sm font-bold text-slate-700">
-        {label}
-
-        {required ? (
-          <span className="mr-1 text-rose-500">
-            *
-          </span>
-        ) : null}
-      </span>
-
-      <select
-        value={value}
-        required={required}
-        onChange={(event) =>
-          onChange(event.target.value)
-        }
-        className="h-12 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-medium text-slate-900 outline-none transition focus:border-rose-300 focus:bg-white focus:ring-4 focus:ring-rose-100"
-      >
-        {children}
-      </select>
-    </label>
-  );
-}
-
-function SectionCard({
-  icon,
-  title,
-  description,
-  children,
-  className = "",
-}: {
-  icon: React.ReactNode;
-  title: string;
-  description: string;
-  children: React.ReactNode;
-  className?: string;
-}) {
-  return (
-    <section
-      className={[
-        "mb-6 break-inside-avoid rounded-[30px] border border-white bg-white p-5 shadow-[0_16px_52px_rgba(15,23,42,0.07)] sm:p-7",
-        className,
-      ].join(" ")}
-    >
-      <div className="mb-6 flex items-start gap-4">
-        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[18px] bg-slate-950 text-white">
-          {icon}
-        </div>
-
-        <div>
-          <h2 className="text-lg font-black text-slate-950">
-            {title}
-          </h2>
-
-          <p className="mt-1 text-sm leading-6 text-slate-500">
-            {description}
-          </p>
-        </div>
-      </div>
-
-      {children}
-    </section>
-  );
-}
-
 export function StudentRegistrationPage() {
   const navigate = useNavigate();
+  const registerMutation = useRegisterStudent();
 
-  const registerMutation =
-    useRegisterStudent();
+  const [form, setForm] = useState<FormState>(initialState);
+  const [studentPreview, setStudentPreview] = useState<string | null>(null);
 
-  const [form, setForm] =
-    useState<FormState>(initialState);
+  const studentCompleted = useMemo(
+    () =>
+      Boolean(
+        form.student.first_name &&
+          form.student.last_name &&
+          form.student.birth_date &&
+          form.student.phone_number,
+      ),
+    [form.student],
+  );
 
-  const [studentPreview, setStudentPreview] =
-    useState<string | null>(null);
+  const guardianCompleted = useMemo(
+    () =>
+      Boolean(
+        form.guardian.first_name &&
+          form.guardian.last_name &&
+          form.guardian.phone_number,
+      ),
+    [form.guardian],
+  );
+
+  const enrollmentCompleted = useMemo(
+    () =>
+      Boolean(
+        form.enrollment.academic_year_id &&
+          form.enrollment.grade_level_id,
+      ),
+    [form.enrollment],
+  );
 
   function updateStudent(
-    key: keyof FormState["student"],
-    value:
-      | string
-      | UserGender
-      | File
-      | null,
+    key: keyof PersonState,
+    value: string | UserGender | File | null,
   ) {
     setForm((current) => ({
       ...current,
-      student: {
-        ...current.student,
-        [key]: value,
-      },
+      student: { ...current.student, [key]: value },
     }));
   }
 
   function updateGuardian(
-    key: keyof FormState["guardian"],
-    value:
-      | string
-      | UserGender
-      | File
-      | null,
+    key: keyof PersonState,
+    value: string | UserGender | File | null,
   ) {
     setForm((current) => ({
       ...current,
-      guardian: {
-        ...current.guardian,
-        [key]: value,
-      },
+      guardian: { ...current.guardian, [key]: value },
     }));
   }
 
@@ -269,559 +137,410 @@ export function StudentRegistrationPage() {
   ) {
     setForm((current) => ({
       ...current,
-      enrollment: {
-        ...current.enrollment,
-        [key]: value,
-      },
+      enrollment: { ...current.enrollment, [key]: value },
     }));
   }
 
   function selectStudentPhoto(
     event: ChangeEvent<HTMLInputElement>,
   ) {
-    const file =
-      event.target.files?.[0] ?? null;
-
+    const file = event.target.files?.[0] ?? null;
     updateStudent("url_photo", file);
 
-    if (file) {
-      setStudentPreview(
-        URL.createObjectURL(file),
-      );
+    if (studentPreview) {
+      URL.revokeObjectURL(studentPreview);
     }
+
+    setStudentPreview(file ? URL.createObjectURL(file) : null);
   }
 
-  async function submit(
-    event: FormEvent<HTMLFormElement>,
-  ) {
+  async function submit(event: FormEvent) {
     event.preventDefault();
 
     const payload: RegisterStudentPayload = {
-      student: {
-        ...form.student,
-      },
-
-      guardian: {
-        ...form.guardian,
-      },
-
+      student: { ...form.student },
+      guardian: { ...form.guardian },
       enrollment: {
-        academic_year_id:
-          form.enrollment
-            .academic_year_id,
-
-        grade_level_id:
-          form.enrollment
-            .grade_level_id,
-
-        class_room_id:
-          form.enrollment
-            .class_room_id || null,
+        academic_year_id: form.enrollment.academic_year_id,
+        grade_level_id: form.enrollment.grade_level_id,
+        class_room_id: form.enrollment.class_room_id || null,
       },
     };
 
-    const result =
-      await registerMutation.mutateAsync(
-        payload,
-      );
+    const result = await registerMutation.mutateAsync(payload);
+    const enrollmentId = result.enrollment?.id;
 
-    const enrollmentId =
-      result.enrollment?.id;
-
-    if (enrollmentId) {
-      navigate(
-        `/users/students/${enrollmentId}`,
-      );
-
-      return;
-    }
-
-    navigate("/users/students");
+    navigate(
+      enrollmentId
+        ? `/users/students/${enrollmentId}`
+        : "/users/students",
+    );
   }
 
   return (
-    <main
-      dir="rtl"
-      className="min-h-screen bg-[#f7f7f5] px-4 py-5 sm:px-6 lg:px-8"
-    >
+    <main className="min-h-screen bg-background px-4 py-5 text-foreground sm:px-6 lg:px-8">
       <form
         onSubmit={submit}
-        className="mx-auto max-w-[1450px]"
+        className="mx-auto flex max-w-[1450px] flex-col gap-6"
       >
         <StudentPageHeader
-          title="إضافة طالب جديد"
-          description="أضيفي معلومات الطالب وولي الأمر والقيد الدراسي ضمن نموذج منظم وواضح."
+          title="Add student"
+          description="Create the student, guardian, and academic enrollment in one connected workflow."
           showBackButton
-          icon={
-            <UserPlus className="h-7 w-7" />
-          }
+          icon={<UserPlus className="h-7 w-7" />}
           actions={
             <>
               <button
                 type="button"
-                onClick={() =>
-                  navigate(
-                    "/users/students",
-                  )
-                }
-                className="h-11 rounded-2xl border border-slate-200 bg-white px-5 text-sm font-bold text-slate-700 transition hover:bg-slate-50"
+                onClick={() => navigate("/users/students")}
+                className="inline-flex h-11 items-center rounded-2xl border border-border bg-card px-5 text-sm font-bold text-foreground transition hover:bg-secondary"
               >
-                إلغاء
+                Cancel
               </button>
-
               <button
                 type="submit"
-                disabled={
-                  registerMutation.isPending
-                }
-                className="inline-flex h-11 items-center gap-2 rounded-2xl bg-slate-950 px-5 text-sm font-bold text-white shadow-lg shadow-slate-300 transition hover:bg-slate-800 disabled:opacity-50"
+                disabled={registerMutation.isPending}
+                className="primary-gradient inline-flex h-11 items-center gap-2 rounded-2xl px-5 text-sm font-bold text-primary-foreground shadow-[var(--shadow-auth-button)] disabled:opacity-60"
               >
                 {registerMutation.isPending ? (
-                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent" />
                 ) : (
                   <Save className="h-4 w-4" />
                 )}
-
-                حفظ الطالب
+                Create student
               </button>
             </>
           }
         />
 
-        <div className="mt-6 columns-1 gap-6 xl:columns-2">
-          <SectionCard
-            icon={
-              <Camera className="h-5 w-5" />
-            }
-            title="صورة الطالب"
-            description="اختاري صورة واضحة للطالب لتظهر في بطاقات القائمة والملف الشخصي."
-          >
-            <div className="flex flex-col items-center rounded-[26px] bg-gradient-to-br from-rose-50 to-orange-50 p-6">
-              {studentPreview ? (
-                <img
-                  src={studentPreview}
-                  alt="معاينة صورة الطالب"
-                  className="h-40 w-40 rounded-[32px] object-cover shadow-xl ring-4 ring-white"
-                />
-              ) : (
-                <div className="flex h-40 w-40 items-center justify-center rounded-[32px] bg-white text-rose-400 shadow-lg">
-                  <Camera className="h-12 w-12" />
+        <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_340px]">
+          <div className="space-y-6">
+            <FormSection
+              eyebrow="Step 1"
+              title="Student photo"
+              description="Use a clear portrait that will appear on cards and the profile page."
+              icon={<Camera className="h-5 w-5" />}
+              completed={Boolean(form.student.url_photo)}
+            >
+              <div className="flex flex-col items-center gap-5 sm:flex-row">
+                <div className="soft-purple-gradient flex h-44 w-36 shrink-0 items-center justify-center overflow-hidden rounded-[28px] border border-primary/15">
+                  {studentPreview ? (
+                    <img
+                      src={studentPreview}
+                      alt="Student preview"
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <Camera className="h-10 w-10 text-primary" />
+                  )}
                 </div>
-              )}
 
-              <label className="mt-5 cursor-pointer rounded-2xl bg-white px-5 py-3 text-sm font-bold text-slate-700 shadow-sm transition hover:-translate-y-0.5">
-                اختيار صورة
+                <div>
+                  <label className="primary-gradient inline-flex h-11 cursor-pointer items-center gap-2 rounded-2xl px-5 text-sm font-bold text-primary-foreground">
+                    <Camera className="h-4 w-4" />
+                    Choose photo
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={selectStudentPhoto}
+                    />
+                  </label>
+                  <p className="mt-3 text-sm font-medium text-muted-foreground">
+                    Recommended: portrait image, JPG or PNG.
+                  </p>
+                </div>
+              </div>
+            </FormSection>
 
-                <input
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={
-                    selectStudentPhoto
-                  }
+            <PersonFormSection
+              eyebrow="Step 2"
+              title="Student information"
+              description="Personal, identity, and contact details for the student."
+              icon={<UserPlus className="h-5 w-5" />}
+              value={form.student}
+              completed={studentCompleted}
+              onChange={updateStudent}
+            />
+
+            <PersonFormSection
+              eyebrow="Step 3"
+              title="Guardian information"
+              description="The primary guardian responsible for the student."
+              icon={<UsersRound className="h-5 w-5" />}
+              value={form.guardian}
+              completed={guardianCompleted}
+              onChange={updateGuardian}
+            />
+
+            <FormSection
+              eyebrow="Step 4"
+              title="Academic enrollment"
+              description="Assign the academic year, grade, and optional classroom."
+              icon={<GraduationCap className="h-5 w-5" />}
+              completed={enrollmentCompleted}
+            >
+              <div className="grid gap-4 md:grid-cols-3">
+                <FormField label="Academic year ID" required>
+                  <input
+                    required
+                    value={form.enrollment.academic_year_id}
+                    onChange={(event) =>
+                      updateEnrollment(
+                        "academic_year_id",
+                        event.target.value,
+                      )
+                    }
+                    className={fieldClassName}
+                    placeholder="Academic year"
+                  />
+                </FormField>
+
+                <FormField label="Grade level ID" required>
+                  <input
+                    required
+                    value={form.enrollment.grade_level_id}
+                    onChange={(event) =>
+                      updateEnrollment(
+                        "grade_level_id",
+                        event.target.value,
+                      )
+                    }
+                    className={fieldClassName}
+                    placeholder="Grade level"
+                  />
+                </FormField>
+
+                <FormField label="Classroom ID">
+                  <input
+                    value={form.enrollment.class_room_id}
+                    onChange={(event) =>
+                      updateEnrollment(
+                        "class_room_id",
+                        event.target.value,
+                      )
+                    }
+                    className={fieldClassName}
+                    placeholder="Optional classroom"
+                  />
+                </FormField>
+              </div>
+            </FormSection>
+          </div>
+
+          <aside className="xl:sticky xl:top-5 xl:self-start">
+            <section className="primary-gradient overflow-hidden rounded-[32px] p-6 text-primary-foreground shadow-[var(--shadow-floating)]">
+              <ShieldCheck className="h-9 w-9" />
+              <h2 className="mt-5 text-2xl font-black">
+                Review before saving
+              </h2>
+              <p className="mt-2 text-sm font-medium leading-6 text-primary-foreground/80">
+                One submission creates the student, guardian, and enrollment together.
+              </p>
+
+              <div className="mt-6 space-y-3">
+                <ReviewRow
+                  label="Student information"
+                  completed={studentCompleted}
                 />
-              </label>
-            </div>
-          </SectionCard>
-
-          <SectionCard
-            icon={
-              <GraduationCap className="h-5 w-5" />
-            }
-            title="بيانات الطالب"
-            description="المعلومات الشخصية والرسمية الأساسية الخاصة بالطالب."
-          >
-            <div className="grid gap-4 sm:grid-cols-2">
-              <FormInput
-                label="الاسم الأول"
-                value={
-                  form.student.first_name
-                }
-                required
-                onChange={(value) =>
-                  updateStudent(
-                    "first_name",
-                    value,
-                  )
-                }
-              />
-
-              <FormInput
-                label="اسم العائلة"
-                value={
-                  form.student.last_name
-                }
-                required
-                onChange={(value) =>
-                  updateStudent(
-                    "last_name",
-                    value,
-                  )
-                }
-              />
-
-              <FormInput
-                label="اسم الأب"
-                value={
-                  form.student.father_name
-                }
-                required
-                onChange={(value) =>
-                  updateStudent(
-                    "father_name",
-                    value,
-                  )
-                }
-              />
-
-              <FormInput
-                label="اسم الأم"
-                value={
-                  form.student.mother_name
-                }
-                required
-                onChange={(value) =>
-                  updateStudent(
-                    "mother_name",
-                    value,
-                  )
-                }
-              />
-
-              <FormInput
-                label="تاريخ الميلاد"
-                type="date"
-                value={
-                  form.student.birth_date
-                }
-                required
-                onChange={(value) =>
-                  updateStudent(
-                    "birth_date",
-                    value,
-                  )
-                }
-              />
-
-              <FormInput
-                label="مكان الميلاد"
-                value={
-                  form.student.birth_place
-                }
-                required
-                onChange={(value) =>
-                  updateStudent(
-                    "birth_place",
-                    value,
-                  )
-                }
-              />
-
-              <FormSelect
-                label="الجنس"
-                value={form.student.gender}
-                required
-                onChange={(value) =>
-                  updateStudent(
-                    "gender",
-                    value as UserGender,
-                  )
-                }
-              >
-                <option value="male">
-                  ذكر
-                </option>
-
-                <option value="female">
-                  أنثى
-                </option>
-              </FormSelect>
-
-              <FormInput
-                label="الجنسية"
-                value={
-                  form.student.nationality
-                }
-                required
-                onChange={(value) =>
-                  updateStudent(
-                    "nationality",
-                    value,
-                  )
-                }
-              />
-
-              <FormInput
-                label="رقم الهاتف"
-                value={
-                  form.student.phone_number
-                }
-                onChange={(value) =>
-                  updateStudent(
-                    "phone_number",
-                    value,
-                  )
-                }
-              />
-
-              <div className="sm:col-span-2">
-                <FormInput
-                  label="العنوان"
-                  value={
-                    form.student.address
-                  }
-                  required
-                  onChange={(value) =>
-                    updateStudent(
-                      "address",
-                      value,
-                    )
-                  }
+                <ReviewRow
+                  label="Guardian information"
+                  completed={guardianCompleted}
+                />
+                <ReviewRow
+                  label="Academic enrollment"
+                  completed={enrollmentCompleted}
                 />
               </div>
-            </div>
-          </SectionCard>
 
-          <SectionCard
-            icon={
-              <UsersRound className="h-5 w-5" />
-            }
-            title="بيانات ولي الأمر"
-            description="بيانات الشخص المسؤول عن الطالب والتواصل معه."
-          >
-            <div className="grid gap-4 sm:grid-cols-2">
-              <FormInput
-                label="الاسم الأول"
-                value={
-                  form.guardian.first_name
-                }
-                required
-                onChange={(value) =>
-                  updateGuardian(
-                    "first_name",
-                    value,
-                  )
-                }
-              />
-
-              <FormInput
-                label="اسم العائلة"
-                value={
-                  form.guardian.last_name
-                }
-                required
-                onChange={(value) =>
-                  updateGuardian(
-                    "last_name",
-                    value,
-                  )
-                }
-              />
-
-              <FormInput
-                label="اسم الأب"
-                value={
-                  form.guardian.father_name
-                }
-                required
-                onChange={(value) =>
-                  updateGuardian(
-                    "father_name",
-                    value,
-                  )
-                }
-              />
-
-              <FormInput
-                label="اسم الأم"
-                value={
-                  form.guardian.mother_name
-                }
-                required
-                onChange={(value) =>
-                  updateGuardian(
-                    "mother_name",
-                    value,
-                  )
-                }
-              />
-
-              <FormInput
-                label="تاريخ الميلاد"
-                type="date"
-                value={
-                  form.guardian.birth_date
-                }
-                required
-                onChange={(value) =>
-                  updateGuardian(
-                    "birth_date",
-                    value,
-                  )
-                }
-              />
-
-              <FormInput
-                label="مكان الميلاد"
-                value={
-                  form.guardian.birth_place
-                }
-                required
-                onChange={(value) =>
-                  updateGuardian(
-                    "birth_place",
-                    value,
-                  )
-                }
-              />
-
-              <FormSelect
-                label="الجنس"
-                value={form.guardian.gender}
-                required
-                onChange={(value) =>
-                  updateGuardian(
-                    "gender",
-                    value as UserGender,
-                  )
-                }
+              <button
+                type="submit"
+                disabled={registerMutation.isPending}
+                className="mt-7 inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-card px-5 text-sm font-black text-primary shadow-lg transition hover:-translate-y-0.5 disabled:opacity-60"
               >
-                <option value="male">
-                  ذكر
-                </option>
-
-                <option value="female">
-                  أنثى
-                </option>
-              </FormSelect>
-
-              <FormInput
-                label="الجنسية"
-                value={
-                  form.guardian.nationality
-                }
-                required
-                onChange={(value) =>
-                  updateGuardian(
-                    "nationality",
-                    value,
-                  )
-                }
-              />
-
-              <FormInput
-                label="رقم الهاتف"
-                value={
-                  form.guardian.phone_number
-                }
-                required
-                onChange={(value) =>
-                  updateGuardian(
-                    "phone_number",
-                    value,
-                  )
-                }
-              />
-
-              <div className="sm:col-span-2">
-                <FormInput
-                  label="العنوان"
-                  value={
-                    form.guardian.address
-                  }
-                  required
-                  onChange={(value) =>
-                    updateGuardian(
-                      "address",
-                      value,
-                    )
-                  }
-                />
-              </div>
-            </div>
-          </SectionCard>
-
-          <SectionCard
-            icon={
-              <BookOpen className="h-5 w-5" />
-            }
-            title="القيد الدراسي"
-            description="اختاري السنة الدراسية والصف والشعبة التي سينضم إليها الطالب."
-          >
-            <div className="grid gap-4">
-              <FormInput
-                label="معرّف السنة الدراسية"
-                value={
-                  form.enrollment
-                    .academic_year_id
-                }
-                required
-                placeholder="مثال: 1"
-                onChange={(value) =>
-                  updateEnrollment(
-                    "academic_year_id",
-                    value,
-                  )
-                }
-              />
-
-              <FormInput
-                label="معرّف الصف"
-                value={
-                  form.enrollment
-                    .grade_level_id
-                }
-                required
-                placeholder="مثال: 3"
-                onChange={(value) =>
-                  updateEnrollment(
-                    "grade_level_id",
-                    value,
-                  )
-                }
-              />
-
-              <FormInput
-                label="معرّف الشعبة"
-                value={
-                  form.enrollment
-                    .class_room_id
-                }
-                placeholder="اختياري"
-                onChange={(value) =>
-                  updateEnrollment(
-                    "class_room_id",
-                    value,
-                  )
-                }
-              />
-            </div>
-          </SectionCard>
-
-          <SectionCard
-            icon={
-              <ShieldCheck className="h-5 w-5" />
-            }
-            title="قبل الحفظ"
-            description="تأكدي من دقة البيانات لأن إنشاء الطالب سيؤدي إلى إنشاء القيد وربط ولي الأمر في العملية نفسها."
-            className="bg-gradient-to-br from-slate-950 to-slate-800 text-white"
-          >
-            <ul className="space-y-3 text-sm leading-6 text-slate-300">
-              <li>
-                • تحققي من اسم الطالب وتاريخ ميلاده.
-              </li>
-
-              <li>
-                • تأكدي من رقم هاتف ولي الأمر.
-              </li>
-
-              <li>
-                • اختاري الصف والسنة الدراسية الصحيحة.
-              </li>
-            </ul>
-          </SectionCard>
+                <Save className="h-4 w-4" />
+                Create student
+              </button>
+            </section>
+          </aside>
         </div>
       </form>
     </main>
+  );
+}
+
+type PersonFormSectionProps = {
+  eyebrow: string;
+  title: string;
+  description: string;
+  icon: React.ReactNode;
+  value: PersonState;
+  completed: boolean;
+  onChange: (
+    key: keyof PersonState,
+    value: string | UserGender | File | null,
+  ) => void;
+};
+
+function PersonFormSection({
+  eyebrow,
+  title,
+  description,
+  icon,
+  value,
+  completed,
+  onChange,
+}: PersonFormSectionProps) {
+  return (
+    <FormSection
+      eyebrow={eyebrow}
+      title={title}
+      description={description}
+      icon={icon}
+      completed={completed}
+    >
+      <div className="grid gap-4 md:grid-cols-2">
+        <FormField label="First name" required>
+          <input
+            required
+            value={value.first_name}
+            onChange={(event) =>
+              onChange("first_name", event.target.value)
+            }
+            className={fieldClassName}
+          />
+        </FormField>
+
+        <FormField label="Last name" required>
+          <input
+            required
+            value={value.last_name}
+            onChange={(event) =>
+              onChange("last_name", event.target.value)
+            }
+            className={fieldClassName}
+          />
+        </FormField>
+
+        <FormField label="Father name" required>
+          <input
+            required
+            value={value.father_name}
+            onChange={(event) =>
+              onChange("father_name", event.target.value)
+            }
+            className={fieldClassName}
+          />
+        </FormField>
+
+        <FormField label="Mother name" required>
+          <input
+            required
+            value={value.mother_name}
+            onChange={(event) =>
+              onChange("mother_name", event.target.value)
+            }
+            className={fieldClassName}
+          />
+        </FormField>
+
+        <FormField label="Birth date" required>
+          <input
+            required
+            type="date"
+            value={value.birth_date}
+            onChange={(event) =>
+              onChange("birth_date", event.target.value)
+            }
+            className={fieldClassName}
+          />
+        </FormField>
+
+        <FormField label="Birth place" required>
+          <input
+            required
+            value={value.birth_place}
+            onChange={(event) =>
+              onChange("birth_place", event.target.value)
+            }
+            className={fieldClassName}
+          />
+        </FormField>
+
+        <FormField label="Gender" required>
+          <select
+            value={value.gender}
+            onChange={(event) =>
+              onChange(
+                "gender",
+                event.target.value as UserGender,
+              )
+            }
+            className={fieldClassName}
+          >
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+          </select>
+        </FormField>
+
+        <FormField label="Nationality" required>
+          <input
+            required
+            value={value.nationality}
+            onChange={(event) =>
+              onChange("nationality", event.target.value)
+            }
+            className={fieldClassName}
+          />
+        </FormField>
+
+        <FormField label="Phone number" required>
+          <input
+            required
+            dir="ltr"
+            value={value.phone_number}
+            onChange={(event) =>
+              onChange("phone_number", event.target.value)
+            }
+            className={fieldClassName}
+          />
+        </FormField>
+
+        <FormField label="Address" required className="md:col-span-2">
+          <textarea
+            required
+            value={value.address}
+            onChange={(event) =>
+              onChange("address", event.target.value)
+            }
+            className={`${fieldClassName} min-h-28 resize-y py-3`}
+          />
+        </FormField>
+      </div>
+    </FormSection>
+  );
+}
+
+function ReviewRow({
+  label,
+  completed,
+}: {
+  label: string;
+  completed: boolean;
+}) {
+  return (
+    <div className="flex items-center justify-between rounded-2xl bg-card/10 px-4 py-3 text-sm font-bold">
+      <span>{label}</span>
+      <span
+        className={[
+          "rounded-full px-2.5 py-1 text-[10px] uppercase tracking-[0.08em]",
+          completed
+            ? "bg-card text-primary"
+            : "bg-primary-foreground/10 text-primary-foreground/70",
+        ].join(" ")}
+      >
+        {completed ? "Ready" : "Incomplete"}
+      </span>
+    </div>
   );
 }

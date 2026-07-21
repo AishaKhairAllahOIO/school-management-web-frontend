@@ -1,8 +1,8 @@
+import type { ReactNode } from "react";
 import {
   BookOpen,
   Eye,
   GraduationCap,
-  MoreHorizontal,
   Phone,
   Power,
   Trash2,
@@ -18,48 +18,33 @@ type StudentCardProps = {
   index: number;
   isDeleting?: boolean;
   isToggling?: boolean;
-
   onView: (student: StudentListItem) => void;
   onDelete: (student: StudentListItem) => void;
-  onToggleStatus: (
-    student: StudentListItem,
-  ) => void;
+  onToggleStatus: (student: StudentListItem) => void;
 };
 
-const cardThemes = [
+const visualVariants = [
   {
-    background:
-      "from-rose-50 via-white to-orange-50",
-    avatar: "bg-rose-100 text-rose-600",
-    accent: "bg-rose-400",
+    surface: "soft-purple-gradient",
+    icon: "bg-primary/10 text-primary",
+    media: "h-64",
   },
   {
-    background:
-      "from-blue-50 via-white to-indigo-50",
-    avatar: "bg-blue-100 text-blue-600",
-    accent: "bg-blue-500",
+    surface: "card-gradient",
+    icon: "bg-secondary text-secondary-foreground",
+    media: "h-52",
   },
   {
-    background:
-      "from-emerald-50 via-white to-teal-50",
-    avatar:
-      "bg-emerald-100 text-emerald-600",
-    accent: "bg-emerald-500",
+    surface: "bg-card",
+    icon: "bg-accent text-accent-foreground",
+    media: "h-72",
   },
   {
-    background:
-      "from-violet-50 via-white to-fuchsia-50",
-    avatar:
-      "bg-violet-100 text-violet-600",
-    accent: "bg-violet-500",
+    surface: "bg-secondary/55",
+    icon: "bg-card text-primary",
+    media: "h-56",
   },
-  {
-    background:
-      "from-amber-50 via-white to-yellow-50",
-    avatar: "bg-amber-100 text-amber-700",
-    accent: "bg-amber-400",
-  },
-];
+] as const;
 
 export function StudentCard({
   student,
@@ -70,192 +55,127 @@ export function StudentCard({
   onDelete,
   onToggleStatus,
 }: StudentCardProps) {
-  const theme =
-    cardThemes[index % cardThemes.length];
-
-  const isTallCard = index % 4 === 0;
-  const isMediumCard = index % 3 === 0;
+  const variant = visualVariants[index % visualVariants.length];
 
   return (
     <motion.article
-      initial={{
-        opacity: 0,
-        y: 18,
-      }}
-      animate={{
-        opacity: 1,
-        y: 0,
-      }}
+      initial={{ opacity: 0, y: 18 }}
+      animate={{ opacity: 1, y: 0 }}
       transition={{
-        duration: 0.35,
-        delay: Math.min(index * 0.035, 0.25),
+        duration: 0.32,
+        delay: Math.min(index * 0.035, 0.24),
       }}
       className="mb-5 break-inside-avoid"
     >
       <div
         className={[
-          "group relative overflow-hidden rounded-[28px] border border-white",
-          "bg-gradient-to-br shadow-[0_14px_44px_rgba(15,23,42,0.08)]",
-          "transition duration-300 hover:-translate-y-1 hover:shadow-[0_22px_60px_rgba(15,23,42,0.13)]",
-          theme.background,
-          isTallCard
-            ? "min-h-[390px]"
-            : isMediumCard
-              ? "min-h-[340px]"
-              : "min-h-[305px]",
+          "group relative overflow-hidden rounded-[30px] border border-border/75",
+          "shadow-[var(--shadow-card)] transition duration-300",
+          "hover:-translate-y-1 hover:border-primary/25 hover:shadow-[var(--shadow-floating)]",
+          variant.surface,
         ].join(" ")}
       >
-        <div
-          className={[
-            "absolute inset-x-0 top-0 h-1.5",
-            theme.accent,
-          ].join(" ")}
-        />
-
-        <div className="absolute left-5 top-5">
-          <button
-            type="button"
-            className="flex h-9 w-9 items-center justify-center rounded-full bg-white/80 text-slate-500 shadow-sm backdrop-blur transition hover:bg-white hover:text-slate-900"
-            aria-label="المزيد"
+        <button
+          type="button"
+          onClick={() => onView(student)}
+          className="block w-full text-left"
+          aria-label={`Open ${student.fullName}'s profile`}
+        >
+          <div
+            className={[
+              "relative w-full overflow-hidden bg-muted",
+              variant.media,
+            ].join(" ")}
           >
-            <MoreHorizontal className="h-5 w-5" />
-          </button>
-        </div>
-
-        <div className="flex h-full flex-col p-5 pt-7">
-          <div className="flex flex-col items-center text-center">
-            <button
-              type="button"
-              onClick={() => onView(student)}
-              className="relative"
-            >
-              {student.photoUrl ? (
-                <img
-                  src={student.photoUrl}
-                  alt={student.fullName}
-                  className={[
-                    "rounded-[26px] object-cover shadow-lg ring-4 ring-white",
-                    isTallCard
-                      ? "h-36 w-36"
-                      : "h-28 w-28",
-                  ].join(" ")}
-                />
-              ) : (
-                <div
-                  className={[
-                    "flex items-center justify-center rounded-[26px] shadow-sm ring-4 ring-white",
-                    theme.avatar,
-                    isTallCard
-                      ? "h-36 w-36"
-                      : "h-28 w-28",
-                  ].join(" ")}
-                >
-                  <UserRound
-                    className={
-                      isTallCard
-                        ? "h-14 w-14"
-                        : "h-11 w-11"
-                    }
-                  />
-                </div>
-              )}
-
-              <span className="absolute -bottom-2 -right-2 flex h-9 w-9 items-center justify-center rounded-full bg-white text-slate-800 shadow-md">
-                <GraduationCap className="h-4 w-4" />
-              </span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => onView(student)}
-              className="mt-5 text-lg font-black text-slate-950 transition hover:text-rose-600"
-            >
-              {student.fullName}
-            </button>
-
-            <p className="mt-1 text-xs font-medium text-slate-400">
-              رقم الطالب: {student.studentId}
-            </p>
-
-            <div className="mt-3">
-              <StudentStatusBadge
-                status={student.status}
+            {student.photoUrl ? (
+              <img
+                src={student.photoUrl}
+                alt={student.fullName}
+                className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.035]"
               />
+            ) : (
+              <div className="soft-purple-gradient flex h-full w-full items-center justify-center">
+                <div className="flex h-24 w-24 items-center justify-center rounded-[28px] border border-primary/15 bg-card/80 text-primary shadow-[var(--shadow-soft)] backdrop-blur">
+                  <UserRound className="h-11 w-11" />
+                </div>
+              </div>
+            )}
+
+            <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-foreground/55 to-transparent" />
+
+            <div className="absolute bottom-4 left-4 right-4 flex items-end justify-between gap-3">
+              <div className="min-w-0 text-primary-foreground">
+                <p className="truncate text-xl font-black tracking-tight">
+                  {student.fullName}
+                </p>
+                <p className="mt-1 text-xs font-semibold text-primary-foreground/75">
+                  Student ID: {student.studentId}
+                </p>
+              </div>
+
+              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-card/40 bg-card/90 text-primary shadow-lg backdrop-blur">
+                <GraduationCap className="h-5 w-5" />
+              </span>
             </div>
           </div>
+        </button>
 
-          <div className="mt-5 space-y-2.5">
-            <div className="flex items-center gap-3 rounded-2xl bg-white/65 px-3 py-2.5 backdrop-blur">
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-white text-slate-500 shadow-sm">
-                <BookOpen className="h-4 w-4" />
-              </div>
+        <div className="p-5">
+          <div className="flex items-center justify-between gap-3">
+            <StudentStatusBadge status={student.status} />
 
-              <div className="min-w-0">
-                <p className="text-[11px] text-slate-400">
-                  الصف الدراسي
-                </p>
-
-                <p className="truncate text-sm font-bold text-slate-700">
-                  {student.grade?.name ??
-                    "غير محدد"}
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3 rounded-2xl bg-white/65 px-3 py-2.5 backdrop-blur">
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-white text-slate-500 shadow-sm">
-                <GraduationCap className="h-4 w-4" />
-              </div>
-
-              <div className="min-w-0">
-                <p className="text-[11px] text-slate-400">
-                  الشعبة
-                </p>
-
-                <p className="truncate text-sm font-bold text-slate-700">
-                  {student.classroom?.name ??
-                    "غير محددة"}
-                </p>
-              </div>
-            </div>
-
-            {student.phoneNumber ? (
-              <div className="flex items-center gap-3 rounded-2xl bg-white/65 px-3 py-2.5 backdrop-blur">
-                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-white text-slate-500 shadow-sm">
-                  <Phone className="h-4 w-4" />
-                </div>
-
-                <p
-                  dir="ltr"
-                  className="truncate text-sm font-semibold text-slate-700"
-                >
-                  {student.phoneNumber}
-                </p>
-              </div>
+            {student.accountStatus ? (
+              <span className="rounded-full border border-border bg-card/70 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.08em] text-muted-foreground">
+                {student.accountStatus}
+              </span>
             ) : null}
           </div>
 
-          <div className="mt-auto flex items-center gap-2 pt-5">
+          <div className="mt-5 space-y-2.5">
+            <InfoRow
+              icon={<BookOpen className="h-4 w-4" />}
+              iconClass={variant.icon}
+              label="Grade"
+              value={student.grade?.name ?? "Not assigned"}
+            />
+
+            <InfoRow
+              icon={<GraduationCap className="h-4 w-4" />}
+              iconClass={variant.icon}
+              label="Classroom"
+              value={student.classroom?.name ?? "Not assigned"}
+            />
+
+            {student.phoneNumber ? (
+              <InfoRow
+                icon={<Phone className="h-4 w-4" />}
+                iconClass={variant.icon}
+                label="Phone"
+                value={student.phoneNumber}
+                valueDirection="ltr"
+              />
+            ) : null}
+          </div>
+
+          <div className="mt-5 grid grid-cols-[1fr_auto_auto] gap-2 border-t border-border/70 pt-4">
             <button
               type="button"
               onClick={() => onView(student)}
-              className="flex h-10 flex-1 items-center justify-center gap-2 rounded-2xl bg-slate-950 text-sm font-bold text-white transition hover:bg-slate-800"
+              className="primary-gradient inline-flex h-11 items-center justify-center gap-2 rounded-2xl px-4 text-sm font-bold text-primary-foreground shadow-[var(--shadow-auth-button)] transition hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/15"
             >
               <Eye className="h-4 w-4" />
-              عرض الملف
+              View profile
             </button>
 
             <button
               type="button"
               disabled={isToggling}
-              onClick={() =>
-                onToggleStatus(student)
-              }
-              className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white text-amber-600 shadow-sm transition hover:bg-amber-50 disabled:opacity-50"
-              aria-label="تغيير حالة الحساب"
+              onClick={() => onToggleStatus(student)}
+              className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-warning/20 bg-warning/10 text-warning transition hover:bg-warning/15 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-warning/15 disabled:cursor-not-allowed disabled:opacity-50"
+              aria-label={`Toggle ${student.fullName}'s account status`}
             >
               {isToggling ? (
-                <span className="h-4 w-4 animate-spin rounded-full border-2 border-amber-500 border-t-transparent" />
+                <span className="h-4 w-4 animate-spin rounded-full border-2 border-warning border-t-transparent" />
               ) : (
                 <Power className="h-4 w-4" />
               )}
@@ -265,11 +185,11 @@ export function StudentCard({
               type="button"
               disabled={isDeleting}
               onClick={() => onDelete(student)}
-              className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white text-rose-600 shadow-sm transition hover:bg-rose-50 disabled:opacity-50"
-              aria-label="حذف الطالب"
+              className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-destructive/20 bg-destructive/10 text-destructive transition hover:bg-destructive/15 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-destructive/15 disabled:cursor-not-allowed disabled:opacity-50"
+              aria-label={`Delete ${student.fullName}`}
             >
               {isDeleting ? (
-                <span className="h-4 w-4 animate-spin rounded-full border-2 border-rose-500 border-t-transparent" />
+                <span className="h-4 w-4 animate-spin rounded-full border-2 border-destructive border-t-transparent" />
               ) : (
                 <Trash2 className="h-4 w-4" />
               )}
@@ -278,5 +198,46 @@ export function StudentCard({
         </div>
       </div>
     </motion.article>
+  );
+}
+
+type InfoRowProps = {
+  icon: ReactNode;
+  iconClass: string;
+  label: string;
+  value: string | number;
+  valueDirection?: "ltr" | "rtl";
+};
+
+function InfoRow({
+  icon,
+  iconClass,
+  label,
+  value,
+  valueDirection,
+}: InfoRowProps) {
+  return (
+    <div className="flex items-center gap-3 rounded-2xl border border-border/60 bg-card/65 p-3 backdrop-blur">
+      <div
+        className={[
+          "flex h-9 w-9 shrink-0 items-center justify-center rounded-xl",
+          iconClass,
+        ].join(" ")}
+      >
+        {icon}
+      </div>
+
+      <div className="min-w-0">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
+          {label}
+        </p>
+        <p
+          dir={valueDirection}
+          className="mt-0.5 truncate text-sm font-bold text-foreground"
+        >
+          {value}
+        </p>
+      </div>
+    </div>
   );
 }

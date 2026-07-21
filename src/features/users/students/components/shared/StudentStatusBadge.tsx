@@ -1,101 +1,60 @@
-import type {
-  AccountStatus,
-  EnrollmentStatus,
-} from "../../types/student.types";
-
-type StudentStatus =
-  | EnrollmentStatus
-  | AccountStatus
-  | string
-  | null
-  | undefined;
+import type { EnrollmentStatus } from "../../types/student.types";
 
 type StudentStatusBadgeProps = {
-  status: StudentStatus;
+  status: EnrollmentStatus;
 };
 
-const statusConfig: Record<
-  string,
-  {
-    label: string;
-    className: string;
-  }
+const statusStyles: Record<
+  EnrollmentStatus,
+  { label: string; className: string; dotClassName: string }
 > = {
   enrolled: {
-    label: "مسجل",
-    className:
-      "bg-emerald-50 text-emerald-700 ring-emerald-200",
+    label: "Enrolled",
+    className: "border-success/20 bg-success/10 text-success",
+    dotClassName: "bg-success",
   },
-
-  active: {
-    label: "نشط",
-    className:
-      "bg-emerald-50 text-emerald-700 ring-emerald-200",
-  },
-
-  enabled: {
-    label: "مفعّل",
-    className:
-      "bg-emerald-50 text-emerald-700 ring-emerald-200",
-  },
-
   pending: {
-    label: "قيد الانتظار",
-    className:
-      "bg-amber-50 text-amber-700 ring-amber-200",
+    label: "Pending",
+    className: "border-warning/20 bg-warning/10 text-warning",
+    dotClassName: "bg-warning",
   },
-
   suspended: {
-    label: "موقوف",
-    className:
-      "bg-rose-50 text-rose-700 ring-rose-200",
+    label: "Suspended",
+    className: "border-destructive/20 bg-destructive/10 text-destructive",
+    dotClassName: "bg-destructive",
   },
-
-  disabled: {
-    label: "معطّل",
-    className:
-      "bg-rose-50 text-rose-700 ring-rose-200",
-  },
-
-  inactive: {
-    label: "غير نشط",
-    className:
-      "bg-slate-100 text-slate-600 ring-slate-200",
-  },
-
   withdrawn: {
-    label: "منسحب",
-    className:
-      "bg-slate-100 text-slate-600 ring-slate-200",
+    label: "Withdrawn",
+    className: "border-border bg-muted text-muted-foreground",
+    dotClassName: "bg-muted-foreground",
   },
-
   completed: {
-    label: "مكتمل",
-    className:
-      "bg-blue-50 text-blue-700 ring-blue-200",
+    label: "Completed",
+    className: "border-info/20 bg-info/10 text-info",
+    dotClassName: "bg-info",
   },
 };
 
 export function StudentStatusBadge({
   status,
 }: StudentStatusBadgeProps) {
-  const key = status ?? "unknown";
-
-  const config = statusConfig[key] ?? {
-    label: String(status ?? "غير محدد"),
-    className:
-      "bg-slate-100 text-slate-600 ring-slate-200",
-  };
+  const style = statusStyles[status];
 
   return (
     <span
       className={[
-        "inline-flex items-center rounded-full px-3 py-1",
-        "text-xs font-semibold ring-1 ring-inset",
-        config.className,
+        "inline-flex items-center gap-2 rounded-full border px-3 py-1.5",
+        "text-[11px] font-bold uppercase tracking-[0.08em]",
+        style.className,
       ].join(" ")}
     >
-      {config.label}
+      <span
+        className={[
+          "h-1.5 w-1.5 rounded-full",
+          style.dotClassName,
+        ].join(" ")}
+      />
+      {style.label}
     </span>
   );
 }
