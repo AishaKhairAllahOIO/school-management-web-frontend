@@ -56,15 +56,6 @@ export function createGradeSubjectOptions(
       gradeSubject.subjectName?.trim() ||
       "Unknown subject";
 
-    /*
-     * لا نعرض المعرّف للمستخدم.
-     *
-     * value:
-     * القيمة الداخلية التي ستُرسل إلى الباك.
-     *
-     * label:
-     * الاسم الظاهر في القائمة.
-     */
     return {
       value: String(gradeSubject.id),
       label: subjectName,

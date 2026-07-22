@@ -28,14 +28,6 @@ export function GradeConfigurationsPage() {
 
   const yearsQuery = useAcademicYears();
   const gradesQuery = useGrades();
-
-  /*
-   * Backend role name:
-   * adviser
-   *
-   * The user sees supervisor names in the interface,
-   * while the selected staff ID is sent internally.
-   */
   const advisersQuery = useStaffByRole(
     "adviser",
     1,

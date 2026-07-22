@@ -126,15 +126,11 @@ function buildCreateRequest(
   payload: CreateGradeConfigurationPayload,
 ): CreateGradeConfigurationRequest {
   return {
-    /*
-     * الباك الحالي ينتظر هذا الحقل بصيغة camelCase.
-     */
+   
     academicYearId:
       payload.academicYearId,
 
-    /*
-     * بينما ينتظر بقية الحقول بهذه الأسماء.
-     */
+    
     grade_level_id:
       payload.gradeId,
 

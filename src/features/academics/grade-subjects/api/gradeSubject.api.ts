@@ -78,11 +78,7 @@ function mapGradeSubject(
         item.academicYearId,
       ),
 
-    /**
-     * الباك يسميه semesterId،
-     * بينما الصفحة الحالية تستخدم
-     * academicTermId.
-     */
+    
     academicTermId:
       String(item.semesterId),
 

@@ -107,9 +107,7 @@ function buildCreateRequest(
   payload: CreateClassroomPayload,
 ): CreateClassroomRequest {
   return {
-    /*
-     * حسب Validation الحالي في الباك.
-     */
+  
     academicYearId:
       payload.academicYearId,
 

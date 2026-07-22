@@ -3,12 +3,7 @@ export type SubjectDifficulty =
   | "medium"
   | "heavy";
 
-/**
- * الموديل الداخلي الذي تستخدمه الواجهة.
- *
- * جميع المعرفات تبقى داخلية ولا نعرضها
- * للمستخدم في الجداول أو الحقول كنصوص.
- */
+
 export type GradeSubject = {
   id: string;
 
@@ -16,16 +11,7 @@ export type GradeSubject = {
   academicTermId: string;
   gradeId: string;
   subjectId: string;
-
-  /**
-   * الباك يعيد اسم المادة مباشرة.
-   */
   subjectName: string;
-
-  /**
-   * هذه الأسماء سيملؤها الفرونت من
-   * قوائم السنوات والفصول والصفوف.
-   */
   academicYearName?: string;
   academicTermName?: string;
   gradeName?: string;
@@ -49,9 +35,7 @@ export type GradeSubject = {
   updatedAt: string;
 };
 
-/**
- * الشكل القادم من GradeSubjectResource في الباك.
- */
+
 export type GradeSubjectApiItem = {
   id: string | number;
 

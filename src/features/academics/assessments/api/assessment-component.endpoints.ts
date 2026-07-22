@@ -11,15 +11,8 @@ export const assessmentComponentEndpoints = {
   update: (id: string) =>
     `/subject/setting/assessment/subject/update/${id}`,
 
-  /*
-   * مسار الباك الحالي مكتوب delete{id}
-   * لذلك لا نضيف / قبل id حاليًا.
-   *
-   * مثال:
-   * /subject/setting/assessment/subject/delete1
-   */
   delete: (id: string) =>
-    `/subject/setting/assessment/subject/delete${id}`,
+    `/subject/setting/assessment/subject/delete/${id}`,
 
   grouped:
     "/subject/setting/assessment/subjects/grouped",
