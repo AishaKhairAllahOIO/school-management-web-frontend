@@ -7,9 +7,7 @@ export type StaffRole =
   | "counselor"
   | "service_staff";
 
-export type StaffGender =
-  | "male"
-  | "female";
+export type StaffGender = "male" | "female";
 
 export type StaffNationality =
   | "syrian"
@@ -66,11 +64,13 @@ export type StaffProfile = {
   hireDate: string | null;
   experienceYears: number | null;
 
-  serviceType:
-    | StaffServiceType
-    | null;
-
+  serviceType: StaffServiceType | null;
   role: StaffRole | null;
+
+  isDeleted: boolean;
+  deletedAt: string | null;
+  createdAt: string | null;
+  updatedAt: string | null;
 };
 
 export type StaffPaginator = {
@@ -99,9 +99,7 @@ export type RegisterStaffValues = {
   address: string;
   gender: StaffGender;
 
-  nationality?:
-    | StaffNationality
-    | null;
+  nationality?: StaffNationality | null;
 
   photo_url?: File | null;
   email?: string | null;
@@ -115,10 +113,7 @@ export type RegisterStaffValues = {
   experience_years?: number | null;
 
   password?: string | null;
-
-  service_type?:
-    | StaffServiceType
-    | null;
+  service_type?: StaffServiceType | null;
 };
 
 export type UpdateStaffPersonalValues = {
@@ -135,9 +130,7 @@ export type UpdateStaffPersonalValues = {
   address?: string;
   gender?: StaffGender;
 
-  nationality?:
-    | StaffNationality
-    | null;
+  nationality?: StaffNationality | null;
 
   photo_url?: File | null;
   email?: string | null;
@@ -147,14 +140,12 @@ export type UpdateStaffEmploymentValues = {
   degree?: StaffDegree | null;
   specialization?: string | null;
   university?: string | null;
-  graduation_year?: number | null;
 
+  graduation_year?: number | null;
   hire_date?: string;
   experience_years?: number | null;
 
-  service_type?:
-    | StaffServiceType
-    | null;
+  service_type?: StaffServiceType | null;
 };
 
 export type StaffSectionConfig = {

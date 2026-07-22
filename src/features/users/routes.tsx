@@ -46,6 +46,18 @@ import {
   ServiceStaffPage,
 } from "@/features/users/service-staff/pages/ServiceStaffPage";
 
+import {
+  StaffRegistrationPage,
+} from "@/features/users/staff/pages/StaffRegistrationPage";
+
+import {
+  StaffProfilePage,
+} from "@/features/users/staff/pages/StaffProfilePage";
+
+import {
+  StaffEditPage,
+} from "@/features/users/staff/pages/StaffEditPage";
+
 export const usersRoutes = [
   {
     path: "users",
@@ -53,70 +65,162 @@ export const usersRoutes = [
     children: [
       {
         index: true,
-        element:
-          <UsersOverviewPage />,
+        element: <UsersOverviewPage />,
       },
 
-    
       {
         path: "students",
-        element:
-          <StudentsPage />,
+        element: <StudentsPage />,
       },
 
       {
         path: "students/new",
-        element:
-          <StudentRegistrationPage />,
+        element: <StudentRegistrationPage />,
       },
 
       {
         path: "students/import",
-        element:
-          <StudentImportPage />,
+        element: <StudentImportPage />,
       },
 
       {
         path: "students/:enrollmentId/edit",
-        element:
-          <StudentEditPage />,
+        element: <StudentEditPage />,
       },
 
       {
         path: "students/:enrollmentId",
-        element:
-          <StudentProfilePage />,
+        element: <StudentProfilePage />,
       },
 
-     
       {
         path: "teachers",
-        element:
-          <TeachersPage />,
+        element: <TeachersPage />,
+      },
+
+      {
+        path: "teachers/new",
+        element: (
+          <StaffRegistrationPage role="teacher" />
+        ),
+      },
+
+      {
+        path: "teachers/:staffId/edit",
+        element: (
+          <StaffEditPage role="teacher" />
+        ),
+      },
+
+      {
+        path: "teachers/:staffId",
+        element: (
+          <StaffProfilePage role="teacher" />
+        ),
       },
 
       {
         path: "supervisors",
-        element:
-          <SupervisorsPage />,
+        element: <SupervisorsPage />,
+      },
+
+      {
+        path: "supervisors/new",
+        element: (
+          <StaffRegistrationPage role="adviser" />
+        ),
+      },
+
+      {
+        path: "supervisors/:staffId/edit",
+        element: (
+          <StaffEditPage role="adviser" />
+        ),
+      },
+
+      {
+        path: "supervisors/:staffId",
+        element: (
+          <StaffProfilePage role="adviser" />
+        ),
       },
 
       {
         path: "secretaries",
-        element:
-          <SecretariesPage />,
+        element: <SecretariesPage />,
+      },
+
+      {
+        path: "secretaries/new",
+        element: (
+          <StaffRegistrationPage role="secretary" />
+        ),
+      },
+
+      {
+        path: "secretaries/:staffId/edit",
+        element: (
+          <StaffEditPage role="secretary" />
+        ),
+      },
+
+      {
+        path: "secretaries/:staffId",
+        element: (
+          <StaffProfilePage role="secretary" />
+        ),
       },
 
       {
         path: "counselors",
-        element:
-          <CounselorsPage />,
+        element: <CounselorsPage />,
+      },
+
+      {
+        path: "counselors/new",
+        element: (
+          <StaffRegistrationPage role="counselor" />
+        ),
+      },
+
+      {
+        path: "counselors/:staffId/edit",
+        element: (
+          <StaffEditPage role="counselor" />
+        ),
+      },
+
+      {
+        path: "counselors/:staffId",
+        element: (
+          <StaffProfilePage role="counselor" />
+        ),
       },
 
       {
         path: "service-staff",
-        element:
-          <ServiceStaffPage />,
+        element: <ServiceStaffPage />,
+      },
+
+      {
+        path: "service-staff/new",
+        element: (
+          <StaffRegistrationPage role="service_staff" />
+        ),
+      },
+
+      {
+        path: "service-staff/:staffId/edit",
+        element: (
+          <StaffEditPage role="service_staff" />
+        ),
+      },
+
+      {
+        path: "service-staff/:staffId",
+        element: (
+          <StaffProfilePage role="service_staff" />
+        ),
       },
     ],
   },

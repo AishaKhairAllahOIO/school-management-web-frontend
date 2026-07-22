@@ -1,5 +1,9 @@
 import { ChevronRight } from "lucide-react";
-import { NavLink, useLocation, useNavigate } from "react-router-dom";
+import {
+  NavLink,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
 
 import { academicNavigationGroups } from "../config/academic-navigation";
 
@@ -22,66 +26,105 @@ export function AcademicNavigation() {
   );
 
   return (
-    <div className="space-y-4">
+    <nav
+      aria-label="Academic navigation"
+      className="w-full min-w-0 space-y-3"
+    >
       <section
         aria-label="Academic categories"
-        className="rounded-3xl border border-border/70 bg-card p-2 shadow-soft"
+        className="w-full min-w-0 overflow-hidden rounded-[28px] border border-border/60 bg-card shadow-soft"
       >
-        <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
-          {academicNavigationGroups.map((group) => {
-            const Icon = group.icon;
-            const isActive =
-              group.id === activeGroup.id;
+        <div className="w-full min-w-0 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <div className="grid h-[104px] min-w-[720px] grid-cols-3">
+            {academicNavigationGroups.map(
+              (group, index) => {
+                const Icon = group.icon;
 
-            return (
-              <button
-                key={group.id}
-                type="button"
-                onClick={() =>
-                  navigate(group.items[0].path)
-                }
-                className={[
-                  "group relative flex min-h-[78px] items-center gap-3 rounded-2xl px-4 text-left transition",
-                  "focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/15",
-                  isActive
-                    ? "bg-primary/10 text-primary"
-                    : "text-muted-foreground hover:bg-muted/50 hover:text-foreground",
-                ].join(" ")}
-              >
-                <span
-                  className={[
-                    "flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border transition",
-                    isActive
-                      ? "border-primary/20 bg-card text-primary shadow-sm"
-                      : "border-border/70 bg-background text-muted-foreground group-hover:text-primary",
-                  ].join(" ")}
-                >
-                  <Icon size={20} />
-                </span>
+                const isActive =
+                  group.id === activeGroup.id;
 
-                <span className="min-w-0">
-                  <span className="block text-sm font-bold">
-                    {group.label}
-                  </span>
-                  <span className="mt-1 block truncate text-[11px] font-medium opacity-75">
-                    {group.description}
-                  </span>
-                </span>
+                const hasDivider =
+                  index <
+                  academicNavigationGroups.length -
+                    1;
 
-                {isActive ? (
-                  <span className="absolute inset-x-6 -bottom-2 h-1 rounded-full bg-primary" />
-                ) : null}
-              </button>
-            );
-          })}
+                return (
+                  <button
+                    key={group.id}
+                    type="button"
+                    onClick={() =>
+                      navigate(
+                        group.items[0].path,
+                      )
+                    }
+                    aria-current={
+                      isActive
+                        ? "page"
+                        : undefined
+                    }
+                    className={[
+                      "group relative flex h-[104px] min-w-0 items-center gap-4 overflow-hidden px-7 text-left",
+                      "transition-colors duration-200",
+                      "focus-visible:z-10 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-inset focus-visible:ring-primary/15",
+                      hasDivider
+                        ? "border-r border-border/60"
+                        : "",
+                      isActive
+                        ? "text-primary"
+                        : "text-foreground hover:bg-muted/20",
+                    ].join(" ")}
+                  >
+                    <span
+                      className={[
+                        "flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border bg-background",
+                        "transition-colors duration-200",
+                        isActive
+                          ? "border-primary/20 text-primary shadow-sm"
+                          : "border-border/70 text-muted-foreground group-hover:border-primary/15 group-hover:text-primary",
+                      ].join(" ")}
+                    >
+                      <Icon
+                        size={25}
+                        strokeWidth={1.75}
+                      />
+                    </span>
+
+                    <span className="min-w-0 flex-1">
+                      <span
+                        className={[
+                          "block truncate text-[15px] font-semibold leading-5",
+                          isActive
+                            ? "text-primary"
+                            : "text-foreground",
+                        ].join(" ")}
+                      >
+                        {group.label}
+                      </span>
+
+                      <span className="mt-1.5 block h-10 max-w-[230px] overflow-hidden text-[12px] font-normal leading-5 text-muted-foreground">
+                        {group.description}
+                      </span>
+                    </span>
+
+                    {isActive ? (
+                      <span
+                        aria-hidden="true"
+                        className="absolute bottom-0 left-[20%] right-[20%] h-[3px] rounded-t-full bg-primary"
+                      />
+                    ) : null}
+                  </button>
+                );
+              },
+            )}
+          </div>
         </div>
       </section>
 
       <section
         aria-label={`${activeGroup.label} pages`}
-        className="rounded-3xl border border-border/70 bg-card px-3 py-2 shadow-soft"
+        className="h-[72px] w-full min-w-0 overflow-hidden rounded-[28px] border border-border/60 bg-card px-3 shadow-soft"
       >
-        <div className="flex items-center gap-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <div className="flex h-full w-full min-w-0 items-center gap-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {activeGroup.items.map((item) => {
             const Icon = item.icon;
 
@@ -91,26 +134,42 @@ export function AcademicNavigation() {
                 to={item.path}
                 className={({ isActive }) =>
                   [
-                    "group relative flex min-w-max items-center gap-2 rounded-xl px-4 py-3 text-sm font-bold transition",
+                    "group flex h-11 min-w-max items-center gap-2.5 rounded-2xl px-4",
+                    "text-[13px] font-semibold transition-colors duration-200",
                     "focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/15",
                     isActive
                       ? "bg-primary text-primary-foreground shadow-sm"
-                      : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                      : "text-foreground hover:bg-muted/50",
                   ].join(" ")
                 }
               >
-                <Icon size={16} />
-                {item.label}
+                {({ isActive }) => (
+                  <>
+                    <Icon
+                      size={17}
+                      strokeWidth={1.75}
+                      className={
+                        isActive
+                          ? "text-primary-foreground"
+                          : "text-muted-foreground transition-colors group-hover:text-primary"
+                      }
+                    />
+
+                    <span>{item.label}</span>
+                  </>
+                )}
               </NavLink>
             );
           })}
 
           <ChevronRight
-            size={16}
+            aria-hidden="true"
+            size={19}
+            strokeWidth={1.7}
             className="ml-auto hidden shrink-0 text-muted-foreground xl:block"
           />
         </div>
       </section>
-    </div>
+    </nav>
   );
 }

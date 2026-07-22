@@ -1,10 +1,6 @@
-import {
-  axiosClient,
-} from "@/services/axios/axiosClient";
+import { axiosClient } from "@/services/axios/axiosClient";
 
-import {
-  staffEndpoints,
-} from "./staff.endpoints";
+import { staffEndpoints } from "./staff.endpoints";
 
 import type {
   ApiId,
@@ -18,9 +14,38 @@ import type {
 
 type ApiResponse<T> = {
   success?: boolean;
-  status?: boolean | string;
+  status?: boolean | string | number;
   message?: string;
   data: T;
+};
+
+type RawRole = {
+  id?: ApiId;
+  name?: string;
+};
+
+type RawUser = {
+  id?: ApiId;
+
+  first_name?: string;
+  father_name?: string;
+  mother_name?: string;
+  last_name?: string;
+
+  phone_number?: string;
+  email?: string | null;
+
+  birth_date?: string | null;
+  birth_place?: string | null;
+
+  gender?: StaffProfile["gender"];
+  nationality?: StaffProfile["nationality"];
+
+  address?: string | null;
+  photo_url?: string | null;
+  account_status?: string;
+
+  roles?: RawRole[];
 };
 
 type RawStaff = {
@@ -82,33 +107,21 @@ type RawStaff = {
   service_type?: StaffProfile["serviceType"];
   serviceType?: StaffProfile["serviceType"];
 
-  role?: StaffRole | null;
+  role?: StaffRole | string | null;
 
-  user?: {
-    id?: ApiId;
+  is_deleted?: boolean;
+  isDeleted?: boolean;
 
-    first_name?: string;
-    father_name?: string;
-    mother_name?: string;
-    last_name?: string;
+  deleted_at?: string | null;
+  deletedAt?: string | null;
 
-    phone_number?: string;
-    email?: string | null;
+  created_at?: string | null;
+  createdAt?: string | null;
 
-    birth_date?: string | null;
-    birth_place?: string | null;
+  updated_at?: string | null;
+  updatedAt?: string | null;
 
-    gender?: StaffProfile["gender"];
-    nationality?: StaffProfile["nationality"];
-
-    address?: string | null;
-    photo_url?: string | null;
-    account_status?: string;
-
-    roles?: Array<{
-      name?: string;
-    }>;
-  };
+  user?: RawUser;
 };
 
 type RawPaginator = {
@@ -127,30 +140,25 @@ type RawPaginator = {
     last_page?: number;
     per_page?: number;
     total?: number;
+
     from?: number | null;
     to?: number | null;
   };
 };
 
-function unwrap<T>(
-  value: ApiResponse<T> | T,
-): T {
+function unwrap<T>(value: ApiResponse<T> | T): T {
   if (
     typeof value === "object" &&
     value !== null &&
     "data" in value
   ) {
-    return (
-      value as ApiResponse<T>
-    ).data;
+    return (value as ApiResponse<T>).data;
   }
 
   return value as T;
 }
 
-function numberOrNull(
-  value: unknown,
-): number | null {
+function nullableNumber(value: unknown): number | null {
   if (
     value === null ||
     value === undefined ||
@@ -159,16 +167,28 @@ function numberOrNull(
     return null;
   }
 
-  const result = Number(value);
+  const parsedValue = Number(value);
 
-  return Number.isFinite(result)
-    ? result
+  return Number.isFinite(parsedValue)
+    ? parsedValue
     : null;
 }
 
-function normalizeStaff(
-  raw: RawStaff,
-): StaffProfile {
+function normalizeRole(value: unknown): StaffRole | null {
+  const supportedRoles: StaffRole[] = [
+    "teacher",
+    "adviser",
+    "secretary",
+    "counselor",
+    "service_staff",
+  ];
+
+  return supportedRoles.includes(value as StaffRole)
+    ? (value as StaffRole)
+    : null;
+}
+
+function normalizeStaff(raw: RawStaff): StaffProfile {
   const user = raw.user;
 
   const firstName =
@@ -196,12 +216,17 @@ function normalizeStaff(
     "";
 
   const roleFromUser =
-    user?.roles?.[0]?.name;
+    user?.roles
+      ?.map((role) => role.name)
+      .find(Boolean) ?? null;
+
+  const deletedAt =
+    raw.deletedAt ??
+    raw.deleted_at ??
+    null;
 
   return {
-    id:
-      raw.id ??
-      "",
+    id: raw.id ?? "",
 
     userId:
       raw.userId ??
@@ -217,11 +242,7 @@ function normalizeStaff(
     fullName:
       raw.fullName ??
       raw.full_name ??
-      [
-        firstName,
-        fatherName,
-        lastName,
-      ]
+      [firstName, fatherName, lastName]
         .filter(Boolean)
         .join(" "),
 
@@ -275,23 +296,17 @@ function normalizeStaff(
       user?.account_status ??
       "disabled",
 
-    degree:
-      raw.degree ??
-      null,
+    degree: raw.degree ?? null,
 
     specialization:
-      raw.specialization ??
-      null,
+      raw.specialization ?? null,
 
     university:
-      raw.university ??
-      null,
+      raw.university ?? null,
 
     graduationYear:
       raw.graduationYear ??
-      numberOrNull(
-        raw.graduation_year,
-      ),
+      nullableNumber(raw.graduation_year),
 
     hireDate:
       raw.hireDate ??
@@ -300,37 +315,41 @@ function normalizeStaff(
 
     experienceYears:
       raw.experienceYears ??
-      numberOrNull(
-        raw.experience_years,
-      ),
+      nullableNumber(raw.experience_years),
 
     serviceType:
       raw.serviceType ??
       raw.service_type ??
       null,
 
-    role:
-      raw.role ??
-      (
-        roleFromUser as
-          | StaffRole
-          | undefined
-      ) ??
+    role: normalizeRole(
+      raw.role ?? roleFromUser,
+    ),
+
+    isDeleted:
+      raw.isDeleted ??
+      raw.is_deleted ??
+      Boolean(deletedAt),
+
+    deletedAt,
+
+    createdAt:
+      raw.createdAt ??
+      raw.created_at ??
+      null,
+
+    updatedAt:
+      raw.updatedAt ??
+      raw.updated_at ??
       null,
   };
 }
 
-function normalizePaginator(
-  raw: RawPaginator,
-): StaffPaginator {
-  const meta =
-    raw.meta ?? {};
+function normalizePaginator(raw: RawPaginator): StaffPaginator {
+  const meta = raw.meta ?? {};
 
   return {
-    data:
-      (raw.data ?? []).map(
-        normalizeStaff,
-      ),
+    data: (raw.data ?? []).map(normalizeStaff),
 
     currentPage:
       raw.current_page ??
@@ -365,7 +384,7 @@ function normalizePaginator(
   };
 }
 
-function appendValue(
+function appendFormDataValue(
   formData: FormData,
   key: string,
   value: unknown,
@@ -379,35 +398,25 @@ function appendValue(
   }
 
   if (value instanceof File) {
-    formData.append(
-      key,
-      value,
-    );
-
+    formData.append(key, value);
     return;
   }
 
-  formData.append(
-    key,
-    String(value),
-  );
+  formData.append(key, String(value));
 }
 
 function toFormData(
   values: Record<string, unknown>,
 ): FormData {
-  const formData =
-    new FormData();
+  const formData = new FormData();
 
-  Object.entries(values).forEach(
-    ([key, value]) => {
-      appendValue(
-        formData,
-        key,
-        value,
-      );
-    },
-  );
+  Object.entries(values).forEach(([key, value]) => {
+    appendFormDataValue(
+      formData,
+      key,
+      value,
+    );
+  });
 
   return formData;
 }
@@ -418,20 +427,17 @@ export const staffApi = {
     page = 1,
     perPage = 15,
   ): Promise<StaffPaginator> {
-    const response =
-      await axiosClient.get<
-        ApiResponse<RawPaginator>
-      >(
-        staffEndpoints.byRole(
-          role,
-        ),
-        {
-          params: {
-            page,
-            per_page: perPage,
-          },
+    const response = await axiosClient.get<
+      ApiResponse<RawPaginator> | RawPaginator
+    >(
+      staffEndpoints.byRole(role),
+      {
+        params: {
+          page,
+          per_page: perPage,
         },
-      );
+      },
+    );
 
     return normalizePaginator(
       unwrap(response.data),
@@ -441,14 +447,11 @@ export const staffApi = {
   async getDetails(
     staffId: ApiId,
   ): Promise<StaffProfile> {
-    const response =
-      await axiosClient.get<
-        ApiResponse<RawStaff>
-      >(
-        staffEndpoints.details(
-          staffId,
-        ),
-      );
+    const response = await axiosClient.get<
+      ApiResponse<RawStaff> | RawStaff
+    >(
+      staffEndpoints.details(staffId),
+    );
 
     return normalizeStaff(
       unwrap(response.data),
@@ -459,26 +462,19 @@ export const staffApi = {
     role: StaffRole,
     values: RegisterStaffValues,
   ): Promise<StaffProfile> {
-    /*
-     * الدور يأتي من الصفحة وليس من النموذج.
-     */
     const payload = {
       ...values,
       role,
     };
 
-    const response =
-      await axiosClient.post<
-        ApiResponse<RawStaff>
-      >(
-        staffEndpoints.register,
-        toFormData(
-          payload as Record<
-            string,
-            unknown
-          >,
-        ),
-      );
+    const response = await axiosClient.post<
+      ApiResponse<RawStaff> | RawStaff
+    >(
+      staffEndpoints.register,
+      toFormData(
+        payload as Record<string, unknown>,
+      ),
+    );
 
     return normalizeStaff(
       unwrap(response.data),
@@ -487,23 +483,16 @@ export const staffApi = {
 
   async updatePersonal(
     staffId: ApiId,
-    values:
-      UpdateStaffPersonalValues,
+    values: UpdateStaffPersonalValues,
   ): Promise<StaffProfile> {
-    const response =
-      await axiosClient.post<
-        ApiResponse<RawStaff>
-      >(
-        staffEndpoints.personal(
-          staffId,
-        ),
-        toFormData(
-          values as Record<
-            string,
-            unknown
-          >,
-        ),
-      );
+    const response = await axiosClient.post<
+      ApiResponse<RawStaff> | RawStaff
+    >(
+      staffEndpoints.personal(staffId),
+      toFormData(
+        values as Record<string, unknown>,
+      ),
+    );
 
     return normalizeStaff(
       unwrap(response.data),
@@ -512,18 +501,14 @@ export const staffApi = {
 
   async updateEmployment(
     staffId: ApiId,
-    values:
-      UpdateStaffEmploymentValues,
+    values: UpdateStaffEmploymentValues,
   ): Promise<StaffProfile> {
-    const response =
-      await axiosClient.post<
-        ApiResponse<RawStaff>
-      >(
-        staffEndpoints.employment(
-          staffId,
-        ),
-        values,
-      );
+    const response = await axiosClient.post<
+      ApiResponse<RawStaff> | RawStaff
+    >(
+      staffEndpoints.employment(staffId),
+      values,
+    );
 
     return normalizeStaff(
       unwrap(response.data),
@@ -534,9 +519,7 @@ export const staffApi = {
     staffId: ApiId,
   ): Promise<void> {
     await axiosClient.post(
-      staffEndpoints.toggleStatus(
-        staffId,
-      ),
+      staffEndpoints.toggleStatus(staffId),
     );
   },
 
@@ -544,9 +527,7 @@ export const staffApi = {
     staffId: ApiId,
   ): Promise<void> {
     await axiosClient.delete(
-      staffEndpoints.remove(
-        staffId,
-      ),
+      staffEndpoints.remove(staffId),
     );
   },
 };
