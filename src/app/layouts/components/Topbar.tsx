@@ -3,9 +3,7 @@ import {
   useEffect,
   useState,
 } from "react";
-import {
-  useLocation,
-} from "react-router-dom";
+import { useLocation } from "react-router-dom";
 
 import { useCurrentUser } from "@/app/layouts/hooks/useCurrentUser";
 import { useLayoutStore } from "@/app/layouts/store/layoutStore";
@@ -72,16 +70,16 @@ export function Topbar() {
   }
 
   return (
-    <header className="sticky top-0 z-40 pb-4 pt-4">
-      <div className="flex h-[44px] w-full items-center justify-between">
-        <div className="flex min-w-0 flex-1 items-center gap-3">
+    <header className="sticky top-0 z-40 pb-3 pt-3.5">
+      <div className="flex h-[46px] w-full items-center justify-between">
+        <div className="flex min-w-0 flex-1 items-center">
           <button
             type="button"
             onClick={openMobileSidebar}
             aria-label={
               t.layout.topbar.openSidebar
             }
-            className={`${TOPBAR_ICON_BUTTON_CLASS_NAME} lg:hidden`}
+            className={`${TOPBAR_ICON_BUTTON_CLASS_NAME} mr-3 lg:hidden`}
           >
             <Menu
               aria-hidden="true"
@@ -95,16 +93,18 @@ export function Topbar() {
           />
         </div>
 
-        <div className="flex shrink-0 items-center gap-[12px]">
+        <div className="flex shrink-0 items-center gap-[10px]">
           <NotificationsMenu
             isOpen={isNotificationsOpen}
-            onToggle={toggleNotifications}
+            onToggle={
+              toggleNotifications
+            }
             onClose={() =>
               setIsNotificationsOpen(false)
             }
           />
 
-          <div className="w-[16px]" />
+          <div className="hidden w-2 sm:block" />
 
           <LanguageToggle
             className={
@@ -114,7 +114,7 @@ export function Topbar() {
 
           <ThemeButton />
 
-          <div className="w-[8px]" />
+          <div className="hidden w-1 sm:block" />
 
           <ProfileMenu
             isOpen={isProfileMenuOpen}
@@ -128,14 +128,15 @@ export function Topbar() {
             type="button"
             onClick={toggleProfileMenu}
             aria-label={
-              t.layout.topbar.openProfileMenu
+              t.layout.topbar
+                .openProfileMenu
             }
-            className="flex h-[44px] w-[44px] items-center justify-center rounded-full lg:hidden"
+            className="flex h-[42px] w-[42px] items-center justify-center rounded-full lg:hidden"
           >
             <img
               src={photoUrl}
               alt={fullName}
-              className="h-[42px] w-[42px] rounded-full object-cover ring-[2px] ring-topbar-surface"
+              className="h-10 w-10 rounded-full object-cover ring-2 ring-topbar-surface"
             />
           </button>
         </div>

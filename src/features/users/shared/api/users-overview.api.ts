@@ -33,21 +33,12 @@ function mapRoleCounts(
     students: toSafeCount(
       data.student,
     ),
-
-    /*
-     * الراوت الحالي لا يعيد guardian.
-     * لذلك لا نضع قيمة وهمية.
-     */
     parents: undefined,
 
     teachers: toSafeCount(
       data.teacher,
     ),
 
-    /*
-     * اسم الدور في الباك adviser،
-     * بينما البطاقة في الواجهة Supervisors.
-     */
     supervisors: toSafeCount(
       data.adviser,
     ),

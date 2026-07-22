@@ -29,17 +29,9 @@ export function Sidebar() {
     ? "rounded-l-3xl"
     : "rounded-r-3xl";
 
-  const collapsedTogglePositionClass = isRtl
-    ? "right-[62px]"
-    : "left-[62px]";
-
-  const collapseButtonPositionClass = isRtl
-    ? "left-3"
-    : "right-3";
-
-  const titlePaddingClass = isRtl
-    ? "pl-11 pr-3"
-    : "pl-3 pr-11";
+  const togglePositionClass = isRtl
+    ? "-left-4"
+    : "-right-4";
 
   const collapseIcon = isRtl ? (
     <ChevronRight
@@ -75,21 +67,13 @@ export function Sidebar() {
         "sidebar-gradient sidebar-shell",
         "fixed top-0 z-50 hidden h-screen overflow-visible",
         "text-sidebar-foreground",
-        "transition-all duration-300 ease-out",
+        "transition-[width] duration-300 ease-out",
         "motion-reduce:transition-none",
-        "lg:grid",
+        "lg:flex lg:flex-col",
         sidebarPositionClass,
         isCollapsed
-          ? [
-              "w-[56px]",
-              "grid-cols-[56px]",
-              "grid-rows-[76px_1fr_64px]",
-            ].join(" ")
-          : [
-              "w-[242px]",
-              "grid-cols-[56px_1fr]",
-              "grid-rows-[76px_1fr_auto]",
-            ].join(" "),
+          ? "w-[76px]"
+          : "w-[264px]",
       ].join(" ")}
     >
       <div
@@ -100,111 +84,124 @@ export function Sidebar() {
         ].join(" ")}
       />
 
-      {isCollapsed && (
-        <button
-          type="button"
-          onClick={toggleSidebar}
-          aria-label={t.layout.sidebar.expandSidebar}
+      <div className="relative z-10 flex h-full min-h-0 flex-col">
+        <header
           className={[
-            "absolute top-6 z-[100]",
-            collapsedTogglePositionClass,
-            "flex h-8 w-8 items-center justify-center",
-            "text-primary",
-            "transition-colors duration-200",
-            "hover:text-primary/80",
-            "focus-visible:outline-none",
-            "focus-visible:text-primary/80",
-            "motion-reduce:transition-none",
+            "relative flex h-[92px] shrink-0 items-center",
+            isCollapsed
+              ? "justify-center px-3"
+              : "px-4",
           ].join(" ")}
         >
-          {expandIcon}
-        </button>
-      )}
-
-      <div
-        className={[
-          "relative z-10 row-span-3",
-          "flex min-h-0 flex-col items-center",
-          "bg-sidebar-foreground/5",
-          sidebarRadiusClass,
-        ].join(" ")}
-      >
-        <div className="flex h-[76px] shrink-0 items-center justify-center">
-          <div className="flex h-10 w-10 items-center justify-center">
-            <GraduationCap
-              aria-hidden="true"
-              size={27}
-              strokeWidth={1.8}
-              className="text-sidebar-foreground"
-            />
-          </div>
-        </div>
-
-        <SidebarMenu variant="icons" />
-      </div>
-
-      {!isCollapsed && (
-        <>
-          <header
-            className={[
-              "relative z-10 h-[76px]",
-              "border-b border-sidebar-foreground/20",
-            ].join(" ")}
-          >
+          {isCollapsed ? (
             <div
               className={[
-                "flex h-full items-center justify-center",
-                titlePaddingClass,
+                "flex h-11 w-11 shrink-0 items-center justify-center",
+                "rounded-2xl",
+                "border border-sidebar-foreground/10",
+                "bg-sidebar-foreground/10",
+                "shadow-[0_8px_24px_rgba(0,0,0,0.12)]",
               ].join(" ")}
             >
-              <h1 className="min-w-0 text-center text-sidebar-foreground">
-                <span
-                  className={[
-                    "block whitespace-nowrap",
-                    "text-[13px] font-medium",
-                    "leading-none tracking-[0.035em]",
-                  ].join(" ")}
-                >
-                  School Management
-                </span>
-
-                <span
-                  className={[
-                    "mt-1.5 block",
-                    "text-[13px] font-medium",
-                    "leading-none tracking-[0.035em]",
-                  ].join(" ")}
-                >
-                  System
-                </span>
-              </h1>
+              <GraduationCap
+                aria-hidden="true"
+                size={24}
+                strokeWidth={1.8}
+                className="shrink-0 text-sidebar-foreground"
+              />
             </div>
+          ) : (
+            <div className="flex min-w-0 flex-1 items-center gap-2.5">
+              <div
+                className={[
+                  "flex h-11 w-11 shrink-0 items-center justify-center",
+                  "rounded-2xl",
+                  "border border-sidebar-foreground/10",
+                  "bg-sidebar-foreground/10",
+                  "shadow-[0_8px_24px_rgba(0,0,0,0.12)]",
+                ].join(" ")}
+              >
+                <GraduationCap
+                  aria-hidden="true"
+                  size={24}
+                  strokeWidth={1.8}
+                  className="shrink-0 text-sidebar-foreground"
+                />
+              </div>
 
-            <button
-              type="button"
-              onClick={toggleSidebar}
-              aria-label={t.layout.sidebar.collapseSidebar}
-              className={[
-                "absolute top-1/2 -translate-y-1/2",
-                collapseButtonPositionClass,
-                "flex h-8 w-8 items-center justify-center",
-                "text-sidebar-foreground",
-                "transition-colors duration-200",
-                "hover:text-sidebar-foreground/80",
-                "focus-visible:outline-none",
-                "focus-visible:text-sidebar-foreground/80",
-                "motion-reduce:transition-none",
-              ].join(" ")}
-            >
-              {collapseIcon}
-            </button>
-          </header>
+              <div className="min-w-0 flex-1">
+                <h1 className="truncate text-[14px] font-semibold leading-5 tracking-[-0.015em] text-sidebar-foreground">
+                  School Management
+                </h1>
 
-          <div className="relative z-10 min-h-0 overflow-visible px-3 pt-3">
-            <SidebarMenu variant="labels" />
-          </div>
-        </>
-      )}
+                <p className="mt-0.5 truncate text-[10px] font-medium leading-4 tracking-[0.01em] text-sidebar-muted">
+                  Administration Platform
+                </p>
+              </div>
+            </div>
+          )}
+
+          <button
+            type="button"
+            onClick={toggleSidebar}
+            aria-label={
+              isCollapsed
+                ? t.layout.sidebar.expandSidebar
+                : t.layout.sidebar.collapseSidebar
+            }
+            className={[
+              "absolute top-1/2 z-20 -translate-y-1/2",
+              togglePositionClass,
+              "flex h-8 w-8 shrink-0 items-center justify-center",
+              "rounded-full",
+              "border border-sidebar-foreground/15",
+              "bg-sidebar/95",
+              "text-sidebar-foreground/75",
+              "shadow-[0_6px_18px_rgba(0,0,0,0.18)]",
+              "transition-colors duration-200",
+              "hover:bg-sidebar-foreground/10",
+              "hover:text-sidebar-foreground",
+              "focus-visible:outline-none",
+              "focus-visible:ring-2",
+              "focus-visible:ring-sidebar-foreground/25",
+              "motion-reduce:transition-none",
+            ].join(" ")}
+          >
+            {isCollapsed
+              ? expandIcon
+              : collapseIcon}
+          </button>
+        </header>
+
+        <div
+          className={[
+            "min-h-0 flex-1 overflow-y-auto overflow-x-hidden",
+            isCollapsed
+              ? "px-2 pt-3"
+              : "px-4 pt-2",
+          ].join(" ")}
+        >
+          {!isCollapsed ? (
+            <div className="mb-3 flex items-center gap-3 px-3">
+              <span className="shrink-0 text-[9px] font-semibold uppercase tracking-[0.16em] text-sidebar-muted/80">
+                Main menu
+              </span>
+
+              <span className="h-px flex-1 bg-sidebar-foreground/[0.08]" />
+            </div>
+          ) : (
+            <div className="mb-3 h-px w-full bg-sidebar-foreground/[0.06]" />
+          )}
+
+          <SidebarMenu
+            variant={
+              isCollapsed
+                ? "icons"
+                : "labels"
+            }
+          />
+        </div>
+      </div>
     </aside>
   );
 }

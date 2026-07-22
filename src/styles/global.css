@@ -505,9 +505,6 @@
         rgb(var(--sidebar-active-foreground) / 0.14);
   }
 
-  /*
-   * دعم الروابط النشطة التي تستخدم aria-current.
-   */
   .sidebar-shell a[aria-current="page"] {
     color:
       rgb(var(--sidebar-active-foreground));
@@ -526,9 +523,6 @@
       rgb(var(--sidebar-active-foreground));
   }
 
-  /*
-   * دعم العناصر النشطة التي تستخدم data-active.
-   */
   .sidebar-shell [data-active="true"] {
     color:
       rgb(var(--sidebar-active-foreground));
@@ -547,9 +541,6 @@
       rgb(var(--sidebar-active-foreground));
   }
 
-  /*
-   * دعم shadcn/Radix الذي يستخدم data-state.
-   */
   .sidebar-shell [data-state="active"] {
     color:
       rgb(var(--sidebar-active-foreground));

@@ -13,7 +13,9 @@ type SidebarMenuProps = {
   onNavigate?: () => void;
 };
 
-function getRootPath(path: string): string {
+function getRootPath(
+  path: string,
+): string {
   if (path === "/") {
     return "/";
   }
@@ -31,22 +33,30 @@ function isItemActive(
   pathname: string,
   item: SidebarItem,
 ): boolean {
-  if (item.exact || item.path === "/") {
+  if (
+    item.exact ||
+    item.path === "/"
+  ) {
     return pathname === item.path;
   }
 
-  const rootPath = getRootPath(item.path);
+  const rootPath =
+    getRootPath(item.path);
 
   return (
     pathname === item.path ||
-    pathname.startsWith(`${rootPath}/`)
+    pathname.startsWith(
+      `${rootPath}/`,
+    )
   );
 }
 
 function getVisibleSidebarItems(
   items: readonly SidebarItem[],
 ): SidebarItem[] {
-  return items.filter((item) => !item.hidden);
+  return items.filter(
+    (item) => !item.hidden,
+  );
 }
 
 function handleDisabledNavigation(
@@ -70,20 +80,24 @@ export function SidebarMenu({
   const { direction, t } = useLocale();
 
   const visibleItems =
-    getVisibleSidebarItems(sidebarItems);
+    getVisibleSidebarItems(
+      sidebarItems,
+    );
 
   if (variant === "icons") {
     return (
       <nav
         aria-label={t.layout.sidebar.navigation}
-        className="flex flex-1 flex-col items-center gap-1 pt-3"
+        className="flex w-full flex-col items-center gap-1.5"
       >
         {visibleItems.map((item) => {
           const Icon = item.icon;
-          const isActive = isItemActive(
-            location.pathname,
-            item,
-          );
+
+          const isActive =
+            isItemActive(
+              location.pathname,
+              item,
+            );
 
           const title =
             t.navigation[item.titleKey];
@@ -96,12 +110,19 @@ export function SidebarMenu({
               title={title}
               aria-label={title}
               aria-current={
-                isActive ? "page" : undefined
+                isActive
+                  ? "page"
+                  : undefined
               }
               aria-disabled={
-                item.disabled || undefined
+                item.disabled ||
+                undefined
               }
-              tabIndex={item.disabled ? -1 : 0}
+              tabIndex={
+                item.disabled
+                  ? -1
+                  : 0
+              }
               onClick={(event) =>
                 handleDisabledNavigation(
                   event,
@@ -110,22 +131,52 @@ export function SidebarMenu({
                 )
               }
               className={[
-                "relative flex h-11 w-full items-center justify-center",
-                "text-sidebar-muted transition-all duration-300 ease-out",
+                "relative flex h-11 w-11 flex-none",
+                "items-center justify-center",
+                "rounded-2xl",
+                "text-sidebar-muted",
+                "transition-colors duration-200",
+                "hover:bg-sidebar-foreground/5",
                 "hover:text-sidebar-foreground",
-                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sidebar-foreground/30",
+                "focus-visible:outline-none",
+                "focus-visible:ring-2",
+                "focus-visible:ring-sidebar-foreground/30",
                 "motion-reduce:transition-none",
                 item.disabled
                   ? "cursor-not-allowed opacity-40"
                   : "",
                 isActive
-                  ? "text-sidebar-foreground"
+                  ? [
+                      "bg-sidebar-foreground/10",
+                      "text-sidebar-foreground",
+                      "ring-1 ring-sidebar-foreground/10",
+                    ].join(" ")
                   : "",
-                isActive && direction === "rtl"
-                  ? "before:absolute before:-right-5 before:top-1/2 before:h-7 before:w-[4px] before:-translate-y-1/2 before:rounded-l-full before:bg-sidebar-foreground"
+                isActive &&
+                direction === "rtl"
+                  ? [
+                      "before:absolute",
+                      "before:-right-[18px]",
+                      "before:top-1/2",
+                      "before:h-7",
+                      "before:w-[4px]",
+                      "before:-translate-y-1/2",
+                      "before:rounded-l-full",
+                      "before:bg-sidebar-foreground",
+                    ].join(" ")
                   : "",
-                isActive && direction === "ltr"
-                  ? "before:absolute before:-left-5 before:top-1/2 before:h-7 before:w-[4px] before:-translate-y-1/2 before:rounded-r-full before:bg-sidebar-foreground"
+                isActive &&
+                direction === "ltr"
+                  ? [
+                      "before:absolute",
+                      "before:-left-[18px]",
+                      "before:top-1/2",
+                      "before:h-7",
+                      "before:w-[4px]",
+                      "before:-translate-y-1/2",
+                      "before:rounded-r-full",
+                      "before:bg-sidebar-foreground",
+                    ].join(" ")
                   : "",
               ].join(" ")}
             >
@@ -133,7 +184,14 @@ export function SidebarMenu({
                 aria-hidden="true"
                 size={18}
                 strokeWidth={2}
+                className="h-[18px] w-[18px] shrink-0"
               />
+
+              {item.badge ? (
+                <span className="absolute -right-1 -top-1 flex min-h-4 min-w-4 items-center justify-center rounded-full bg-sidebar-foreground px-1 text-[9px] font-bold text-sidebar">
+                  {item.badge}
+                </span>
+              ) : null}
             </NavLink>
           );
         })}
@@ -144,13 +202,16 @@ export function SidebarMenu({
   return (
     <nav
       aria-label={t.layout.sidebar.navigation}
-      className="flex flex-col gap-1"
+      className="flex w-full flex-col gap-1"
     >
       {visibleItems.map((item) => {
-        const isActive = isItemActive(
-          location.pathname,
-          item,
-        );
+        const Icon = item.icon;
+
+        const isActive =
+          isItemActive(
+            location.pathname,
+            item,
+          );
 
         const title =
           t.navigation[item.titleKey];
@@ -161,12 +222,19 @@ export function SidebarMenu({
             to={item.path}
             end={item.exact}
             aria-current={
-              isActive ? "page" : undefined
+              isActive
+                ? "page"
+                : undefined
             }
             aria-disabled={
-              item.disabled || undefined
+              item.disabled ||
+              undefined
             }
-            tabIndex={item.disabled ? -1 : 0}
+            tabIndex={
+              item.disabled
+                ? -1
+                : 0
+            }
             onClick={(event) =>
               handleDisabledNavigation(
                 event,
@@ -175,19 +243,40 @@ export function SidebarMenu({
               )
             }
             className={[
-              "relative mx-3 flex h-11 items-center rounded-2xl px-4",
-              "text-[13px] font-semibold tracking-[-0.005em]",
-              "transition-all duration-300 ease-out motion-reduce:transition-none",
-              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sidebar-foreground/30",
+              "relative flex h-11 w-full",
+              "items-center gap-3",
+              "rounded-2xl px-4",
+              "text-[13px] font-semibold",
+              "tracking-[-0.005em]",
+              "transition-colors duration-200",
+              "motion-reduce:transition-none",
+              "focus-visible:outline-none",
+              "focus-visible:ring-2",
+              "focus-visible:ring-sidebar-foreground/30",
               item.disabled
                 ? "cursor-not-allowed opacity-40"
                 : "",
               isActive
-                ? "bg-sidebar-foreground/10 text-sidebar-foreground ring-1 ring-sidebar-foreground/10"
-                : "text-sidebar-muted hover:bg-sidebar-foreground/5 hover:text-sidebar-foreground",
+                ? [
+                    "bg-sidebar-foreground/10",
+                    "text-sidebar-foreground",
+                    "ring-1 ring-sidebar-foreground/10",
+                  ].join(" ")
+                : [
+                    "text-sidebar-muted",
+                    "hover:bg-sidebar-foreground/5",
+                    "hover:text-sidebar-foreground",
+                  ].join(" "),
             ].join(" ")}
           >
-            <span className="truncate">
+            <Icon
+              aria-hidden="true"
+              size={18}
+              strokeWidth={2}
+              className="h-[18px] w-[18px] shrink-0"
+            />
+
+            <span className="min-w-0 flex-1 truncate">
               {title}
             </span>
 

@@ -1,8 +1,3 @@
-import {
-  ChevronLeft,
-  ChevronRight,
-} from "lucide-react";
-
 import { useLocale } from "@/app/providers/locale";
 
 import {
@@ -17,9 +12,11 @@ type TopbarBreadcrumbProps = {
 export function TopbarBreadcrumb({
   pathname,
 }: TopbarBreadcrumbProps) {
-  const { direction, t } = useLocale();
+  const { t } = useLocale();
 
-  const sectionKey = getSectionKey(pathname);
+  const sectionKey =
+    getSectionKey(pathname);
+
   const sectionTitle =
     t.navigation[sectionKey];
 
@@ -29,27 +26,76 @@ export function TopbarBreadcrumb({
       t.layout.topbar.overview,
     );
 
-  const BreadcrumbChevron =
-    direction === "rtl"
-      ? ChevronLeft
-      : ChevronRight;
+  const isSameTitle =
+    sectionTitle
+      .trim()
+      .toLowerCase() ===
+    currentPageTitle
+      .trim()
+      .toLowerCase();
 
   return (
-    <div className="hidden min-w-0 items-center gap-[13px] lg:flex">
-      <h1 className="truncate text-[15px] font-bold tracking-[-0.02em] text-topbar-title">
-        {sectionTitle}
-      </h1>
+    <nav
+      aria-label="Breadcrumb"
+      className="hidden min-w-0 items-center lg:flex"
+    >
+      <ol className="flex min-w-0 items-center gap-3">
+        <li className="min-w-0">
+          <span
+            className={[
+              "inline-flex h-9 max-w-[190px]",
+              "items-center rounded-xl",
+              "border border-primary/10",
+              "bg-primary/[0.07]",
+              "px-4",
+              "text-[13px] font-semibold",
+              "tracking-[-0.015em]",
+              "text-primary",
+            ].join(" ")}
+          >
+            <span className="truncate">
+              {sectionTitle}
+            </span>
+          </span>
+        </li>
 
-      <BreadcrumbChevron
-        aria-hidden="true"
-        size={14}
-        strokeWidth={1.9}
-        className="shrink-0 text-topbar-subtle/55"
-      />
+        {!isSameTitle ? (
+          <>
+            <li
+              aria-hidden="true"
+              className={[
+                "flex h-9 items-center",
+                "text-[14px] font-medium",
+                "text-topbar-subtle/55",
+              ].join(" ")}
+            >
+              /
+            </li>
 
-      <span className="inline-flex h-[34px] max-w-[150px] shrink-0 items-center rounded-[12px] border border-topbar-border bg-topbar-soft px-[17px] text-[12px] font-semibold text-topbar-text">
-        {currentPageTitle}
-      </span>
-    </div>
+            <li className="min-w-0">
+              <span
+                aria-current="page"
+                className={[
+                  "inline-flex h-9 max-w-[190px]",
+                  "items-center rounded-xl",
+                  "border border-topbar-border/75",
+                  "bg-topbar-surface/80",
+                  "px-4",
+                  "text-[13px] font-medium",
+                  "tracking-[-0.01em]",
+                  "text-topbar-text",
+                  "shadow-[0_4px_14px_rgba(30,20,70,0.035)]",
+                  "backdrop-blur-sm",
+                ].join(" ")}
+              >
+                <span className="truncate">
+                  {currentPageTitle}
+                </span>
+              </span>
+            </li>
+          </>
+        ) : null}
+      </ol>
+    </nav>
   );
 }
