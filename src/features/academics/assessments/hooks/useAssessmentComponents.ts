@@ -1,43 +1,176 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 
-import { assessmentComponentApi } from "../api/assessmentComponent.api";
-import type { CreateAssessmentComponentPayload, UpdateAssessmentComponentPayload } from "../types/assessment-component.types";
+import {
+  assessmentComponentApi,
+} from "../api/assessment-component.api";
 
-export const assessmentComponentQueryKey = ["academics", "assessmentComponents"];
+import type {
+  CreateAssessmentComponentPayload,
+  UpdateAssessmentComponentPayload,
+} from "../types/assessment-component.types";
+
+export const assessmentComponentKeys = {
+  all: [
+    "assessment-components",
+  ] as const,
+
+  list: () =>
+    [
+      ...assessmentComponentKeys.all,
+      "list",
+    ] as const,
+
+  details: (id: string) =>
+    [
+      ...assessmentComponentKeys.all,
+      "details",
+      id,
+    ] as const,
+
+  grouped: () =>
+    [
+      ...assessmentComponentKeys.all,
+      "grouped",
+    ] as const,
+};
 
 export function useAssessmentComponents() {
   return useQuery({
-    queryKey: assessmentComponentQueryKey,
-    queryFn: assessmentComponentApi.list,
+    queryKey:
+      assessmentComponentKeys.list(),
+
+    queryFn: () =>
+      assessmentComponentApi.getAll(),
   });
 }
 
-function useRefreshAssessmentComponents() {
-  const queryClient = useQueryClient();
-  return () => queryClient.invalidateQueries({ queryKey: assessmentComponentQueryKey });
+export function useAssessmentComponent(
+  id: string,
+  enabled = true,
+) {
+  return useQuery({
+    queryKey:
+      assessmentComponentKeys.details(
+        id,
+      ),
+
+    queryFn: () =>
+      assessmentComponentApi.getDetails(
+        id,
+      ),
+
+    enabled:
+      enabled && Boolean(id),
+  });
+}
+
+export function useGroupedAssessmentComponents() {
+  return useQuery({
+    queryKey:
+      assessmentComponentKeys.grouped(),
+
+    queryFn: () =>
+      assessmentComponentApi.getGrouped(),
+  });
 }
 
 export function useCreateAssessmentComponent() {
-  const refresh = useRefreshAssessmentComponents();
+  const queryClient =
+    useQueryClient();
+
   return useMutation({
-    mutationFn: (payload: CreateAssessmentComponentPayload) => assessmentComponentApi.create(payload),
-    onSuccess: refresh,
+    mutationFn: (
+      payload: CreateAssessmentComponentPayload,
+    ) =>
+      assessmentComponentApi.create(
+        payload,
+      ),
+
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey:
+            assessmentComponentKeys.list(),
+        }),
+
+        queryClient.invalidateQueries({
+          queryKey:
+            assessmentComponentKeys.grouped(),
+        }),
+      ]);
+    },
   });
 }
 
+type UpdateAssessmentComponentVariables = {
+  id: string;
+
+  payload: UpdateAssessmentComponentPayload;
+};
+
 export function useUpdateAssessmentComponent() {
-  const refresh = useRefreshAssessmentComponents();
+  const queryClient =
+    useQueryClient();
+
   return useMutation({
-    mutationFn: ({ id, payload }: { id: string; payload: UpdateAssessmentComponentPayload }) =>
-      assessmentComponentApi.update(id, payload),
-    onSuccess: refresh,
+    mutationFn: ({
+      id,
+      payload,
+    }: UpdateAssessmentComponentVariables) =>
+      assessmentComponentApi.update(
+        id,
+        payload,
+      ),
+
+    onSuccess: async (
+      updatedComponent,
+    ) => {
+      queryClient.setQueryData(
+        assessmentComponentKeys.details(
+          updatedComponent.id,
+        ),
+        updatedComponent,
+      );
+
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey:
+            assessmentComponentKeys.list(),
+        }),
+
+        queryClient.invalidateQueries({
+          queryKey:
+            assessmentComponentKeys.grouped(),
+        }),
+      ]);
+    },
   });
 }
 
 export function useDeleteAssessmentComponent() {
-  const refresh = useRefreshAssessmentComponents();
+  const queryClient =
+    useQueryClient();
+
   return useMutation({
-    mutationFn: assessmentComponentApi.remove,
-    onSuccess: refresh,
+    mutationFn: (id: string) =>
+      assessmentComponentApi.delete(id),
+
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey:
+            assessmentComponentKeys.list(),
+        }),
+
+        queryClient.invalidateQueries({
+          queryKey:
+            assessmentComponentKeys.grouped(),
+        }),
+      ]);
+    },
   });
 }

@@ -229,10 +229,6 @@ ACADEMICS: {
     ) =>
       `/subject/setting/assessment/subject/update/${assessmentId}`,
 
-    /*
-     * هذا مطابق للمسار الحالي في الباك.
-     * لا توجد شرطة مائلة قبل id.
-     */
     DELETE: (
       assessmentId: ApiId,
     ) =>
