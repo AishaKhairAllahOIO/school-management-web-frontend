@@ -8,8 +8,8 @@ import { GradeSubjectsPage } from "@/features/academics/grade-subjects/pages/Gra
 import { GradesPage } from "@/features/academics/grades/pages/GradesPage";
 import { AcademicsLayout } from "@/features/academics/shared/layouts/AcademicsLayout";
 import { SubjectsPage } from "@/features/academics/subjects/pages/SubjectsPage";
-import { TeacherAssignmentsPage } from "@/features/academics/teacher-assignments/pages/TeacherAssignmentsPage";
-import { TeacherWorkloadsPage } from "@/features/academics/teacher-workloads/pages/TeacherWorkloadsPage";
+// import { TeacherAssignmentsPage } from "@/features/academics/teacher-assignments/pages/TeacherAssignmentsPage";
+// import { TeacherWorkloadsPage } from "@/features/academics/teacher-workloads/pages/TeacherWorkloadsPage";
 
 export const academicsRoutes = [
   {
@@ -51,11 +51,11 @@ export const academicsRoutes = [
       },
       {
         path: "teacher-workloads",
-        element: <TeacherWorkloadsPage />,
+        element: <SubjectsPage />,
       },
       {
         path: "teacher-assignments",
-        element: <TeacherAssignmentsPage />,
+        element: <SubjectsPage />,
       },
     ],
   },
