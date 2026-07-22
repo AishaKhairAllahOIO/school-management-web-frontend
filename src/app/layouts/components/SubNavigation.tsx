@@ -27,123 +27,124 @@ type SubNavigationSection = {
   items: SubNavigationItem[];
 };
 
-const subNavigationSections: SubNavigationSection[] = [
-  {
-    basePath: "/attendance",
-    items: [
-      {
-        title: "Students",
-        path: "/attendance/students",
-        icon: Users,
-      },
-      {
-        title: "Staff",
-        path: "/attendance/staff",
-        icon: UserCheck,
-      },
-      {
-        title: "Vacations",
-        path: "/attendance/vacations",
-        icon: CalendarDays,
-      },
-    ],
-  },
-  {
-    basePath: "/scheduling",
-    items: [
-      {
-        title: "Classes",
-        path: "/scheduling/classes",
-        icon: CalendarDays,
-      },
-      {
-        title: "Teachers",
-        path: "/scheduling/teachers",
-        icon: UserCheck,
-      },
-      {
-        title: "Exams",
-        path: "/scheduling/exams",
-        icon: FileText,
-      },
-      {
-        title: "Quizzes",
-        path: "/scheduling/quizzes",
-        icon: BookOpen,
-      },
-      {
-        title: "Holidays",
-        path: "/scheduling/holidays",
-        icon: CalendarDays,
-      },
-    ],
-  },
-  {
-    basePath: "/finance",
-    items: [
-      {
-        title: "Operations", 
-        path: "/finance",
-        icon: Wallet,
-      },
-     ],
-  },
-  {
-    basePath: "/communications",
-    items: [
-      {
-        title: "Announcements",
-        path: "/communications/announcements",
-        icon: Bell,
-      },
-      {
-        title: "Notifications",
-        path: "/communications/notifications",
-        icon: Bell,
-      },
-      {
-        title: "Messages",
-        path: "/communications/messages",
-        icon: FileText,
-      },
-      {
-        title: "Complaints",
-        path: "/communications/complaints",
-        icon: FileText,
-      },
-    ],
-  },
-  {
-    basePath: "/settings",
-    items: [
-      {
-        title: "General",
-        path: "/settings/general",
-        icon: Building2,
-      },
-      {
-        title: "Academic",
-        path: "/settings/academic",
-        icon: BookOpen,
-      },
-      {
-        title: "Roles",
-        path: "/settings/roles",
-        icon: ShieldCheck,
-      },
-      {
-        title: "Permissions",
-        path: "/settings/permissions",
-        icon: LockKeyhole,
-      },
-      {
-        title: "Financial",
-        path: "/settings/financial",
-        icon: Wallet,
-      },
-    ],
-  },
-];
+const subNavigationSections: SubNavigationSection[] =
+  [
+    {
+      basePath: "/attendance",
+      items: [
+        {
+          title: "Students",
+          path: "/attendance/students",
+          icon: Users,
+        },
+        {
+          title: "Staff",
+          path: "/attendance/staff",
+          icon: UserCheck,
+        },
+        {
+          title: "Vacations",
+          path: "/attendance/vacations",
+          icon: CalendarDays,
+        },
+      ],
+    },
+    {
+      basePath: "/scheduling",
+      items: [
+        {
+          title: "Classes",
+          path: "/scheduling/classes",
+          icon: CalendarDays,
+        },
+        {
+          title: "Teachers",
+          path: "/scheduling/teachers",
+          icon: UserCheck,
+        },
+        {
+          title: "Exams",
+          path: "/scheduling/exams",
+          icon: FileText,
+        },
+        {
+          title: "Quizzes",
+          path: "/scheduling/quizzes",
+          icon: BookOpen,
+        },
+        {
+          title: "Holidays",
+          path: "/scheduling/holidays",
+          icon: CalendarDays,
+        },
+      ],
+    },
+    {
+      basePath: "/finance",
+      items: [
+        {
+          title: "Operations",
+          path: "/finance",
+          icon: Wallet,
+        },
+      ],
+    },
+    {
+      basePath: "/communications",
+      items: [
+        {
+          title: "Announcements",
+          path: "/communications/announcements",
+          icon: Bell,
+        },
+        {
+          title: "Notifications",
+          path: "/communications/notifications",
+          icon: Bell,
+        },
+        {
+          title: "Messages",
+          path: "/communications/messages",
+          icon: FileText,
+        },
+        {
+          title: "Complaints",
+          path: "/communications/complaints",
+          icon: FileText,
+        },
+      ],
+    },
+    {
+      basePath: "/settings",
+      items: [
+        {
+          title: "General",
+          path: "/settings/general",
+          icon: Building2,
+        },
+        {
+          title: "Academic",
+          path: "/settings/academic",
+          icon: BookOpen,
+        },
+        {
+          title: "Roles",
+          path: "/settings/roles",
+          icon: ShieldCheck,
+        },
+        {
+          title: "Permissions",
+          path: "/settings/permissions",
+          icon: LockKeyhole,
+        },
+        {
+          title: "Financial",
+          path: "/settings/financial",
+          icon: Wallet,
+        },
+      ],
+    },
+  ];
 
 function TabItem({
   title,
@@ -155,34 +156,66 @@ function TabItem({
       to={path}
       className={({ isActive }) =>
         [
-          "inline-flex min-w-max items-center gap-2",
-          "rounded-xl px-4 py-3",
-          "text-sm font-semibold",
-          "transition-colors duration-200",
+          "group relative",
+          "inline-flex h-14 min-w-max",
+          "items-center justify-center gap-2.5",
+          "rounded-2xl px-5",
+          "text-[14px] font-medium",
+          "transition-all duration-200 ease-out",
           "focus-visible:outline-none",
           "focus-visible:ring-4",
-          "focus-visible:ring-primary/15",
+          "focus-visible:ring-primary/10",
           isActive
             ? [
-                "bg-primary",
-                "text-primary-foreground",
-                "shadow-sm",
+                "bg-primary/[0.07]",
+                "text-primary",
               ].join(" ")
             : [
                 "text-muted-foreground",
-                "hover:bg-muted",
+                "hover:bg-muted/45",
                 "hover:text-foreground",
               ].join(" "),
         ].join(" ")
       }
     >
-      <Icon
-        aria-hidden="true"
-        size={17}
-        strokeWidth={1.8}
-      />
+      {({ isActive }) => (
+        <>
+          <Icon
+            aria-hidden="true"
+            size={18}
+            strokeWidth={1.75}
+            className={[
+              "shrink-0",
+              "transition-colors duration-200",
+              isActive
+                ? "text-primary"
+                : [
+                    "text-muted-foreground",
+                    "group-hover:text-foreground",
+                  ].join(" "),
+            ].join(" ")}
+          />
 
-      <span>{title}</span>
+          <span className="whitespace-nowrap">
+            {title}
+          </span>
+
+          <span
+            aria-hidden="true"
+            className={[
+              "absolute bottom-0",
+              "left-5 right-5",
+              "h-[2px]",
+              "origin-center rounded-full",
+              "bg-primary",
+              "transition-transform duration-200",
+              isActive
+                ? "scale-x-100"
+                : "scale-x-0",
+            ].join(" ")}
+          />
+        </>
+      )}
     </NavLink>
   );
 }
@@ -196,15 +229,20 @@ function DefaultSubNavigation({
     <nav
       aria-label="Section navigation"
       className={[
-        "rounded-3xl",
-        "border border-border/70",
-        "bg-card px-3 py-2",
-        "shadow-soft",
+        "w-full min-w-0",
+        "overflow-hidden",
+        "rounded-[26px]",
+        "border border-border/60",
+        "bg-card/95",
+        "p-2",
+        "shadow-[0_10px_35px_rgba(38,24,84,0.05)]",
+        "backdrop-blur-sm",
       ].join(" ")}
     >
       <div
         className={[
-          "flex items-center gap-2",
+          "flex h-14 w-full min-w-0",
+          "items-center gap-1.5",
           "overflow-x-auto",
           "[scrollbar-width:none]",
           "[&::-webkit-scrollbar]:hidden",
@@ -240,11 +278,14 @@ export function SubNavigation() {
     return null;
   }
 
-  const currentSection = subNavigationSections.find(
-    (section) =>
-      pathname === section.basePath ||
-      pathname.startsWith(`${section.basePath}/`),
-  );
+  const currentSection =
+    subNavigationSections.find(
+      (section) =>
+        pathname === section.basePath ||
+        pathname.startsWith(
+          `${section.basePath}/`,
+        ),
+    );
 
   if (!currentSection) {
     return null;
