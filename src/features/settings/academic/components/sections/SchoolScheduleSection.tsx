@@ -1,5 +1,7 @@
 import {
   Check,
+  Clock3,
+  Coffee,
   Info,
   Plus,
   Save,
@@ -150,23 +152,28 @@ export function SchoolScheduleSection({
     setSchedule((previousSchedule) => ({
       ...previousSchedule,
 
-      breaks: previousSchedule.breaks.filter(
-        (item) => item.id !== id,
-      ),
+      breaks:
+        previousSchedule.breaks.filter(
+          (item) => item.id !== id,
+        ),
     }));
   }
 
   return (
-    <section className="rounded-3xl border border-border/70 bg-card p-5 shadow-soft">
+    <section>
       <SectionHeader
-        title="School Schedule"
-        description="Configure working days, periods and breaks."
+        title="School Calendar"
+        description="Set working days, lesson duration and break timing for the daily school routine."
       />
 
-      <div className="mt-6 grid gap-5 xl:grid-cols-[1fr_360px]">
+      <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_340px]">
         <div className="space-y-5">
-          <SchedulePanel title="Working Days">
-            <div className="space-y-3">
+          <SchedulePanel
+            icon={<Clock3 size={18} />}
+            title="Working Days"
+            description="Choose active days and the number of periods for each one."
+          >
+            <div className="space-y-2.5">
               {schoolDays.map((day) => {
                 const dayConfiguration =
                   workingDaysMap.get(day);
@@ -178,7 +185,15 @@ export function SchoolScheduleSection({
                 return (
                   <div
                     key={day}
-                    className="flex items-center justify-between gap-4 rounded-2xl border border-border/70 bg-card p-4"
+                    className={[
+                      "flex items-center justify-between",
+                      "gap-4 rounded-[16px]",
+                      "border px-4 py-3.5",
+                      "transition-colors",
+                      checked
+                        ? "border-primary/15 bg-primary/[0.035]"
+                        : "border-border/60 bg-card hover:bg-muted/20",
+                    ].join(" ")}
                   >
                     <button
                       type="button"
@@ -189,18 +204,31 @@ export function SchoolScheduleSection({
                     >
                       <span
                         className={[
-                          "flex h-5 w-5 shrink-0 items-center justify-center rounded-md border",
+                          "flex h-5 w-5 shrink-0",
+                          "items-center justify-center",
+                          "rounded-md border",
+                          "transition-colors",
                           checked
-                            ? "border-primary bg-primary text-white"
-                            : "border-border bg-card",
+                            ? "border-primary bg-primary text-primary-foreground"
+                            : "border-border bg-background",
                         ].join(" ")}
                       >
                         {checked ? (
-                          <Check size={13} />
+                          <Check
+                            size={13}
+                            strokeWidth={2}
+                          />
                         ) : null}
                       </span>
 
-                      <span className="truncate text-sm font-bold text-foreground">
+                      <span
+                        className={[
+                          "truncate text-sm font-medium",
+                          checked
+                            ? "text-foreground"
+                            : "text-muted-foreground",
+                        ].join(" ")}
+                      >
                         {schoolDayLabels[day]}
                       </span>
                     </button>
@@ -208,8 +236,8 @@ export function SchoolScheduleSection({
                     <div className="flex items-center gap-2">
                       <select
                         value={
-                          dayConfiguration?.periodsCount ??
-                          ""
+                          dayConfiguration
+                            ?.periodsCount ?? ""
                         }
                         disabled={!checked}
                         onChange={(event) =>
@@ -220,9 +248,23 @@ export function SchoolScheduleSection({
                             ),
                           )
                         }
-                        className="h-9 rounded-xl border border-border/70 bg-card px-3 text-sm font-bold outline-none disabled:text-muted-foreground"
+                        className={[
+                          "h-9 rounded-xl",
+                          "border border-border/70",
+                          "bg-background px-3",
+                          "text-sm font-normal",
+                          "text-foreground outline-none",
+                          "transition-all",
+                          "focus:border-primary/40",
+                          "focus:ring-4",
+                          "focus:ring-primary/10",
+                          "disabled:cursor-not-allowed",
+                          "disabled:opacity-50",
+                        ].join(" ")}
                       >
-                        <option value="">—</option>
+                        <option value="">
+                          —
+                        </option>
 
                         {[
                           1, 2, 3, 4, 5, 6, 7, 8,
@@ -237,7 +279,7 @@ export function SchoolScheduleSection({
                         ))}
                       </select>
 
-                      <span className="text-xs font-semibold text-muted-foreground">
+                      <span className="text-[11px] font-normal text-muted-foreground">
                         periods
                       </span>
                     </div>
@@ -247,13 +289,13 @@ export function SchoolScheduleSection({
             </div>
           </SchedulePanel>
 
-          <SchedulePanel title="Timing">
+          <SchedulePanel
+            icon={<Clock3 size={18} />}
+            title="Day Timing"
+            description="Define when the school day begins and how long each period lasts."
+          >
             <div className="grid gap-4 md:grid-cols-2">
-              <label className="block">
-                <span className="mb-2 block text-xs font-bold text-foreground">
-                  Day Starts At
-                </span>
-
+              <ScheduleField label="Day Starts At">
                 <input
                   type="time"
                   value={schedule.dayStartTime}
@@ -266,65 +308,76 @@ export function SchoolScheduleSection({
                       }),
                     )
                   }
-                  className="h-11 w-full rounded-xl border border-border/70 bg-card px-3 text-sm font-bold outline-none"
+                  className={inputClassName}
                 />
-              </label>
+              </ScheduleField>
 
-              <label className="block">
-                <span className="mb-2 block text-xs font-bold text-foreground">
-                  Period Duration
-                </span>
+              <ScheduleField label="Period Duration">
+                <div className="relative">
+                  <input
+                    type="number"
+                    min={1}
+                    value={
+                      schedule.periodDurationMinutes
+                    }
+                    onChange={(event) =>
+                      setSchedule(
+                        (previousSchedule) => ({
+                          ...previousSchedule,
 
-                <input
-                  type="number"
-                  min={1}
-                  value={
-                    schedule.periodDurationMinutes
-                  }
-                  onChange={(event) =>
-                    setSchedule(
-                      (previousSchedule) => ({
-                        ...previousSchedule,
+                          periodDurationMinutes:
+                            Number(
+                              event.target.value,
+                            ),
+                        }),
+                      )
+                    }
+                    className={`${inputClassName} pr-16`}
+                  />
 
-                        periodDurationMinutes:
-                          Number(
-                            event.target.value,
-                          ),
-                      }),
-                    )
-                  }
-                  className="h-11 w-full rounded-xl border border-border/70 bg-card px-3 text-sm font-bold outline-none"
-                />
-              </label>
+                  <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[11px] text-muted-foreground">
+                    minutes
+                  </span>
+                </div>
+              </ScheduleField>
             </div>
 
-            <div className="mt-4 flex items-start gap-2 rounded-2xl bg-primary/5 p-4 text-primary">
+            <div className="mt-4 flex items-start gap-3 rounded-[16px] border border-primary/10 bg-primary/[0.045] p-4 text-primary">
               <Info
                 size={17}
+                strokeWidth={1.75}
                 className="mt-0.5 shrink-0"
               />
 
-              <p className="text-xs font-semibold leading-5">
+              <p className="text-xs font-normal leading-5">
                 The end time is calculated
-                automatically based on periods and
-                breaks.
+                automatically from working periods
+                and breaks.
               </p>
             </div>
           </SchedulePanel>
 
-          <SchedulePanel title="Breaks">
+          <SchedulePanel
+            icon={<Coffee size={18} />}
+            title="Breaks"
+            description="Insert break periods between lessons."
+          >
             <div className="space-y-3">
               {schedule.breaks.map(
-                (breakItem) => (
+                (breakItem, index) => (
                   <div
                     key={breakItem.id}
-                    className="grid gap-3 rounded-2xl border border-border/70 bg-card p-4 sm:grid-cols-[1fr_1fr_auto]"
+                    className={[
+                      "grid gap-3",
+                      "rounded-[16px]",
+                      "border border-border/60",
+                      "bg-card p-4",
+                      "sm:grid-cols-[1fr_1fr_auto]",
+                    ].join(" ")}
                   >
-                    <label>
-                      <span className="mb-2 block text-xs font-bold text-foreground">
-                        After Period
-                      </span>
-
+                    <ScheduleField
+                      label={`Break ${index + 1} · After Period`}
+                    >
                       <input
                         type="number"
                         min={1}
@@ -340,33 +393,35 @@ export function SchoolScheduleSection({
                             ),
                           )
                         }
-                        className="h-10 w-full rounded-xl border border-border/70 bg-card px-3 text-sm font-bold outline-none"
+                        className={inputClassName}
                       />
-                    </label>
+                    </ScheduleField>
 
-                    <label>
-                      <span className="mb-2 block text-xs font-bold text-foreground">
-                        Duration
-                      </span>
+                    <ScheduleField label="Duration">
+                      <div className="relative">
+                        <input
+                          type="number"
+                          min={1}
+                          value={
+                            breakItem.durationMinutes
+                          }
+                          onChange={(event) =>
+                            updateBreak(
+                              breakItem.id,
+                              "durationMinutes",
+                              Number(
+                                event.target.value,
+                              ),
+                            )
+                          }
+                          className={`${inputClassName} pr-16`}
+                        />
 
-                      <input
-                        type="number"
-                        min={1}
-                        value={
-                          breakItem.durationMinutes
-                        }
-                        onChange={(event) =>
-                          updateBreak(
-                            breakItem.id,
-                            "durationMinutes",
-                            Number(
-                              event.target.value,
-                            ),
-                          )
-                        }
-                        className="h-10 w-full rounded-xl border border-border/70 bg-card px-3 text-sm font-bold outline-none"
-                      />
-                    </label>
+                        <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[11px] text-muted-foreground">
+                          minutes
+                        </span>
+                      </div>
+                    </ScheduleField>
 
                     <button
                       type="button"
@@ -374,17 +429,35 @@ export function SchoolScheduleSection({
                       onClick={() =>
                         deleteBreak(breakItem.id)
                       }
-                      className="mt-auto flex h-10 w-10 items-center justify-center rounded-xl border border-destructive/20 bg-card text-destructive"
+                      className={[
+                        "mt-auto flex h-11 w-11",
+                        "items-center justify-center",
+                        "rounded-xl border",
+                        "border-destructive/20",
+                        "bg-card text-destructive",
+                        "transition-colors",
+                        "hover:bg-destructive/[0.07]",
+                      ].join(" ")}
                     >
-                      <Trash2 size={16} />
+                      <Trash2
+                        size={16}
+                        strokeWidth={1.75}
+                      />
                     </button>
                   </div>
                 ),
               )}
 
               {schedule.breaks.length === 0 ? (
-                <div className="rounded-2xl border border-dashed border-border p-5 text-center text-xs font-semibold text-muted-foreground">
-                  No breaks added.
+                <div className="rounded-[16px] border border-dashed border-border bg-muted/10 p-6 text-center">
+                  <p className="text-sm font-medium text-foreground">
+                    No breaks added
+                  </p>
+
+                  <p className="mt-1 text-xs font-normal text-muted-foreground">
+                    Add a break between school
+                    periods when needed.
+                  </p>
                 </div>
               ) : null}
             </div>
@@ -392,9 +465,22 @@ export function SchoolScheduleSection({
             <button
               type="button"
               onClick={addBreak}
-              className="mt-4 flex h-10 items-center gap-2 rounded-xl border border-border/70 px-4 text-xs font-bold text-foreground transition hover:bg-muted"
+              className={[
+                "mt-4 inline-flex h-10",
+                "items-center gap-2",
+                "rounded-xl border",
+                "border-primary/20",
+                "bg-card px-4",
+                "text-xs font-medium",
+                "text-primary transition-colors",
+                "hover:bg-primary/[0.055]",
+              ].join(" ")}
             >
-              <Plus size={15} />
+              <Plus
+                size={15}
+                strokeWidth={1.8}
+              />
+
               Add Break
             </button>
           </SchedulePanel>
@@ -402,21 +488,40 @@ export function SchoolScheduleSection({
           <div className="flex justify-end">
             <button
               type="button"
-              disabled={updateSettings.isPending}
+              disabled={
+                updateSettings.isPending
+              }
               onClick={saveSchedule}
-              className="flex h-11 items-center gap-2 rounded-xl bg-primary px-6 text-sm font-bold text-primary-foreground disabled:cursor-not-allowed disabled:opacity-60"
+              className={[
+                "inline-flex h-11 items-center",
+                "gap-2 rounded-[14px]",
+                "bg-primary px-6",
+                "text-sm font-medium",
+                "text-primary-foreground",
+                "shadow-sm transition",
+                "hover:bg-primary/90",
+                "disabled:cursor-not-allowed",
+                "disabled:opacity-60",
+              ].join(" ")}
             >
-              <Save size={16} />
+              <Save
+                size={16}
+                strokeWidth={1.8}
+              />
 
               {updateSettings.isPending
                 ? "Saving..."
-                : "Save Schedule"}
+                : "Save Calendar"}
             </button>
           </div>
         </div>
 
-        <aside>
-          <SchedulePanel title="Schedule Preview">
+        <aside className="xl:sticky xl:top-6 xl:self-start">
+          <SchedulePanel
+            icon={<Clock3 size={18} />}
+            title="Day Preview"
+            description="A live view of the generated school day."
+          >
             <SchedulePreview
               schedule={schedule}
             />
@@ -427,20 +532,70 @@ export function SchoolScheduleSection({
   );
 }
 
-function SchedulePanel({
-  title,
+const inputClassName = [
+  "h-11 w-full rounded-xl",
+  "border border-border/70",
+  "bg-background px-3.5",
+  "text-sm font-normal",
+  "text-foreground outline-none",
+  "transition-all",
+  "focus:border-primary/40",
+  "focus:ring-4",
+  "focus:ring-primary/10",
+].join(" ");
+
+function ScheduleField({
+  label,
   children,
 }: {
-  title: string;
+  label: string;
   children: React.ReactNode;
 }) {
   return (
-    <div className="rounded-3xl border border-border/70 bg-muted/20 p-5">
-      <h3 className="text-sm font-bold text-foreground">
-        {title}
-      </h3>
+    <label className="block">
+      <span className="mb-2 block text-xs font-medium text-foreground">
+        {label}
+      </span>
 
-      <div className="mt-4">{children}</div>
+      {children}
+    </label>
+  );
+}
+
+function SchedulePanel({
+  icon,
+  title,
+  description,
+  children,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  description?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="rounded-[22px] border border-border/60 bg-muted/[0.12] p-5">
+      <div className="flex items-start gap-3">
+        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px] bg-primary/[0.075] text-primary">
+          {icon}
+        </span>
+
+        <div>
+          <h3 className="text-sm font-medium text-foreground">
+            {title}
+          </h3>
+
+          {description ? (
+            <p className="mt-1 text-[11px] font-normal leading-4 text-muted-foreground">
+              {description}
+            </p>
+          ) : null}
+        </div>
+      </div>
+
+      <div className="mt-5">
+        {children}
+      </div>
     </div>
   );
 }

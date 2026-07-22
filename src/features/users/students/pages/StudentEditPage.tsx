@@ -5,6 +5,7 @@ import {
 } from "react";
 import {
   GraduationCap,
+  Loader2,
   Save,
   UserRound,
   UsersRound,
@@ -19,6 +20,7 @@ import {
   FormField,
   FormSection,
 } from "../components/form/StudentFormPrimitives";
+import { StudentAcademicFields } from "../components/form/StudentAcademicFields";
 import { StudentPageHeader } from "../components/shared/StudentPageHeader";
 import {
   useStudentFullProfile,
@@ -62,103 +64,186 @@ const emptyPerson: EditablePerson = {
 
 export function StudentEditPage() {
   const navigate = useNavigate();
-  const { enrollmentId } = useParams<{
-    enrollmentId: string;
-  }>();
 
-  const profileQuery = useStudentFullProfile(enrollmentId);
+  const { enrollmentId } =
+    useParams<{
+      enrollmentId: string;
+    }>();
+
+  const profileQuery =
+    useStudentFullProfile(enrollmentId);
+
   const studentMutation =
-    useUpdateStudentPersonal(enrollmentId);
+    useUpdateStudentPersonal(
+      enrollmentId,
+    );
+
   const guardianMutation =
     useUpdateGuardian(enrollmentId);
+
   const enrollmentMutation =
     useUpdateStudentEnrollment();
 
   const [student, setStudent] =
-    useState<EditablePerson>(emptyPerson);
+    useState<EditablePerson>(
+      emptyPerson,
+    );
+
   const [guardian, setGuardian] =
-    useState<EditablePerson>(emptyPerson);
-  const [enrollment, setEnrollment] = useState({
-    academic_year_id: "",
-    grade_level_id: "",
-    class_room_id: "",
-    enrollment_status: "enrolled" as EnrollmentStatus,
-  });
+    useState<EditablePerson>(
+      emptyPerson,
+    );
+
+  const [enrollment, setEnrollment] =
+    useState({
+      academic_year_id: "",
+      grade_level_id: "",
+      class_room_id: "",
+
+      enrollment_status:
+        "enrolled" as EnrollmentStatus,
+    });
 
   useEffect(() => {
-    if (!profileQuery.data) return;
+    if (!profileQuery.data) {
+      return;
+    }
 
     const data = profileQuery.data;
 
     setStudent({
-      first_name: data.student.firstName ?? "",
-      last_name: data.student.lastName ?? "",
-      father_name: data.student.fatherName ?? "",
-      mother_name: data.student.motherName ?? "",
-      birth_date: data.student.birthDate ?? "",
-      birth_place: data.student.birthPlace ?? "",
-      gender: data.student.gender ?? "male",
-      nationality: data.student.nationality ?? "",
-      address: data.student.address ?? "",
-      phone_number: data.student.phoneNumber ?? "",
+      first_name:
+        data.student.firstName ?? "",
+
+      last_name:
+        data.student.lastName ?? "",
+
+      father_name:
+        data.student.fatherName ?? "",
+
+      mother_name:
+        data.student.motherName ?? "",
+
+      birth_date:
+        data.student.birthDate ?? "",
+
+      birth_place:
+        data.student.birthPlace ?? "",
+
+      gender:
+        data.student.gender ?? "male",
+
+      nationality:
+        data.student.nationality ?? "",
+
+      address:
+        data.student.address ?? "",
+
+      phone_number:
+        data.student.phoneNumber ?? "",
     });
 
     if (data.guardian) {
       setGuardian({
-        first_name: data.guardian.firstName ?? "",
-        last_name: data.guardian.lastName ?? "",
-        father_name: data.guardian.fatherName ?? "",
-        mother_name: data.guardian.motherName ?? "",
-        birth_date: data.guardian.birthDate ?? "",
-        birth_place: data.guardian.birthPlace ?? "",
-        gender: data.guardian.gender ?? "male",
-        nationality: data.guardian.nationality ?? "",
-        address: data.guardian.address ?? "",
-        phone_number: data.guardian.phoneNumber ?? "",
+        first_name:
+          data.guardian.firstName ?? "",
+
+        last_name:
+          data.guardian.lastName ?? "",
+
+        father_name:
+          data.guardian.fatherName ??
+          "",
+
+        mother_name:
+          data.guardian.motherName ??
+          "",
+
+        birth_date:
+          data.guardian.birthDate ?? "",
+
+        birth_place:
+          data.guardian.birthPlace ??
+          "",
+
+        gender:
+          data.guardian.gender ?? "male",
+
+        nationality:
+          data.guardian.nationality ??
+          "",
+
+        address:
+          data.guardian.address ?? "",
+
+        phone_number:
+          data.guardian.phoneNumber ??
+          "",
       });
     }
 
     setEnrollment({
       academic_year_id: String(
-        data.enrollment.academicYearId ?? "",
+        data.enrollment
+          .academicYearId ?? "",
       ),
+
       grade_level_id: String(
         data.enrollment.gradeId ?? "",
       ),
+
       class_room_id: String(
-        data.enrollment.classroomId ?? "",
+        data.enrollment.classroomId ??
+          "",
       ),
+
       enrollment_status:
-        data.enrollment.enrollmentStatus,
+        data.enrollment
+          .enrollmentStatus,
     });
   }, [profileQuery.data]);
 
-  async function submit(event: FormEvent) {
+  async function submit(
+    event: FormEvent,
+  ) {
     event.preventDefault();
 
-    if (!profileQuery.data || !enrollmentId) return;
+    if (
+      !profileQuery.data ||
+      !enrollmentId
+    ) {
+      return;
+    }
 
     const tasks: Promise<unknown>[] = [
       studentMutation.mutateAsync({
-        studentId: profileQuery.data.student.id,
+        studentId:
+          profileQuery.data.student.id,
+
         payload:
           student as UpdateStudentPersonalPayload,
       }),
+
       enrollmentMutation.mutateAsync({
         enrollmentId,
-        payload:
-          {
-            ...enrollment,
-            class_room_id:
-              enrollment.class_room_id || null,
-          } as UpdateStudentEnrollmentPayload,
+
+        payload: {
+          ...enrollment,
+
+          class_room_id:
+            enrollment.class_room_id ||
+            null,
+        } as UpdateStudentEnrollmentPayload,
       }),
     ];
 
     if (profileQuery.data.guardian) {
       tasks.push(
         guardianMutation.mutateAsync({
-          guardianId: profileQuery.data.guardian.id,
+          guardianId:
+            profileQuery.data.guardian
+              .id,
+
           payload:
             guardian as UpdateGuardianPersonalPayload,
         }),
@@ -166,31 +251,53 @@ export function StudentEditPage() {
     }
 
     await Promise.all(tasks);
-    navigate(`/users/students/${enrollmentId}`);
+
+    navigate(
+      `/users/students/${enrollmentId}`,
+    );
   }
 
   if (profileQuery.isPending) {
     return (
-      <main className="min-h-screen bg-background p-6">
-        <div className="mx-auto max-w-[1450px] space-y-5">
-          <div className="h-36 animate-pulse rounded-[34px] bg-muted" />
-          <div className="h-[700px] animate-pulse rounded-[34px] bg-muted" />
+      <main className="min-h-screen bg-background px-4 py-5 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-[1450px] space-y-6">
+          <div className="h-28 animate-pulse rounded-[24px] bg-muted/65" />
+
+          <div className="h-[520px] animate-pulse rounded-[24px] bg-muted/50" />
         </div>
       </main>
     );
   }
 
-  if (profileQuery.isError || !profileQuery.data) {
+  if (
+    profileQuery.isError ||
+    !profileQuery.data
+  ) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-background p-6">
-        <div className="rounded-[32px] border border-destructive/20 bg-card p-8 text-center shadow-[var(--shadow-card)]">
-          <h1 className="text-xl font-black text-foreground">
-            Student data could not be loaded
+        <div className="w-full max-w-md rounded-[24px] border border-destructive/15 bg-card p-8 text-center shadow-[0_18px_50px_rgba(30,20,70,0.08)]">
+          <UserRound
+            size={30}
+            className="mx-auto text-destructive"
+          />
+
+          <h1 className="mt-4 text-lg font-semibold text-foreground">
+            Student data could not be
+            loaded
           </h1>
+
+          <p className="mt-2 text-sm font-normal leading-6 text-muted-foreground">
+            The profile may be unavailable or
+            you may not have permission to
+            edit it.
+          </p>
+
           <button
             type="button"
-            onClick={() => navigate("/users/students")}
-            className="primary-gradient mt-5 rounded-2xl px-5 py-3 text-sm font-bold text-primary-foreground"
+            onClick={() =>
+              navigate("/users/students")
+            }
+            className="mt-5 inline-flex h-11 items-center rounded-xl bg-primary px-5 text-sm font-medium text-primary-foreground"
           >
             Back to students
           </button>
@@ -212,30 +319,45 @@ export function StudentEditPage() {
       >
         <StudentPageHeader
           title="Edit student"
-          description="Update student, guardian, and academic enrollment without changing their existing relationships."
+          description="Update personal details, guardian information and academic placement."
           showBackButton
-          icon={<UserRound className="h-7 w-7" />}
+          icon={
+            <UserRound
+              size={23}
+              strokeWidth={1.7}
+            />
+          }
           actions={
             <>
               <button
                 type="button"
                 onClick={() =>
-                  navigate(`/users/students/${enrollmentId}`)
+                  navigate(
+                    `/users/students/${enrollmentId}`,
+                  )
                 }
-                className="inline-flex h-11 items-center rounded-2xl border border-border bg-card px-5 text-sm font-bold text-foreground hover:bg-secondary"
+                className="inline-flex h-11 items-center rounded-xl border border-border/70 bg-card px-5 text-sm font-medium text-foreground transition hover:bg-muted/40"
               >
                 Cancel
               </button>
+
               <button
                 type="submit"
                 disabled={isSaving}
-                className="primary-gradient inline-flex h-11 items-center gap-2 rounded-2xl px-5 text-sm font-bold text-primary-foreground disabled:opacity-60"
+                className="inline-flex h-11 items-center gap-2 rounded-xl bg-primary px-5 text-sm font-medium text-primary-foreground shadow-sm transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {isSaving ? (
-                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent" />
+                  <Loader2
+                    size={16}
+                    className="animate-spin"
+                  />
                 ) : (
-                  <Save className="h-4 w-4" />
+                  <Save
+                    size={16}
+                    strokeWidth={1.8}
+                  />
                 )}
+
                 Save changes
               </button>
             </>
@@ -243,99 +365,161 @@ export function StudentEditPage() {
         />
 
         <EditablePersonSection
-          title="Student information"
-          description="Update personal and contact information."
-          icon={<UserRound className="h-5 w-5" />}
+          eyebrow="Student details"
+          title="Personal information"
+          description="Update identity, birth and contact details."
+          icon={
+            <UserRound
+              size={18}
+              strokeWidth={1.7}
+            />
+          }
           value={student}
           onChange={setStudent}
         />
 
         {profileQuery.data.guardian ? (
           <EditablePersonSection
+            eyebrow="Family contact"
             title="Guardian information"
-            description="Update the linked guardian information."
-            icon={<UsersRound className="h-5 w-5" />}
+            description="Update the linked guardian's personal and contact details."
+            icon={
+              <UsersRound
+                size={18}
+                strokeWidth={1.7}
+              />
+            }
             value={guardian}
             onChange={setGuardian}
           />
         ) : null}
 
         <FormSection
-          eyebrow="Academic record"
+          eyebrow="Academic placement"
           title="Enrollment"
-          description="Change placement or enrollment status."
-          icon={<GraduationCap className="h-5 w-5" />}
+          description="Change the academic year, grade, classroom or enrollment status."
+          icon={
+            <GraduationCap
+              size={18}
+              strokeWidth={1.7}
+            />
+          }
         >
-          <div className="grid gap-4 md:grid-cols-4">
-            <FormField label="Academic year ID">
-              <input
-                value={enrollment.academic_year_id}
-                onChange={(event) =>
-                  setEnrollment((current) => ({
-                    ...current,
-                    academic_year_id: event.target.value,
-                  }))
-                }
-                className={fieldClassName}
-              />
-            </FormField>
+          <StudentAcademicFields
+            academicYearId={
+              enrollment.academic_year_id
+            }
+            gradeId={
+              enrollment.grade_level_id
+            }
+            classroomId={
+              enrollment.class_room_id
+            }
+            disabled={isSaving}
+            onAcademicYearChange={(
+              value,
+            ) =>
+              setEnrollment(
+                (current) => ({
+                  ...current,
 
-            <FormField label="Grade level ID">
-              <input
-                value={enrollment.grade_level_id}
-                onChange={(event) =>
-                  setEnrollment((current) => ({
-                    ...current,
-                    grade_level_id: event.target.value,
-                  }))
-                }
-                className={fieldClassName}
-              />
-            </FormField>
+                  academic_year_id:
+                    value,
 
-            <FormField label="Classroom ID">
-              <input
-                value={enrollment.class_room_id}
-                onChange={(event) =>
-                  setEnrollment((current) => ({
-                    ...current,
-                    class_room_id: event.target.value,
-                  }))
-                }
-                className={fieldClassName}
-              />
-            </FormField>
+                  class_room_id: "",
+                }),
+              )
+            }
+            onGradeChange={(value) =>
+              setEnrollment(
+                (current) => ({
+                  ...current,
 
+                  grade_level_id:
+                    value,
+
+                  class_room_id: "",
+                }),
+              )
+            }
+            onClassroomChange={(
+              value,
+            ) =>
+              setEnrollment(
+                (current) => ({
+                  ...current,
+
+                  class_room_id: value,
+                }),
+              )
+            }
+          />
+
+          <div className="mt-4 max-w-sm">
             <FormField label="Enrollment status">
               <select
-                value={enrollment.enrollment_status}
+                value={
+                  enrollment.enrollment_status
+                }
+                disabled={isSaving}
                 onChange={(event) =>
-                  setEnrollment((current) => ({
-                    ...current,
-                    enrollment_status:
-                      event.target.value as EnrollmentStatus,
-                  }))
+                  setEnrollment(
+                    (current) => ({
+                      ...current,
+
+                      enrollment_status:
+                        event.target
+                          .value as EnrollmentStatus,
+                    }),
+                  )
                 }
                 className={fieldClassName}
               >
-                <option value="pending">Pending</option>
-                <option value="enrolled">Enrolled</option>
-                <option value="suspended">Suspended</option>
-                <option value="withdrawn">Withdrawn</option>
-                <option value="completed">Completed</option>
+                <option value="pending">
+                  Pending
+                </option>
+
+                <option value="enrolled">
+                  Enrolled
+                </option>
+
+                <option value="suspended">
+                  Suspended
+                </option>
+
+                <option value="withdrawn">
+                  Withdrawn
+                </option>
+
+                <option value="completed">
+                  Completed
+                </option>
               </select>
             </FormField>
           </div>
         </FormSection>
 
-        <div className="flex justify-end">
+        <div className="flex justify-end border-t border-border/55 pt-5">
           <button
             type="submit"
             disabled={isSaving}
-            className="primary-gradient inline-flex h-12 items-center gap-2 rounded-2xl px-7 text-sm font-black text-primary-foreground shadow-[var(--shadow-auth-button)] disabled:opacity-60"
+            className="inline-flex h-11 items-center gap-2 rounded-xl bg-primary px-6 text-sm font-medium text-primary-foreground shadow-sm transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            <Save className="h-4 w-4" />
-            Save all changes
+            {isSaving ? (
+              <Loader2
+                size={16}
+                className="animate-spin"
+              />
+            ) : (
+              <Save
+                size={16}
+                strokeWidth={1.8}
+              />
+            )}
+
+            {isSaving
+              ? "Saving changes..."
+              : "Save all changes"}
           </button>
         </div>
       </form>
@@ -344,16 +528,19 @@ export function StudentEditPage() {
 }
 
 function EditablePersonSection({
+  eyebrow,
   title,
   description,
   icon,
   value,
   onChange,
 }: {
+  eyebrow: string;
   title: string;
   description: string;
   icon: React.ReactNode;
   value: EditablePerson;
+
   onChange: React.Dispatch<
     React.SetStateAction<EditablePerson>
   >;
@@ -370,7 +557,7 @@ function EditablePersonSection({
 
   return (
     <FormSection
-      eyebrow="Profile details"
+      eyebrow={eyebrow}
       title={title}
       description={description}
       icon={icon}
@@ -378,23 +565,60 @@ function EditablePersonSection({
       <div className="grid gap-4 md:grid-cols-2">
         {(
           [
-            ["first_name", "First name"],
-            ["last_name", "Last name"],
-            ["father_name", "Father name"],
-            ["mother_name", "Mother name"],
-            ["birth_place", "Birth place"],
-            ["nationality", "Nationality"],
-            ["phone_number", "Phone number"],
+            [
+              "first_name",
+              "First name",
+            ],
+
+            [
+              "last_name",
+              "Last name",
+            ],
+
+            [
+              "father_name",
+              "Father name",
+            ],
+
+            [
+              "mother_name",
+              "Mother name",
+            ],
+
+            [
+              "birth_place",
+              "Birth place",
+            ],
+
+            [
+              "nationality",
+              "Nationality",
+            ],
+
+            [
+              "phone_number",
+              "Phone number",
+            ],
           ] as const
         ).map(([key, label]) => (
-          <FormField key={key} label={label}>
+          <FormField
+            key={key}
+            label={label}
+          >
             <input
               value={value[key]}
               onChange={(event) =>
-                update(key, event.target.value)
+                update(
+                  key,
+                  event.target.value,
+                )
               }
               className={fieldClassName}
-              dir={key === "phone_number" ? "ltr" : undefined}
+              dir={
+                key === "phone_number"
+                  ? "ltr"
+                  : undefined
+              }
             />
           </FormField>
         ))}
@@ -404,7 +628,10 @@ function EditablePersonSection({
             type="date"
             value={value.birth_date}
             onChange={(event) =>
-              update("birth_date", event.target.value)
+              update(
+                "birth_date",
+                event.target.value,
+              )
             }
             className={fieldClassName}
           />
@@ -414,20 +641,34 @@ function EditablePersonSection({
           <select
             value={value.gender}
             onChange={(event) =>
-              update("gender", event.target.value)
+              update(
+                "gender",
+                event.target.value,
+              )
             }
             className={fieldClassName}
           >
-            <option value="male">Male</option>
-            <option value="female">Female</option>
+            <option value="male">
+              Male
+            </option>
+
+            <option value="female">
+              Female
+            </option>
           </select>
         </FormField>
 
-        <FormField label="Address" className="md:col-span-2">
+        <FormField
+          label="Address"
+          className="md:col-span-2"
+        >
           <textarea
             value={value.address}
             onChange={(event) =>
-              update("address", event.target.value)
+              update(
+                "address",
+                event.target.value,
+              )
             }
             className={`${fieldClassName} min-h-28 resize-y py-3`}
           />

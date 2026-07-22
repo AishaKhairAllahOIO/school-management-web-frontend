@@ -1,5 +1,13 @@
-import { CalendarDays } from "lucide-react";
-import { useState } from "react";
+import {
+  CalendarDays,
+  CircleCheck,
+  History,
+  Sparkles,
+} from "lucide-react";
+import {
+  useMemo,
+  useState,
+} from "react";
 
 import {
   useCreateAcademicYear,
@@ -42,7 +50,20 @@ export function AcademicYearsSection({
   const deleteYear =
     useDeleteAcademicYear();
 
-  function handleDelete(year: AcademicYear) {
+  const currentYearsCount = useMemo(
+    () =>
+      academicYears.filter(
+        (year) => year.isCurrent,
+      ).length,
+    [academicYears],
+  );
+
+  const latestYear =
+    academicYears[0]?.name ?? "—";
+
+  function handleDelete(
+    year: AcademicYear,
+  ) {
     const confirmed = window.confirm(
       `Delete academic year "${year.name}"?\n\nThis action cannot be undone.`,
     );
@@ -52,7 +73,6 @@ export function AcademicYearsSection({
     }
 
     deleteYear.mutate(year.id);
-
     setOpenMenuId(null);
   }
 
@@ -60,7 +80,7 @@ export function AcademicYearsSection({
     <>
       <SectionHeader
         title="Academic Years"
-        description="Create and manage academic years. The current year will be used throughout the system."
+        description="Create yearly periods and choose which one is currently active across the school."
         actionLabel="Add Year"
         onAction={() =>
           setDialogValue("new")
@@ -70,17 +90,12 @@ export function AcademicYearsSection({
       <EntityTable>
         <thead>
           <tr>
-            <EntityTh>Year Name</EntityTh>
-
+            <EntityTh>Academic Year</EntityTh>
             <EntityTh>Start Date</EntityTh>
-
             <EntityTh>End Date</EntityTh>
-
             <EntityTh>Status</EntityTh>
-
-            <EntityTh>Created At</EntityTh>
-
-            <EntityTh>Updated At</EntityTh>
+            <EntityTh>Created</EntityTh>
+            <EntityTh>Updated</EntityTh>
 
             <EntityTh align="right">
               Actions
@@ -105,12 +120,16 @@ export function AcademicYearsSection({
 
               <EntityTd>
                 {year.isCurrent ? (
-                  <span className="inline-flex rounded-full bg-emerald-50 px-3 py-1 text-xs font-black text-emerald-600">
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/[0.09] px-3 py-1.5 text-[11px] font-medium text-emerald-600">
+                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+
                     Current Year
                   </span>
                 ) : (
-                  <span className="inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs font-black text-slate-500">
-                    Not Current
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-muted/70 px-3 py-1.5 text-[11px] font-medium text-muted-foreground">
+                    <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground/50" />
+
+                    Previous
                   </span>
                 )}
               </EntityTd>
@@ -134,7 +153,9 @@ export function AcademicYearsSection({
                   }
                   onOpenChange={(open) =>
                     setOpenMenuId(
-                      open ? year.id : null,
+                      open
+                        ? year.id
+                        : null,
                     )
                   }
                   onEdit={() => {
@@ -151,40 +172,49 @@ export function AcademicYearsSection({
         </tbody>
       </EntityTable>
 
-      <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      {academicYears.length === 0 ? (
+        <div className="mt-4 rounded-[18px] border border-dashed border-border bg-muted/15 p-8 text-center">
+          <p className="text-sm font-medium text-foreground">
+            No academic years yet
+          </p>
+
+          <p className="mt-1 text-xs font-normal text-muted-foreground">
+            Add the first academic year to begin
+            configuring the school calendar.
+          </p>
+        </div>
+      ) : null}
+
+      <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <YearStat
-          icon={
-            <CalendarDays size={18} />
-          }
+          icon={<CalendarDays size={18} />}
           value={academicYears.length}
           label="Total Years"
+          description="All saved periods"
         />
 
         <YearStat
-          value={
-            academicYears.filter(
-              (item) => item.isCurrent,
-            ).length
-          }
+          icon={<CircleCheck size={18} />}
+          value={currentYearsCount}
           label="Current Year"
+          description="Used across the system"
         />
 
         <YearStat
+          icon={<History size={18} />}
           value={
-            academicYears.filter(
-              (item) => !item.isCurrent,
-            ).length
+            academicYears.length -
+            currentYearsCount
           }
-          label="Other Years"
+          label="Previous Years"
+          description="Historical periods"
         />
 
         <YearStat
-          value={
-            academicYears.length
-              ? academicYears[0].name
-              : "—"
-          }
+          icon={<Sparkles size={18} />}
+          value={latestYear}
           label="Latest Entry"
+          description="Most recently listed"
         />
       </div>
 
@@ -219,28 +249,45 @@ export function AcademicYearsSection({
 function YearStat({
   value,
   label,
+  description,
   icon,
 }: {
   value: number | string;
   label: string;
-  icon?: React.ReactNode;
+  description: string;
+  icon: React.ReactNode;
 }) {
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-4">
-      <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-2xl bg-indigo-50 text-primary">
-        {icon ?? (
-          <span className="text-lg font-black">
-            {String(value).slice(0, 1)}
-          </span>
-        )}
+    <div
+      className={[
+        "relative overflow-hidden",
+        "rounded-[20px]",
+        "border border-border/60",
+        "bg-card p-4",
+        "transition-all duration-200",
+        "hover:-translate-y-0.5",
+        "hover:border-primary/15",
+        "hover:shadow-[0_12px_30px_rgba(30,20,70,0.06)]",
+      ].join(" ")}
+    >
+      <div className="flex items-start justify-between gap-3">
+        <span className="flex h-10 w-10 items-center justify-center rounded-[14px] bg-primary/[0.075] text-primary">
+          {icon}
+        </span>
+
+        <span className="h-14 w-14 rounded-full bg-primary/[0.025]" />
       </div>
 
-      <p className="text-xl font-black text-slate-900">
+      <p className="mt-5 truncate text-xl font-semibold tracking-[-0.025em] text-foreground">
         {value}
       </p>
 
-      <p className="mt-1 text-xs font-semibold text-slate-500">
+      <p className="mt-1 text-xs font-medium text-foreground">
         {label}
+      </p>
+
+      <p className="mt-1 text-[10px] font-normal text-muted-foreground">
+        {description}
       </p>
     </div>
   );

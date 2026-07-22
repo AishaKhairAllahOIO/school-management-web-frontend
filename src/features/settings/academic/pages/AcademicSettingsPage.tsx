@@ -27,10 +27,11 @@ const workspaceItems = [
   {
     id: "years",
     title: "Academic Years",
-    description: "Manage academic years",
+    description: "Define yearly periods",
     icon: (
       <CalendarDays
-        size={20}
+        size={18}
+        strokeWidth={1.75}
         className="shrink-0"
       />
     ),
@@ -38,10 +39,11 @@ const workspaceItems = [
   {
     id: "terms",
     title: "Academic Terms",
-    description: "Manage academic terms",
+    description: "Arrange terms and breaks",
     icon: (
       <Layers3
-        size={20}
+        size={18}
+        strokeWidth={1.75}
         className="shrink-0"
       />
     ),
@@ -49,21 +51,23 @@ const workspaceItems = [
   {
     id: "stages",
     title: "Academic Stages",
-    description: "Manage academic stages",
+    description: "Organize grade levels",
     icon: (
       <GraduationCap
-        size={20}
+        size={18}
+        strokeWidth={1.75}
         className="shrink-0"
       />
     ),
   },
   {
     id: "schedule",
-    title: "School Schedule",
-    description: "Configure school schedule",
+    title: "School Calendar",
+    description: "Set days and lesson timing",
     icon: (
       <Clock
-        size={20}
+        size={18}
+        strokeWidth={1.75}
         className="shrink-0"
       />
     ),
@@ -114,7 +118,7 @@ export function AcademicSettingsPage() {
             id as ActiveSection,
           );
         }}
-        hint="The current academic year is used across the system for attendance, grades and reports."
+        hint="The active academic year connects attendance, grades and reporting across the system."
       >
         {activeSection === "years" ? (
           <AcademicYearsSection
@@ -132,12 +136,10 @@ export function AcademicSettingsPage() {
             academicTerms={
               data.academicTerms
             }
-            currentAcademicYearId={
-              String(
-                data.settings
-                  .currentAcademicYearId,
-              )
-            }
+            currentAcademicYearId={String(
+              data.settings
+                .currentAcademicYearId,
+            )}
           />
         ) : null}
 
@@ -166,29 +168,29 @@ export function AcademicSettingsPage() {
 function AcademicSettingsLoadingState() {
   return (
     <div className="mx-auto w-full max-w-[1500px] space-y-6">
-      <div className="rounded-3xl border border-border/70 bg-card p-6 shadow-soft">
+      <div className="rounded-[26px] border border-border/60 bg-card p-6 shadow-soft">
         <div className="flex items-center gap-4">
-          <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+          <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
             <Loader2
-              size={22}
+              size={20}
               className="animate-spin"
             />
           </span>
 
           <div>
-            <h1 className="text-xl font-bold text-foreground">
-              Loading Academic Settings
+            <h1 className="text-lg font-semibold text-foreground">
+              Preparing academic workspace
             </h1>
 
-            <p className="mt-1 text-sm text-muted-foreground">
-              Fetching academic years, terms,
-              stages and schedule configuration.
+            <p className="mt-1 text-sm font-normal text-muted-foreground">
+              Loading years, terms, stages and
+              calendar information.
             </p>
           </div>
         </div>
 
-        <div className="mt-6 grid gap-4 lg:grid-cols-[280px_minmax(0,1fr)]">
-          <div className="space-y-3 rounded-2xl bg-muted/20 p-4">
+        <div className="mt-6 grid gap-5 lg:grid-cols-[270px_minmax(0,1fr)]">
+          <div className="space-y-3 rounded-[22px] bg-muted/20 p-4">
             {Array.from({
               length: 4,
             }).map((_, index) => (
@@ -199,7 +201,7 @@ function AcademicSettingsLoadingState() {
             ))}
           </div>
 
-          <div className="min-h-[420px] animate-pulse rounded-3xl bg-muted/30" />
+          <div className="min-h-[420px] animate-pulse rounded-[24px] bg-muted/30" />
         </div>
       </div>
     </div>
@@ -215,17 +217,17 @@ function AcademicSettingsErrorState({
 }) {
   return (
     <div className="mx-auto w-full max-w-[1500px]">
-      <div className="rounded-3xl border border-destructive/20 bg-card p-8 shadow-soft">
+      <div className="rounded-[26px] border border-destructive/20 bg-card p-8 shadow-soft">
         <div className="mx-auto max-w-lg text-center">
           <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-destructive/10 text-destructive">
-            <GraduationCap size={26} />
+            <GraduationCap size={25} />
           </span>
 
-          <h1 className="mt-5 text-xl font-bold text-foreground">
-            Failed to load academic settings
+          <h1 className="mt-5 text-xl font-semibold text-foreground">
+            Academic data is unavailable
           </h1>
 
-          <p className="mt-2 text-sm leading-6 text-muted-foreground">
+          <p className="mt-2 text-sm font-normal leading-6 text-muted-foreground">
             The academic configuration could not
             be retrieved. Check the server
             connection and try again.
@@ -235,7 +237,17 @@ function AcademicSettingsErrorState({
             type="button"
             disabled={isRetrying}
             onClick={onRetry}
-            className="mt-5 inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-primary px-6 text-sm font-bold text-primary-foreground shadow-soft transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
+            className={[
+              "mt-5 inline-flex h-11",
+              "items-center justify-center gap-2",
+              "rounded-xl bg-primary px-6",
+              "text-sm font-medium",
+              "text-primary-foreground",
+              "shadow-soft transition",
+              "hover:bg-primary/90",
+              "disabled:cursor-not-allowed",
+              "disabled:opacity-60",
+            ].join(" ")}
           >
             {isRetrying ? (
               <Loader2
@@ -247,8 +259,8 @@ function AcademicSettingsErrorState({
             )}
 
             {isRetrying
-              ? "Trying Again..."
-              : "Try Again"}
+              ? "Trying again..."
+              : "Try again"}
           </button>
         </div>
       </div>

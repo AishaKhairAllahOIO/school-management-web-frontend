@@ -128,6 +128,11 @@ const subNavigationSections: SubNavigationSection[] =
           icon: BookOpen,
         },
         {
+          title: "Financial",
+          path: "/settings/financial",
+          icon: Wallet,
+        },
+        {
           title: "Roles",
           path: "/settings/roles",
           icon: ShieldCheck,
@@ -136,11 +141,6 @@ const subNavigationSections: SubNavigationSection[] =
           title: "Permissions",
           path: "/settings/permissions",
           icon: LockKeyhole,
-        },
-        {
-          title: "Financial",
-          path: "/settings/financial",
-          icon: Wallet,
         },
       ],
     },

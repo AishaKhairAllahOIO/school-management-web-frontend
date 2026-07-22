@@ -1,10 +1,10 @@
 import {
   Box,
   ChevronRight,
-  Download,
+
   LayoutGrid,
   LockKeyhole,
-  Settings,
+  
   Shield,
   Users,
   BookOpen,
@@ -132,23 +132,7 @@ export function PermissionsPage() {
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
-          <button
-            type="button"
-            className="flex h-11 items-center gap-2 rounded-2xl border border-border/70 bg-card px-4 text-sm font-bold text-foreground transition hover:bg-muted"
-          >
-            <Download size={16} />
-            Export
-          </button>
-
-          <button
-            type="button"
-            className="flex h-11 items-center gap-2 rounded-2xl bg-primary px-5 text-sm font-bold text-primary-foreground shadow-soft transition hover:bg-primary/90"
-          >
-            <Settings size={16} />
-            Manage Modules
-          </button>
-        </div>
+        
       </div>
 
       <section className="mb-7 grid gap-4 md:grid-cols-2 xl:grid-cols-4">

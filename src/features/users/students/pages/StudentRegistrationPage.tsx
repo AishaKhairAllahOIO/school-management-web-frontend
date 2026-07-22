@@ -1,11 +1,13 @@
 import {
   type ChangeEvent,
   type FormEvent,
+  useEffect,
   useMemo,
   useState,
 } from "react";
 import {
   Camera,
+  Check,
   GraduationCap,
   Save,
   ShieldCheck,
@@ -19,6 +21,7 @@ import {
   FormField,
   FormSection,
 } from "../components/form/StudentFormPrimitives";
+import { StudentAcademicFields } from "../components/form/StudentAcademicFields";
 import { StudentPageHeader } from "../components/shared/StudentPageHeader";
 import { useRegisterStudent } from "../hooks/useStudents";
 import type {
@@ -43,6 +46,7 @@ type PersonState = {
 type FormState = {
   student: PersonState;
   guardian: PersonState;
+
   enrollment: {
     academic_year_id: string;
     grade_level_id: string;
@@ -67,6 +71,7 @@ const emptyPerson: PersonState = {
 const initialState: FormState = {
   student: { ...emptyPerson },
   guardian: { ...emptyPerson },
+
   enrollment: {
     academic_year_id: "",
     grade_level_id: "",
@@ -76,10 +81,27 @@ const initialState: FormState = {
 
 export function StudentRegistrationPage() {
   const navigate = useNavigate();
-  const registerMutation = useRegisterStudent();
 
-  const [form, setForm] = useState<FormState>(initialState);
-  const [studentPreview, setStudentPreview] = useState<string | null>(null);
+  const registerMutation =
+    useRegisterStudent();
+
+  const [form, setForm] =
+    useState<FormState>(initialState);
+
+  const [
+    studentPreview,
+    setStudentPreview,
+  ] = useState<string | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (studentPreview) {
+        URL.revokeObjectURL(
+          studentPreview,
+        );
+      }
+    };
+  }, [studentPreview]);
 
   const studentCompleted = useMemo(
     () =>
@@ -105,7 +127,8 @@ export function StudentRegistrationPage() {
   const enrollmentCompleted = useMemo(
     () =>
       Boolean(
-        form.enrollment.academic_year_id &&
+        form.enrollment
+          .academic_year_id &&
           form.enrollment.grade_level_id,
       ),
     [form.enrollment],
@@ -113,21 +136,37 @@ export function StudentRegistrationPage() {
 
   function updateStudent(
     key: keyof PersonState,
-    value: string | UserGender | File | null,
+    value:
+      | string
+      | UserGender
+      | File
+      | null,
   ) {
     setForm((current) => ({
       ...current,
-      student: { ...current.student, [key]: value },
+
+      student: {
+        ...current.student,
+        [key]: value,
+      },
     }));
   }
 
   function updateGuardian(
     key: keyof PersonState,
-    value: string | UserGender | File | null,
+    value:
+      | string
+      | UserGender
+      | File
+      | null,
   ) {
     setForm((current) => ({
       ...current,
-      guardian: { ...current.guardian, [key]: value },
+
+      guardian: {
+        ...current.guardian,
+        [key]: value,
+      },
     }));
   }
 
@@ -137,38 +176,70 @@ export function StudentRegistrationPage() {
   ) {
     setForm((current) => ({
       ...current,
-      enrollment: { ...current.enrollment, [key]: value },
+
+      enrollment: {
+        ...current.enrollment,
+        [key]: value,
+      },
     }));
   }
 
   function selectStudentPhoto(
     event: ChangeEvent<HTMLInputElement>,
   ) {
-    const file = event.target.files?.[0] ?? null;
+    const file =
+      event.target.files?.[0] ?? null;
+
     updateStudent("url_photo", file);
 
-    if (studentPreview) {
-      URL.revokeObjectURL(studentPreview);
-    }
+    setStudentPreview((current) => {
+      if (current) {
+        URL.revokeObjectURL(current);
+      }
 
-    setStudentPreview(file ? URL.createObjectURL(file) : null);
+      return file
+        ? URL.createObjectURL(file)
+        : null;
+    });
   }
 
-  async function submit(event: FormEvent) {
+  async function submit(
+    event: FormEvent,
+  ) {
     event.preventDefault();
 
-    const payload: RegisterStudentPayload = {
-      student: { ...form.student },
-      guardian: { ...form.guardian },
-      enrollment: {
-        academic_year_id: form.enrollment.academic_year_id,
-        grade_level_id: form.enrollment.grade_level_id,
-        class_room_id: form.enrollment.class_room_id || null,
-      },
-    };
+    const payload: RegisterStudentPayload =
+      {
+        student: {
+          ...form.student,
+        },
 
-    const result = await registerMutation.mutateAsync(payload);
-    const enrollmentId = result.enrollment?.id;
+        guardian: {
+          ...form.guardian,
+        },
+
+        enrollment: {
+          academic_year_id:
+            form.enrollment
+              .academic_year_id,
+
+          grade_level_id:
+            form.enrollment
+              .grade_level_id,
+
+          class_room_id:
+            form.enrollment
+              .class_room_id || null,
+        },
+      };
+
+    const result =
+      await registerMutation.mutateAsync(
+        payload,
+      );
+
+    const enrollmentId =
+      result.enrollment?.id;
 
     navigate(
       enrollmentId
@@ -185,45 +256,68 @@ export function StudentRegistrationPage() {
       >
         <StudentPageHeader
           title="Add student"
-          description="Create the student, guardian, and academic enrollment in one connected workflow."
+          description="Create a student profile, connect a guardian and choose the academic placement."
           showBackButton
-          icon={<UserPlus className="h-7 w-7" />}
+          icon={
+            <UserPlus
+              size={23}
+              strokeWidth={1.7}
+            />
+          }
           actions={
             <>
               <button
                 type="button"
-                onClick={() => navigate("/users/students")}
-                className="inline-flex h-11 items-center rounded-2xl border border-border bg-card px-5 text-sm font-bold text-foreground transition hover:bg-secondary"
+                onClick={() =>
+                  navigate(
+                    "/users/students",
+                  )
+                }
+                className="inline-flex h-11 items-center rounded-xl border border-border/70 bg-card px-5 text-sm font-medium text-foreground transition hover:bg-muted/40"
               >
                 Cancel
               </button>
+
               <button
                 type="submit"
-                disabled={registerMutation.isPending}
-                className="primary-gradient inline-flex h-11 items-center gap-2 rounded-2xl px-5 text-sm font-bold text-primary-foreground shadow-[var(--shadow-auth-button)] disabled:opacity-60"
+                disabled={
+                  registerMutation.isPending
+                }
+                className="inline-flex h-11 items-center gap-2 rounded-xl bg-primary px-5 text-sm font-medium text-primary-foreground shadow-sm transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {registerMutation.isPending ? (
                   <span className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent" />
                 ) : (
-                  <Save className="h-4 w-4" />
+                  <Save
+                    size={16}
+                    strokeWidth={1.8}
+                  />
                 )}
+
                 Create student
               </button>
             </>
           }
         />
 
-        <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_340px]">
+        <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_320px]">
           <div className="space-y-6">
             <FormSection
-              eyebrow="Step 1"
+              eyebrow="Profile image"
               title="Student photo"
-              description="Use a clear portrait that will appear on cards and the profile page."
-              icon={<Camera className="h-5 w-5" />}
-              completed={Boolean(form.student.url_photo)}
+              description="Add a clear portrait for the student directory and profile."
+              icon={
+                <Camera
+                  size={18}
+                  strokeWidth={1.7}
+                />
+              }
+              completed={Boolean(
+                form.student.url_photo,
+              )}
             >
               <div className="flex flex-col items-center gap-5 sm:flex-row">
-                <div className="soft-purple-gradient flex h-44 w-36 shrink-0 items-center justify-center overflow-hidden rounded-[28px] border border-primary/15">
+                <div className="flex h-44 w-36 shrink-0 items-center justify-center overflow-hidden rounded-[20px] border border-border/60 bg-primary/[0.035]">
                   {studentPreview ? (
                     <img
                       src={studentPreview}
@@ -231,136 +325,197 @@ export function StudentRegistrationPage() {
                       className="h-full w-full object-cover"
                     />
                   ) : (
-                    <Camera className="h-10 w-10 text-primary" />
+                    <Camera
+                      size={35}
+                      strokeWidth={1.4}
+                      className="text-primary"
+                    />
                   )}
                 </div>
 
                 <div>
-                  <label className="primary-gradient inline-flex h-11 cursor-pointer items-center gap-2 rounded-2xl px-5 text-sm font-bold text-primary-foreground">
-                    <Camera className="h-4 w-4" />
+                  <label className="inline-flex h-11 cursor-pointer items-center gap-2 rounded-xl border border-primary/20 bg-primary/[0.06] px-5 text-sm font-medium text-primary transition hover:bg-primary/[0.1]">
+                    <Camera
+                      size={16}
+                      strokeWidth={1.8}
+                    />
+
                     Choose photo
+
                     <input
                       type="file"
                       accept="image/*"
                       className="hidden"
-                      onChange={selectStudentPhoto}
+                      onChange={
+                        selectStudentPhoto
+                      }
                     />
                   </label>
-                  <p className="mt-3 text-sm font-medium text-muted-foreground">
-                    Recommended: portrait image, JPG or PNG.
+
+                  <p className="mt-3 text-xs font-normal leading-5 text-muted-foreground">
+                    Use a portrait JPG or PNG
+                    image with a clear face.
                   </p>
                 </div>
               </div>
             </FormSection>
 
             <PersonFormSection
-              eyebrow="Step 2"
-              title="Student information"
-              description="Personal, identity, and contact details for the student."
-              icon={<UserPlus className="h-5 w-5" />}
+              eyebrow="Student details"
+              title="Personal information"
+              description="Identity, birth and contact details for the student."
+              icon={
+                <UserPlus
+                  size={18}
+                  strokeWidth={1.7}
+                />
+              }
               value={form.student}
               completed={studentCompleted}
               onChange={updateStudent}
             />
 
             <PersonFormSection
-              eyebrow="Step 3"
+              eyebrow="Family contact"
               title="Guardian information"
-              description="The primary guardian responsible for the student."
-              icon={<UsersRound className="h-5 w-5" />}
+              description="Information for the guardian responsible for this student."
+              icon={
+                <UsersRound
+                  size={18}
+                  strokeWidth={1.7}
+                />
+              }
               value={form.guardian}
-              completed={guardianCompleted}
+              completed={
+                guardianCompleted
+              }
               onChange={updateGuardian}
             />
 
             <FormSection
-              eyebrow="Step 4"
-              title="Academic enrollment"
-              description="Assign the academic year, grade, and optional classroom."
-              icon={<GraduationCap className="h-5 w-5" />}
-              completed={enrollmentCompleted}
+              eyebrow="Academic placement"
+              title="Enrollment"
+              description="Choose the academic year, grade and optional classroom."
+              icon={
+                <GraduationCap
+                  size={18}
+                  strokeWidth={1.7}
+                />
+              }
+              completed={
+                enrollmentCompleted
+              }
             >
-              <div className="grid gap-4 md:grid-cols-3">
-                <FormField label="Academic year ID" required>
-                  <input
-                    required
-                    value={form.enrollment.academic_year_id}
-                    onChange={(event) =>
-                      updateEnrollment(
-                        "academic_year_id",
-                        event.target.value,
-                      )
-                    }
-                    className={fieldClassName}
-                    placeholder="Academic year"
-                  />
-                </FormField>
+              <StudentAcademicFields
+                academicYearId={
+                  form.enrollment
+                    .academic_year_id
+                }
+                gradeId={
+                  form.enrollment
+                    .grade_level_id
+                }
+                classroomId={
+                  form.enrollment
+                    .class_room_id
+                }
+                onAcademicYearChange={(
+                  value,
+                ) => {
+                  setForm((current) => ({
+                    ...current,
 
-                <FormField label="Grade level ID" required>
-                  <input
-                    required
-                    value={form.enrollment.grade_level_id}
-                    onChange={(event) =>
-                      updateEnrollment(
-                        "grade_level_id",
-                        event.target.value,
-                      )
-                    }
-                    className={fieldClassName}
-                    placeholder="Grade level"
-                  />
-                </FormField>
+                    enrollment: {
+                      ...current.enrollment,
+                      academic_year_id:
+                        value,
+                      class_room_id: "",
+                    },
+                  }));
+                }}
+                onGradeChange={(value) => {
+                  setForm((current) => ({
+                    ...current,
 
-                <FormField label="Classroom ID">
-                  <input
-                    value={form.enrollment.class_room_id}
-                    onChange={(event) =>
-                      updateEnrollment(
-                        "class_room_id",
-                        event.target.value,
-                      )
-                    }
-                    className={fieldClassName}
-                    placeholder="Optional classroom"
-                  />
-                </FormField>
-              </div>
+                    enrollment: {
+                      ...current.enrollment,
+                      grade_level_id:
+                        value,
+                      class_room_id: "",
+                    },
+                  }));
+                }}
+                onClassroomChange={(
+                  value,
+                ) =>
+                  updateEnrollment(
+                    "class_room_id",
+                    value,
+                  )
+                }
+              />
             </FormSection>
           </div>
 
-          <aside className="xl:sticky xl:top-5 xl:self-start">
-            <section className="primary-gradient overflow-hidden rounded-[32px] p-6 text-primary-foreground shadow-[var(--shadow-floating)]">
-              <ShieldCheck className="h-9 w-9" />
-              <h2 className="mt-5 text-2xl font-black">
-                Review before saving
-              </h2>
-              <p className="mt-2 text-sm font-medium leading-6 text-primary-foreground/80">
-                One submission creates the student, guardian, and enrollment together.
-              </p>
+          <aside className="xl:sticky xl:top-5">
+            <section className="overflow-hidden rounded-[24px] border border-primary/15 bg-card shadow-[0_16px_45px_rgba(30,20,70,0.08)]">
+              <div className="border-b border-border/50 bg-primary/[0.055] p-5">
+                <span className="flex h-10 w-10 items-center justify-center rounded-[14px] bg-primary/10 text-primary">
+                  <ShieldCheck
+                    size={19}
+                    strokeWidth={1.7}
+                  />
+                </span>
 
-              <div className="mt-6 space-y-3">
-                <ReviewRow
-                  label="Student information"
-                  completed={studentCompleted}
-                />
-                <ReviewRow
-                  label="Guardian information"
-                  completed={guardianCompleted}
-                />
-                <ReviewRow
-                  label="Academic enrollment"
-                  completed={enrollmentCompleted}
-                />
+                <h2 className="mt-4 text-lg font-semibold text-foreground">
+                  Ready to create?
+                </h2>
+
+                <p className="mt-1 text-xs font-normal leading-5 text-muted-foreground">
+                  Review the required sections
+                  before submitting the record.
+                </p>
               </div>
 
-              <button
-                type="submit"
-                disabled={registerMutation.isPending}
-                className="mt-7 inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-card px-5 text-sm font-black text-primary shadow-lg transition hover:-translate-y-0.5 disabled:opacity-60"
-              >
-                <Save className="h-4 w-4" />
-                Create student
-              </button>
+              <div className="space-y-2.5 p-5">
+                <ReviewRow
+                  label="Student details"
+                  completed={
+                    studentCompleted
+                  }
+                />
+
+                <ReviewRow
+                  label="Guardian contact"
+                  completed={
+                    guardianCompleted
+                  }
+                />
+
+                <ReviewRow
+                  label="Academic placement"
+                  completed={
+                    enrollmentCompleted
+                  }
+                />
+
+                <button
+                  type="submit"
+                  disabled={
+                    registerMutation.isPending
+                  }
+                  className="mt-3 inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-primary px-5 text-sm font-medium text-primary-foreground shadow-sm transition hover:bg-primary/90 disabled:opacity-60"
+                >
+                  <Save
+                    size={16}
+                    strokeWidth={1.8}
+                  />
+
+                  {registerMutation.isPending
+                    ? "Creating..."
+                    : "Create student"}
+                </button>
+              </div>
             </section>
           </aside>
         </div>
@@ -376,9 +531,14 @@ type PersonFormSectionProps = {
   icon: React.ReactNode;
   value: PersonState;
   completed: boolean;
+
   onChange: (
     key: keyof PersonState,
-    value: string | UserGender | File | null,
+    value:
+      | string
+      | UserGender
+      | File
+      | null,
   ) => void;
 };
 
@@ -400,118 +560,182 @@ function PersonFormSection({
       completed={completed}
     >
       <div className="grid gap-4 md:grid-cols-2">
-        <FormField label="First name" required>
+        <FormField
+          label="First name"
+          required
+        >
           <input
             required
             value={value.first_name}
             onChange={(event) =>
-              onChange("first_name", event.target.value)
+              onChange(
+                "first_name",
+                event.target.value,
+              )
             }
             className={fieldClassName}
           />
         </FormField>
 
-        <FormField label="Last name" required>
+        <FormField
+          label="Last name"
+          required
+        >
           <input
             required
             value={value.last_name}
             onChange={(event) =>
-              onChange("last_name", event.target.value)
+              onChange(
+                "last_name",
+                event.target.value,
+              )
             }
             className={fieldClassName}
           />
         </FormField>
 
-        <FormField label="Father name" required>
+        <FormField
+          label="Father name"
+          required
+        >
           <input
             required
             value={value.father_name}
             onChange={(event) =>
-              onChange("father_name", event.target.value)
+              onChange(
+                "father_name",
+                event.target.value,
+              )
             }
             className={fieldClassName}
           />
         </FormField>
 
-        <FormField label="Mother name" required>
+        <FormField
+          label="Mother name"
+          required
+        >
           <input
             required
             value={value.mother_name}
             onChange={(event) =>
-              onChange("mother_name", event.target.value)
+              onChange(
+                "mother_name",
+                event.target.value,
+              )
             }
             className={fieldClassName}
           />
         </FormField>
 
-        <FormField label="Birth date" required>
+        <FormField
+          label="Birth date"
+          required
+        >
           <input
             required
             type="date"
             value={value.birth_date}
             onChange={(event) =>
-              onChange("birth_date", event.target.value)
+              onChange(
+                "birth_date",
+                event.target.value,
+              )
             }
             className={fieldClassName}
           />
         </FormField>
 
-        <FormField label="Birth place" required>
+        <FormField
+          label="Birth place"
+          required
+        >
           <input
             required
             value={value.birth_place}
             onChange={(event) =>
-              onChange("birth_place", event.target.value)
+              onChange(
+                "birth_place",
+                event.target.value,
+              )
             }
             className={fieldClassName}
           />
         </FormField>
 
-        <FormField label="Gender" required>
+        <FormField
+          label="Gender"
+          required
+        >
           <select
             value={value.gender}
             onChange={(event) =>
               onChange(
                 "gender",
-                event.target.value as UserGender,
+                event.target
+                  .value as UserGender,
               )
             }
             className={fieldClassName}
           >
-            <option value="male">Male</option>
-            <option value="female">Female</option>
+            <option value="male">
+              Male
+            </option>
+
+            <option value="female">
+              Female
+            </option>
           </select>
         </FormField>
 
-        <FormField label="Nationality" required>
+        <FormField
+          label="Nationality"
+          required
+        >
           <input
             required
             value={value.nationality}
             onChange={(event) =>
-              onChange("nationality", event.target.value)
+              onChange(
+                "nationality",
+                event.target.value,
+              )
             }
             className={fieldClassName}
           />
         </FormField>
 
-        <FormField label="Phone number" required>
+        <FormField
+          label="Phone number"
+          required
+        >
           <input
             required
             dir="ltr"
             value={value.phone_number}
             onChange={(event) =>
-              onChange("phone_number", event.target.value)
+              onChange(
+                "phone_number",
+                event.target.value,
+              )
             }
             className={fieldClassName}
           />
         </FormField>
 
-        <FormField label="Address" required className="md:col-span-2">
+        <FormField
+          label="Address"
+          required
+          className="md:col-span-2"
+        >
           <textarea
             required
             value={value.address}
             onChange={(event) =>
-              onChange("address", event.target.value)
+              onChange(
+                "address",
+                event.target.value,
+              )
             }
             className={`${fieldClassName} min-h-28 resize-y py-3`}
           />
@@ -529,17 +753,31 @@ function ReviewRow({
   completed: boolean;
 }) {
   return (
-    <div className="flex items-center justify-between rounded-2xl bg-card/10 px-4 py-3 text-sm font-bold">
-      <span>{label}</span>
+    <div className="flex items-center justify-between rounded-[14px] bg-muted/[0.25] px-3.5 py-3">
+      <span className="text-xs font-medium text-foreground">
+        {label}
+      </span>
+
       <span
         className={[
-          "rounded-full px-2.5 py-1 text-[10px] uppercase tracking-[0.08em]",
+          "inline-flex items-center gap-1.5",
+          "rounded-full px-2.5 py-1",
+          "text-[10px] font-medium",
           completed
-            ? "bg-card text-primary"
-            : "bg-primary-foreground/10 text-primary-foreground/70",
+            ? "bg-emerald-500/[0.09] text-emerald-600"
+            : "bg-muted text-muted-foreground",
         ].join(" ")}
       >
-        {completed ? "Ready" : "Incomplete"}
+        {completed ? (
+          <Check
+            size={11}
+            strokeWidth={2}
+          />
+        ) : null}
+
+        {completed
+          ? "Ready"
+          : "Incomplete"}
       </span>
     </div>
   );

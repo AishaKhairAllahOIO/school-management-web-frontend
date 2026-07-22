@@ -9,25 +9,53 @@ type Props = {
   children?: ReactNode;
 };
 
-export function SectionHeader({ title, description, actionLabel, onAction, children }: Props) {
+export function SectionHeader({
+  title,
+  description,
+  actionLabel,
+  onAction,
+  children,
+}: Props) {
   return (
-    <div className="mb-6 flex items-start justify-between gap-4">
-      <div>
-        <h2 className="text-2xl font-black tracking-[-0.04em] text-slate-900">{title}</h2>
-        <p className="mt-1 text-sm font-medium text-slate-500">{description}</p>
+    <div className="mb-6 flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
+      <div className="min-w-0">
+        <h2 className="text-[22px] font-semibold tracking-[-0.025em] text-foreground">
+          {title}
+        </h2>
+
+        <p className="mt-1.5 max-w-2xl text-[13px] font-normal leading-5 text-muted-foreground">
+          {description}
+        </p>
+
         {children}
       </div>
 
-      {actionLabel && onAction && (
+      {actionLabel && onAction ? (
         <button
           type="button"
           onClick={onAction}
-          className="flex h-11 shrink-0 items-center gap-2 rounded-xl border border-indigo-200 bg-white px-4 text-sm font-black text-primary transition hover:bg-indigo-50"
+          className={[
+            "inline-flex h-11 shrink-0",
+            "items-center justify-center gap-2",
+            "rounded-[14px] border",
+            "border-primary/25 bg-card px-4",
+            "text-[13px] font-medium text-primary",
+            "transition-all duration-200",
+            "hover:border-primary/40",
+            "hover:bg-primary/[0.055]",
+            "focus-visible:outline-none",
+            "focus-visible:ring-4",
+            "focus-visible:ring-primary/10",
+          ].join(" ")}
         >
-          <Plus size={16} />
+          <Plus
+            size={16}
+            strokeWidth={1.8}
+          />
+
           {actionLabel}
         </button>
-      )}
+      ) : null}
     </div>
   );
 }

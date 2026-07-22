@@ -7,6 +7,7 @@ import {
   MapPin,
   Pencil,
   Phone,
+  RefreshCw,
   ShieldCheck,
   UserRound,
   UsersRound,
@@ -23,18 +24,23 @@ import { StudentPageHeader } from "../components/shared/StudentPageHeader";
 import { StudentStatusBadge } from "../components/shared/StudentStatusBadge";
 import { useStudentFullProfile } from "../hooks/useStudents";
 import type {
-  ApiId,
-} from "../../shared/types/api.types";
-import type {
   NamedEntity,
   StudentEnrollment,
 } from "../types/student.types";
 
 function displayValue(
-  value: string | number | null | undefined,
+  value:
+    | string
+    | number
+    | null
+    | undefined,
   fallback = "Not specified",
 ) {
-  if (value === null || value === undefined || value === "") {
+  if (
+    value === null ||
+    value === undefined ||
+    value === ""
+  ) {
     return fallback;
   }
 
@@ -43,18 +49,8 @@ function displayValue(
 
 function referenceValue(
   reference: NamedEntity | null | undefined,
-  id: ApiId | null | undefined,
-  fallback: string,
 ) {
-  if (reference?.name) {
-    return reference.name;
-  }
-
-  if (id !== null && id !== undefined && id !== "") {
-    return `${fallback} #${id}`;
-  }
-
-  return "Not assigned";
+  return reference?.name ?? "Not assigned";
 }
 
 function enrollmentDateValue(
@@ -68,9 +64,11 @@ function enrollmentDateValue(
 
 export function StudentProfilePage() {
   const navigate = useNavigate();
-  const { enrollmentId } = useParams<{
-    enrollmentId: string;
-  }>();
+
+  const { enrollmentId } =
+    useParams<{
+      enrollmentId: string;
+    }>();
 
   const profileQuery =
     useStudentFullProfile(enrollmentId);
@@ -80,7 +78,9 @@ export function StudentProfilePage() {
       <ProfileErrorState
         title="Invalid student profile"
         description="The enrollment identifier is missing from the page URL."
-        onBack={() => navigate("/users/students")}
+        onBack={() =>
+          navigate("/users/students")
+        }
       />
     );
   }
@@ -97,8 +97,12 @@ export function StudentProfilePage() {
       <ProfileErrorState
         title="Student profile could not be loaded"
         description="The enrollment may not exist, or your account may not have permission to view it."
-        onBack={() => navigate("/users/students")}
-        onRetry={() => void profileQuery.refetch()}
+        onBack={() =>
+          navigate("/users/students")
+        }
+        onRetry={() =>
+          void profileQuery.refetch()
+        }
       />
     );
   }
@@ -114,9 +118,14 @@ export function StudentProfilePage() {
       <div className="mx-auto flex max-w-[1450px] flex-col gap-6">
         <StudentPageHeader
           title="Student profile"
-          description="Review the student's personal information, guardian details, academic placement, and account state."
+          description="Review personal information, guardian details and the current academic placement."
           showBackButton
-          icon={<UserRound className="h-7 w-7" />}
+          icon={
+            <UserRound
+              size={23}
+              strokeWidth={1.7}
+            />
+          }
           actions={
             <button
               type="button"
@@ -125,9 +134,23 @@ export function StudentProfilePage() {
                   `/users/students/${enrollmentId}/edit`,
                 )
               }
-              className="primary-gradient inline-flex h-11 items-center gap-2 rounded-2xl px-5 text-sm font-bold text-primary-foreground shadow-[var(--shadow-auth-button)] transition hover:-translate-y-0.5"
+              className={[
+                "inline-flex h-11 items-center gap-2",
+                "rounded-xl bg-primary px-5",
+                "text-sm font-medium",
+                "text-primary-foreground",
+                "shadow-sm transition",
+                "hover:bg-primary/90",
+                "focus-visible:outline-none",
+                "focus-visible:ring-4",
+                "focus-visible:ring-primary/10",
+              ].join(" ")}
             >
-              <Pencil className="h-4 w-4" />
+              <Pencil
+                size={16}
+                strokeWidth={1.8}
+              />
+
               Edit profile
             </button>
           }
@@ -138,75 +161,148 @@ export function StudentProfilePage() {
           enrollment={enrollment}
         />
 
-        <div className="grid gap-6 xl:grid-cols-[1.15fr_.85fr]">
+        <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1.15fr)_minmax(340px,.85fr)]">
           <StudentProfileSection
             title="Student information"
-            description="Identity and contact information"
-            icon={<UserRound className="h-5 w-5" />}
+            description="Identity, birth and contact information."
+            icon={
+              <UserRound
+                size={18}
+                strokeWidth={1.7}
+              />
+            }
           >
             <div className="grid gap-3 sm:grid-cols-2">
               <ProfileInfoCard
-                icon={<UserRound className="h-5 w-5" />}
+                icon={
+                  <UserRound
+                    size={18}
+                    strokeWidth={1.7}
+                  />
+                }
                 label="Full name"
                 value={student.fullName}
               />
 
               <ProfileInfoCard
-                icon={<IdCard className="h-5 w-5" />}
-                label="Student ID"
-                value={displayValue(student.id)}
+                icon={
+                  <IdCard
+                    size={18}
+                    strokeWidth={1.7}
+                  />
+                }
+                label="Student reference"
+                value={displayValue(
+                  student.id,
+                )}
               />
 
               <ProfileInfoCard
-                icon={<UsersRound className="h-5 w-5" />}
+                icon={
+                  <UsersRound
+                    size={18}
+                    strokeWidth={1.7}
+                  />
+                }
                 label="Father name"
-                value={displayValue(student.fatherName)}
+                value={displayValue(
+                  student.fatherName,
+                )}
               />
 
               <ProfileInfoCard
-                icon={<UsersRound className="h-5 w-5" />}
+                icon={
+                  <UsersRound
+                    size={18}
+                    strokeWidth={1.7}
+                  />
+                }
                 label="Mother name"
-                value={displayValue(student.motherName)}
+                value={displayValue(
+                  student.motherName,
+                )}
               />
 
               <ProfileInfoCard
-                icon={<CalendarDays className="h-5 w-5" />}
+                icon={
+                  <CalendarDays
+                    size={18}
+                    strokeWidth={1.7}
+                  />
+                }
                 label="Birth date"
-                value={displayValue(student.birthDate)}
+                value={displayValue(
+                  student.birthDate,
+                )}
               />
 
               <ProfileInfoCard
-                icon={<MapPin className="h-5 w-5" />}
+                icon={
+                  <MapPin
+                    size={18}
+                    strokeWidth={1.7}
+                  />
+                }
                 label="Birth place"
-                value={displayValue(student.birthPlace)}
+                value={displayValue(
+                  student.birthPlace,
+                )}
               />
 
               <ProfileInfoCard
-                icon={<IdCard className="h-5 w-5" />}
+                icon={
+                  <IdCard
+                    size={18}
+                    strokeWidth={1.7}
+                  />
+                }
                 label="Gender"
-                value={displayValue(student.gender)}
+                value={displayValue(
+                  student.gender,
+                )}
               />
 
               <ProfileInfoCard
-                icon={<IdCard className="h-5 w-5" />}
+                icon={
+                  <IdCard
+                    size={18}
+                    strokeWidth={1.7}
+                  />
+                }
                 label="Nationality"
-                value={displayValue(student.nationality)}
+                value={displayValue(
+                  student.nationality,
+                )}
               />
 
               <ProfileInfoCard
-                icon={<Phone className="h-5 w-5" />}
+                icon={
+                  <Phone
+                    size={18}
+                    strokeWidth={1.7}
+                  />
+                }
                 label="Phone number"
                 value={
                   <span dir="ltr">
-                    {displayValue(student.phoneNumber)}
+                    {displayValue(
+                      student.phoneNumber,
+                    )}
                   </span>
                 }
               />
 
               <ProfileInfoCard
-                icon={<Home className="h-5 w-5" />}
+                icon={
+                  <Home
+                    size={18}
+                    strokeWidth={1.7}
+                  />
+                }
                 label="Address"
-                value={displayValue(student.address)}
+                value={displayValue(
+                  student.address,
+                )}
                 className="sm:col-span-2"
               />
             </div>
@@ -214,25 +310,34 @@ export function StudentProfilePage() {
 
           <StudentProfileSection
             title="Guardian information"
-            description="Primary family contact"
-            icon={<UsersRound className="h-5 w-5" />}
+            description="Primary family and emergency contact."
+            icon={
+              <UsersRound
+                size={18}
+                strokeWidth={1.7}
+              />
+            }
           >
             {guardian ? (
               <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
                 <ProfileInfoCard
-                  icon={<UsersRound className="h-5 w-5" />}
+                  icon={
+                    <UsersRound
+                      size={18}
+                      strokeWidth={1.7}
+                    />
+                  }
                   label="Full name"
                   value={guardian.fullName}
                 />
 
                 <ProfileInfoCard
-                  icon={<IdCard className="h-5 w-5" />}
-                  label="Guardian ID"
-                  value={displayValue(guardian.id)}
-                />
-
-                <ProfileInfoCard
-                  icon={<Phone className="h-5 w-5" />}
+                  icon={
+                    <Phone
+                      size={18}
+                      strokeWidth={1.7}
+                    />
+                  }
                   label="Phone number"
                   value={
                     <span dir="ltr">
@@ -244,7 +349,12 @@ export function StudentProfilePage() {
                 />
 
                 <ProfileInfoCard
-                  icon={<MapPin className="h-5 w-5" />}
+                  icon={
+                    <MapPin
+                      size={18}
+                      strokeWidth={1.7}
+                    />
+                  }
                   label="Birth place"
                   value={displayValue(
                     guardian.birthPlace,
@@ -252,7 +362,12 @@ export function StudentProfilePage() {
                 />
 
                 <ProfileInfoCard
-                  icon={<Home className="h-5 w-5" />}
+                  icon={
+                    <Home
+                      size={18}
+                      strokeWidth={1.7}
+                    />
+                  }
                   label="Address"
                   value={displayValue(
                     guardian.address,
@@ -260,9 +375,21 @@ export function StudentProfilePage() {
                 />
               </div>
             ) : (
-              <div className="rounded-[24px] border border-dashed border-warning/30 bg-warning/10 p-6">
-                <p className="font-bold text-warning">
-                  No guardian is linked to this student.
+              <div className="rounded-[18px] border border-dashed border-amber-500/25 bg-amber-500/[0.045] p-6 text-center">
+                <span className="mx-auto flex h-11 w-11 items-center justify-center rounded-[14px] bg-amber-500/[0.1] text-amber-600">
+                  <UsersRound
+                    size={20}
+                    strokeWidth={1.7}
+                  />
+                </span>
+
+                <p className="mt-4 text-sm font-medium text-foreground">
+                  No guardian linked
+                </p>
+
+                <p className="mt-1 text-xs font-normal leading-5 text-muted-foreground">
+                  This student does not currently
+                  have a guardian record.
                 </p>
               </div>
             )}
@@ -271,54 +398,74 @@ export function StudentProfilePage() {
 
         <StudentProfileSection
           title="Academic enrollment"
-          description="Current academic placement and enrollment record"
-          icon={<GraduationCap className="h-5 w-5" />}
+          description="Current academic year, grade, classroom and enrollment state."
+          icon={
+            <GraduationCap
+              size={18}
+              strokeWidth={1.7}
+            />
+          }
         >
           <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
             <ProfileInfoCard
-              icon={<IdCard className="h-5 w-5" />}
-              label="Enrollment ID"
-              value={displayValue(enrollment.id)}
-            />
-
-            <ProfileInfoCard
-              icon={<CalendarDays className="h-5 w-5" />}
+              icon={
+                <CalendarDays
+                  size={18}
+                  strokeWidth={1.7}
+                />
+              }
               label="Academic year"
               value={referenceValue(
                 enrollment.academicYear,
-                enrollment.academicYearId,
-                "Academic year",
               )}
             />
 
             <ProfileInfoCard
-              icon={<BookOpen className="h-5 w-5" />}
+              icon={
+                <BookOpen
+                  size={18}
+                  strokeWidth={1.7}
+                />
+              }
               label="Grade"
               value={referenceValue(
                 enrollment.grade,
-                enrollment.gradeId,
-                "Grade",
               )}
             />
 
             <ProfileInfoCard
-              icon={<GraduationCap className="h-5 w-5" />}
+              icon={
+                <GraduationCap
+                  size={18}
+                  strokeWidth={1.7}
+                />
+              }
               label="Classroom"
               value={referenceValue(
                 enrollment.classroom,
-                enrollment.classroomId,
-                "Classroom",
               )}
             />
 
             <ProfileInfoCard
-              icon={<CalendarDays className="h-5 w-5" />}
+              icon={
+                <CalendarDays
+                  size={18}
+                  strokeWidth={1.7}
+                />
+              }
               label="Enrollment date"
-              value={enrollmentDateValue(enrollment)}
+              value={enrollmentDateValue(
+                enrollment,
+              )}
             />
 
             <ProfileInfoCard
-              icon={<CalendarDays className="h-5 w-5" />}
+              icon={
+                <CalendarDays
+                  size={18}
+                  strokeWidth={1.7}
+                />
+              }
               label="Completed at"
               value={displayValue(
                 enrollment.completedAt,
@@ -327,7 +474,12 @@ export function StudentProfilePage() {
             />
 
             <ProfileInfoCard
-              icon={<ShieldCheck className="h-5 w-5" />}
+              icon={
+                <ShieldCheck
+                  size={18}
+                  strokeWidth={1.7}
+                />
+              }
               label="Record state"
               value={
                 enrollment.isDeleted
@@ -339,37 +491,77 @@ export function StudentProfilePage() {
         </StudentProfileSection>
 
         <section className="grid gap-4 sm:grid-cols-2">
-          <article className="rounded-[28px] border border-border/70 bg-card p-5 shadow-[var(--shadow-card)]">
-            <div className="flex items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-[18px] bg-primary/10 text-primary">
-                <ShieldCheck className="h-5 w-5" />
-              </div>
+          <StatusSummaryCard
+            icon={
+              <ShieldCheck
+                size={19}
+                strokeWidth={1.7}
+              />
+            }
+            label="Account status"
+          >
+            <span className="text-lg font-semibold capitalize text-foreground">
+              {displayValue(
+                student.accountStatus,
+              )}
+            </span>
+          </StatusSummaryCard>
 
-              <div>
-                <p className="text-xs font-black uppercase tracking-[0.1em] text-muted-foreground">
-                  Account status
-                </p>
-                <p className="mt-1 text-lg font-black capitalize text-foreground">
-                  {displayValue(
-                    student.accountStatus,
-                  )}
-                </p>
-              </div>
-            </div>
-          </article>
-
-          <article className="rounded-[28px] border border-border/70 bg-card p-5 shadow-[var(--shadow-card)]">
-            <p className="mb-3 text-xs font-black uppercase tracking-[0.1em] text-muted-foreground">
-              Enrollment status
-            </p>
-
+          <StatusSummaryCard
+            icon={
+              <GraduationCap
+                size={19}
+                strokeWidth={1.7}
+              />
+            }
+            label="Enrollment status"
+          >
             <StudentStatusBadge
-              status={enrollment.enrollmentStatus}
+              status={
+                enrollment.enrollmentStatus
+              }
             />
-          </article>
+          </StatusSummaryCard>
         </section>
       </div>
     </main>
+  );
+}
+
+function StatusSummaryCard({
+  icon,
+  label,
+  children,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <article
+      className={[
+        "rounded-[20px]",
+        "border border-border/60",
+        "bg-card p-5",
+        "shadow-[0_10px_30px_rgba(30,20,70,0.045)]",
+      ].join(" ")}
+    >
+      <div className="flex items-center gap-3">
+        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px] bg-primary/[0.07] text-primary">
+          {icon}
+        </span>
+
+        <div>
+          <p className="text-[10px] font-medium uppercase tracking-[0.12em] text-muted-foreground">
+            {label}
+          </p>
+
+          <div className="mt-1.5">
+            {children}
+          </div>
+        </div>
+      </div>
+    </article>
   );
 }
 
@@ -377,12 +569,14 @@ function StudentProfileSkeleton() {
   return (
     <main className="min-h-screen bg-background px-4 py-5 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-[1450px] space-y-6">
-        <div className="h-36 animate-pulse rounded-[34px] bg-muted" />
-        <div className="h-[390px] animate-pulse rounded-[34px] bg-muted" />
+        <div className="h-28 animate-pulse rounded-[22px] bg-muted/60" />
 
-        <div className="grid gap-6 xl:grid-cols-2">
-          <div className="h-96 animate-pulse rounded-[30px] bg-muted" />
-          <div className="h-96 animate-pulse rounded-[30px] bg-muted" />
+        <div className="h-[360px] animate-pulse rounded-[24px] bg-muted/55" />
+
+        <div className="grid gap-6 xl:grid-cols-[1.15fr_.85fr]">
+          <div className="h-96 animate-pulse rounded-[24px] bg-muted/50" />
+
+          <div className="h-96 animate-pulse rounded-[24px] bg-muted/50" />
         </div>
       </div>
     </main>
@@ -404,16 +598,19 @@ function ProfileErrorState({
 }: ProfileErrorStateProps) {
   return (
     <main className="flex min-h-screen items-center justify-center bg-background px-4 py-10">
-      <section className="soft-purple-gradient w-full max-w-lg rounded-[34px] border border-destructive/20 p-8 text-center shadow-[var(--shadow-floating)]">
-        <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-[26px] bg-destructive/10 text-destructive">
-          <UserRound className="h-9 w-9" />
-        </div>
+      <section className="w-full max-w-md rounded-[24px] border border-destructive/15 bg-card p-8 text-center shadow-[0_18px_55px_rgba(30,20,70,0.08)]">
+        <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-[18px] bg-destructive/[0.08] text-destructive">
+          <UserRound
+            size={26}
+            strokeWidth={1.7}
+          />
+        </span>
 
-        <h1 className="mt-5 text-2xl font-black text-foreground">
+        <h1 className="mt-5 text-xl font-semibold text-foreground">
           {title}
         </h1>
 
-        <p className="mt-3 text-sm font-medium leading-6 text-muted-foreground">
+        <p className="mt-2 text-sm font-normal leading-6 text-muted-foreground">
           {description}
         </p>
 
@@ -421,7 +618,7 @@ function ProfileErrorState({
           <button
             type="button"
             onClick={onBack}
-            className="inline-flex h-11 items-center justify-center rounded-2xl border border-border bg-card px-5 text-sm font-bold text-foreground hover:bg-secondary"
+            className="inline-flex h-11 items-center justify-center rounded-xl border border-border/70 bg-card px-5 text-sm font-medium text-foreground transition hover:bg-muted/40"
           >
             Back to students
           </button>
@@ -430,8 +627,13 @@ function ProfileErrorState({
             <button
               type="button"
               onClick={onRetry}
-              className="primary-gradient inline-flex h-11 items-center justify-center rounded-2xl px-5 text-sm font-bold text-primary-foreground"
+              className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-primary px-5 text-sm font-medium text-primary-foreground transition hover:bg-primary/90"
             >
+              <RefreshCw
+                size={15}
+                strokeWidth={1.8}
+              />
+
               Try again
             </button>
           ) : null}

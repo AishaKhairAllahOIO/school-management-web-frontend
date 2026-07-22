@@ -15,42 +15,135 @@ type Props = {
   hint?: string;
 };
 
-export function SettingsWorkspace({ items, activeId, onChange, children, hint }: Props) {
+export function SettingsWorkspace({
+  items,
+  activeId,
+  onChange,
+  children,
+  hint,
+}: Props) {
   return (
-    <div className="grid grid-cols-[260px_minmax(0,1fr)] gap-6">
-      <aside className="rounded-[24px] border border-slate-200 bg-white p-4 shadow-[0_8px_28px_rgba(15,23,42,0.06)]">
-        <h2 className="px-2 py-2 text-base font-black text-slate-900">Settings</h2>
-        <div className="mt-3 space-y-2">
-          {items.map((item) => {
+    <div className="grid items-start gap-6 lg:grid-cols-[270px_minmax(0,1fr)]">
+      <aside
+        className={[
+          "overflow-hidden rounded-[26px]",
+          "border border-border/60",
+          "bg-card",
+          "shadow-[0_12px_40px_rgba(30,20,70,0.055)]",
+          "lg:sticky lg:top-6",
+        ].join(" ")}
+      >
+        <div className="px-5 pb-3 pt-5">
+          <h2 className="text-sm font-semibold text-foreground">
+            Academic Management
+          </h2>
+
+          <p className="mt-1 text-xs font-normal leading-5 text-muted-foreground">
+            Choose an area to manage.
+          </p>
+        </div>
+
+        <div className="px-3 pb-3">
+          {items.map((item, index) => {
             const active = item.id === activeId;
+
             return (
-              <button
+              <div
                 key={item.id}
-                type="button"
-                onClick={() => onChange(item.id)}
-                className={[
-                  "flex w-full items-start gap-3 rounded-2xl px-4 py-4 text-left transition",
-                  active ? "bg-indigo-50 text-primary shadow-sm" : "text-slate-600 hover:bg-slate-50",
-                ].join(" ")}
+                className={
+                  index > 0
+                    ? "border-t border-border/45"
+                    : ""
+                }
               >
-                <span className="mt-0.5 text-current">{item.icon}</span>
-                <span>
-                  <span className="block text-sm font-black text-slate-900">{item.title}</span>
-                  <span className="mt-1 block text-xs font-medium text-slate-500">{item.description}</span>
-                </span>
-              </button>
+                <button
+                  type="button"
+                  onClick={() =>
+                    onChange(item.id)
+                  }
+                  aria-current={
+                    active ? "page" : undefined
+                  }
+                  className={[
+                    "group my-1 flex w-full items-start gap-3.5",
+                    "rounded-[18px] px-4 py-4 text-left",
+                    "transition-all duration-200",
+                    "focus-visible:outline-none",
+                    "focus-visible:ring-4",
+                    "focus-visible:ring-primary/10",
+                    active
+                      ? [
+                          "bg-primary/[0.075]",
+                          "text-primary",
+                          "shadow-[0_6px_18px_rgba(95,55,220,0.07)]",
+                        ].join(" ")
+                      : [
+                          "text-muted-foreground",
+                          "hover:bg-muted/45",
+                          "hover:text-foreground",
+                        ].join(" "),
+                  ].join(" ")}
+                >
+                  <span
+                    className={[
+                      "mt-0.5 flex h-9 w-9 shrink-0",
+                      "items-center justify-center rounded-xl",
+                      "transition-colors duration-200",
+                      active
+                        ? "bg-primary/10 text-primary"
+                        : [
+                            "bg-muted/55",
+                            "text-muted-foreground",
+                            "group-hover:text-foreground",
+                          ].join(" "),
+                    ].join(" ")}
+                  >
+                    {item.icon}
+                  </span>
+
+                  <span className="min-w-0">
+                    <span
+                      className={[
+                        "block truncate text-[13px]",
+                        "font-medium leading-5",
+                        active
+                          ? "text-primary"
+                          : "text-foreground",
+                      ].join(" ")}
+                    >
+                      {item.title}
+                    </span>
+
+                    <span className="mt-0.5 block text-[11px] font-normal leading-4 text-muted-foreground">
+                      {item.description}
+                    </span>
+                  </span>
+                </button>
+              </div>
             );
           })}
         </div>
 
-        {hint && (
-          <div className="mt-8 rounded-2xl bg-indigo-50 px-4 py-4 text-xs font-semibold leading-5 text-primary">
-            {hint}
+        {hint ? (
+          <div className="border-t border-border/50 p-4">
+            <div className="rounded-[18px] bg-primary/[0.055] px-4 py-4">
+              <p className="text-[11px] font-normal leading-5 text-primary">
+                {hint}
+              </p>
+            </div>
           </div>
-        )}
+        ) : null}
       </aside>
 
-      <main className="min-w-0 rounded-[24px] border border-slate-200 bg-white p-6 shadow-[0_8px_28px_rgba(15,23,42,0.06)]">
+      <main
+        className={[
+          "min-w-0 rounded-[26px]",
+          "border border-border/60",
+          "bg-card p-5",
+          "shadow-[0_12px_40px_rgba(30,20,70,0.055)]",
+          "sm:p-6",
+        ].join(" ")}
+      >
         {children}
       </main>
     </div>

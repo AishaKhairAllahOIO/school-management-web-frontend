@@ -80,13 +80,7 @@ export function RolesPage() {
           </p>
         </div>
 
-        <button
-          type="button"
-          className="flex h-11 items-center gap-2 rounded-2xl bg-primary px-5 text-sm font-bold text-primary-foreground shadow-soft transition hover:bg-primary/90"
-        >
-          <span className="text-xl leading-none">+</span>
-          Create Role
-        </button>
+     
       </div>
 
       <div className="grid gap-6 xl:grid-cols-[350px_1fr]">
