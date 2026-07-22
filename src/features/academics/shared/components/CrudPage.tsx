@@ -5,12 +5,10 @@ import {
   Pencil,
   Plus,
   RefreshCw,
-  Search,
   Trash2,
   X,
 } from "lucide-react";
 import {
-  useMemo,
   useState,
   type ReactNode,
 } from "react";
@@ -152,13 +150,11 @@ export function CrudPage<
   toFormValues,
   buildPayload,
   buildUpdatePayload,
-  emptyTitle = "No records found",
-  emptyDescription = "Create the first record to get started.",
-  deleteTitle = "Delete record?",
-  deleteDescription = () =>
-    "This record will be permanently deleted.",
-  searchPlaceholder = `Search ${title.toLowerCase()}...`,
-  enableSearch = true,
+emptyTitle = "No records found",
+emptyDescription = "Create the first record to get started.",
+deleteTitle = "Delete record?",
+deleteDescription = () =>
+  "This record will be permanently deleted.",
 }: CrudPageProps<TEntity, TCreate, TUpdate>) {
   const [dialogRow, setDialogRow] =
     useState<TEntity | "new" | null>(
@@ -188,40 +184,6 @@ export function CrudPage<
     detailsError,
     setDetailsError,
   ] = useState<string | null>(null);
-
-  const [search, setSearch] =
-    useState("");
-
-  const filteredRows = useMemo(() => {
-    const normalizedSearch =
-      search.trim().toLowerCase();
-
-    if (
-      !enableSearch ||
-      normalizedSearch.length === 0
-    ) {
-      return rows;
-    }
-
-    return rows.filter((row) =>
-      columns.some((column) => {
-        const value =
-          column.searchableText?.(row) ??
-          String(
-            column.render(row) ?? "",
-          );
-
-        return value
-          .toLowerCase()
-          .includes(normalizedSearch);
-      }),
-    );
-  }, [
-    columns,
-    enableSearch,
-    rows,
-    search,
-  ]);
 
   function openCreate() {
     const initialValues: FormValues = {};
@@ -509,72 +471,28 @@ export function CrudPage<
           </button>
         </header>
 
-        <div className="border-b border-border/60 bg-muted/[0.18] px-5 py-4 sm:px-6">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            {enableSearch ? (
-              <label className="relative block w-full sm:max-w-sm">
-                <Search
-                  size={16}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
-                />
-                <input
-                  value={search}
-                  onChange={(event) =>
-                    setSearch(
-                      event.target.value,
-                    )
-                  }
-                  placeholder={
-                    searchPlaceholder
-                  }
-                  className="h-11 w-full rounded-xl border border-border/70 bg-card pl-10 pr-4 text-sm font-medium text-foreground outline-none transition placeholder:text-muted-foreground focus:border-primary/50 focus:ring-4 focus:ring-primary/10"
-                />
-              </label>
-            ) : (
-              <div />
-            )}
-
-            <span className="inline-flex w-fit items-center rounded-full border border-primary/15 bg-primary/10 px-3 py-1.5 text-xs font-bold text-primary">
-              {filteredRows.length}{" "}
-              {filteredRows.length === 1
-                ? "record"
-                : "records"}
-            </span>
-          </div>
-        </div>
-
+       
         {rows.length === 0 ? (
-          <div className="px-6 py-16 text-center">
-            <h2 className="text-base font-bold text-foreground">
-              {emptyTitle}
-            </h2>
-            <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-muted-foreground">
-              {emptyDescription}
-            </p>
-            <button
-              type="button"
-              onClick={openCreate}
-              className="mt-5 inline-flex h-10 items-center gap-2 rounded-xl bg-primary px-5 text-xs font-bold text-primary-foreground"
-            >
-              <Plus size={15} />
-              {addLabel}
-            </button>
-          </div>
-        ) : filteredRows.length === 0 ? (
-          <div className="px-6 py-14 text-center">
-            <Search
-              size={24}
-              className="mx-auto text-muted-foreground"
-            />
-            <h2 className="mt-3 text-sm font-bold text-foreground">
-              No matching results
-            </h2>
-            <p className="mt-1 text-xs text-muted-foreground">
-              Try a different search term.
-            </p>
-          </div>
-        ) : (
-         <div className="relative overflow-x-auto">
+  <div className="px-6 py-16 text-center">
+    <h2 className="text-base font-bold text-foreground">
+      {emptyTitle}
+    </h2>
+
+    <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-muted-foreground">
+      {emptyDescription}
+    </p>
+
+    <button
+      type="button"
+      onClick={openCreate}
+      className="mt-5 inline-flex h-10 items-center gap-2 rounded-xl bg-primary px-5 text-xs font-bold text-primary-foreground"
+    >
+      <Plus size={15} />
+      {addLabel}
+    </button>
+  </div>
+) : (
+  <div className="relative overflow-x-auto">
   <table className="w-full min-w-[860px] border-separate border-spacing-0">
     <thead>
       <tr className="bg-[#faf9ff]">
@@ -613,8 +531,7 @@ export function CrudPage<
     </thead>
 
     <tbody>
-      {filteredRows.map((row, rowIndex) => (
-        <tr
+{rows.map((row, rowIndex) => (        <tr
           key={row.id}
           className={[
             "group transition-all duration-200",
