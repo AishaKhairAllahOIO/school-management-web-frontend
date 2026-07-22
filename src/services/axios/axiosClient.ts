@@ -23,15 +23,7 @@ axiosClient.interceptors.request.use((config) => {
     delete config.headers.Authorization;
   }
 
-  /**
-   * لا نحدد Content-Type يدويًا لطلبات FormData.
-   *
-   * المتصفح يضيف تلقائيًا:
-   * multipart/form-data; boundary=...
-   *
-   * وضع multipart/form-data يدويًا قد يحذف الـ boundary
-   * ويجعل Laravel غير قادر على قراءة الملف.
-   */
+
   if (config.data instanceof FormData) {
     delete config.headers["Content-Type"];
   } else if (!config.headers["Content-Type"]) {

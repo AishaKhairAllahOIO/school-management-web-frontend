@@ -108,38 +108,137 @@ export const API_ENDPOINTS = {
     `/admin/students/${studentId}`,
 },
 
-  STAFF: {
-    REGISTER: "/admin/staff/register",
+STAFF: {
+  REGISTER: "/admin/staff/register",
 
-    IMPORT: "/admin/staff/import",
+  IMPORT: "/admin/staff/import",
 
-    IMPORT_STATUS: (batchId: ApiId) =>
-      `/admin/staff/import-batches/${batchId}/status`,
+  IMPORT_STATUS: (
+    batchId: ApiId,
+  ) =>
+    `/admin/staff/import-batches/${batchId}/status`,
 
-    IMPORT_ERRORS: (batchId: ApiId) =>
-      `/admin/staff/import-batches/${batchId}/errors/export`,
+  IMPORT_ERRORS: (
+    batchId: ApiId,
+  ) =>
+    `/admin/staff/import-batches/${batchId}/errors/export`,
 
-    LIST: "/admin/staff/showAllStaff",
+  LIST: "/admin/staff/showAllStaff",
 
-    SEARCH: "/admin/staff/search",
+  SEARCH: "/admin/staff/search",
 
-    ALPHABETICAL: "/admin/staff/alphabetical",
+  ALPHABETICAL:
+    "/admin/staff/alphabetical",
 
-    DETAILS: (staffId: ApiId) =>
-      `/admin/staff/showStaff/${staffId}`,
+  DETAILS: (
+    staffId: ApiId,
+  ) =>
+    `/admin/staff/showStaff/${staffId}`,
 
-    PERSONAL: (staffId: ApiId) =>
-      `/admin/staff/${staffId}/personal`,
+  PERSONAL: (
+    staffId: ApiId,
+  ) =>
+    `/admin/staff/${staffId}/personal`,
 
-    EMPLOYMENT: (staffId: ApiId) =>
-      `/admin/staff/${staffId}/employment`,
+  EMPLOYMENT: (
+    staffId: ApiId,
+  ) =>
+    `/admin/staff/${staffId}/employment`,
 
-    TOGGLE_STATUS: (staffId: ApiId) =>
-      `/admin/staff/${staffId}/toggle-status`,
+  ROLE_COUNTS:
+    "/admin/staff/counts/roles",
 
-    DELETE: (staffId: ApiId) =>
-      `/admin/staff/${staffId}`,
+  BY_ROLE: (
+    role: string,
+  ) =>
+    `/admin/staff/role/${encodeURIComponent(role)}`,
+
+  PROFILE:
+    "/admin/staff/profile",
+
+  TOGGLE_STATUS: (
+    staffId: ApiId,
+  ) =>
+    `/admin/staff/${staffId}/toggle-status`,
+
+  DELETE: (
+    staffId: ApiId,
+  ) =>
+    `/admin/staff/${staffId}`,
+},
+
+ACADEMICS: {
+  SUBJECTS: {
+    LIST:
+      "/subject/setting/subjects/show",
+
+    CREATE:
+      "/subject/setting/subject/store",
+
+    UPDATE: (
+      subjectId: ApiId,
+    ) =>
+      `/subject/setting/subjects/update/${subjectId}`,
+
+    DELETE: (
+      subjectId: ApiId,
+    ) =>
+      `/subject/setting/subject/delete/${subjectId}`,
   },
+
+  GRADE_SUBJECTS: {
+    LIST:
+      "/subject/setting/grade/subjects/show",
+
+    DETAILS: (
+      gradeSubjectId: ApiId,
+    ) =>
+      `/subject/setting/grade/subjects/show/${gradeSubjectId}`,
+
+    CREATE:
+      "/subject/setting/grade/subject/store",
+
+    UPDATE: (
+      gradeSubjectId: ApiId,
+    ) =>
+      `/subject/setting/grade/subjects/update/${gradeSubjectId}`,
+
+    DELETE: (
+      gradeSubjectId: ApiId,
+    ) =>
+      `/subject/setting/grade/subject/delete/${gradeSubjectId}`,
+  },
+
+  ASSESSMENTS: {
+    LIST:
+      "/subject/setting/assessment/subjects/show",
+
+    GROUPED:
+      "/subject/setting/assessment/subjects/grouped",
+
+    DETAILS: (
+      assessmentId: ApiId,
+    ) =>
+      `/subject/setting/assessment/subject/show/${assessmentId}`,
+
+    CREATE:
+      "/subject/setting/assessment/subject/store",
+
+    UPDATE: (
+      assessmentId: ApiId,
+    ) =>
+      `/subject/setting/assessment/subject/update/${assessmentId}`,
+
+    /*
+     * هذا مطابق للمسار الحالي في الباك.
+     * لا توجد شرطة مائلة قبل id.
+     */
+    DELETE: (
+      assessmentId: ApiId,
+    ) =>
+      `/subject/setting/assessment/subject/delete${assessmentId}`,
+  },
+},
 
   FINANCIAL: {
     BASE: "/admin/finance/settings",
