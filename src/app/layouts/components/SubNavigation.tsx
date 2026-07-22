@@ -1,7 +1,6 @@
 import {
   Bell,
   BookOpen,
-  Briefcase,
   Building2,
   CalendarDays,
   FileText,
