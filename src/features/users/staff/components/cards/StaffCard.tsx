@@ -16,12 +16,12 @@ import {
 
 import type {
   StaffProfile,
+  StaffSectionColor,
 } from "../../types/staff.types";
 
 type StaffCardProps = {
   staff: StaffProfile;
-
-  index?: number;
+  color: StaffSectionColor;
 
   pendingToggle?: boolean;
   pendingDelete?: boolean;
@@ -43,37 +43,6 @@ type StaffCardProps = {
   ) => void;
 };
 
-const cardAccents = [
-  {
-    line: "bg-primary",
-    icon:
-      "bg-primary/[0.08] text-primary",
-    footer:
-      "bg-primary/[0.035] hover:bg-primary/[0.07]",
-  },
-  {
-    line: "bg-info",
-    icon:
-      "bg-info/[0.09] text-info",
-    footer:
-      "bg-info/[0.035] hover:bg-info/[0.07]",
-  },
-  {
-    line: "bg-success",
-    icon:
-      "bg-success/[0.09] text-success",
-    footer:
-      "bg-success/[0.035] hover:bg-success/[0.07]",
-  },
-  {
-    line: "bg-warning",
-    icon:
-      "bg-warning/[0.1] text-warning",
-    footer:
-      "bg-warning/[0.035] hover:bg-warning/[0.075]",
-  },
-] as const;
-
 function getInitials(
   fullName: string,
 ): string {
@@ -92,7 +61,10 @@ function getInitials(
 }
 
 function formatDate(
-  value: string | null | undefined,
+  value:
+    | string
+    | null
+    | undefined,
 ): string {
   if (!value) {
     return "Not recorded";
@@ -105,9 +77,15 @@ function formatDate(
 
   const date = dateOnlyMatch
     ? new Date(
-        Number(dateOnlyMatch[1]),
-        Number(dateOnlyMatch[2]) - 1,
-        Number(dateOnlyMatch[3]),
+        Number(
+          dateOnlyMatch[1],
+        ),
+        Number(
+          dateOnlyMatch[2],
+        ) - 1,
+        Number(
+          dateOnlyMatch[3],
+        ),
       )
     : new Date(value);
 
@@ -155,7 +133,10 @@ function formatText(
 }
 
 function formatExperience(
-  value: number | null | undefined,
+  value:
+    | number
+    | null
+    | undefined,
 ): string {
   if (
     value === null ||
@@ -173,7 +154,7 @@ function formatExperience(
 
 export function StaffCard({
   staff,
-  index = 0,
+  color,
   pendingToggle = false,
   pendingDelete = false,
   onView,
@@ -181,27 +162,26 @@ export function StaffCard({
   onToggleStatus,
   onDelete,
 }: StaffCardProps) {
-  const accent =
-    cardAccents[
-      index %
-        cardAccents.length
-    ];
-
   const fullName =
     staff.fullName?.trim() ||
     "Unnamed staff member";
 
   const isDeleted =
-    Boolean(staff.isDeleted);
+    Boolean(
+      staff.isDeleted,
+    );
 
   const normalizedStatus =
     String(
-      staff.accountStatus ?? "",
+      staff.accountStatus ??
+        "",
     ).toLowerCase();
 
   const isEnabled =
-    normalizedStatus === "enabled" ||
-    normalizedStatus === "active";
+    normalizedStatus ===
+      "enabled" ||
+    normalizedStatus ===
+      "active";
 
   const isBusy =
     pendingToggle ||
@@ -217,11 +197,11 @@ export function StaffCard({
       aria-busy={isBusy}
       className={[
         "group relative flex min-h-[365px] flex-col overflow-hidden",
-        "rounded-[24px] border border-border/70 bg-card",
+        "rounded-[24px] border bg-card",
+        color.border,
         "shadow-[var(--shadow-card)]",
         "transition-[transform,border-color,box-shadow] duration-300",
         "hover:-translate-y-1",
-        "hover:border-primary/20",
         "hover:shadow-[var(--shadow-floating)]",
         "motion-reduce:transform-none",
         "motion-reduce:transition-none",
@@ -231,7 +211,7 @@ export function StaffCard({
         aria-hidden="true"
         className={[
           "absolute inset-x-0 top-0 h-[3px]",
-          accent.line,
+          color.background,
         ].join(" ")}
       />
 
@@ -243,21 +223,23 @@ export function StaffCard({
               onView(staff)
             }
             className={[
-              "min-w-0 flex-1 text-left",
-              "rounded-xl",
+              "min-w-0 flex-1 rounded-xl text-left",
               "focus-visible:outline-none",
               "focus-visible:ring-4",
-              "focus-visible:ring-primary/10",
+              color.ring,
             ].join(" ")}
           >
             <div className="flex items-center gap-3.5">
               {staff.photoUrl ? (
                 <img
-                  src={staff.photoUrl}
+                  src={
+                    staff.photoUrl
+                  }
                   alt={fullName}
                   className={[
                     "h-14 w-14 shrink-0 rounded-[18px] object-cover",
-                    "border border-border/70",
+                    "border",
+                    color.border,
                     "shadow-[var(--shadow-soft)]",
                   ].join(" ")}
                 />
@@ -267,7 +249,8 @@ export function StaffCard({
                   className={[
                     "flex h-14 w-14 shrink-0 items-center justify-center",
                     "rounded-[18px]",
-                    accent.icon,
+                    color.light,
+                    color.text,
                     "text-base font-semibold",
                   ].join(" ")}
                 >
@@ -302,9 +285,10 @@ export function StaffCard({
               "flex h-9 w-9 shrink-0 items-center justify-center",
               "rounded-full text-muted-foreground",
               "transition-colors",
-              "hover:bg-muted hover:text-primary",
+              color.hover,
               "focus-visible:outline-none",
-              "focus-visible:ring-4 focus-visible:ring-primary/10",
+              "focus-visible:ring-4",
+              color.ring,
             ].join(" ")}
           >
             <ArrowUpRight className="h-[18px] w-[18px]" />
@@ -320,7 +304,8 @@ export function StaffCard({
           <span
             className={[
               "max-w-[50%] truncate rounded-full",
-              "border border-border/70 bg-muted/55",
+              "border bg-muted/55",
+              color.border,
               "px-2.5 py-1",
               "text-[10px] font-medium uppercase",
               "tracking-[0.08em]",
@@ -342,6 +327,7 @@ export function StaffCard({
               "No phone number"
             }
             direction="ltr"
+            color={color}
           />
 
           <InfoRow
@@ -354,6 +340,7 @@ export function StaffCard({
               "No email address"
             }
             direction="ltr"
+            color={color}
           />
 
           <InfoRow
@@ -364,6 +351,7 @@ export function StaffCard({
             value={formatDate(
               staff.hireDate,
             )}
+            color={color}
           />
 
           <InfoRow
@@ -374,6 +362,7 @@ export function StaffCard({
             value={formatExperience(
               staff.experienceYears,
             )}
+            color={color}
           />
 
           <InfoRow
@@ -385,6 +374,7 @@ export function StaffCard({
               staff.address ||
               "No address"
             }
+            color={color}
           />
         </div>
       </div>
@@ -392,8 +382,9 @@ export function StaffCard({
       <div
         className={[
           "grid grid-cols-[1fr_auto_auto_auto] items-center gap-2",
-          "border-t border-border/50 px-4 py-3",
-          accent.footer,
+          "border-t px-4 py-3",
+          color.border,
+          color.footer,
           "transition-colors",
         ].join(" ")}
       >
@@ -406,9 +397,11 @@ export function StaffCard({
             "inline-flex h-10 min-w-0 items-center justify-center gap-2",
             "rounded-xl px-3",
             "text-xs font-semibold text-foreground",
-            "transition hover:bg-card/75",
+            "transition-colors",
+            color.hover,
             "focus-visible:outline-none",
-            "focus-visible:ring-4 focus-visible:ring-primary/10",
+            "focus-visible:ring-4",
+            color.ring,
           ].join(" ")}
         >
           <span className="truncate">
@@ -427,6 +420,7 @@ export function StaffCard({
             isBusy ||
             isDeleted
           }
+          color={color}
         >
           <Pencil className="h-4 w-4" />
         </ActionButton>
@@ -438,13 +432,16 @@ export function StaffCard({
               : "Enable account"
           }
           onClick={() =>
-            onToggleStatus(staff)
+            onToggleStatus(
+              staff,
+            )
           }
           disabled={
             isBusy ||
             isDeleted
           }
-          className="text-warning hover:bg-warning/10"
+          color={color}
+          className="text-warning hover:border-warning/20 hover:bg-warning/10 hover:text-warning"
         >
           {pendingToggle ? (
             <Spinner />
@@ -462,7 +459,8 @@ export function StaffCard({
             isBusy ||
             isDeleted
           }
-          className="text-destructive hover:bg-destructive/10"
+          color={color}
+          className="text-destructive hover:border-destructive/20 hover:bg-destructive/10 hover:text-destructive"
         >
           {pendingDelete ? (
             <Spinner />
@@ -525,15 +523,26 @@ function InfoRow({
   label,
   value,
   direction,
+  color,
 }: {
   icon: ReactNode;
   label: string;
   value: string;
-  direction?: "ltr" | "rtl";
+  direction?:
+    | "ltr"
+    | "rtl";
+  color: StaffSectionColor;
 }) {
   return (
     <div className="flex min-w-0 items-center gap-3 rounded-2xl border border-border/55 bg-muted/35 px-3 py-2.5">
-      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-card text-primary shadow-[var(--shadow-soft)]">
+      <span
+        className={[
+          "flex h-8 w-8 shrink-0 items-center justify-center",
+          "rounded-xl shadow-[var(--shadow-soft)]",
+          color.light,
+          color.text,
+        ].join(" ")}
+      >
         {icon}
       </span>
 
@@ -559,12 +568,14 @@ function ActionButton({
   onClick,
   disabled = false,
   className = "",
+  color,
   children,
 }: {
   label: string;
   onClick: () => void;
   disabled?: boolean;
   className?: string;
+  color: StaffSectionColor;
   children: ReactNode;
 }) {
   return (
@@ -576,12 +587,14 @@ function ActionButton({
       disabled={disabled}
       className={[
         "flex h-10 w-10 items-center justify-center rounded-xl",
-        "border border-border/65 bg-card/80",
-        "text-muted-foreground",
+        "border bg-card/80",
+        color.border,
+        color.text,
         "transition-colors",
-        "hover:border-primary/20 hover:bg-card hover:text-primary",
+        color.hover,
         "focus-visible:outline-none",
-        "focus-visible:ring-4 focus-visible:ring-primary/10",
+        "focus-visible:ring-4",
+        color.ring,
         "disabled:cursor-not-allowed disabled:opacity-40",
         className,
       ].join(" ")}

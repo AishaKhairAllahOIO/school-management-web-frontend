@@ -3,10 +3,14 @@ import {
 } from "react";
 
 import {
+  ArrowUpAZ,
   BriefcaseBusiness,
+  Download,
   Plus,
   RefreshCw,
+  Search,
   Sparkles,
+  Upload,
   UsersRound,
 } from "lucide-react";
 
@@ -39,6 +43,7 @@ import type {
 import type {
   StaffProfile,
   StaffRole,
+  StaffSectionColor,
 } from "../types/staff.types";
 
 type StaffRolePageProps = {
@@ -48,10 +53,29 @@ type StaffRolePageProps = {
 export function StaffRolePage({
   role,
 }: StaffRolePageProps) {
-  const navigate = useNavigate();
+  const navigate =
+    useNavigate();
 
   const config =
     staffSectionConfigs[role];
+
+  const Icon =
+    config.icon;
+
+  const [
+    searchTerm,
+    setSearchTerm,
+  ] = useState("");
+
+  const [
+    sortDirection,
+    setSortDirection,
+  ] = useState<
+    "asc" | "desc"
+  >("asc");
+
+  const [isExporting] =
+    useState(false);
 
   const [page, setPage] =
     useState(1);
@@ -66,14 +90,17 @@ export function StaffRolePage({
     setPendingDeleteId,
   ] = useState<ApiId>();
 
-  const query = useStaffByRole(
-    role,
-    page,
-    12,
-  );
+  const query =
+    useStaffByRole(
+      role,
+      page,
+      12,
+    );
 
   const toggleStatus =
-    useToggleStaffStatus(role);
+    useToggleStaffStatus(
+      role,
+    );
 
   const deleteStaff =
     useDeleteStaff(role);
@@ -84,6 +111,14 @@ export function StaffRolePage({
   const total =
     query.data?.total ??
     staff.length;
+
+  function handleExport() {
+    // سيتم ربط Export API هنا.
+  }
+
+  function openImportDialog() {
+    // سيتم فتح نافذة الاستيراد هنا.
+  }
 
   function viewStaff(
     item: StaffProfile,
@@ -106,9 +141,7 @@ export function StaffRolePage({
   ) {
     const isEnabled =
       item.accountStatus ===
-        "enabled" ||
-      item.accountStatus ===
-        "active";
+      "active";
 
     const action =
       isEnabled
@@ -171,25 +204,51 @@ export function StaffRolePage({
       <header
         className={[
           "relative overflow-hidden rounded-[26px]",
-          "border border-border/70 bg-card",
+          "border bg-card",
+          config.color.border,
           "px-5 py-5 shadow-[var(--shadow-card)] sm:px-6",
         ].join(" ")}
       >
-        <div className="soft-purple-gradient pointer-events-none absolute inset-0 opacity-55" />
+        <div
+          className={[
+            "pointer-events-none absolute inset-0 opacity-[0.045]",
+            config.color.background,
+          ].join(" ")}
+        />
 
-        <div className="pointer-events-none absolute -right-10 -top-16 h-40 w-40 rounded-full bg-primary/10 blur-3xl" />
+        <div
+          className={[
+            "pointer-events-none absolute -right-10 -top-16",
+            "h-40 w-40 rounded-full opacity-15 blur-3xl",
+            config.color.background,
+          ].join(" ")}
+        />
 
-        <div className="relative flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+        <div className="relative flex flex-col gap-6 xl:flex-row xl:items-center xl:justify-between">
           <div className="flex min-w-0 items-start gap-3.5">
-            <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[17px] bg-primary/[0.09] text-primary">
-              <UsersRound
+            <span
+              className={[
+                "flex h-12 w-12 shrink-0 items-center justify-center",
+                "rounded-[17px]",
+                config.color.light,
+                config.color.text,
+              ].join(" ")}
+            >
+              <Icon
                 className="h-5 w-5"
-                strokeWidth={1.8}
+                strokeWidth={
+                  1.8
+                }
               />
             </span>
 
             <div className="min-w-0">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-primary">
+              <p
+                className={[
+                  "text-[10px] font-semibold uppercase tracking-[0.14em]",
+                  config.color.text,
+                ].join(" ")}
+              >
                 Staff directory
               </p>
 
@@ -198,59 +257,246 @@ export function StaffRolePage({
               </h1>
 
               <p className="mt-1.5 max-w-2xl text-sm font-normal leading-6 text-muted-foreground">
-                Review profiles, employment details and account access for{" "}
-                {config.pluralLabel.toLowerCase()}.
+                Review profiles,
+                employment details
+                and account access
+                for{" "}
+                {config.pluralLabel.toLowerCase()}
+                .
               </p>
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2">
-            <button
-              type="button"
-              disabled={
-                query.isFetching
-              }
-              onClick={() => {
-                void query.refetch();
-              }}
-              className={[
-                "inline-flex h-10 items-center justify-center gap-2",
-                "rounded-xl border border-border bg-card/80 px-4",
-                "text-xs font-semibold text-foreground",
-                "transition-colors",
-                "hover:border-primary/20 hover:bg-primary/[0.06] hover:text-primary",
-                "disabled:cursor-not-allowed disabled:opacity-50",
-              ].join(" ")}
-            >
-              <RefreshCw
-                className={[
-                  "h-4 w-4",
-                  query.isFetching
-                    ? "animate-spin"
-                    : "",
-                ].join(" ")}
-              />
-              Refresh
-            </button>
+          <div className="grid w-full gap-2.5 xl:w-[466px]">
+            <div className="grid w-full grid-cols-[minmax(0,1fr)_82px] gap-2">
+              <div className="relative min-w-0">
+                <Search
+                  className={[
+                    "pointer-events-none absolute left-3.5 top-1/2",
+                    "h-4 w-4 -translate-y-1/2",
+                    searchTerm
+                      ? config.color.text
+                      : "text-muted-foreground",
+                  ].join(" ")}
+                  strokeWidth={
+                    1.8
+                  }
+                />
 
-            <button
-              type="button"
-              onClick={() =>
-                navigate(
-                  config.createPath,
-                )
-              }
-              className={[
-                "primary-gradient inline-flex h-10 items-center justify-center gap-2",
-                "rounded-xl px-4",
-                "text-xs font-semibold text-primary-foreground",
-                "shadow-[var(--shadow-auth-button)]",
-                "transition-transform hover:-translate-y-0.5",
-              ].join(" ")}
-            >
-              <Plus className="h-4 w-4" />
-              Add {config.singularLabel}
-            </button>
+                <input
+                  type="search"
+                  value={
+                    searchTerm
+                  }
+                  onChange={(
+                    event,
+                  ) => {
+                    setSearchTerm(
+                      event.target
+                        .value,
+                    );
+
+                    setPage(1);
+                  }}
+                  placeholder={`Search ${config.pluralLabel.toLowerCase()}...`}
+                  className={[
+                    "h-10 w-full rounded-xl border bg-card/80",
+                    "pl-10 pr-4",
+                    "text-xs font-medium text-foreground",
+                    "outline-none transition-colors",
+                    "placeholder:text-muted-foreground",
+                    config.color.border,
+                    "focus:ring-2",
+                    config.color.ring,
+                  ].join(" ")}
+                />
+              </div>
+
+              <button
+                type="button"
+                onClick={() =>
+                  setSortDirection(
+                    (
+                      current,
+                    ) =>
+                      current ===
+                      "asc"
+                        ? "desc"
+                        : "asc",
+                  )
+                }
+                className={[
+                  "inline-flex h-10 items-center justify-center gap-2",
+                  "rounded-xl border bg-card/80 px-3",
+                  "text-xs font-semibold transition-colors",
+                  config.color.border,
+                  config.color.text,
+                  config.color.hover,
+                  "focus-visible:outline-none focus-visible:ring-4",
+                  config.color.ring,
+                ].join(" ")}
+                title={
+                  sortDirection ===
+                  "asc"
+                    ? "Sort Z to A"
+                    : "Sort A to Z"
+                }
+              >
+                <ArrowUpAZ
+                  className={[
+                    "h-4 w-4 transition-transform",
+                    sortDirection ===
+                    "desc"
+                      ? "rotate-180"
+                      : "",
+                  ].join(" ")}
+                  strokeWidth={
+                    1.8
+                  }
+                />
+
+                <span>
+                  {sortDirection ===
+                  "asc"
+                    ? "A–Z"
+                    : "Z–A"}
+                </span>
+              </button>
+            </div>
+
+            <div className="grid w-full grid-cols-2 gap-2 sm:grid-cols-4">
+              <button
+                type="button"
+                onClick={
+                  handleExport
+                }
+                disabled={
+                  isExporting
+                }
+                className={[
+                  "inline-flex h-10 items-center justify-center gap-2",
+                  "rounded-xl border bg-card/80 px-3",
+                  "text-xs font-semibold transition-colors",
+                  config.color.border,
+                  config.color.text,
+                  config.color.hover,
+                  "focus-visible:outline-none focus-visible:ring-4",
+                  config.color.ring,
+                  "disabled:cursor-not-allowed disabled:opacity-50",
+                ].join(" ")}
+              >
+                <Download
+                  className="h-4 w-4"
+                  strokeWidth={
+                    1.8
+                  }
+                />
+
+                <span>
+                  {isExporting
+                    ? "Exporting..."
+                    : "Export"}
+                </span>
+              </button>
+
+              <button
+                type="button"
+                onClick={
+                  openImportDialog
+                }
+                className={[
+                  "inline-flex h-10 items-center justify-center gap-2",
+                  "rounded-xl border bg-card/80 px-3",
+                  "text-xs font-semibold transition-colors",
+                  config.color.border,
+                  config.color.text,
+                  config.color.hover,
+                  "focus-visible:outline-none focus-visible:ring-4",
+                  config.color.ring,
+                ].join(" ")}
+              >
+                <Upload
+                  className="h-4 w-4"
+                  strokeWidth={
+                    1.8
+                  }
+                />
+
+                <span>
+                  Import
+                </span>
+              </button>
+
+              <button
+                type="button"
+                disabled={
+                  query.isFetching
+                }
+                onClick={() => {
+                  void query.refetch();
+                }}
+                className={[
+                  config.color.button,
+                  "inline-flex h-10 items-center justify-center gap-2",
+                  "rounded-xl px-3",
+                  "text-xs font-semibold",
+                  "shadow-[var(--shadow-auth-button)]",
+                  "transition-transform hover:-translate-y-0.5",
+                  "focus-visible:outline-none focus-visible:ring-4",
+                  config.color.ring,
+                  "disabled:cursor-not-allowed disabled:opacity-60",
+                ].join(" ")}
+              >
+                <RefreshCw
+                  className={[
+                    "h-4 w-4",
+                    query.isFetching
+                      ? "animate-spin"
+                      : "",
+                  ].join(" ")}
+                  strokeWidth={
+                    1.8
+                  }
+                />
+
+                <span>
+                  Refresh
+                </span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() =>
+                  navigate(
+                    config.createPath,
+                  )
+                }
+                className={[
+                  config.color.button,
+                  "inline-flex h-10 items-center justify-center gap-2",
+                  "rounded-xl px-3",
+                  "text-xs font-semibold",
+                  "shadow-[var(--shadow-auth-button)]",
+                  "transition-transform hover:-translate-y-0.5",
+                  "focus-visible:outline-none focus-visible:ring-4",
+                  config.color.ring,
+                ].join(" ")}
+              >
+                <Plus
+                  className="h-4 w-4"
+                  strokeWidth={
+                    1.8
+                  }
+                />
+
+                <span>
+                  Add{" "}
+                  {
+                    config.singularLabel
+                  }
+                </span>
+              </button>
+            </div>
           </div>
         </div>
       </header>
@@ -258,23 +504,45 @@ export function StaffRolePage({
       {!query.isLoading &&
       !query.isError ? (
         <div className="flex flex-wrap items-center gap-2">
-          <span className="inline-flex items-center gap-2 rounded-full border border-primary/10 bg-primary/[0.06] px-3 py-1.5 text-xs font-medium text-primary">
+          <span
+            className={[
+              "inline-flex items-center gap-2 rounded-full border",
+              "px-3 py-1.5 text-xs font-medium",
+              config.color.border,
+              config.color.light,
+              config.color.text,
+            ].join(" ")}
+          >
             <UsersRound className="h-3.5 w-3.5" />
+
             {total}{" "}
             {total === 1
               ? config.singularLabel.toLowerCase()
               : config.pluralLabel.toLowerCase()}
           </span>
 
-          <span className="inline-flex items-center gap-2 rounded-full border border-success/10 bg-success/[0.06] px-3 py-1.5 text-xs font-medium text-success">
+          <span
+            className={[
+              "inline-flex items-center gap-2 rounded-full border",
+              "px-3 py-1.5 text-xs font-medium",
+              config.color.border,
+              config.color.light,
+              config.color.text,
+            ].join(" ")}
+          >
             <Sparkles className="h-3.5 w-3.5" />
+
             Updated directory
           </span>
         </div>
       ) : null}
 
       {query.isLoading ? (
-        <StaffGridSkeleton />
+        <StaffGridSkeleton
+          color={
+            config.color
+          }
+        />
       ) : query.isError ? (
         <ErrorState
           label={
@@ -284,13 +552,17 @@ export function StaffRolePage({
             void query.refetch()
           }
         />
-      ) : staff.length === 0 ? (
+      ) : staff.length ===
+        0 ? (
         <EmptyState
           singularLabel={
             config.singularLabel
           }
           pluralLabel={
             config.pluralLabel
+          }
+          color={
+            config.color
           }
           onCreate={() =>
             navigate(
@@ -301,11 +573,13 @@ export function StaffRolePage({
       ) : (
         <div className="grid gap-5 md:grid-cols-2 2xl:grid-cols-3">
           {staff.map(
-            (item, index) => (
+            (item) => (
               <StaffCard
                 key={item.id}
                 staff={item}
-                index={index}
+                color={
+                  config.color
+                }
                 pendingToggle={
                   pendingToggleId ===
                   item.id
@@ -314,8 +588,12 @@ export function StaffRolePage({
                   pendingDeleteId ===
                   item.id
                 }
-                onView={viewStaff}
-                onEdit={editStaff}
+                onView={
+                  viewStaff
+                }
+                onEdit={
+                  editStaff
+                }
                 onToggleStatus={
                   toggleStaff
                 }
@@ -329,7 +607,8 @@ export function StaffRolePage({
       )}
 
       {query.data &&
-      query.data.lastPage > 1 ? (
+      query.data.lastPage >
+        1 ? (
         <StaffPagination
           currentPage={
             query.data.currentPage
@@ -352,12 +631,17 @@ export function StaffRolePage({
           disabled={
             query.isFetching
           }
-          onPageChange={(nextPage) => {
-            setPage(nextPage);
+          onPageChange={(
+            nextPage,
+          ) => {
+            setPage(
+              nextPage,
+            );
 
             window.scrollTo({
               top: 0,
-              behavior: "smooth",
+              behavior:
+                "smooth",
             });
           }}
         />
@@ -366,41 +650,69 @@ export function StaffRolePage({
   );
 }
 
-function StaffGridSkeleton() {
+function StaffGridSkeleton({
+  color,
+}: {
+  color: StaffSectionColor;
+}) {
   return (
     <div className="grid gap-5 md:grid-cols-2 2xl:grid-cols-3">
       {Array.from({
         length: 6,
-      }).map((_, index) => (
-        <div
-          key={index}
-          className="min-h-[365px] animate-pulse overflow-hidden rounded-[24px] border border-border/70 bg-card"
-        >
-          <div className="h-[3px] bg-muted" />
+      }).map(
+        (_, index) => (
+          <div
+            key={index}
+            className={[
+              "min-h-[365px] animate-pulse overflow-hidden",
+              "rounded-[24px] border bg-card",
+              color.border,
+            ].join(" ")}
+          >
+            <div
+              className={[
+                "h-[3px]",
+                color.background,
+              ].join(" ")}
+            />
 
-          <div className="p-5">
-            <div className="flex items-center gap-4">
-              <div className="h-14 w-14 rounded-[18px] bg-muted" />
+            <div className="p-5">
+              <div className="flex items-center gap-4">
+                <div
+                  className={[
+                    "h-14 w-14 rounded-[18px]",
+                    color.light,
+                  ].join(" ")}
+                />
 
-              <div className="flex-1">
-                <div className="h-5 w-2/3 rounded bg-muted" />
-                <div className="mt-2 h-3 w-1/2 rounded bg-muted/70" />
+                <div className="flex-1">
+                  <div className="h-5 w-2/3 rounded bg-muted" />
+
+                  <div className="mt-2 h-3 w-1/2 rounded bg-muted/70" />
+                </div>
+              </div>
+
+              <div className="mt-5 space-y-2.5">
+                {Array.from({
+                  length: 5,
+                }).map(
+                  (
+                    __,
+                    row,
+                  ) => (
+                    <div
+                      key={
+                        row
+                      }
+                      className="h-[53px] rounded-2xl bg-muted/55"
+                    />
+                  ),
+                )}
               </div>
             </div>
-
-            <div className="mt-5 space-y-2.5">
-              {Array.from({
-                length: 5,
-              }).map((__, row) => (
-                <div
-                  key={row}
-                  className="h-[53px] rounded-2xl bg-muted/55"
-                />
-              ))}
-            </div>
           </div>
-        </div>
-      ))}
+        ),
+      )}
     </div>
   );
 }
@@ -408,43 +720,73 @@ function StaffGridSkeleton() {
 function EmptyState({
   singularLabel,
   pluralLabel,
+  color,
   onCreate,
 }: {
   singularLabel: string;
   pluralLabel: string;
+  color: StaffSectionColor;
   onCreate: () => void;
 }) {
   return (
     <section
       className={[
         "relative overflow-hidden rounded-[26px]",
-        "border border-dashed border-primary/20 bg-card",
+        "border border-dashed bg-card",
+        color.border,
         "px-6 py-14 text-center shadow-[var(--shadow-card)]",
       ].join(" ")}
     >
-      <div className="soft-purple-gradient pointer-events-none absolute inset-0 opacity-70" />
+      <div
+        className={[
+          "pointer-events-none absolute inset-0 opacity-[0.045]",
+          color.background,
+        ].join(" ")}
+      />
 
       <div className="relative mx-auto max-w-md">
-        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-[20px] border border-primary/15 bg-card/80 text-primary shadow-[var(--shadow-soft)]">
+        <div
+          className={[
+            "mx-auto flex h-16 w-16 items-center justify-center",
+            "rounded-[20px] border shadow-[var(--shadow-soft)]",
+            color.border,
+            color.light,
+            color.text,
+          ].join(" ")}
+        >
           <BriefcaseBusiness className="h-7 w-7" />
         </div>
 
         <h2 className="mt-5 text-xl font-semibold tracking-[-0.025em] text-foreground">
-          No {pluralLabel.toLowerCase()} yet
+          No{" "}
+          {pluralLabel.toLowerCase()}{" "}
+          yet
         </h2>
 
         <p className="mt-2 text-sm font-normal leading-6 text-muted-foreground">
           Create the first{" "}
           {singularLabel.toLowerCase()}{" "}
-          profile to begin building this staff directory.
+          profile to begin
+          building this staff
+          directory.
         </p>
 
         <button
           type="button"
           onClick={onCreate}
-          className="primary-gradient mt-6 inline-flex h-11 items-center gap-2 rounded-xl px-5 text-sm font-semibold text-primary-foreground shadow-[var(--shadow-auth-button)]"
+          className={[
+            color.button,
+            "mt-6 inline-flex h-11 items-center gap-2",
+            "rounded-xl px-5",
+            "text-sm font-semibold",
+            "shadow-[var(--shadow-auth-button)]",
+            "transition-transform hover:-translate-y-0.5",
+            "focus-visible:outline-none focus-visible:ring-4",
+            color.ring,
+          ].join(" ")}
         >
           <Plus className="h-4 w-4" />
+
           Add {singularLabel}
         </button>
       </div>
@@ -466,11 +808,15 @@ function ErrorState({
       </div>
 
       <h2 className="mt-4 text-lg font-semibold text-foreground">
-        {label} could not be loaded
+        {label} could not
+        be loaded
       </h2>
 
       <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-muted-foreground">
-        Check your connection and permissions, then try loading the directory again.
+        Check your connection
+        and permissions, then
+        try loading the
+        directory again.
       </p>
 
       <button
@@ -479,6 +825,7 @@ function ErrorState({
         className="mt-5 inline-flex h-10 items-center gap-2 rounded-xl border border-border bg-card px-4 text-xs font-semibold text-foreground hover:bg-muted"
       >
         <RefreshCw className="h-4 w-4" />
+
         Try again
       </button>
     </section>

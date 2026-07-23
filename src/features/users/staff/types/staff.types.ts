@@ -1,4 +1,8 @@
 import type {
+  LucideIcon,
+} from "lucide-react";
+
+import type {
   ApiId,
 } from "../../shared/types/api.types";
 
@@ -68,6 +72,7 @@ export type StaffProfile =
     birthPlace: string | null;
 
     gender: StaffGender | null;
+
     nationality:
       StaffNationality | null;
 
@@ -177,6 +182,19 @@ export type UpdateStaffEmploymentValues = {
     | null;
 };
 
+export type StaffSectionColor = {
+  background: string;
+  light: string;
+  text: string;
+
+  border: string;
+  hover: string;
+  ring: string;
+
+  button: string;
+  footer: string;
+};
+
 export type StaffSectionConfig = {
   role: StaffRole;
 
@@ -186,4 +204,8 @@ export type StaffSectionConfig = {
 
   listPath: string;
   createPath: string;
+
+  icon: LucideIcon;
+
+  color: StaffSectionColor;
 };

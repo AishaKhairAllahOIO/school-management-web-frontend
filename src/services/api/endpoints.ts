@@ -96,7 +96,7 @@ export const API_ENDPOINTS = {
     IMPORT_ERRORS: (batchId: ApiId) =>
       `/admin/staff/import-batches/${batchId}/errors/export`,
 
-    LIST: "/admin/staff/showAllStaff",
+    // LIST: "/admin/staff/showAllStaff",
 
     SEARCH: "/admin/staff/search",
 
