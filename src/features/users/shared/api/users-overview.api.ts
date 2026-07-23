@@ -1,3 +1,4 @@
+import { API_ENDPOINTS } from "@/services/api/endpoints";
 import { axiosClient } from "@/services/axios/axiosClient";
 
 import type {
@@ -5,9 +6,6 @@ import type {
   UsersRoleCountsApiData,
   UsersRoleCountsApiResponse,
 } from "../types/users-overview.types";
-
-const USERS_ROLE_COUNTS_ENDPOINT =
-  "/user/counts/roles";
 
 function toSafeCount(
   value: unknown,
@@ -33,7 +31,6 @@ function mapRoleCounts(
     students: toSafeCount(
       data.student,
     ),
-    parents: undefined,
 
     teachers: toSafeCount(
       data.teacher,
@@ -64,10 +61,8 @@ function mapRoleCounts(
 export const usersOverviewApi = {
   async getRoleCounts(): Promise<UsersOverviewCounts> {
     const response =
-      await axiosClient.get<
-        UsersRoleCountsApiResponse
-      >(
-        USERS_ROLE_COUNTS_ENDPOINT,
+      await axiosClient.get<UsersRoleCountsApiResponse>(
+        API_ENDPOINTS.STAFF.ROLE_COUNTS,
       );
 
     return mapRoleCounts(

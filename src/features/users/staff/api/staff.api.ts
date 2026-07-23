@@ -1,23 +1,29 @@
-import { axiosClient } from "@/services/axios/axiosClient";
+import {
+  API_ENDPOINTS,
+} from "@/services/api/endpoints";
 
-import { staffEndpoints } from "./staff.endpoints";
+import {
+  axiosClient,
+} from "@/services/axios/axiosClient";
+
+import {
+  objectToFormData,
+} from "../../shared/api/form-data.utils";
+
+import type {
+  ApiResponse,
+} from "../../shared/types/api.types";
 
 import type {
   ApiId,
   RegisterStaffValues,
+  StaffAccountStatus,
   StaffPaginator,
   StaffProfile,
   StaffRole,
   UpdateStaffEmploymentValues,
   UpdateStaffPersonalValues,
 } from "../types/staff.types";
-
-type ApiResponse<T> = {
-  success?: boolean;
-  status?: boolean | string | number;
-  message?: string;
-  data: T;
-};
 
 type RawRole = {
   id?: ApiId;
@@ -39,10 +45,12 @@ type RawUser = {
   birth_place?: string | null;
 
   gender?: StaffProfile["gender"];
-  nationality?: StaffProfile["nationality"];
+  nationality:
+    StaffProfile["nationality"];
 
   address?: string | null;
   photo_url?: string | null;
+
   account_status?: string;
 
   roles?: RawRole[];
@@ -81,7 +89,8 @@ type RawStaff = {
   birthPlace?: string | null;
 
   gender?: StaffProfile["gender"];
-  nationality?: StaffProfile["nationality"];
+  nationality?:
+    StaffProfile["nationality"];
 
   address?: string | null;
 
@@ -95,19 +104,33 @@ type RawStaff = {
   specialization?: string | null;
   university?: string | null;
 
-  graduation_year?: number | string | null;
+  graduation_year?:
+    | number
+    | string
+    | null;
+
   graduationYear?: number | null;
 
   hire_date?: string | null;
   hireDate?: string | null;
 
-  experience_years?: number | string | null;
+  experience_years?:
+    | number
+    | string
+    | null;
+
   experienceYears?: number | null;
 
-  service_type?: StaffProfile["serviceType"];
-  serviceType?: StaffProfile["serviceType"];
+  service_type?:
+    StaffProfile["serviceType"];
 
-  role?: StaffRole | string | null;
+  serviceType?:
+    StaffProfile["serviceType"];
+
+  role?:
+    | StaffRole
+    | string
+    | null;
 
   is_deleted?: boolean;
   isDeleted?: boolean;
@@ -146,19 +169,27 @@ type RawPaginator = {
   };
 };
 
-function unwrap<T>(value: ApiResponse<T> | T): T {
+function unwrap<T>(
+  value:
+    | ApiResponse<T>
+    | T,
+): T {
   if (
     typeof value === "object" &&
     value !== null &&
     "data" in value
   ) {
-    return (value as ApiResponse<T>).data;
+    return (
+      value as ApiResponse<T>
+    ).data;
   }
 
   return value as T;
 }
 
-function nullableNumber(value: unknown): number | null {
+function nullableNumber(
+  value: unknown,
+): number | null {
   if (
     value === null ||
     value === undefined ||
@@ -167,28 +198,46 @@ function nullableNumber(value: unknown): number | null {
     return null;
   }
 
-  const parsedValue = Number(value);
+  const parsedValue =
+    Number(value);
 
-  return Number.isFinite(parsedValue)
+  return Number.isFinite(
+    parsedValue,
+  )
     ? parsedValue
     : null;
 }
 
-function normalizeRole(value: unknown): StaffRole | null {
-  const supportedRoles: StaffRole[] = [
-    "teacher",
-    "adviser",
-    "secretary",
-    "counselor",
-    "service_staff",
-  ];
+function normalizeRole(
+  value: unknown,
+): StaffRole | null {
+  const supportedRoles:
+    StaffRole[] = [
+      "teacher",
+      "adviser",
+      "secretary",
+      "counselor",
+      "service_staff",
+    ];
 
-  return supportedRoles.includes(value as StaffRole)
-    ? (value as StaffRole)
+  return supportedRoles.includes(
+    value as StaffRole,
+  )
+    ? value as StaffRole
     : null;
 }
 
-function normalizeStaff(raw: RawStaff): StaffProfile {
+function normalizeAccountStatus(
+  value: unknown,
+): StaffAccountStatus {
+  return value === "active"
+    ? "active"
+    : "disabled";
+}
+
+function normalizeStaff(
+  raw: RawStaff,
+): StaffProfile {
   const user = raw.user;
 
   const firstName =
@@ -218,7 +267,8 @@ function normalizeStaff(raw: RawStaff): StaffProfile {
   const roleFromUser =
     user?.roles
       ?.map((role) => role.name)
-      .find(Boolean) ?? null;
+      .find(Boolean) ??
+    null;
 
   const deletedAt =
     raw.deletedAt ??
@@ -242,7 +292,11 @@ function normalizeStaff(raw: RawStaff): StaffProfile {
     fullName:
       raw.fullName ??
       raw.full_name ??
-      [firstName, fatherName, lastName]
+      [
+        firstName,
+        fatherName,
+        lastName,
+      ]
         .filter(Boolean)
         .join(" "),
 
@@ -291,22 +345,29 @@ function normalizeStaff(raw: RawStaff): StaffProfile {
       null,
 
     accountStatus:
-      raw.accountStatus ??
-      raw.account_status ??
-      user?.account_status ??
-      "disabled",
+      normalizeAccountStatus(
+        raw.accountStatus ??
+        raw.account_status ??
+        user?.account_status,
+      ),
 
-    degree: raw.degree ?? null,
+    degree:
+      raw.degree ??
+      null,
 
     specialization:
-      raw.specialization ?? null,
+      raw.specialization ??
+      null,
 
     university:
-      raw.university ?? null,
+      raw.university ??
+      null,
 
     graduationYear:
       raw.graduationYear ??
-      nullableNumber(raw.graduation_year),
+      nullableNumber(
+        raw.graduation_year,
+      ),
 
     hireDate:
       raw.hireDate ??
@@ -315,16 +376,20 @@ function normalizeStaff(raw: RawStaff): StaffProfile {
 
     experienceYears:
       raw.experienceYears ??
-      nullableNumber(raw.experience_years),
+      nullableNumber(
+        raw.experience_years,
+      ),
 
     serviceType:
       raw.serviceType ??
       raw.service_type ??
       null,
 
-    role: normalizeRole(
-      raw.role ?? roleFromUser,
-    ),
+    role:
+      normalizeRole(
+        raw.role ??
+        roleFromUser,
+      ),
 
     isDeleted:
       raw.isDeleted ??
@@ -345,11 +410,16 @@ function normalizeStaff(raw: RawStaff): StaffProfile {
   };
 }
 
-function normalizePaginator(raw: RawPaginator): StaffPaginator {
-  const meta = raw.meta ?? {};
+function normalizePaginator(
+  raw: RawPaginator,
+): StaffPaginator {
+  const meta =
+    raw.meta ?? {};
 
   return {
-    data: (raw.data ?? []).map(normalizeStaff),
+    data: (
+      raw.data ?? []
+    ).map(normalizeStaff),
 
     currentPage:
       raw.current_page ??
@@ -384,60 +454,27 @@ function normalizePaginator(raw: RawPaginator): StaffPaginator {
   };
 }
 
-function appendFormDataValue(
-  formData: FormData,
-  key: string,
-  value: unknown,
-): void {
-  if (
-    value === undefined ||
-    value === null ||
-    value === ""
-  ) {
-    return;
-  }
-
-  if (value instanceof File) {
-    formData.append(key, value);
-    return;
-  }
-
-  formData.append(key, String(value));
-}
-
-function toFormData(
-  values: Record<string, unknown>,
-): FormData {
-  const formData = new FormData();
-
-  Object.entries(values).forEach(([key, value]) => {
-    appendFormDataValue(
-      formData,
-      key,
-      value,
-    );
-  });
-
-  return formData;
-}
-
 export const staffApi = {
   async getByRole(
     role: StaffRole,
     page = 1,
     perPage = 15,
   ): Promise<StaffPaginator> {
-    const response = await axiosClient.get<
-      ApiResponse<RawPaginator> | RawPaginator
-    >(
-      staffEndpoints.byRole(role),
-      {
-        params: {
-          page,
-          per_page: perPage,
+    const response =
+      await axiosClient.get<
+        | ApiResponse<RawPaginator>
+        | RawPaginator
+      >(
+        API_ENDPOINTS.STAFF.BY_ROLE(
+          role,
+        ),
+        {
+          params: {
+            page,
+            per_page: perPage,
+          },
         },
-      },
-    );
+      );
 
     return normalizePaginator(
       unwrap(response.data),
@@ -447,11 +484,30 @@ export const staffApi = {
   async getDetails(
     staffId: ApiId,
   ): Promise<StaffProfile> {
-    const response = await axiosClient.get<
-      ApiResponse<RawStaff> | RawStaff
-    >(
-      staffEndpoints.details(staffId),
+    const response =
+      await axiosClient.get<
+        | ApiResponse<RawStaff>
+        | RawStaff
+      >(
+        API_ENDPOINTS.STAFF.DETAILS(
+          staffId,
+        ),
+      );
+
+    return normalizeStaff(
+      unwrap(response.data),
     );
+  },
+
+  async getProfile():
+    Promise<StaffProfile> {
+    const response =
+      await axiosClient.get<
+        | ApiResponse<RawStaff>
+        | RawStaff
+      >(
+        API_ENDPOINTS.STAFF.PROFILE,
+      );
 
     return normalizeStaff(
       unwrap(response.data),
@@ -467,14 +523,19 @@ export const staffApi = {
       role,
     };
 
-    const response = await axiosClient.post<
-      ApiResponse<RawStaff> | RawStaff
-    >(
-      staffEndpoints.register,
-      toFormData(
-        payload as Record<string, unknown>,
-      ),
-    );
+    const response =
+      await axiosClient.post<
+        | ApiResponse<RawStaff>
+        | RawStaff
+      >(
+        API_ENDPOINTS.STAFF.REGISTER,
+        objectToFormData(
+          payload as Record<
+            string,
+            unknown
+          >,
+        ),
+      );
 
     return normalizeStaff(
       unwrap(response.data),
@@ -483,16 +544,24 @@ export const staffApi = {
 
   async updatePersonal(
     staffId: ApiId,
-    values: UpdateStaffPersonalValues,
+    values:
+      UpdateStaffPersonalValues,
   ): Promise<StaffProfile> {
-    const response = await axiosClient.post<
-      ApiResponse<RawStaff> | RawStaff
-    >(
-      staffEndpoints.personal(staffId),
-      toFormData(
-        values as Record<string, unknown>,
-      ),
-    );
+    const response =
+      await axiosClient.post<
+        | ApiResponse<RawStaff>
+        | RawStaff
+      >(
+        API_ENDPOINTS.STAFF.PERSONAL(
+          staffId,
+        ),
+        objectToFormData(
+          values as Record<
+            string,
+            unknown
+          >,
+        ),
+      );
 
     return normalizeStaff(
       unwrap(response.data),
@@ -501,14 +570,19 @@ export const staffApi = {
 
   async updateEmployment(
     staffId: ApiId,
-    values: UpdateStaffEmploymentValues,
+    values:
+      UpdateStaffEmploymentValues,
   ): Promise<StaffProfile> {
-    const response = await axiosClient.post<
-      ApiResponse<RawStaff> | RawStaff
-    >(
-      staffEndpoints.employment(staffId),
-      values,
-    );
+    const response =
+      await axiosClient.post<
+        | ApiResponse<RawStaff>
+        | RawStaff
+      >(
+        API_ENDPOINTS.STAFF.EMPLOYMENT(
+          staffId,
+        ),
+        values,
+      );
 
     return normalizeStaff(
       unwrap(response.data),
@@ -519,7 +593,9 @@ export const staffApi = {
     staffId: ApiId,
   ): Promise<void> {
     await axiosClient.post(
-      staffEndpoints.toggleStatus(staffId),
+      API_ENDPOINTS.STAFF.TOGGLE_STATUS(
+        staffId,
+      ),
     );
   },
 
@@ -527,7 +603,9 @@ export const staffApi = {
     staffId: ApiId,
   ): Promise<void> {
     await axiosClient.delete(
-      staffEndpoints.remove(staffId),
+      API_ENDPOINTS.STAFF.DELETE(
+        staffId,
+      ),
     );
   },
 };

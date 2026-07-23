@@ -130,7 +130,7 @@ export function Sidebar() {
               </div>
 
               <div className="min-w-0 flex-1">
-                <h1 className="truncate text-[14px] font-semibold leading-5 tracking-[-0.015em] text-sidebar-foreground">
+                <h1 className="truncate text-[15px] font-semibold leading-5 tracking-[-0.015em] text-sidebar-foreground">
                   School Management
                 </h1>
 
@@ -183,7 +183,7 @@ export function Sidebar() {
         >
           {!isCollapsed ? (
             <div className="mb-3 flex items-center gap-3 px-3">
-              <span className="shrink-0 text-[9px] font-semibold uppercase tracking-[0.16em] text-sidebar-muted/80">
+              <span className="shrink-0 text-[10px] font-semibold uppercase tracking-[0.16em] text-sidebar-muted/80">
                 Main menu
               </span>
 

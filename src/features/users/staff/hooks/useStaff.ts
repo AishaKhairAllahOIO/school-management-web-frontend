@@ -4,13 +4,8 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 
-import {
-  staffApi,
-} from "../api/staff.api";
-
-import {
-  staffKeys,
-} from "./staff.keys";
+import { staffApi } from "../api/staff.api";
+import { staffKeys } from "./staff.keys";
 
 import type {
   ApiId,
@@ -20,18 +15,37 @@ import type {
   UpdateStaffPersonalValues,
 } from "../types/staff.types";
 
+type UpdateStaffPersonalMutationVariables = {
+  staffId: ApiId;
+  values: UpdateStaffPersonalValues;
+};
+
+type UpdateStaffEmploymentMutationVariables = {
+  staffId: ApiId;
+  values: UpdateStaffEmploymentValues;
+};
+
+function hasStaffId(
+  staffId: ApiId | null | undefined,
+): staffId is ApiId {
+  return (
+    staffId !== null &&
+    staffId !== undefined &&
+    staffId !== ""
+  );
+}
+
 export function useStaffByRole(
   role: StaffRole,
   page = 1,
   perPage = 15,
 ) {
   return useQuery({
-    queryKey:
-      staffKeys.rolePage(
-        role,
-        page,
-        perPage,
-      ),
+    queryKey: staffKeys.rolePage(
+      role,
+      page,
+      perPage,
+    ),
 
     queryFn: () =>
       staffApi.getByRole(
@@ -52,20 +66,39 @@ export function useStaffDetails(
     | null
     | undefined,
 ) {
+  const isEnabled =
+    hasStaffId(staffId);
+
+  return useQuery({
+    queryKey: staffKeys.detail(
+      isEnabled
+        ? staffId
+        : "disabled",
+    ),
+
+    queryFn: () => {
+      if (!isEnabled) {
+        throw new Error(
+          "A staff ID is required to load staff details.",
+        );
+      }
+
+      return staffApi.getDetails(
+        staffId,
+      );
+    },
+
+    enabled: isEnabled,
+  });
+}
+
+export function useMyStaffProfile() {
   return useQuery({
     queryKey:
-      staffKeys.detail(
-        staffId ?? "disabled",
-      ),
+      staffKeys.profile(),
 
     queryFn: () =>
-      staffApi.getDetails(
-        staffId!,
-      ),
-
-    enabled:
-      staffId !== null &&
-      staffId !== undefined,
+      staffApi.getProfile(),
   });
 }
 
@@ -77,8 +110,7 @@ export function useRegisterStaff(
 
   return useMutation({
     mutationFn: (
-      values:
-        RegisterStaffValues,
+      values: RegisterStaffValues,
     ) =>
       staffApi.register(
         role,
@@ -104,11 +136,7 @@ export function useUpdateStaffPersonal(
     mutationFn: ({
       staffId,
       values,
-    }: {
-      staffId: ApiId;
-      values:
-        UpdateStaffPersonalValues;
-    }) =>
+    }: UpdateStaffPersonalMutationVariables) =>
       staffApi.updatePersonal(
         staffId,
         values,
@@ -116,18 +144,26 @@ export function useUpdateStaffPersonal(
 
     onSuccess: async (
       staff,
+      variables,
     ) => {
       queryClient.setQueryData(
         staffKeys.detail(
-          staff.id,
+          variables.staffId,
         ),
         staff,
       );
 
-      await queryClient.invalidateQueries({
-        queryKey:
-          staffKeys.role(role),
-      });
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey:
+            staffKeys.role(role),
+        }),
+
+        queryClient.invalidateQueries({
+          queryKey:
+            staffKeys.profile(),
+        }),
+      ]);
     },
   });
 }
@@ -142,11 +178,7 @@ export function useUpdateStaffEmployment(
     mutationFn: ({
       staffId,
       values,
-    }: {
-      staffId: ApiId;
-      values:
-        UpdateStaffEmploymentValues;
-    }) =>
+    }: UpdateStaffEmploymentMutationVariables) =>
       staffApi.updateEmployment(
         staffId,
         values,
@@ -154,18 +186,26 @@ export function useUpdateStaffEmployment(
 
     onSuccess: async (
       staff,
+      variables,
     ) => {
       queryClient.setQueryData(
         staffKeys.detail(
-          staff.id,
+          variables.staffId,
         ),
         staff,
       );
 
-      await queryClient.invalidateQueries({
-        queryKey:
-          staffKeys.role(role),
-      });
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey:
+            staffKeys.role(role),
+        }),
+
+        queryClient.invalidateQueries({
+          queryKey:
+            staffKeys.profile(),
+        }),
+      ]);
     },
   });
 }
@@ -199,6 +239,11 @@ export function useToggleStaffStatus(
             staffKeys.detail(
               staffId,
             ),
+        }),
+
+        queryClient.invalidateQueries({
+          queryKey:
+            staffKeys.profile(),
         }),
       ]);
     },

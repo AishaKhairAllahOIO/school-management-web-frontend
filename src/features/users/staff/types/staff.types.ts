@@ -1,4 +1,10 @@
-export type ApiId = string | number;
+import type {
+  ApiId,
+} from "../../shared/types/api.types";
+
+export type {
+  ApiId,
+} from "../../shared/types/api.types";
 
 export type StaffRole =
   | "teacher"
@@ -7,7 +13,9 @@ export type StaffRole =
   | "counselor"
   | "service_staff";
 
-export type StaffGender = "male" | "female";
+export type StaffGender =
+  | "male"
+  | "female";
 
 export type StaffNationality =
   | "syrian"
@@ -32,46 +40,58 @@ export type StaffServiceType =
   | "maintenance"
   | "kitchen_staff";
 
-export type StaffProfile = {
-  id: ApiId;
-  userId: ApiId | null;
+export type StaffAccountStatus =
+  | "active"
+  | "disabled";
 
-  firstName: string;
-  fatherName: string;
-  motherName: string;
-  lastName: string;
-  fullName: string;
-
-  phoneNumber: string;
-  email: string | null;
-
-  birthDate: string | null;
-  birthPlace: string | null;
-
-  gender: StaffGender | null;
-  nationality: StaffNationality | null;
-
-  address: string | null;
-  photoUrl: string | null;
-
-  accountStatus: string;
-
-  degree: StaffDegree | null;
-  specialization: string | null;
-  university: string | null;
-  graduationYear: number | null;
-
-  hireDate: string | null;
-  experienceYears: number | null;
-
-  serviceType: StaffServiceType | null;
-  role: StaffRole | null;
-
-  isDeleted: boolean;
+export type StaffTimestampFields = {
   deletedAt: string | null;
   createdAt: string | null;
   updatedAt: string | null;
 };
+
+export type StaffProfile =
+  StaffTimestampFields & {
+    id: ApiId;
+    userId: ApiId | null;
+
+    firstName: string;
+    fatherName: string;
+    motherName: string;
+    lastName: string;
+    fullName: string;
+
+    phoneNumber: string;
+    email: string | null;
+
+    birthDate: string | null;
+    birthPlace: string | null;
+
+    gender: StaffGender | null;
+    nationality:
+      StaffNationality | null;
+
+    address: string | null;
+    photoUrl: string | null;
+
+    accountStatus:
+      StaffAccountStatus;
+
+    degree: StaffDegree | null;
+    specialization: string | null;
+    university: string | null;
+    graduationYear: number | null;
+
+    hireDate: string | null;
+    experienceYears: number | null;
+
+    serviceType:
+      StaffServiceType | null;
+
+    role: StaffRole | null;
+
+    isDeleted: boolean;
+  };
 
 export type StaffPaginator = {
   data: StaffProfile[];
@@ -99,7 +119,9 @@ export type RegisterStaffValues = {
   address: string;
   gender: StaffGender;
 
-  nationality?: StaffNationality | null;
+  nationality?:
+    | StaffNationality
+    | null;
 
   photo_url?: File | null;
   email?: string | null;
@@ -113,7 +135,10 @@ export type RegisterStaffValues = {
   experience_years?: number | null;
 
   password?: string | null;
-  service_type?: StaffServiceType | null;
+
+  service_type?:
+    | StaffServiceType
+    | null;
 };
 
 export type UpdateStaffPersonalValues = {
@@ -130,7 +155,9 @@ export type UpdateStaffPersonalValues = {
   address?: string;
   gender?: StaffGender;
 
-  nationality?: StaffNationality | null;
+  nationality?:
+    | StaffNationality
+    | null;
 
   photo_url?: File | null;
   email?: string | null;
@@ -145,7 +172,9 @@ export type UpdateStaffEmploymentValues = {
   hire_date?: string;
   experience_years?: number | null;
 
-  service_type?: StaffServiceType | null;
+  service_type?:
+    | StaffServiceType
+    | null;
 };
 
 export type StaffSectionConfig = {

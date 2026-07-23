@@ -8,6 +8,18 @@ export const staffKeys = {
     "staff",
   ] as const,
 
+  profile: () =>
+    [
+      ...staffKeys.all,
+      "profile",
+    ] as const,
+
+  roleCounts: () =>
+    [
+      ...staffKeys.all,
+      "role-counts",
+    ] as const,
+
   roles: () =>
     [
       ...staffKeys.all,
@@ -48,4 +60,4 @@ export const staffKeys = {
       ...staffKeys.details(),
       staffId,
     ] as const,
-};
+} as const;

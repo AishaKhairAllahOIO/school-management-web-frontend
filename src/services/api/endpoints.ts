@@ -47,194 +47,129 @@ export const API_ENDPOINTS = {
   },
 
   STUDENTS: {
-  REGISTER:
-    "/admin/student/register",
+    REGISTER: "/admin/student/register",
 
-  IMPORT:
-    "/admin/student/import",
+    IMPORT: "/admin/student/import",
 
-  IMPORT_STATUS: (
-    batchId: ApiId,
-  ) =>
-    `/admin/student/import-batches/${batchId}/status`,
+    IMPORT_STATUS: (batchId: ApiId) =>
+      `/admin/student/import-batches/${batchId}/status`,
 
-  IMPORT_ERRORS: (
-    batchId: ApiId,
-  ) =>
-    `/admin/student/import-batches/${batchId}/errors/export`,
+    IMPORT_ERRORS: (batchId: ApiId) =>
+      `/admin/student/import-batches/${batchId}/errors/export`,
 
-  IMPORT_HISTORY:
-    "/admin/student/import-batches/history",
+    IMPORT_HISTORY: "/admin/student/import-batches/history",
 
-  FILTER:
-    "/admin/students/filter",
+    FILTER: "/admin/students/filter",
 
-  SEARCH:
-    "/admin/students/search",
+    SEARCH: "/admin/students/search",
 
-  DETAILS: (
-    studentId: ApiId,
-  ) =>
-    `/admin/students/${studentId}`,
+    DETAILS: (studentId: ApiId) =>
+      `/admin/students/${studentId}`,
 
-  FULL_PROFILE: (
-    enrollmentId: ApiId,
-  ) =>
-    `/admin/students/${enrollmentId}/full-profile`,
+    FULL_PROFILE: (enrollmentId: ApiId) =>
+      `/admin/students/${enrollmentId}/full-profile`,
 
-  PERSONAL: (
-    studentId: ApiId,
-  ) =>
-    `/admin/students/${studentId}/personal`,
+    PERSONAL: (studentId: ApiId) =>
+      `/admin/students/${studentId}/personal`,
 
-  GUARDIAN_PERSONAL: (
-    guardianId: ApiId,
-  ) =>
-    `/admin/students/guardians/${guardianId}/personal`,
+    GUARDIAN_PERSONAL: (guardianId: ApiId) =>
+      `/admin/students/guardians/${guardianId}/personal`,
 
-  ENROLLMENT: (
-    enrollmentId: ApiId,
-  ) =>
-    `/admin/students/enrollments/${enrollmentId}`,
+    ENROLLMENT: (enrollmentId: ApiId) =>
+      `/admin/students/enrollments/${enrollmentId}`,
 
-  TOGGLE_ACCOUNT_STATUS: (
-    enrollmentId: ApiId,
-  ) =>
-    `/admin/students/${enrollmentId}/toggle-account-status`,
+    TOGGLE_ACCOUNT_STATUS: (enrollmentId: ApiId) =>
+      `/admin/students/${enrollmentId}/toggle-account-status`,
 
-  DELETE: (
-    studentId: ApiId,
-  ) =>
-    `/admin/students/${studentId}`,
-},
-
-STAFF: {
-  REGISTER: "/admin/staff/register",
-
-  IMPORT: "/admin/staff/import",
-
-  IMPORT_STATUS: (
-    batchId: ApiId,
-  ) =>
-    `/admin/staff/import-batches/${batchId}/status`,
-
-  IMPORT_ERRORS: (
-    batchId: ApiId,
-  ) =>
-    `/admin/staff/import-batches/${batchId}/errors/export`,
-
-  LIST: "/admin/staff/showAllStaff",
-
-  SEARCH: "/admin/staff/search",
-
-  ALPHABETICAL:
-    "/admin/staff/alphabetical",
-
-  DETAILS: (
-    staffId: ApiId,
-  ) =>
-    `/admin/staff/showStaff/${staffId}`,
-
-  PERSONAL: (
-    staffId: ApiId,
-  ) =>
-    `/admin/staff/${staffId}/personal`,
-
-  EMPLOYMENT: (
-    staffId: ApiId,
-  ) =>
-    `/admin/staff/${staffId}/employment`,
-
-  ROLE_COUNTS:
-    "/admin/staff/counts/roles",
-
-  BY_ROLE: (
-    role: string,
-  ) =>
-    `/admin/staff/role/${encodeURIComponent(role)}`,
-
-  PROFILE:
-    "/admin/staff/profile",
-
-  TOGGLE_STATUS: (
-    staffId: ApiId,
-  ) =>
-    `/admin/staff/${staffId}/toggle-status`,
-
-  DELETE: (
-    staffId: ApiId,
-  ) =>
-    `/admin/staff/${staffId}`,
-},
-
-ACADEMICS: {
-  SUBJECTS: {
-    LIST:
-      "/subject/setting/subjects/show",
-
-    CREATE:
-      "/subject/setting/subject/store",
-
-    UPDATE: (
-      subjectId: ApiId,
-    ) =>
-      `/subject/setting/subjects/update/${subjectId}`,
-
-    DELETE: (
-      subjectId: ApiId,
-    ) =>
-      `/subject/setting/subject/delete/${subjectId}`,
+    DELETE: (studentId: ApiId) =>
+      `/admin/students/${studentId}`,
   },
 
-  GRADE_SUBJECTS: {
-    LIST:
-      "/subject/setting/grade/subjects/show",
+  STAFF: {
+    REGISTER: "/admin/staff/register",
 
-    DETAILS: (
-      gradeSubjectId: ApiId,
-    ) =>
-      `/subject/setting/grade/subjects/show/${gradeSubjectId}`,
+    IMPORT: "/admin/staff/import",
 
-    CREATE:
-      "/subject/setting/grade/subject/store",
+    IMPORT_STATUS: (batchId: ApiId) =>
+      `/admin/staff/import-batches/${batchId}/status`,
 
-    UPDATE: (
-      gradeSubjectId: ApiId,
-    ) =>
-      `/subject/setting/grade/subjects/update/${gradeSubjectId}`,
+    IMPORT_ERRORS: (batchId: ApiId) =>
+      `/admin/staff/import-batches/${batchId}/errors/export`,
 
-    DELETE: (
-      gradeSubjectId: ApiId,
-    ) =>
-      `/subject/setting/grade/subject/delete/${gradeSubjectId}`,
+    LIST: "/admin/staff/showAllStaff",
+
+    SEARCH: "/admin/staff/search",
+
+    ALPHABETICAL: "/admin/staff/alphabetical",
+
+    DETAILS: (staffId: ApiId) =>
+      `/admin/staff/showStaff/${staffId}`,
+
+    PERSONAL: (staffId: ApiId) =>
+      `/admin/staff/${staffId}/personal`,
+
+    EMPLOYMENT: (staffId: ApiId) =>
+      `/admin/staff/${staffId}/employment`,
+
+    ROLE_COUNTS: "/admin/staff/counts/roles",
+
+    BY_ROLE: (role: string) =>
+      `/admin/staff/role/${encodeURIComponent(role)}`,
+
+    PROFILE: "/admin/staff/profile",
+
+    TOGGLE_STATUS: (staffId: ApiId) =>
+      `/admin/staff/${staffId}/toggle-status`,
+
+    DELETE: (staffId: ApiId) =>
+      `/admin/staff/${staffId}`,
   },
 
-  ASSESSMENTS: {
-    LIST:
-      "/subject/setting/assessment/subjects/show",
+  ACADEMICS: {
+    SUBJECTS: {
+      LIST: "/subject/setting/subjects/show",
 
-    GROUPED:
-      "/subject/setting/assessment/subjects/grouped",
+      CREATE: "/subject/setting/subject/store",
 
-    DETAILS: (
-      assessmentId: ApiId,
-    ) =>
-      `/subject/setting/assessment/subject/show/${assessmentId}`,
+      UPDATE: (subjectId: ApiId) =>
+        `/subject/setting/subjects/update/${subjectId}`,
 
-    CREATE:
-      "/subject/setting/assessment/subject/store",
+      DELETE: (subjectId: ApiId) =>
+        `/subject/setting/subject/delete/${subjectId}`,
+    },
 
-    UPDATE: (
-      assessmentId: ApiId,
-    ) =>
-      `/subject/setting/assessment/subject/update/${assessmentId}`,
+    GRADE_SUBJECTS: {
+      LIST: "/subject/setting/grade/subjects/show",
 
-    DELETE: (
-      assessmentId: ApiId,
-    ) =>
-      `/subject/setting/assessment/subject/delete${assessmentId}`,
+      DETAILS: (gradeSubjectId: ApiId) =>
+        `/subject/setting/grade/subjects/show/${gradeSubjectId}`,
+
+      CREATE: "/subject/setting/grade/subject/store",
+
+      UPDATE: (gradeSubjectId: ApiId) =>
+        `/subject/setting/grade/subjects/update/${gradeSubjectId}`,
+
+      DELETE: (gradeSubjectId: ApiId) =>
+        `/subject/setting/grade/subject/delete/${gradeSubjectId}`,
+    },
+
+    ASSESSMENTS: {
+      LIST: "/subject/setting/assessment/subjects/show",
+
+      GROUPED: "/subject/setting/assessment/subjects/grouped",
+
+      DETAILS: (assessmentId: ApiId) =>
+        `/subject/setting/assessment/subject/show/${assessmentId}`,
+
+      CREATE: "/subject/setting/assessment/subject/store",
+
+      UPDATE: (assessmentId: ApiId) =>
+        `/subject/setting/assessment/subject/update/${assessmentId}`,
+
+      DELETE: (assessmentId: ApiId) =>
+        `/subject/setting/assessment/subject/delete${assessmentId}`,
+    },
   },
-},
 
   FINANCIAL: {
     BASE: "/admin/finance/settings",
@@ -248,22 +183,25 @@ ACADEMICS: {
     EXTRA_SERVICES: "/admin/finance/settings/extra-services",
   },
 
+  FINANCE_OPERATIONS: {
+    ACCOUNTS: "/admin/finance/contracts/accounts",
 
-FINANCE_OPERATIONS: {
-    ACCOUNTS: "/admin/finance/contracts/accounts", // [cite: 11, 15]
-    ACCOUNT: (studentId: string | number) =>
-      `/admin/finance/contracts/accounts/${studentId}`, // [cite: 61, 65]
-    
-    FINALIZE_CONTRACT: "/admin/finance/contracts/finalize", // [cite: 113, 117]
-    UPDATE_CONTRACT: (studentId: string | number) =>
-      `/admin/finance/contracts/${studentId}`, // [cite: 210, 214]
-    
-    INSTALLMENTS: "/admin/finance/contracts/installments", // [cite: 260, 262]
-    INSTALLMENT: (id: string | number) =>
-      `/admin/finance/contracts/installments/${id}`, // [cite: 293, 295]
-    
-    PAYMENTS: "/admin/finance/contracts/payments", // [cite: 324, 326, 385, 387]
-    PAYMENT: (id: string | number) =>
-      `/admin/finance/contracts/payments/${id}`, // [cite: 355, 358, 451, 456, 497, 500]
+    ACCOUNT: (studentId: ApiId) =>
+      `/admin/finance/contracts/accounts/${studentId}`,
+
+    FINALIZE_CONTRACT: "/admin/finance/contracts/finalize",
+
+    UPDATE_CONTRACT: (studentId: ApiId) =>
+      `/admin/finance/contracts/${studentId}`,
+
+    INSTALLMENTS: "/admin/finance/contracts/installments",
+
+    INSTALLMENT: (id: ApiId) =>
+      `/admin/finance/contracts/installments/${id}`,
+
+    PAYMENTS: "/admin/finance/contracts/payments",
+
+    PAYMENT: (id: ApiId) =>
+      `/admin/finance/contracts/payments/${id}`,
   },
 } as const;

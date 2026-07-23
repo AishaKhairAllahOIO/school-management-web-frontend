@@ -84,7 +84,6 @@ export function UsersOverviewPage() {
           icon={GraduationCap}
           count={counts.students}
           countLabel="Total students"
-          secondaryCount={counts.parents}
           secondaryCountLabel="Parents"
           viewLabel="View all students"
           accentClassName="bg-primary"

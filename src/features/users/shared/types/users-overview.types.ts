@@ -1,6 +1,9 @@
+import type {
+  ApiResponse,
+} from "./api.types";
+
 export type UsersOverviewCounts = {
   students?: number;
-  parents?: number;
   teachers?: number;
   supervisors?: number;
   secretaries?: number;
@@ -15,13 +18,9 @@ export type UsersRoleCountsApiData = {
   counselor?: number;
   secretary?: number;
   service_staff?: number;
-  super_admin?: number;
   student?: number;
   total?: number;
 };
 
-export type UsersRoleCountsApiResponse = {
-  success: boolean;
-  message: string;
-  data: UsersRoleCountsApiData;
-};
+export type UsersRoleCountsApiResponse =
+  ApiResponse<UsersRoleCountsApiData>;

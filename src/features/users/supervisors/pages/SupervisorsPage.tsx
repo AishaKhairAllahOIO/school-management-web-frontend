@@ -1,9 +1,6 @@
-import {
-  StaffRolePage,
-} from "../../staff/pages/StaffRolePage";
+import { StaffRolePage } from "../../staff/pages/StaffRolePage";
 
-export function SupervisorsPage() {
-  return (
-    <StaffRolePage role="adviser" />
-  );
+export function SupervisorsPage() 
+{
+  return ( <StaffRolePage role="adviser" /> );
 }

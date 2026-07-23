@@ -1,13 +1,22 @@
-export type ApiId = string | number;
+export type ApiId =
+  | string
+  | number;
+
+export type ApiStatus =
+  | boolean
+  | string
+  | number;
 
 export type ApiResponse<T> = {
-  status: boolean;
-  message: string;
+  success?: boolean;
+  status?: ApiStatus;
+  message?: string;
   data: T;
 };
 
 export type ApiMessageResponse = {
-  status: boolean;
+  success?: boolean;
+  status?: ApiStatus;
   message: string;
 };
 
@@ -34,27 +43,35 @@ export type PaginatedData<T> = {
   meta: PaginationMeta;
 };
 
+export type LaravelPaginationLink = {
+  url: string | null;
+  label: string;
+  active: boolean;
+};
+
 export type LaravelPaginationResponse<T> = {
   data: T[];
+
   current_page: number;
   first_page_url: string;
   from: number | null;
+
   last_page: number;
   last_page_url: string;
-  links: Array<{
-    url: string | null;
-    label: string;
-    active: boolean;
-  }>;
+
+  links: LaravelPaginationLink[];
+
   next_page_url: string | null;
   path: string;
   per_page: number;
   prev_page_url: string | null;
+
   to: number | null;
   total: number;
 };
 
-export type ValidationErrors = Record<string, string[]>;
+export type ValidationErrors =
+  Record<string, string[]>;
 
 export type ApiValidationError = {
   message: string;

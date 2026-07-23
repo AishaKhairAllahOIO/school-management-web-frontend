@@ -1,9 +1,6 @@
-import {
-  StaffRolePage,
-} from "../../staff/pages/StaffRolePage";
+import { StaffRolePage } from "../../staff/pages/StaffRolePage";
 
-export function SecretariesPage() {
-  return (
-    <StaffRolePage role="secretary" />
-  );
+export function SecretariesPage() 
+{
+  return ( <StaffRolePage role="secretary" /> );
 }
