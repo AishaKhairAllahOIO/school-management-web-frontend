@@ -3,6 +3,7 @@ import {
 } from "react";
 
 import {
+   ArrowLeft,
   ArrowUpAZ,
   BriefcaseBusiness,
   Download,
@@ -225,47 +226,72 @@ export function StaffRolePage({
         />
 
         <div className="relative flex flex-col gap-6 xl:flex-row xl:items-center xl:justify-between">
-          <div className="flex min-w-0 items-start gap-3.5">
-            <span
-              className={[
-                "flex h-12 w-12 shrink-0 items-center justify-center",
-                "rounded-[17px]",
-                config.color.light,
-                config.color.text,
-              ].join(" ")}
-            >
-              <Icon
-                className="h-5 w-5"
-                strokeWidth={
-                  1.8
-                }
-              />
-            </span>
+          <div className="relative min-w-0 pt-2">
+  <button
+    type="button"
+    aria-label="Back to users"
+    title="Back to users"
+    onClick={() =>
+      navigate("/users")
+    }
+    className={[
+      "absolute left-2 top-0",
+      "inline-flex h-7 w-7",
+      "items-center justify-center",
+      "rounded-full",
+      "transition duration-200",
+      config.color.text,
+      config.color.hover,
+      "hover:-translate-x-0.5",
+      "focus-visible:outline-none",
+      "focus-visible:ring-4",
+      config.color.ring,
+    ].join(" ")}
+  >
+    <ArrowLeft
+      className="h-4 w-4"
+      strokeWidth={1.9}
+    />
+  </button>
 
-            <div className="min-w-0">
-              <p
-                className={[
-                  "text-[10px] font-semibold uppercase tracking-[0.14em]",
-                  config.color.text,
-                ].join(" ")}
-              >
-                Staff directory
-              </p>
+  <div className="flex min-w-0 items-start gap-3.5">
+    <span
+      className={[
+        "mt-5 flex h-10 w-12 shrink-0",
+        "items-center justify-center",
+        "rounded-[17px]",
+        config.color.light,
+        config.color.text,
+      ].join(" ")}
+    >
+      <Icon
+        className="h-5 w-5"
+        strokeWidth={1.8}
+      />
+    </span>
 
-              <h1 className="mt-1 text-[27px] font-semibold tracking-[-0.04em] text-foreground">
-                {config.title}
-              </h1>
+    <div className="min-w-0">
+      <p
+        className={[
+          "text-[10px] font-semibold uppercase tracking-[0.14em]",
+          config.color.text,
+        ].join(" ")}
+      >
+        Staff directory
+      </p>
 
-              <p className="mt-1.5 max-w-2xl text-sm font-normal leading-6 text-muted-foreground">
-                Review profiles,
-                employment details
-                and account access
-                for{" "}
-                {config.pluralLabel.toLowerCase()}
-                .
-              </p>
-            </div>
-          </div>
+      <h1 className="mt-1 text-[27px] font-semibold tracking-[-0.04em] text-foreground">
+        {config.title}
+      </h1>
+
+      <p className="mt-1.5 max-w-2xl text-sm font-normal leading-6 text-muted-foreground">
+        Review profiles, employment details and
+        account access for{" "}
+        {config.pluralLabel.toLowerCase()}.
+      </p>
+    </div>
+  </div>
+</div>
 
           <div className="grid w-full gap-2.5 xl:w-[466px]">
             <div className="grid w-full grid-cols-[minmax(0,1fr)_82px] gap-2">
@@ -491,9 +517,6 @@ export function StaffRolePage({
 
                 <span>
                   Add{" "}
-                  {
-                    config.singularLabel
-                  }
                 </span>
               </button>
             </div>

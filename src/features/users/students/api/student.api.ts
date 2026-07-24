@@ -30,18 +30,7 @@ import type {
   UpdateStudentPersonalPayload,
 } from "../types/student.types";
 
-/**
- * بعض endpoints تعيد:
- *
- * {
- *   status: true,
- *   data: ...
- * }
- *
- * وبعضها قد يعيد data مباشرة.
- *
- * هذه الدالة تجعل studentApi يتعامل مع الحالتين.
- */
+
 function unwrapResponse<T>(
   response: ApiResponse<T> | T,
 ): T {
@@ -56,17 +45,7 @@ function unwrapResponse<T>(
   return response as T;
 }
 
-/**
- * الباك قد يعيد snake_case:
- *
- * enrollment_id
- * account_status
- *
- * بينما الفرونت يستخدم camelCase:
- *
- * enrollmentId
- * accountStatus
- */
+
 function normalizeToggleAccountResponse(
   response: ToggleStudentAccountResponse & {
     enrollment_id?: ApiId;
@@ -157,11 +136,6 @@ export const studentApi = {
     return unwrapResponse(response.data);
   },
 
-  /**
-   * جلب البروفايل الكامل.
-   *
-   * هذا endpoint يستخدم enrollmentId.
-   */
   async getFullProfile(
     enrollmentId: ApiId,
   ): Promise<StudentFullProfile> {
@@ -176,9 +150,6 @@ export const studentApi = {
     return unwrapResponse(response.data);
   },
 
-  /**
-   * تسجيل طالب جديد.
-   */
   async register(
     payload: RegisterStudentPayload,
   ): Promise<StudentFullProfile> {

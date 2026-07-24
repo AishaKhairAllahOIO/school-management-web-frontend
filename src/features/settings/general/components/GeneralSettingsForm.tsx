@@ -1,13 +1,17 @@
 import {
   Building2,
   Globe2,
+  Loader2,
   Mail,
   MapPin,
   Phone,
   Save,
 } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
+import {
+  useState,
+  type InputHTMLAttributes,
+} from "react";
 import {
   useForm,
   type Path,
@@ -30,7 +34,7 @@ type GeneralSettingsFormProps = {
 };
 
 type TextInputProps =
-  React.InputHTMLAttributes<HTMLInputElement> & {
+  InputHTMLAttributes<HTMLInputElement> & {
     label: string;
     required?: boolean;
     icon?: typeof Building2;
@@ -46,11 +50,20 @@ function TextInput({
   ...props
 }: TextInputProps) {
   return (
-    <label className={["block", className ?? ""].join(" ")}>
-      <span className="mb-2 block text-[11px] font-bold text-foreground/80">
+    <label
+      className={[
+        "block min-w-0",
+        className ?? "",
+      ].join(" ")}
+    >
+      <span className="mb-2 block text-xs font-semibold text-foreground/80">
         {label}
+
         {required ? (
-          <span className="text-destructive"> *</span>
+          <span className="text-destructive">
+            {" "}
+            *
+          </span>
         ) : null}
       </span>
 
@@ -58,29 +71,44 @@ function TextInput({
         {Icon ? (
           <Icon
             size={16}
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-primary"
+            strokeWidth={1.75}
+            className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground/75"
           />
         ) : null}
 
         <input
           {...props}
           className={[
-            "h-11 w-full rounded-xl border bg-card",
-            "text-sm font-semibold text-foreground",
-            "outline-none transition",
-            "placeholder:font-normal placeholder:text-muted-foreground",
-            "focus:border-primary/50 focus:ring-4 focus:ring-primary/10",
-            "disabled:cursor-not-allowed disabled:opacity-60",
-            Icon ? "pl-10 pr-4" : "px-4",
+            "h-12 w-full rounded-[16px]",
+            "border border-transparent",
+            "bg-muted/[0.38]",
+            "text-sm font-medium text-foreground",
+            "outline-none transition duration-200",
+            "placeholder:font-normal",
+            "placeholder:text-muted-foreground/65",
+            "hover:bg-muted/55",
+            "focus:border-primary/20",
+            "focus:bg-background",
+            "focus:ring-4 focus:ring-primary/[0.07]",
+            "disabled:cursor-not-allowed",
+            "disabled:opacity-60",
+            Icon
+              ? "pl-11 pr-4"
+              : "px-4",
             error
-              ? "border-destructive/60"
-              : "border-border/70",
+              ? [
+                  "border-destructive/35",
+                  "bg-destructive/[0.025]",
+                  "focus:border-destructive/40",
+                  "focus:ring-destructive/[0.07]",
+                ].join(" ")
+              : "",
           ].join(" ")}
         />
       </div>
 
       {error ? (
-        <p className="mt-1.5 text-[11px] font-semibold text-destructive">
+        <p className="mt-1.5 px-1 text-[11px] font-medium text-destructive">
           {error}
         </p>
       ) : null}
@@ -98,20 +126,58 @@ function SectionHeader({
   icon: typeof Building2;
 }) {
   return (
-    <div className="mb-5 flex items-start gap-3">
-      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-        <Icon size={20} strokeWidth={1.9} />
+    <div className="mb-6 flex items-start gap-3.5">
+      <span
+        className={[
+          "flex h-10 w-10 shrink-0",
+          "items-center justify-center",
+          "rounded-[15px]",
+          "bg-primary/[0.08]",
+          "text-primary",
+        ].join(" ")}
+      >
+        <Icon
+          size={18}
+          strokeWidth={1.75}
+        />
       </span>
 
-      <div className="pt-0.5">
-        <h2 className="text-base font-bold text-foreground">
+      <div className="min-w-0 pt-0.5">
+        <h2 className="text-[15px] font-semibold text-foreground">
           {title}
         </h2>
-        <p className="mt-1 text-xs leading-5 text-muted-foreground">
+
+        <p className="mt-1 max-w-xl text-xs leading-5 text-muted-foreground">
           {description}
         </p>
       </div>
     </div>
+  );
+}
+
+function SettingsCard({
+  children,
+  className,
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <section
+      className={[
+        "rounded-[26px]",
+        "border border-border/45",
+        "bg-card",
+        "p-5 sm:p-6",
+        "shadow-[0_10px_35px_rgba(30,20,70,0.035)]",
+        "transition duration-300",
+        "hover:border-border/65",
+        "hover:shadow-[0_14px_42px_rgba(30,20,70,0.055)]",
+        className ?? "",
+      ].join(" ")}
+    >
+      {children}
+    </section>
   );
 }
 
@@ -262,7 +328,9 @@ function GeneralSettingsFormContent({
 
     for (const mapping of fieldMappings) {
       const message =
-        validationErrors[mapping.apiField]?.[0];
+        validationErrors[
+          mapping.apiField
+        ]?.[0];
 
       if (!message) {
         continue;
@@ -318,7 +386,10 @@ function GeneralSettingsFormContent({
         onSuccess: (settings) => {
           setSelectedLogo(null);
           setLogoError(undefined);
-          reset(getDefaultValues(settings));
+
+          reset(
+            getDefaultValues(settings),
+          );
         },
         onError:
           applyServerValidationErrors,
@@ -327,7 +398,10 @@ function GeneralSettingsFormContent({
   }
 
   function handleCancel() {
-    reset(getDefaultValues(initialData));
+    reset(
+      getDefaultValues(initialData),
+    );
+
     clearErrors();
     setSelectedLogo(null);
     setLogoError(undefined);
@@ -336,257 +410,289 @@ function GeneralSettingsFormContent({
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="mx-auto w-full max-w-[1500px] rounded-3xl border border-border/70 bg-card p-5 shadow-soft sm:p-6"
+      className="mx-auto w-full max-w-[1500px]"
     >
-      <div className="mb-7 flex flex-col gap-4 border-b border-border/60 pb-6 lg:flex-row lg:items-center lg:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold tracking-[-0.035em] text-foreground sm:text-[28px]">
-            School Information
-          </h1>
-          <p className="mt-1.5 text-sm leading-6 text-muted-foreground">
-            Manage your school&apos;s profile,
-            contact details and visual identity.
-          </p>
-        </div>
-
-        <span className="w-fit rounded-full bg-muted px-3 py-1.5 text-[11px] font-semibold text-muted-foreground">
-          {initialData.updatedAt
-            ? `Last updated: ${new Date(
-                initialData.updatedAt,
-              ).toLocaleString()}`
-            : "School settings have not been initialized yet."}
-        </span>
-      </div>
-
       {!isInitialized ? (
-        <div className="mb-6 rounded-2xl border border-primary/20 bg-primary/5 px-4 py-3">
-          <p className="text-sm font-bold text-foreground">
-            Complete the school profile
-          </p>
-          <p className="mt-1 text-xs leading-5 text-muted-foreground">
-            These settings have not been initialized.
-            Complete the required fields and save to
-            create the school profile.
-          </p>
+        <div
+          className={[
+            "mb-5 rounded-[22px]",
+            "border border-primary/10",
+            "bg-primary/[0.035]",
+            "px-5 py-4 sm:px-6",
+          ].join(" ")}
+        >
+          <div className="flex items-start gap-3.5">
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[15px] bg-primary/[0.09] text-primary">
+              <Building2
+                size={18}
+                strokeWidth={1.75}
+              />
+            </span>
+
+            <div className="pt-0.5">
+              <p className="text-sm font-semibold text-foreground">
+                Complete the school profile
+              </p>
+
+              <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                Fill in the required information
+                and save the form to initialize
+                the school settings.
+              </p>
+            </div>
+          </div>
         </div>
       ) : null}
 
-      <div className="grid gap-6 2xl:grid-cols-[minmax(0,1fr)_360px]">
-        <div className="space-y-6">
-          <section className="rounded-3xl border border-border/60 bg-card p-5 sm:p-6">
-            <SectionHeader
-              title="Basic Information"
-              description="Update the school's identity and profile information."
-              icon={Building2}
+      <div className="space-y-5">
+        <SettingsCard>
+          <SectionHeader
+            title="School Identity"
+            description="Manage the school's name, description and visual identity."
+            icon={Building2}
+          />
+
+          <div className="grid gap-6 lg:grid-cols-[minmax(230px,290px)_minmax(0,1fr)]">
+            <SchoolLogoUpload
+              currentLogoUrl={
+                initialData.logoUrl
+              }
+              selectedFile={
+                selectedLogo
+              }
+              error={logoError}
+              disabled={
+                updateMutation.isPending
+              }
+              onFileChange={(file) => {
+                setLogoError(undefined);
+                setSelectedLogo(file);
+              }}
             />
 
-            <div className="grid gap-6 lg:grid-cols-[270px_minmax(0,1fr)]">
-              <SchoolLogoUpload
-                currentLogoUrl={
-                  initialData.logoUrl
+            <div className="grid content-start gap-5 md:grid-cols-2">
+              <TextInput
+                label="School Name"
+                required
+                error={
+                  errors.schoolName?.message
                 }
-                selectedFile={
-                  selectedLogo
-                }
-                error={logoError}
-                disabled={
-                  updateMutation.isPending
-                }
-                onFileChange={(file) => {
-                  setLogoError(undefined);
-                  setSelectedLogo(file);
-                }}
+                {...register("schoolName")}
               />
 
-              <div className="rounded-2xl border border-border/40 bg-muted/10 p-4 sm:p-5">
-                <div className="grid gap-5 md:grid-cols-2">
-                  <TextInput
-                    label="School Name"
-                    required
-                    error={
-                      errors.schoolName?.message
+              <TextInput
+                label="Short Name"
+                required
+                error={
+                  errors.shortName?.message
+                }
+                {...register("shortName")}
+              />
+
+              <label className="md:col-span-2">
+                <span className="mb-2 block text-xs font-semibold text-foreground/80">
+                  Description
+
+                  <span className="text-destructive">
+                    {" "}
+                    *
+                  </span>
+                </span>
+
+                <textarea
+                  rows={7}
+                  {...register("description")}
+                  className={[
+                    "w-full resize-none",
+                    "rounded-[18px]",
+                    "border border-transparent",
+                    "bg-muted/[0.38]",
+                    "px-4 py-3.5",
+                    "text-sm font-medium leading-6",
+                    "text-foreground",
+                    "outline-none transition duration-200",
+                    "hover:bg-muted/55",
+                    "focus:border-primary/20",
+                    "focus:bg-background",
+                    "focus:ring-4 focus:ring-primary/[0.07]",
+                    "disabled:cursor-not-allowed",
+                    "disabled:opacity-60",
+                    errors.description?.message
+                      ? [
+                          "border-destructive/35",
+                          "bg-destructive/[0.025]",
+                          "focus:border-destructive/40",
+                          "focus:ring-destructive/[0.07]",
+                        ].join(" ")
+                      : "",
+                  ].join(" ")}
+                />
+
+                {errors.description
+                  ?.message ? (
+                  <p className="mt-1.5 px-1 text-[11px] font-medium text-destructive">
+                    {
+                      errors.description
+                        .message
                     }
-                    {...register("schoolName")}
-                  />
-
-                  <TextInput
-                    label="Short Name"
-                    required
-                    error={
-                      errors.shortName?.message
-                    }
-                    {...register("shortName")}
-                  />
-
-                  <label className="md:col-span-2">
-                    <span className="mb-2 block text-[11px] font-bold text-foreground/80">
-                      Description
-                      <span className="text-destructive">
-                        {" "}
-                        *
-                      </span>
-                    </span>
-
-                    <textarea
-                      rows={6}
-                      {...register("description")}
-                      className={[
-                        "w-full resize-none rounded-xl border bg-card",
-                        "px-4 py-3 text-sm font-medium text-foreground",
-                        "outline-none transition",
-                        "focus:border-primary/50 focus:ring-4 focus:ring-primary/10",
-                        errors.description?.message
-                          ? "border-destructive/60"
-                          : "border-border/70",
-                      ].join(" ")}
-                    />
-
-                    {errors.description?.message ? (
-                      <p className="mt-1.5 text-[11px] font-semibold text-destructive">
-                        {
-                          errors.description
-                            .message
-                        }
-                      </p>
-                    ) : null}
-                  </label>
-                </div>
-              </div>
+                  </p>
+                ) : null}
+              </label>
             </div>
-          </section>
-
-          <div className="grid gap-6 xl:grid-cols-2">
-            <section className="rounded-3xl border border-border/60 bg-muted/10 p-5">
-              <SectionHeader
-                title="Contact Information"
-                description="Manage how people can reach your school."
-                icon={Phone}
-              />
-
-              <div className="grid gap-5 md:grid-cols-2">
-                <TextInput
-                  label="Phone Number"
-                  required
-                  icon={Phone}
-                  error={
-                    errors.phoneNumber?.message
-                  }
-                  {...register("phoneNumber")}
-                />
-
-                <TextInput
-                  label="Emergency Phone"
-                  required
-                  icon={Phone}
-                  error={
-                    errors.emergencyPhoneNumber
-                      ?.message
-                  }
-                  {...register(
-                    "emergencyPhoneNumber",
-                  )}
-                />
-
-                <TextInput
-                  label="Email Address"
-                  required
-                  icon={Mail}
-                  error={errors.email?.message}
-                  {...register("email")}
-                />
-
-                <TextInput
-                  label="Website"
-                  icon={Globe2}
-                  error={errors.website?.message}
-                  {...register("website")}
-                />
-              </div>
-            </section>
-
-            <section className="rounded-3xl border border-border/60 bg-muted/10 p-5">
-              <SectionHeader
-                title="Address & Location"
-                description="Update the school's address and geographic location."
-                icon={MapPin}
-              />
-
-              <div className="grid gap-5 md:grid-cols-2">
-                <TextInput
-                  label="Country"
-                  required
-                  error={errors.country?.message}
-                  {...register("country")}
-                />
-
-                <TextInput
-                  label="City"
-                  required
-                  error={errors.city?.message}
-                  {...register("city")}
-                />
-
-                <TextInput
-                  label="Full Address"
-                  required
-                  icon={MapPin}
-                  className="md:col-span-2"
-                  error={errors.address?.message}
-                  {...register("address")}
-                />
-
-                <TextInput
-                  label="Latitude"
-                  required
-                  icon={MapPin}
-                  error={
-                    errors.location?.latitude
-                      ?.message
-                  }
-                  {...register(
-                    "location.latitude",
-                  )}
-                />
-
-                <TextInput
-                  label="Longitude"
-                  required
-                  icon={MapPin}
-                  error={
-                    errors.location?.longitude
-                      ?.message
-                  }
-                  {...register(
-                    "location.longitude",
-                  )}
-                />
-              </div>
-            </section>
           </div>
+        </SettingsCard>
+
+        <div className="grid gap-5 xl:grid-cols-2">
+          <SettingsCard>
+            <SectionHeader
+              title="Contact Information"
+              description="Manage the primary contact channels used by the school."
+              icon={Phone}
+            />
+
+            <div className="grid gap-5 md:grid-cols-2">
+              <TextInput
+                label="Phone Number"
+                required
+                icon={Phone}
+                error={
+                  errors.phoneNumber?.message
+                }
+                {...register("phoneNumber")}
+              />
+
+              <TextInput
+                label="Emergency Phone"
+                required
+                icon={Phone}
+                error={
+                  errors
+                    .emergencyPhoneNumber
+                    ?.message
+                }
+                {...register(
+                  "emergencyPhoneNumber",
+                )}
+              />
+
+              <TextInput
+                label="Email Address"
+                required
+                type="email"
+                icon={Mail}
+                error={
+                  errors.email?.message
+                }
+                {...register("email")}
+              />
+
+              <TextInput
+                label="Website"
+                type="url"
+                icon={Globe2}
+                error={
+                  errors.website?.message
+                }
+                {...register("website")}
+              />
+            </div>
+          </SettingsCard>
+
+          <SettingsCard>
+            <SectionHeader
+              title="Address & Location"
+              description="Update the school's physical address and geographic coordinates."
+              icon={MapPin}
+            />
+
+            <div className="grid gap-5 md:grid-cols-2">
+              <TextInput
+                label="Country"
+                required
+                error={
+                  errors.country?.message
+                }
+                {...register("country")}
+              />
+
+              <TextInput
+                label="City"
+                required
+                error={
+                  errors.city?.message
+                }
+                {...register("city")}
+              />
+
+              <TextInput
+                label="Full Address"
+                required
+                icon={MapPin}
+                className="md:col-span-2"
+                error={
+                  errors.address?.message
+                }
+                {...register("address")}
+              />
+
+              <TextInput
+                label="Latitude"
+                required
+                inputMode="decimal"
+                error={
+                  errors.location?.latitude
+                    ?.message
+                }
+                {...register(
+                  "location.latitude",
+                )}
+              />
+
+              <TextInput
+                label="Longitude"
+                required
+                inputMode="decimal"
+                error={
+                  errors.location?.longitude
+                    ?.message
+                }
+                {...register(
+                  "location.longitude",
+                )}
+              />
+            </div>
+          </SettingsCard>
         </div>
 
-        <aside className="space-y-5">
-          <SchoolGallery
-            images={initialData.images}
-          />
-        </aside>
-      </div>
-
-      <div className="mt-7">
-        <GeneralSettingsDangerZone
-          schoolName={
-            initialData.schoolName
-          }
-          shortName={
-            initialData.shortName
-          }
-          isInitialized={
-            isInitialized
-          }
+        <SchoolGallery
+          images={initialData.images}
         />
+
+        {isInitialized ? (
+          <GeneralSettingsDangerZone
+            schoolName={
+              initialData.schoolName
+            }
+            shortName={
+              initialData.shortName
+            }
+          />
+        ) : null}
       </div>
 
-      <div className="mt-7 flex justify-end gap-3 border-t border-border/60 pt-5">
+      <div
+        className={[
+          "sticky bottom-0 z-10",
+          "mt-6 flex flex-col-reverse gap-3",
+          "rounded-t-[22px]",
+          "border-t border-border/45",
+          "bg-background/85",
+          "px-5 py-4 sm:px-6",
+          "backdrop-blur-xl",
+          "sm:flex-row sm:items-center",
+          "sm:justify-end",
+        ].join(" ")}
+      >
         <button
           type="button"
           onClick={handleCancel}
@@ -594,7 +700,17 @@ function GeneralSettingsFormContent({
             !hasUnsavedChanges ||
             updateMutation.isPending
           }
-          className="h-11 rounded-xl border border-border/70 bg-card px-7 text-sm font-bold text-foreground transition hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50"
+          className={[
+            "h-11 rounded-full",
+            "bg-muted/55 px-6",
+            "text-sm font-semibold",
+            "text-foreground/75",
+            "transition duration-200",
+            "hover:bg-muted",
+            "hover:text-foreground",
+            "disabled:cursor-not-allowed",
+            "disabled:opacity-45",
+          ].join(" ")}
         >
           Cancel
         </button>
@@ -605,9 +721,32 @@ function GeneralSettingsFormContent({
             !hasUnsavedChanges ||
             updateMutation.isPending
           }
-          className="flex h-11 items-center gap-2 rounded-xl bg-primary px-7 text-sm font-bold text-primary-foreground shadow-soft transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-70"
+          className={[
+            "flex h-11 items-center",
+            "justify-center gap-2",
+            "rounded-full bg-primary",
+            "px-6",
+            "text-sm font-semibold",
+            "text-primary-foreground",
+            "shadow-[0_10px_24px_rgba(98,74,180,0.2)]",
+            "transition duration-200",
+            "hover:-translate-y-0.5",
+            "hover:bg-primary/90",
+            "hover:shadow-[0_14px_30px_rgba(98,74,180,0.25)]",
+            "disabled:cursor-not-allowed",
+            "disabled:translate-y-0",
+            "disabled:opacity-55",
+          ].join(" ")}
         >
-          <Save size={16} />
+          {updateMutation.isPending ? (
+            <Loader2
+              size={16}
+              className="animate-spin"
+            />
+          ) : (
+            <Save size={16} />
+          )}
+
           {updateMutation.isPending
             ? "Saving..."
             : isInitialized

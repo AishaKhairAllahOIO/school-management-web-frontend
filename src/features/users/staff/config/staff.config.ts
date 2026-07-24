@@ -107,7 +107,7 @@ export const staffSectionConfigs: Record<
         "focus-visible:ring-warning/15",
 
       button:
-        "bg-warning text-warning-foreground hover:bg-warning/90",
+        "bg-warning text-white hover:bg-warning/90",
 
       footer:
         "bg-warning/[0.04] hover:bg-warning/[0.08]",

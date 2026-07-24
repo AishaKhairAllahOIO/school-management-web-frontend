@@ -370,10 +370,11 @@ export function StaffEditPage({
         mode="edit"
         title={`Edit ${staff.fullName}`}
         description={`Update the ${config.singularLabel.toLowerCase()}'s personal and employment information.`}
-        backLabel="Back to profile"
+        backLabel={`Back to ${config.singularLabel.toLowerCase()}`}
+        
         onBack={() =>
           navigate(
-            `${config.listPath}/${staffId}`,
+            `${config.listPath}`,
           )
         }
         photoUrl={visiblePhoto}

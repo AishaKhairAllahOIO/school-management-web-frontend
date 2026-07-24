@@ -111,9 +111,17 @@ export function SchoolLogoUpload({
     localError ?? error;
 
   return (
-    <div className="rounded-2xl border border-border/50 bg-muted/10 p-4">
-      <div>
-        <h3 className="text-sm font-bold text-foreground">
+    <div
+      className={[
+        "rounded-[22px]",
+        "bg-muted/[0.28]",
+        "p-3.5",
+        "transition duration-300",
+        "hover:bg-muted/[0.38]",
+      ].join(" ")}
+    >
+      <div className="px-1">
+        <h3 className="text-sm font-semibold text-foreground">
           School Logo
         </h3>
 
@@ -130,40 +138,76 @@ export function SchoolLogoUpload({
           inputRef.current?.click()
         }
         className={[
-          "group mt-4 flex min-h-[190px] w-full",
-          "items-center justify-center overflow-hidden",
-          "rounded-2xl border border-dashed bg-card",
-          "transition hover:border-primary/50 hover:bg-primary/5",
-          "disabled:cursor-not-allowed disabled:opacity-60",
+          "group relative mt-3",
+          "flex min-h-[210px] w-full",
+          "items-center justify-center",
+          "overflow-hidden rounded-[20px]",
+          "border border-dashed",
+          "bg-card",
+          "transition duration-300",
+          "hover:-translate-y-0.5",
+          "hover:border-primary/30",
+          "hover:shadow-[0_12px_30px_rgba(30,20,70,0.08)]",
+          "disabled:cursor-not-allowed",
+          "disabled:translate-y-0",
+          "disabled:opacity-60",
           displayedError
-            ? "border-destructive/60"
-            : "border-border/80",
+            ? "border-destructive/45"
+            : "border-border/65",
         ].join(" ")}
       >
         {previewUrl ? (
-          <div className="relative flex h-[190px] w-full items-center justify-center">
+          <div className="relative flex h-[210px] w-full items-center justify-center">
             <img
               src={previewUrl}
               alt="School logo preview"
-              className="h-full w-full object-contain p-5"
+              className="h-full w-full object-contain p-7"
             />
 
-            <span className="absolute inset-x-3 bottom-3 rounded-xl bg-foreground/80 px-3 py-2 text-center text-[11px] font-bold text-background opacity-0 backdrop-blur transition group-hover:opacity-100">
-              Choose another logo
-            </span>
+            <div
+              className={[
+                "absolute inset-0",
+                "flex items-end justify-center",
+                "bg-gradient-to-t",
+                "from-foreground/40",
+                "via-transparent",
+                "to-transparent",
+                "p-3",
+                "opacity-0",
+                "transition duration-300",
+                "group-hover:opacity-100",
+              ].join(" ")}
+            >
+              <span className="rounded-full bg-card/95 px-4 py-2 text-[11px] font-semibold text-foreground shadow-lg backdrop-blur">
+                Choose another logo
+              </span>
+            </div>
           </div>
         ) : (
           <div className="px-6 text-center">
-            <ImagePlus
-              size={28}
-              className="mx-auto text-primary"
-            />
+            <span
+              className={[
+                "mx-auto flex h-14 w-14",
+                "items-center justify-center",
+                "rounded-[18px]",
+                "bg-primary/[0.08]",
+                "text-primary",
+                "transition duration-300",
+                "group-hover:scale-105",
+                "group-hover:bg-primary/[0.12]",
+              ].join(" ")}
+            >
+              <ImagePlus
+                size={25}
+                strokeWidth={1.75}
+              />
+            </span>
 
-            <p className="mt-3 text-xs font-bold text-foreground">
+            <p className="mt-4 text-xs font-semibold text-foreground">
               Upload school logo
             </p>
 
-            <p className="mt-1 text-[10px] leading-4 text-muted-foreground">
+            <p className="mt-1.5 text-[10px] leading-4 text-muted-foreground">
               JPG, PNG, SVG or WebP · Max 5 MB
             </p>
           </div>
@@ -180,19 +224,33 @@ export function SchoolLogoUpload({
       />
 
       {displayedError ? (
-        <p className="mt-2 text-[11px] font-semibold text-destructive">
+        <p className="mt-2 px-1 text-[11px] font-medium text-destructive">
           {displayedError}
         </p>
       ) : null}
 
-      <div className="mt-4 flex gap-2">
+      <div className="mt-3 flex gap-2">
         <button
           type="button"
           disabled={disabled}
           onClick={() =>
             inputRef.current?.click()
           }
-          className="flex h-10 flex-1 items-center justify-center gap-2 rounded-xl bg-primary px-4 text-xs font-bold text-primary-foreground transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
+          className={[
+            "flex h-10 flex-1",
+            "items-center justify-center gap-2",
+            "rounded-full bg-primary",
+            "px-4",
+            "text-xs font-semibold",
+            "text-primary-foreground",
+            "shadow-[0_8px_20px_rgba(98,74,180,0.16)]",
+            "transition duration-200",
+            "hover:-translate-y-0.5",
+            "hover:bg-primary/90",
+            "disabled:cursor-not-allowed",
+            "disabled:translate-y-0",
+            "disabled:opacity-60",
+          ].join(" ")}
         >
           {disabled ? (
             <Loader2
@@ -213,7 +271,19 @@ export function SchoolLogoUpload({
             type="button"
             disabled={disabled}
             onClick={undoSelection}
-            className="flex h-10 items-center justify-center gap-2 rounded-xl border border-border px-4 text-xs font-bold text-muted-foreground transition hover:bg-muted disabled:opacity-60"
+            className={[
+              "flex h-10 items-center",
+              "justify-center gap-2",
+              "rounded-full",
+              "bg-card px-4",
+              "text-xs font-semibold",
+              "text-muted-foreground",
+              "shadow-[0_5px_16px_rgba(30,20,70,0.05)]",
+              "transition duration-200",
+              "hover:bg-muted",
+              "hover:text-foreground",
+              "disabled:opacity-60",
+            ].join(" ")}
           >
             <RotateCcw size={14} />
             Undo
@@ -222,8 +292,14 @@ export function SchoolLogoUpload({
       </div>
 
       {selectedFile ? (
-        <div className="mt-3 rounded-xl bg-primary/5 px-3 py-2">
-          <p className="truncate text-[11px] font-bold text-foreground">
+        <div
+          className={[
+            "mt-3 rounded-[16px]",
+            "bg-card px-3.5 py-2.5",
+            "shadow-[0_5px_16px_rgba(30,20,70,0.035)]",
+          ].join(" ")}
+        >
+          <p className="truncate text-[11px] font-semibold text-foreground">
             {selectedFile.name}
           </p>
 

@@ -9,7 +9,6 @@ import {
 import { useState } from "react";
 
 import { AcademicSettingsDangerZone } from "../components/AcademicSettingsDangerZone";
-import { AcademicSettingsHeader } from "../components/AcademicSettingsHeader";
 import { AcademicStagesSection } from "../components/sections/AcademicStagesSection";
 import { AcademicTermsSection } from "../components/sections/AcademicTermsSection";
 import { AcademicYearsSection } from "../components/sections/AcademicYearsSection";
@@ -108,7 +107,7 @@ export function AcademicSettingsPage() {
 
   return (
     <div className="mx-auto w-full max-w-[1500px] space-y-6">
-      <AcademicSettingsHeader />
+     
 
       <SettingsWorkspace
         items={workspaceItems}

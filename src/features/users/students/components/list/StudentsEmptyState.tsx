@@ -1,4 +1,7 @@
-import { SearchX, Sparkles, UserPlus } from "lucide-react";
+import {
+  SearchX,
+  UserPlus,
+} from "lucide-react";
 
 type StudentsEmptyStateProps = {
   hasSearch: boolean;
@@ -11,49 +14,103 @@ export function StudentsEmptyState({
   onAddStudent,
   onReset,
 }: StudentsEmptyStateProps) {
+  const title = hasSearch
+    ? "No students found"
+    : "No students have been added yet";
+
+  const description = hasSearch
+    ? "Try adjusting your search or filters, or reset them to browse all students."
+    : "Create your first student profile and connect their guardian and academic enrollment.";
+
   return (
-    <section className="relative overflow-hidden rounded-[34px] border border-dashed border-primary/25 bg-card px-6 py-16 text-center shadow-[var(--shadow-card)]">
-      <div className="soft-purple-gradient pointer-events-none absolute inset-0 opacity-75" />
-      <div className="relative mx-auto max-w-lg">
-        <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-[30px] border border-primary/15 bg-card/85 text-primary shadow-[var(--shadow-floating)] backdrop-blur">
-          {hasSearch ? <SearchX className="h-10 w-10" /> : <UserPlus className="h-10 w-10" />}
-        </div>
+    <section
+      className={[
+        "rounded-[28px]",
+        "border border-border/70",
+        "bg-card",
+        "px-6 py-14",
+        "text-center",
+        "shadow-[var(--shadow-card)]",
+      ].join(" ")}
+    >
+      <span
+        className={[
+          "mx-auto flex h-16 w-16",
+          "items-center justify-center",
+          "rounded-[22px]",
+          "bg-primary/[0.07]",
+          "text-primary",
+        ].join(" ")}
+      >
+        {hasSearch ? (
+          <SearchX className="h-7 w-7" />
+        ) : (
+          <UserPlus className="h-7 w-7" />
+        )}
+      </span>
 
-        <div className="mt-6 inline-flex items-center gap-2 rounded-full border border-primary/15 bg-primary/10 px-3 py-1.5 text-xs font-bold uppercase tracking-[0.1em] text-primary">
-          <Sparkles className="h-3.5 w-3.5" />
-          {hasSearch ? "No matching profiles" : "Start your directory"}
-        </div>
+      <h2
+        className={[
+          "mt-5",
+          "text-xl font-semibold",
+          "tracking-[-0.025em]",
+          "text-foreground",
+        ].join(" ")}
+      >
+        {title}
+      </h2>
 
-        <h2 className="mt-4 text-2xl font-black tracking-tight text-foreground">
-          {hasSearch ? "We could not find any students" : "No students have been added yet"}
-        </h2>
+      <p
+        className={[
+          "mx-auto mt-2",
+          "max-w-md",
+          "text-sm leading-6",
+          "text-muted-foreground",
+        ].join(" ")}
+      >
+        {description}
+      </p>
 
-        <p className="mt-3 text-sm font-medium leading-6 text-muted-foreground">
-          {hasSearch
-            ? "Try a different name, status, or sorting option. You can also reset all filters and browse the full directory."
-            : "Create the first student profile and connect their guardian and academic enrollment in one guided flow."}
-        </p>
-
-        <div className="mt-7 flex flex-col justify-center gap-2 sm:flex-row">
-          {hasSearch ? (
-            <button
-              type="button"
-              onClick={onReset}
-              className="inline-flex h-12 items-center justify-center rounded-2xl border border-border bg-card px-5 text-sm font-bold text-foreground transition hover:border-primary/25 hover:bg-secondary"
-            >
-              Reset filters
-            </button>
-          ) : null}
-
+      <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
+        {hasSearch ? (
           <button
             type="button"
-            onClick={onAddStudent}
-            className="primary-gradient inline-flex h-12 items-center justify-center gap-2 rounded-2xl px-5 text-sm font-bold text-primary-foreground shadow-[var(--shadow-auth-button)] transition hover:-translate-y-0.5"
+            onClick={onReset}
+            className={[
+              "inline-flex h-11",
+              "items-center justify-center",
+              "rounded-xl",
+              "border border-border",
+              "bg-card px-5",
+              "text-sm font-semibold",
+              "text-foreground",
+              "transition-colors",
+              "hover:border-primary/20",
+              "hover:bg-primary/[0.05]",
+            ].join(" ")}
           >
-            <UserPlus className="h-4 w-4" />
-            Add student
+            Reset filters
           </button>
-        </div>
+        ) : null}
+
+        <button
+          type="button"
+          onClick={onAddStudent}
+          className={[
+            "primary-gradient",
+            "inline-flex h-11",
+            "items-center justify-center gap-2",
+            "rounded-xl px-5",
+            "text-sm font-semibold",
+            "text-primary-foreground",
+            "shadow-[var(--shadow-auth-button)]",
+            "transition-transform",
+            "hover:-translate-y-0.5",
+          ].join(" ")}
+        >
+          <UserPlus className="h-4 w-4" />
+          Add student
+        </button>
       </div>
     </section>
   );

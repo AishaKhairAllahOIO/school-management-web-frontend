@@ -11,42 +11,17 @@ import { ResetGeneralSettingsDialog } from "./ResetGeneralSettingsDialog";
 type GeneralSettingsDangerZoneProps = {
   schoolName: string;
   shortName: string;
-  isInitialized: boolean;
 };
 
 export function GeneralSettingsDangerZone({
   schoolName,
   shortName,
-  isInitialized,
 }: GeneralSettingsDangerZoneProps) {
   const [dialogOpen, setDialogOpen] =
     useState(false);
 
   const deleteMutation =
     useDeleteGeneralSettings();
-
-  if (!isInitialized) {
-    return (
-      <section className="rounded-3xl border border-border/60 bg-muted/10 p-5">
-        <div className="flex items-start gap-4">
-          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-muted text-muted-foreground">
-            <RotateCcw size={20} />
-          </span>
-
-          <div>
-            <h2 className="text-base font-bold text-foreground">
-              School settings are not initialized
-            </h2>
-
-            <p className="mt-1 text-xs leading-5 text-muted-foreground">
-              Complete the form and save it to
-              initialize the school profile.
-            </p>
-          </div>
-        </div>
-      </section>
-    );
-  }
 
   function handleConfirm() {
     deleteMutation.mutate(undefined, {
@@ -58,15 +33,36 @@ export function GeneralSettingsDangerZone({
 
   return (
     <>
-      <section className="rounded-3xl border border-destructive/20 bg-destructive/[0.03] p-5">
+      <section
+        className={[
+          "rounded-[24px]",
+          "border border-destructive/10",
+          "bg-destructive/[0.025]",
+          "p-5 sm:p-6",
+          "transition duration-300",
+          "hover:border-destructive/15",
+          "hover:bg-destructive/[0.035]",
+        ].join(" ")}
+      >
         <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-start gap-4">
-            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-destructive/10 text-destructive">
-              <AlertTriangle size={20} />
+          <div className="flex items-start gap-3.5">
+            <span
+              className={[
+                "flex h-10 w-10 shrink-0",
+                "items-center justify-center",
+                "rounded-[15px]",
+                "bg-destructive/[0.08]",
+                "text-destructive",
+              ].join(" ")}
+            >
+              <AlertTriangle
+                size={18}
+                strokeWidth={1.75}
+              />
             </span>
 
-            <div>
-              <h2 className="text-base font-bold text-foreground">
+            <div className="pt-0.5">
+              <h2 className="text-[15px] font-semibold text-foreground">
                 Danger Zone
               </h2>
 
@@ -85,7 +81,22 @@ export function GeneralSettingsDangerZone({
             onClick={() =>
               setDialogOpen(true)
             }
-            className="flex h-10 shrink-0 items-center justify-center gap-2 rounded-xl border border-destructive/25 bg-card px-5 text-xs font-bold text-destructive transition hover:bg-destructive/10 disabled:cursor-not-allowed disabled:opacity-50"
+            className={[
+              "flex h-10 shrink-0",
+              "items-center justify-center gap-2",
+              "rounded-full",
+              "bg-card px-5",
+              "text-xs font-semibold",
+              "text-destructive",
+              "shadow-[0_6px_20px_rgba(100,20,20,0.06)]",
+              "transition duration-200",
+              "hover:-translate-y-0.5",
+              "hover:bg-destructive/[0.07]",
+              "hover:shadow-[0_10px_24px_rgba(100,20,20,0.09)]",
+              "disabled:cursor-not-allowed",
+              "disabled:translate-y-0",
+              "disabled:opacity-50",
+            ].join(" ")}
           >
             <RotateCcw size={15} />
             Reset School Settings
