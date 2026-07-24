@@ -45,6 +45,11 @@ export const staffSectionConfigs: Record<
 
       footer:
         "bg-info/[0.035] hover:bg-info/[0.07]",
+
+      fieldHover: "hover:border-info/25 hover:bg-card",
+      fieldFocus: "focus:border-info/40 focus:bg-card",
+      fieldRing: "focus:ring-info/[0.10]",
+      itemHover: "hover:border-info/20 hover:bg-info/[0.035]",
     },
   },
 
@@ -78,6 +83,11 @@ export const staffSectionConfigs: Record<
 
       footer:
         "bg-success/[0.035] hover:bg-success/[0.07]",
+
+      fieldHover: "hover:border-success/25 hover:bg-card",
+      fieldFocus: "focus:border-success/40 focus:bg-card",
+      fieldRing: "focus:ring-success/[0.10]",
+      itemHover: "hover:border-success/20 hover:bg-success/[0.035]",
     },
   },
 
@@ -111,6 +121,11 @@ export const staffSectionConfigs: Record<
 
       footer:
         "bg-warning/[0.04] hover:bg-warning/[0.08]",
+
+      fieldHover: "hover:border-warning/30 hover:bg-card",
+      fieldFocus: "focus:border-warning/45 focus:bg-card",
+      fieldRing: "focus:ring-warning/[0.12]",
+      itemHover: "hover:border-warning/25 hover:bg-warning/[0.04]",
     },
   },
 
@@ -150,6 +165,11 @@ export const staffSectionConfigs: Record<
 
       footer:
         "bg-destructive/[0.035] hover:bg-destructive/[0.07]",
+
+      fieldHover: "hover:border-destructive/25 hover:bg-card",
+      fieldFocus: "focus:border-destructive/40 focus:bg-card",
+      fieldRing: "focus:ring-destructive/[0.10]",
+      itemHover: "hover:border-destructive/20 hover:bg-destructive/[0.035]",
     },
   },
 
@@ -192,6 +212,11 @@ export const staffSectionConfigs: Record<
 
       footer:
         "bg-secondary/55 hover:bg-secondary/80",
+
+      fieldHover: "hover:border-secondary-foreground/25 hover:bg-card",
+      fieldFocus: "focus:border-secondary-foreground/40 focus:bg-card",
+      fieldRing: "focus:ring-secondary-foreground/[0.10]",
+      itemHover: "hover:border-secondary-foreground/20 hover:bg-secondary/70",
     },
   },
 };

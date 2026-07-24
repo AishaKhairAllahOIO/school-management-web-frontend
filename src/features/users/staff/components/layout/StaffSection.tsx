@@ -2,6 +2,14 @@ import type {
   ReactNode,
 } from "react";
 
+import type {
+  StaffSectionColor,
+} from "../../types/staff.types";
+
+import {
+  defaultStaffSectionColor,
+} from "../theme/staff-theme";
+
 type StaffSectionProps = {
   eyebrow: string;
   title: string;
@@ -12,7 +20,10 @@ type StaffSectionProps = {
 
   className?: string;
   contentClassName?: string;
+
+  color?: StaffSectionColor;
 };
+
 
 export function StaffSection({
   eyebrow,
@@ -22,6 +33,7 @@ export function StaffSection({
   children,
   className = "",
   contentClassName = "",
+  color = defaultStaffSectionColor,
 }: StaffSectionProps) {
   return (
     <section
@@ -44,7 +56,8 @@ export function StaffSection({
             "flex h-11 w-11 shrink-0",
             "items-center justify-center",
             "rounded-[15px]",
-            "bg-primary/[0.08] text-primary",
+            color.light,
+            color.text,
           ].join(" ")}
         >
           {icon}
@@ -55,7 +68,7 @@ export function StaffSection({
             className={[
               "text-[10px] font-semibold",
               "uppercase tracking-[0.13em]",
-              "text-primary",
+              color.text,
             ].join(" ")}
           >
             {eyebrow}

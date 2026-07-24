@@ -3,6 +3,10 @@ import {
   ShieldCheck,
 } from "lucide-react";
 
+import type {
+  StaffSectionColor,
+} from "../../types/staff.types";
+
 import {
   StaffFormField,
 } from "../fields/StaffFormField";
@@ -11,23 +15,18 @@ import {
   StaffSection,
 } from "../layout/StaffSection";
 
-const fieldClassName = [
-  "h-12 w-full rounded-[16px]",
-  "border border-border/70 bg-muted/25 px-4",
-  "text-sm font-normal text-foreground",
-  "outline-none transition duration-200",
-  "placeholder:text-muted-foreground/70",
-  "hover:border-primary/20 hover:bg-card",
-  "focus:border-primary/35 focus:bg-card",
-  "focus:ring-4 focus:ring-primary/[0.08]",
-  "disabled:cursor-not-allowed",
-  "disabled:opacity-60",
-].join(" ");
+import {
+  defaultStaffSectionColor,
+  getStaffFieldClassName,
+} from "../theme/staff-theme";
+
 
 type StaffSecurityFormSectionProps = {
   value: string;
 
   disabled?: boolean;
+
+  color?: StaffSectionColor;
 
   required?: boolean;
 
@@ -45,12 +44,15 @@ type StaffSecurityFormSectionProps = {
 export function StaffSecurityFormSection({
   value,
   disabled = false,
+  color = defaultStaffSectionColor,
   required = true,
   title = "Account access",
   description = "Create the password this staff member will use to sign in.",
   helper = "Use at least 8 characters.",
   onChange,
 }: StaffSecurityFormSectionProps) {
+  const fieldClassName = getStaffFieldClassName(color);
+
   return (
     <StaffSection
       eyebrow="Security"
@@ -59,6 +61,7 @@ export function StaffSecurityFormSection({
       icon={
         <KeyRound className="h-5 w-5" />
       }
+      color={color}
     >
       <div className="grid gap-5 lg:grid-cols-[1fr_.85fr]">
         <StaffFormField
@@ -87,8 +90,9 @@ export function StaffSecurityFormSection({
           className={[
             "flex items-start gap-3",
             "rounded-[18px]",
-            "border border-primary/10",
-            "bg-primary/[0.035]",
+            "border",
+            color.border,
+            color.footer,
             "p-4",
           ].join(" ")}
         >
@@ -97,8 +101,8 @@ export function StaffSecurityFormSection({
               "flex h-10 w-10 shrink-0",
               "items-center justify-center",
               "rounded-[14px]",
-              "bg-primary/[0.08]",
-              "text-primary",
+              color.light,
+              color.text,
             ].join(" ")}
           >
             <ShieldCheck className="h-5 w-5" />

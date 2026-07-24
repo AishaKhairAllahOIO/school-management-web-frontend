@@ -1,8 +1,4 @@
 import {
-  StaffFormFooter,
-} from "../components/layout/StaffFormFooter";
-
-import {
   StaffPageHero,
 } from "../components/layout/StaffPageHero";
 
@@ -70,7 +66,7 @@ export function StaffRegistrationPage({
   return (
     <form
       onSubmit={handleSubmit}
-      className="space-y-5 pb-28"
+      className="space-y-5 pb-8"
     >
       <StaffPageHero
         mode="create"
@@ -80,9 +76,17 @@ export function StaffRegistrationPage({
         onBack={handleCancel}
         roleLabel={config.singularLabel}
         badgeLabel="New profile"
+        icon={config.icon}
+        color={config.color}
+        showFormActions
+        loading={isSubmitting}
+        submitLabel={`Create ${config.singularLabel}`}
+        cancelLabel="Cancel"
+        onCancel={handleCancel}
       />
 
       <StaffPhotoFormSection
+        color={config.color}
         mode="create"
         photoUrl={photoPreview}
         disabled={isSubmitting}
@@ -91,18 +95,21 @@ export function StaffRegistrationPage({
       />
 
       <StaffPersonalFormSection
+        color={config.color}
         values={values}
         disabled={isSubmitting}
         updateValue={updateValue}
       />
 
       <StaffContactFormSection
+        color={config.color}
         values={values}
         disabled={isSubmitting}
         updateValue={updateValue}
       />
 
       <StaffEmploymentFormSection
+        color={config.color}
         values={values}
         disabled={isSubmitting}
         isServiceStaff={isServiceStaff}
@@ -111,6 +118,7 @@ export function StaffRegistrationPage({
 
       {requiresPassword ? (
         <StaffSecurityFormSection
+          color={config.color}
           value={values.password ?? ""}
           disabled={isSubmitting}
           onChange={(password) => {
@@ -131,12 +139,6 @@ export function StaffRegistrationPage({
         />
       ) : null}
 
-      <StaffFormFooter
-        loading={isSubmitting}
-        submitLabel={`Create ${config.singularLabel}`}
-        hint="Review the information before creating the profile."
-        onCancel={handleCancel}
-      />
     </form>
   );
 }

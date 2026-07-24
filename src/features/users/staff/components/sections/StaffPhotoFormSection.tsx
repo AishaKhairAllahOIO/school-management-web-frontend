@@ -2,6 +2,14 @@ import type {
   ChangeEvent,
 } from "react";
 
+import type {
+  StaffSectionColor,
+} from "../../types/staff.types";
+
+import {
+  defaultStaffSectionColor,
+} from "../theme/staff-theme";
+
 import {
   Camera,
 } from "lucide-react";
@@ -19,6 +27,8 @@ type StaffPhotoFormSectionProps = {
 
   disabled?: boolean;
 
+  color?: StaffSectionColor;
+
   mode?: "create" | "edit";
 
   onChange: (
@@ -31,6 +41,7 @@ type StaffPhotoFormSectionProps = {
 export function StaffPhotoFormSection({
   photoUrl,
   disabled = false,
+  color = defaultStaffSectionColor,
   mode = "create",
   onChange,
   onRemove,
@@ -50,10 +61,12 @@ export function StaffPhotoFormSection({
       icon={
         <Camera className="h-5 w-5" />
       }
+      color={color}
     >
       <StaffPhotoEditor
         photoUrl={photoUrl}
         disabled={disabled}
+        color={color}
         title={
           isEdit
             ? "Change profile photo"

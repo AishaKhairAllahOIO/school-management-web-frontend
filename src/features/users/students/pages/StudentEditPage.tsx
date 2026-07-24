@@ -312,11 +312,7 @@ export function StudentEditPage() {
     enrollmentMutation.isPending;
 
   return (
-    <main className="min-h-screen bg-background px-4 py-5 text-foreground sm:px-6 lg:px-8">
-      <form
-        onSubmit={submit}
-        className="mx-auto flex max-w-[1450px] flex-col gap-6"
-      >
+    <form onSubmit={submit} className="space-y-5 pb-8">
         <StudentPageHeader
           title="Edit student"
           description="Update personal details, guardian information and academic placement."
@@ -522,8 +518,7 @@ export function StudentEditPage() {
               : "Save all changes"}
           </button>
         </div>
-      </form>
-    </main>
+    </form>
   );
 }
 

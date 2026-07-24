@@ -1,103 +1,96 @@
-import type { LucideIcon } from "lucide-react";
-
+import type {
+  LucideIcon,
+} from "lucide-react";
 
 type ProfileInfoItemProps = {
   label: string;
   value: string | number;
   icon: LucideIcon;
+  compact?: boolean;
+  className?: string;
 };
-
-
 
 export function ProfileInfoItem({
   label,
   value,
   icon: Icon,
+  compact = false,
+  className = "",
 }: ProfileInfoItemProps) {
-
+  const displayValue =
+    value === null ||
+    value === undefined ||
+    value === ""
+      ? "—"
+      : value;
 
   return (
-
     <div
-      className="
-      group
-      flex
-      items-center
-      gap-4
-      rounded-[22px]
-      border
-      border-border/50
-      bg-card
-      px-4
-      py-3.5
-      transition
-      hover:border-primary/20
-      hover:bg-primary/[0.02]
-      "
+      className={[
+        "group flex min-w-0 items-center",
+        compact
+          ? "gap-3 rounded-[16px] px-3 py-2.5"
+          : "gap-3 rounded-[18px] px-3.5 py-3",
+        "border border-border/60",
+        "bg-card",
+        "transition-colors",
+        "hover:border-primary/20",
+        "hover:bg-primary/[0.025]",
+        className,
+      ].join(" ")}
     >
-
-
       <span
-        className="
-        flex
-        h-11
-        w-11
-        shrink-0
-        items-center
-        justify-center
-        rounded-2xl
-        bg-primary/10
-        text-primary
-        transition
-        group-hover:bg-primary/15
-        "
+        className={[
+          "flex shrink-0 items-center",
+          "justify-center",
+          "bg-primary/[0.08]",
+          "text-primary",
+          "transition-colors",
+          "group-hover:bg-primary/[0.12]",
+          compact
+            ? "h-9 w-9 rounded-[12px]"
+            : "h-10 w-10 rounded-[14px]",
+        ].join(" ")}
       >
-
         <Icon
-          size={18}
+          className={
+            compact
+              ? "h-4 w-4"
+              : "h-[17px] w-[17px]"
+          }
           strokeWidth={2}
         />
-
       </span>
 
-
-
-
-      <div
-        className="
-        min-w-0
-        "
-      >
-
+      <div className="min-w-0 flex-1">
         <p
-          className="
-          text-[11px]
-          font-semibold
-          tracking-wide
-          text-muted-foreground
-          "
+          className={[
+            "truncate font-medium",
+            "text-muted-foreground",
+            compact
+              ? "text-[10px]"
+              : "text-[11px]",
+          ].join(" ")}
         >
           {label}
         </p>
 
-
         <p
-          className="
-          mt-1
-          truncate
-          text-sm
-          font-bold
-          text-foreground
-          "
+          className={[
+            "mt-0.5 truncate",
+            "font-semibold",
+            "text-foreground",
+            compact
+              ? "text-[13px]"
+              : "text-sm",
+          ].join(" ")}
+          title={String(
+            displayValue,
+          )}
         >
-          {value || "—"}
+          {displayValue}
         </p>
-
-
       </div>
-
-
     </div>
-
   );
 }

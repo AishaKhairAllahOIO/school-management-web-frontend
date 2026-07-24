@@ -18,7 +18,6 @@ import {
 } from "react-router-dom";
 
 import { ProfileInfoCard } from "../components/profile/ProfileInfoCard";
-import { StudentProfileHero } from "../components/profile/StudentProfileHero";
 import { StudentProfileSection } from "../components/profile/StudentProfileSection";
 import { StudentPageHeader } from "../components/shared/StudentPageHeader";
 import { StudentStatusBadge } from "../components/shared/StudentStatusBadge";
@@ -114,12 +113,15 @@ export function StudentProfilePage() {
   } = profileQuery.data;
 
   return (
-    <main className="min-h-screen bg-background px-4 py-5 text-foreground sm:px-6 lg:px-8">
-      <div className="mx-auto flex max-w-[1450px] flex-col gap-6">
+    <div className="space-y-5 pb-8">
         <StudentPageHeader
-          title="Student profile"
+          title={student.fullName}
           description="Review personal information, guardian details and the current academic placement."
           showBackButton
+          backLabel="Back to students"
+          onBack={() => navigate("/users/students")}
+          photoUrl={student.photoUrl}
+          photoAlt={student.fullName}
           icon={
             <UserRound
               size={23}
@@ -156,10 +158,6 @@ export function StudentProfilePage() {
           }
         />
 
-        <StudentProfileHero
-          student={student}
-          enrollment={enrollment}
-        />
 
         <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1.15fr)_minmax(340px,.85fr)]">
           <StudentProfileSection
@@ -523,8 +521,7 @@ export function StudentProfilePage() {
             />
           </StatusSummaryCard>
         </section>
-      </div>
-    </main>
+    </div>
   );
 }
 

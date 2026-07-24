@@ -251,6 +251,8 @@ export function StaffProfilePage({
         roleLabel={
           config.singularLabel
         }
+        icon={config.icon}
+        color={config.color}
       >
         
       </StaffPageHero>
@@ -267,6 +269,7 @@ export function StaffProfilePage({
 
       <div className="grid gap-5 xl:grid-cols-[1.1fr_.9fr]">
         <StaffPersonalViewSection
+          color={config.color}
           firstName={formatText(
             staff.firstName,
           )}
@@ -298,6 +301,7 @@ export function StaffProfilePage({
 
         <div className="space-y-5">
           <StaffContactViewSection
+            color={config.color}
             phoneNumber={
               staff.phoneNumber ||
               "Not specified"
@@ -308,6 +312,7 @@ export function StaffProfilePage({
           />
 
           <StaffEmploymentViewSection
+            color={config.color}
             degree={formatText(
               staff.degree,
             )}

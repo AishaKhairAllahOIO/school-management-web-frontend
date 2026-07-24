@@ -2,6 +2,14 @@ import type {
   ChangeEvent,
 } from "react";
 
+import type {
+  StaffSectionColor,
+} from "../../types/staff.types";
+
+import {
+  defaultStaffSectionColor,
+} from "../theme/staff-theme";
+
 import {
   Camera,
   ImagePlus,
@@ -20,6 +28,8 @@ type StaffPhotoEditorProps = {
 
   disabled?: boolean;
 
+  color?: StaffSectionColor;
+
   onChange: (
     event: ChangeEvent<HTMLInputElement>,
   ) => void;
@@ -35,6 +45,7 @@ export function StaffPhotoEditor({
   replaceLabel = "Replace photo",
   chooseLabel = "Choose photo",
   disabled = false,
+  color = defaultStaffSectionColor,
   onChange,
   onRemove,
 }: StaffPhotoEditorProps) {
@@ -71,8 +82,8 @@ export function StaffPhotoEditor({
                 "flex h-14 w-14",
                 "items-center justify-center",
                 "rounded-[18px]",
-                "bg-primary/[0.07]",
-                "text-primary",
+                color.light,
+                color.text,
               ].join(" ")}
             >
               <Camera className="h-6 w-6" />
@@ -103,8 +114,8 @@ export function StaffPhotoEditor({
               "shrink-0 items-center",
               "justify-center",
               "rounded-[15px]",
-              "bg-primary/[0.07]",
-              "text-primary",
+              color.light,
+              color.text,
             ].join(" ")}
           >
             <ImagePlus className="h-5 w-5" />
@@ -133,8 +144,7 @@ export function StaffPhotoEditor({
               "text-foreground",
               "shadow-[var(--shadow-card)]",
               "transition",
-              "hover:border-primary/20",
-              "hover:bg-primary/[0.025]",
+              color.itemHover,
               disabled
                 ? "cursor-not-allowed opacity-50"
                 : "cursor-pointer",

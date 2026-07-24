@@ -11,10 +11,6 @@ import {
 } from "react-router-dom";
 
 import {
-  StaffFormFooter,
-} from "../components/layout/StaffFormFooter";
-
-import {
   StaffPageHero,
 } from "../components/layout/StaffPageHero";
 
@@ -119,11 +115,15 @@ export function StaffEditPage({
   const [photoPreview, setPhotoPreview] =
     useState<string | null>(null);
 
-  const [currentPhotoUrl, setCurrentPhotoUrl] =
-    useState<string | null>(null);
+  const [
+    currentPhotoUrl,
+    setCurrentPhotoUrl,
+  ] = useState<string | null>(null);
 
-  const [removeCurrentPhoto, setRemoveCurrentPhoto] =
-    useState(false);
+  const [
+    removeCurrentPhoto,
+    setRemoveCurrentPhoto,
+  ] = useState(false);
 
   const [formError, setFormError] =
     useState<string | null>(null);
@@ -211,9 +211,11 @@ export function StaffEditPage({
     }
 
     updateValue("photo_url", file);
+
     setPhotoPreview(
       URL.createObjectURL(file),
     );
+
     setRemoveCurrentPhoto(false);
     setFormError(null);
 
@@ -288,6 +290,7 @@ export function StaffEditPage({
           staffId,
           values: personalValues,
         }),
+
         employmentMutation.mutateAsync({
           staffId,
           values: employmentValues,
@@ -349,7 +352,8 @@ export function StaffEditPage({
     );
   }
 
-  const staff = staffQuery.data;
+  const staff =
+    staffQuery.data;
 
   const isSaving =
     personalMutation.isPending ||
@@ -364,26 +368,33 @@ export function StaffEditPage({
   return (
     <form
       onSubmit={handleSubmit}
-      className="space-y-5 pb-28"
+      className="space-y-5 pb-8"
     >
       <StaffPageHero
         mode="edit"
         title={`Edit ${staff.fullName}`}
         description={`Update the ${config.singularLabel.toLowerCase()}'s personal and employment information.`}
-        backLabel={`Back to ${config.singularLabel.toLowerCase()}`}
-        
+        backLabel={`Back to ${config.pluralLabel}`}
         onBack={() =>
-          navigate(
-            `${config.listPath}`,
-          )
+          navigate(config.listPath)
         }
         photoUrl={visiblePhoto}
         photoAlt={staff.fullName}
         roleLabel={config.singularLabel}
         badgeLabel="Edit profile"
+        icon={config.icon}
+        color={config.color}
+        showFormActions
+        loading={isSaving}
+        submitLabel="Save changes"
+        cancelLabel="Cancel"
+        onCancel={() =>
+          navigate(config.listPath)
+        }
       />
 
       <StaffPhotoFormSection
+        color={config.color}
         mode="edit"
         photoUrl={visiblePhoto}
         disabled={isSaving}
@@ -392,18 +403,21 @@ export function StaffEditPage({
       />
 
       <StaffPersonalFormSection
+        color={config.color}
         values={values}
         disabled={isSaving}
         updateValue={updateValue}
       />
 
       <StaffContactFormSection
+        color={config.color}
         values={values}
         disabled={isSaving}
         updateValue={updateValue}
       />
 
       <StaffEmploymentFormSection
+        color={config.color}
         values={values}
         disabled={isSaving}
         isServiceStaff={
@@ -419,17 +433,6 @@ export function StaffEditPage({
           description={formError}
         />
       ) : null}
-
-      <StaffFormFooter
-        loading={isSaving}
-        submitLabel="Save changes"
-        hint="Review the updated information before saving."
-        onCancel={() =>
-          navigate(
-            `${config.listPath}/${staffId}`,
-          )
-        }
-      />
     </form>
   );
 }

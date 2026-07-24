@@ -10,28 +10,25 @@ import {
   StaffSection,
 } from "../layout/StaffSection";
 
+import {
+  defaultStaffSectionColor,
+  getStaffFieldClassName,
+} from "../theme/staff-theme";
+
 import type {
+  StaffSectionColor,
   RegisterStaffValues,
   StaffDegree,
   StaffServiceType,
 } from "../../types/staff.types";
 
-const fieldClassName = [
-  "h-12 w-full rounded-[16px]",
-  "border border-border/70 bg-muted/25 px-4",
-  "text-sm font-normal text-foreground",
-  "outline-none transition duration-200",
-  "placeholder:text-muted-foreground/70",
-  "hover:border-primary/20 hover:bg-card",
-  "focus:border-primary/35 focus:bg-card",
-  "focus:ring-4 focus:ring-primary/[0.08]",
-  "disabled:cursor-not-allowed disabled:opacity-60",
-].join(" ");
 
 type Props = {
   values: RegisterStaffValues;
 
   disabled?: boolean;
+
+  color?: StaffSectionColor;
 
   isServiceStaff: boolean;
 
@@ -46,9 +43,12 @@ type Props = {
 export function StaffEmploymentFormSection({
   values,
   disabled = false,
+  color = defaultStaffSectionColor,
   isServiceStaff,
   updateValue,
 }: Props) {
+  const fieldClassName = getStaffFieldClassName(color);
+
   return (
     <StaffSection
       eyebrow="Professional record"
@@ -57,6 +57,7 @@ export function StaffEmploymentFormSection({
       icon={
         <BriefcaseBusiness className="h-5 w-5" />
       }
+      color={color}
     >
       <div className="grid gap-x-5 gap-y-5 md:grid-cols-2">
 

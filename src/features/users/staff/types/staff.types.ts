@@ -193,6 +193,11 @@ export type StaffSectionColor = {
 
   button: string;
   footer: string;
+
+  fieldHover: string;
+  fieldFocus: string;
+  fieldRing: string;
+  itemHover: string;
 };
 
 export type StaffSectionConfig = {

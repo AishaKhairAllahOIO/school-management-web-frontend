@@ -5,6 +5,10 @@ import {
   UserRound,
 } from "lucide-react";
 
+import type {
+  StaffSectionColor,
+} from "../../types/staff.types";
+
 import { StaffInfoItem } from "../fields/StaffInfoItem";
 import { StaffSection } from "../layout/StaffSection";
 
@@ -22,6 +26,8 @@ type StaffPersonalViewSectionProps = {
   nationality: string;
 
   address: string;
+
+  color?: StaffSectionColor;
 };
 
 export function StaffPersonalViewSection({
@@ -34,6 +40,7 @@ export function StaffPersonalViewSection({
   gender,
   nationality,
   address,
+  color,
 }: StaffPersonalViewSectionProps) {
   return (
     <StaffSection
@@ -42,28 +49,34 @@ export function StaffPersonalViewSection({
       description="Legal identity and personal information."
       icon={<UserRound className="h-5 w-5" />}
       contentClassName="grid gap-3 md:grid-cols-2"
+      color={color}
     >
       <StaffInfoItem
+        color={color}
         label="First name"
         value={firstName}
       />
 
       <StaffInfoItem
+        color={color}
         label="Last name"
         value={lastName}
       />
 
       <StaffInfoItem
+        color={color}
         label="Father name"
         value={fatherName}
       />
 
       <StaffInfoItem
+        color={color}
         label="Mother name"
         value={motherName}
       />
 
       <StaffInfoItem
+        color={color}
         label="Birth date"
         value={birthDate}
         icon={
@@ -72,6 +85,7 @@ export function StaffPersonalViewSection({
       />
 
       <StaffInfoItem
+        color={color}
         label="Birth place"
         value={birthPlace}
         icon={
@@ -80,11 +94,13 @@ export function StaffPersonalViewSection({
       />
 
       <StaffInfoItem
+        color={color}
         label="Gender"
         value={gender}
       />
 
       <StaffInfoItem
+        color={color}
         label="Nationality"
         value={nationality}
         icon={
@@ -93,6 +109,7 @@ export function StaffPersonalViewSection({
       />
 
       <StaffInfoItem
+        color={color}
         className="md:col-span-2"
         label="Address"
         value={address}

@@ -27,7 +27,6 @@
   --accent: 236 231 255;
   --accent-foreground: 77 50 183;
 
-  --destructive: 255 82 118;
   --destructive-foreground: 255 255 255;
 
   --border: 226 224 240;
@@ -43,9 +42,17 @@
   --sidebar-active-foreground: 255 255 255;
   --sidebar-divider: 255 255 255;
 
-  --success: 34 197 94;
-  --warning: 245 158 11;
-  --info: 59 130 246;
+  /* Pastel Green */
+--success: 95 186 143;
+
+/* Pastel Amber */
+--warning: 223 181 88;
+
+/* Pastel Blue */
+--info: 108 153 224;
+
+/* Pastel Red */
+--destructive: 223 118 128;
 
   --gradient-primary:
     linear-gradient(
@@ -145,7 +152,6 @@
   --accent: 42 34 96;
   --accent-foreground: 232 225 255;
 
-  --destructive: 255 82 118;
   --destructive-foreground: 255 255 255;
 
   --border: 50 45 92;
@@ -159,9 +165,13 @@
   --sidebar-active-foreground: 255 255 255;
   --sidebar-divider: 255 255 255;
 
-  --success: 74 222 128;
-  --warning: 251 191 36;
-  --info: 96 165 250;
+--success: 129 205 165;
+
+--warning: 232 196 112;
+
+--info: 138 175 232;
+
+--destructive: 231 144 152;
 
   --gradient-primary:
     linear-gradient(

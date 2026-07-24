@@ -10,27 +10,23 @@ import {
   StaffSection,
 } from "../layout/StaffSection";
 
+import {
+  defaultStaffSectionColor,
+  getStaffFieldClassName,
+} from "../theme/staff-theme";
+
 import type {
+  StaffSectionColor,
   RegisterStaffValues,
 } from "../../types/staff.types";
 
-const fieldClassName = [
-  "h-12 w-full rounded-[16px]",
-  "border border-border/70 bg-muted/25 px-4",
-  "text-sm font-normal text-foreground",
-  "outline-none transition duration-200",
-  "placeholder:text-muted-foreground/70",
-  "hover:border-primary/20 hover:bg-card",
-  "focus:border-primary/35 focus:bg-card",
-  "focus:ring-4 focus:ring-primary/[0.08]",
-  "disabled:cursor-not-allowed",
-  "disabled:opacity-60",
-].join(" ");
 
 type StaffContactFormSectionProps = {
   values: RegisterStaffValues;
 
   disabled?: boolean;
+
+  color?: StaffSectionColor;
 
   updateValue: <
     K extends keyof RegisterStaffValues,
@@ -40,11 +36,15 @@ type StaffContactFormSectionProps = {
   ) => void;
 };
 
+
 export function StaffContactFormSection({
   values,
   disabled = false,
+  color = defaultStaffSectionColor,
   updateValue,
 }: StaffContactFormSectionProps) {
+  const fieldClassName = getStaffFieldClassName(color);
+
   return (
     <StaffSection
       eyebrow="Communication"
@@ -53,6 +53,7 @@ export function StaffContactFormSection({
       icon={
         <ContactRound className="h-5 w-5" />
       }
+      color={color}
     >
       <div className="grid gap-x-5 gap-y-5 md:grid-cols-2">
         <StaffFormField
@@ -92,30 +93,6 @@ export function StaffContactFormSection({
               )
             }
             className={fieldClassName}
-          />
-        </StaffFormField>
-
-        <StaffFormField
-          label="Address"
-          required
-          className="md:col-span-2"
-        >
-          <textarea
-            required
-            disabled={disabled}
-            autoComplete="street-address"
-            placeholder="Enter the complete address"
-            value={values.address}
-            onChange={(event) =>
-              updateValue(
-                "address",
-                event.target.value,
-              )
-            }
-            className={[
-              fieldClassName,
-              "min-h-28 resize-y py-3",
-            ].join(" ")}
           />
         </StaffFormField>
       </div>

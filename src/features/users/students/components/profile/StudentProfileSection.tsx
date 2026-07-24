@@ -8,6 +8,7 @@ type StudentProfileSectionProps = {
   children: ReactNode;
   onEdit?: () => void;
   className?: string;
+  eyebrow?: string;
 };
 
 export function StudentProfileSection({
@@ -17,47 +18,26 @@ export function StudentProfileSection({
   children,
   onEdit,
   className = "",
+  eyebrow = "Student profile",
 }: StudentProfileSectionProps) {
   return (
-    <section
-      className={[
-        "overflow-hidden rounded-[30px] border border-border/70 bg-card",
-        "shadow-[var(--shadow-card)]",
-        className,
-      ].join(" ")}
-    >
-      <header className="flex flex-col gap-4 border-b border-border/70 bg-secondary/35 px-5 py-5 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-center gap-3">
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[18px] bg-primary/10 text-primary">
-            {icon}
-          </div>
-
-          <div>
-            <h2 className="text-lg font-black tracking-tight text-foreground">
-              {title}
-            </h2>
-
-            {description ? (
-              <p className="mt-1 text-sm font-medium text-muted-foreground">
-                {description}
-              </p>
-            ) : null}
+    <section className={["overflow-hidden rounded-[26px] border border-border/70 bg-card shadow-[var(--shadow-card)]", className].join(" ")}>
+      <header className="flex items-start justify-between gap-4 border-b border-border/60 bg-muted/25 px-5 py-4">
+        <div className="flex min-w-0 items-start gap-3">
+          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[15px] bg-primary/[0.08] text-primary">{icon}</span>
+          <div className="min-w-0">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.13em] text-primary">{eyebrow}</p>
+            <h2 className="mt-0.5 text-[17px] font-semibold tracking-[-0.02em] text-foreground">{title}</h2>
+            {description ? <p className="mt-1 text-[13px] font-normal leading-5 text-muted-foreground">{description}</p> : null}
           </div>
         </div>
-
         {onEdit ? (
-          <button
-            type="button"
-            onClick={onEdit}
-            className="inline-flex h-10 items-center justify-center gap-2 rounded-2xl border border-border bg-card px-4 text-sm font-bold text-foreground transition hover:border-primary/25 hover:bg-primary/10 hover:text-primary"
-          >
-            <Pencil className="h-4 w-4" />
-            Edit
+          <button type="button" onClick={onEdit} className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-border/80 bg-card px-4 text-sm font-semibold text-foreground shadow-sm transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/15">
+            <Pencil className="h-4 w-4" /> Edit
           </button>
         ) : null}
       </header>
-
-      <div className="p-5">{children}</div>
+      <div className="p-5 sm:p-6">{children}</div>
     </section>
   );
 }

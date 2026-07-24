@@ -1,4 +1,4 @@
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, GraduationCap } from "lucide-react";
 import type { ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -8,6 +8,10 @@ type StudentPageHeaderProps = {
   icon?: ReactNode;
   actions?: ReactNode;
   showBackButton?: boolean;
+  backLabel?: string;
+  onBack?: () => void;
+  photoUrl?: string | null;
+  photoAlt?: string;
 };
 
 export function StudentPageHeader({
@@ -16,68 +20,60 @@ export function StudentPageHeader({
   icon,
   actions,
   showBackButton = false,
+  backLabel = "Back to students",
+  onBack,
+  photoUrl,
+  photoAlt,
 }: StudentPageHeaderProps) {
   const navigate = useNavigate();
 
   return (
-    <header className="border-b border-border/60 pb-6">
-      <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
-        <div className="flex min-w-0 items-start gap-3.5">
-          {showBackButton ? (
-            <button
-              type="button"
-              onClick={() => navigate(-1)}
-              aria-label="Go back"
-              className={[
-                "flex h-10 w-10 shrink-0",
-                "items-center justify-center",
-                "rounded-xl border border-border/70",
-                "bg-card text-muted-foreground",
-                "transition-all duration-200",
-                "hover:border-primary/20",
-                "hover:bg-primary/[0.045]",
-                "hover:text-primary",
-                "focus-visible:outline-none",
-                "focus-visible:ring-4",
-                "focus-visible:ring-primary/10",
-              ].join(" ")}
-            >
-              <ArrowLeft
-                size={18}
-                strokeWidth={1.8}
-              />
-            </button>
-          ) : null}
+    <section className="relative overflow-hidden rounded-[22px] border border-primary/20 bg-card shadow-[var(--shadow-floating)]">
+      <div className="absolute inset-0 bg-primary/[0.08] opacity-70" />
+      <div className="pointer-events-none absolute -right-16 -top-24 h-52 w-52 rounded-full bg-primary opacity-[0.12] blur-3xl" />
+      <div className="pointer-events-none absolute -bottom-24 left-1/3 h-44 w-44 rounded-full bg-primary opacity-[0.06] blur-3xl" />
 
-          {icon ? (
-            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[14px] bg-primary/[0.08] text-primary">
-              {icon}
-            </span>
-          ) : null}
-
-          <div className="min-w-0">
-            <p className="text-[10px] font-medium uppercase tracking-[0.16em] text-primary">
-              Student workspace
-            </p>
-
-            <h1 className="mt-1 truncate text-[28px] font-semibold tracking-[-0.035em] text-foreground sm:text-[30px]">
-              {title}
-            </h1>
-
-            {description ? (
-              <p className="mt-1.5 max-w-3xl text-sm font-normal leading-6 text-muted-foreground">
-                {description}
-              </p>
-            ) : null}
-          </div>
-        </div>
-
-        {actions ? (
-          <div className="flex flex-wrap items-center gap-2">
-            {actions}
-          </div>
+      <div className="relative p-4 sm:p-5">
+        {showBackButton ? (
+          <button
+            type="button"
+            onClick={onBack ?? (() => navigate("/users/students"))}
+            className="inline-flex items-center gap-2 rounded-lg px-1 py-1 text-xs font-medium text-muted-foreground transition-colors hover:bg-primary/[0.07] hover:text-primary focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/15"
+          >
+            <ArrowLeft className="h-4 w-4" strokeWidth={1.8} />
+            {backLabel}
+          </button>
         ) : null}
+
+        <div className={["flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between", showBackButton ? "mt-3" : ""].join(" ")}>
+          <div className="flex min-w-0 items-center gap-3.5">
+            {photoUrl ? (
+              <div className="h-14 w-14 shrink-0 overflow-hidden rounded-[16px] border border-primary/20 bg-card shadow-[var(--shadow-card)]">
+                <img src={photoUrl} alt={photoAlt ?? title} className="h-full w-full object-cover" />
+              </div>
+            ) : (
+              <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[16px] bg-primary text-primary-foreground shadow-[var(--shadow-card)]">
+                {icon ?? <GraduationCap className="h-5 w-5" strokeWidth={1.8} />}
+              </span>
+            )}
+
+            <div className="min-w-0">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/[0.08] px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.12em] text-primary">
+                <GraduationCap className="h-3 w-3" strokeWidth={1.9} />
+                Student profile
+              </span>
+              <h1 className="mt-2 truncate text-2xl font-semibold tracking-[-0.035em] text-foreground">
+                {title}
+              </h1>
+              {description ? (
+                <p className="mt-1 max-w-2xl text-sm leading-5 text-muted-foreground">{description}</p>
+              ) : null}
+            </div>
+          </div>
+
+          {actions ? <div className="flex shrink-0 flex-wrap items-center gap-2 self-start lg:self-center">{actions}</div> : null}
+        </div>
       </div>
-    </header>
+    </section>
   );
 }

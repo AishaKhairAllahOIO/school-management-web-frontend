@@ -7,10 +7,8 @@ import {
 } from "react";
 import {
   Camera,
-  Check,
   GraduationCap,
   Save,
-  ShieldCheck,
   UserPlus,
   UsersRound,
 } from "lucide-react";
@@ -249,11 +247,7 @@ export function StudentRegistrationPage() {
   }
 
   return (
-    <main className="min-h-screen bg-background px-4 py-5 text-foreground sm:px-6 lg:px-8">
-      <form
-        onSubmit={submit}
-        className="mx-auto flex max-w-[1450px] flex-col gap-6"
-      >
+    <form onSubmit={submit} className="space-y-5 pb-8">
         <StudentPageHeader
           title="Add student"
           description="Create a student profile, connect a guardian and choose the academic placement."
@@ -300,8 +294,7 @@ export function StudentRegistrationPage() {
           }
         />
 
-        <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_320px]">
-          <div className="space-y-6">
+        <div className="space-y-5">
             <FormSection
               eyebrow="Profile image"
               title="Student photo"
@@ -455,72 +448,8 @@ export function StudentRegistrationPage() {
                 }
               />
             </FormSection>
-          </div>
-
-          <aside className="xl:sticky xl:top-5">
-            <section className="overflow-hidden rounded-[24px] border border-primary/15 bg-card shadow-[0_16px_45px_rgba(30,20,70,0.08)]">
-              <div className="border-b border-border/50 bg-primary/[0.055] p-5">
-                <span className="flex h-10 w-10 items-center justify-center rounded-[14px] bg-primary/10 text-primary">
-                  <ShieldCheck
-                    size={19}
-                    strokeWidth={1.7}
-                  />
-                </span>
-
-                <h2 className="mt-4 text-lg font-semibold text-foreground">
-                  Ready to create?
-                </h2>
-
-                <p className="mt-1 text-xs font-normal leading-5 text-muted-foreground">
-                  Review the required sections
-                  before submitting the record.
-                </p>
-              </div>
-
-              <div className="space-y-2.5 p-5">
-                <ReviewRow
-                  label="Student details"
-                  completed={
-                    studentCompleted
-                  }
-                />
-
-                <ReviewRow
-                  label="Guardian contact"
-                  completed={
-                    guardianCompleted
-                  }
-                />
-
-                <ReviewRow
-                  label="Academic placement"
-                  completed={
-                    enrollmentCompleted
-                  }
-                />
-
-                <button
-                  type="submit"
-                  disabled={
-                    registerMutation.isPending
-                  }
-                  className="mt-3 inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-primary px-5 text-sm font-medium text-primary-foreground shadow-sm transition hover:bg-primary/90 disabled:opacity-60"
-                >
-                  <Save
-                    size={16}
-                    strokeWidth={1.8}
-                  />
-
-                  {registerMutation.isPending
-                    ? "Creating..."
-                    : "Create student"}
-                </button>
-              </div>
-            </section>
-          </aside>
         </div>
-      </form>
-    </main>
+    </form>
   );
 }
 
