@@ -355,37 +355,57 @@
     border-color: rgb(var(--border));
   }
 
-  html {
-    scroll-behavior: smooth;
-  }
+ html {
+  scroll-behavior: smooth;
 
-  body {
-    min-height: 100vh;
+  scrollbar-width: thin;
 
-    background:
-      radial-gradient(
-        circle at top left,
-        rgba(139, 92, 246, 0.13),
-        transparent 34rem
-      ),
-      radial-gradient(
-        circle at top right,
-        rgba(91, 79, 199, 0.1),
-        transparent 30rem
-      ),
-      rgb(var(--background));
+  scrollbar-color:
+    rgba(120, 124, 145, 0.25)
+    transparent;
+}
 
-    color: rgb(var(--foreground));
 
-    font-feature-settings:
-      "rlig" 1,
-      "calt" 1;
+/* Chrome / Edge / Safari */
 
-    text-rendering: optimizeLegibility;
+*::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
 
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
+
+*::-webkit-scrollbar-track {
+  background:
+    transparent;
+}
+
+
+*::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+
+  background:
+    rgba(120, 124, 145, 0.22);
+
+  transition:
+    background-color 200ms ease;
+}
+
+
+*::-webkit-scrollbar-thumb:hover {
+  background:
+    rgba(120, 124, 145, 0.42);
+}
+
+
+*::-webkit-scrollbar-button {
+  display: none;
+}
+
+
+*::-webkit-scrollbar-corner {
+  background:
+    transparent;
+}
 
   button,
   input,
@@ -752,47 +772,47 @@
   }
 
   .staff-form-field {
-  height: 3rem;
-  width: 100%;
-  border-radius: 1rem;
-  border: 1px solid rgb(var(--input));
-  background: rgb(var(--muted) / 0.55);
-  padding-inline: 1rem;
-  color: rgb(var(--foreground));
-  font-size: 0.875rem;
-  font-weight: 500;
-  outline: none;
+    height: 3rem;
+    width: 100%;
+    border-radius: 1rem;
+    border: 1px solid rgb(var(--input));
+    background: rgb(var(--muted) / 0.55);
+    padding-inline: 1rem;
+    color: rgb(var(--foreground));
+    font-size: 0.875rem;
+    font-weight: 500;
+    outline: none;
 
-  transition:
-    border-color 180ms ease,
-    background-color 180ms ease,
-    box-shadow 180ms ease;
-}
+    transition:
+      border-color 180ms ease,
+      background-color 180ms ease,
+      box-shadow 180ms ease;
+  }
 
-.staff-form-field::placeholder {
-  color: rgb(var(--muted-foreground) / 0.65);
-}
+  .staff-form-field::placeholder {
+    color: rgb(var(--muted-foreground) / 0.65);
+  }
 
-.staff-form-field:hover:not(:disabled) {
-  border-color: rgb(var(--primary) / 0.24);
-}
+  .staff-form-field:hover:not(:disabled) {
+    border-color: rgb(var(--primary) / 0.24);
+  }
 
-.staff-form-field:focus {
-  border-color: rgb(var(--primary));
-  background: rgb(var(--card));
-  box-shadow:
-    0 0 0 4px
-      rgb(var(--primary) / 0.09);
-}
+  .staff-form-field:focus {
+    border-color: rgb(var(--primary));
+    background: rgb(var(--card));
+    box-shadow:
+      0 0 0 4px
+        rgb(var(--primary) / 0.09);
+  }
 
-.staff-form-field:disabled {
-  cursor: not-allowed;
-  opacity: 0.6;
-}
+  .staff-form-field:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
 
-.staff-form-surface {
-  border: 1px solid rgb(var(--border) / 0.72);
-  background: rgb(var(--card));
-  box-shadow: var(--shadow-card);
-}
+  .staff-form-surface {
+    border: 1px solid rgb(var(--border) / 0.72);
+    background: rgb(var(--card));
+    box-shadow: var(--shadow-card);
+  }
 }

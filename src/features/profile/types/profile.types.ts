@@ -1,21 +1,93 @@
-import type { SuperAdminUser } from "@/features/users/super-admin/types/super-admin.types";
-import type { SecretaryUser } from "@/features/users/secretaries/types/secretary.types";
-import type { SupervisorUser } from "@/features/users/supervisors/types/supervisor.types";
+export type ProfileRole =
+  | "super_admin"
+  | "secretary"
+  | "supervisor"
+  | string;
 
-export type DashboardProfileUser =
-  | SuperAdminUser
-  | SecretaryUser
-  | SupervisorUser;
 
-export type ProfileIdentity = {
-  code: string;
+export type DashboardProfileUser = {
+
+  id: string;
+
+  userId: string;
+
+  role: ProfileRole[];
+
+  fullName: string;
+
+  firstName: string;
+
+  lastName: string;
+
+
+  phoneNumber: string;
+
   email: string;
-  roleLabel: string;
-  category: DashboardProfileUser["category"];
+
+
+  gender: string;
+
+  birthDate: string | null;
+
+  address: string;
+
+
+  photoUrl: string;
+
+
+  accountStatus: string;
+
+
+  degree: string | null;
+
+  specialization: string | null;
+
+  university: string | null;
+
+
+  graduationYear: number | null;
+
+
+  hireDate: string | null;
+
+
+  experienceYears: number | null;
+
+
+  serviceType: string | null;
+
+
+  isDeleted: boolean;
+
+
+  deletedAt: string | null;
+
+
+  createdAt: string;
+
+
 };
 
+
+
+export type ProfileIdentity = {
+
+  email: string;
+
+  roleLabel: string;
+
+  code?: string;
+
+};
+
+
+
 export type ProfilePermissions = {
+
   canEditPersonalInfo: boolean;
+
   canChangePassword: boolean;
+
   canManageUsers: boolean;
+
 };

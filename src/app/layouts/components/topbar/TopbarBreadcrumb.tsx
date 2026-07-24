@@ -5,20 +5,30 @@ import {
   getSectionKey,
 } from "./topbar.helpers";
 
+
 type TopbarBreadcrumbProps = {
   pathname: string;
 };
 
+
 export function TopbarBreadcrumb({
   pathname,
 }: TopbarBreadcrumbProps) {
+
+
   const { t } = useLocale();
+
+
 
   const sectionKey =
     getSectionKey(pathname);
 
+
+
   const sectionTitle =
     t.navigation[sectionKey];
+
+
 
   const currentPageTitle =
     getCurrentPageTitle(
@@ -26,76 +36,99 @@ export function TopbarBreadcrumb({
       t.layout.topbar.overview,
     );
 
+
+
   const isSameTitle =
-    sectionTitle
-      .trim()
-      .toLowerCase() ===
-    currentPageTitle
-      .trim()
-      .toLowerCase();
+    sectionTitle.trim().toLowerCase() ===
+    currentPageTitle.trim().toLowerCase();
+
+
+
 
   return (
+
     <nav
       aria-label="Breadcrumb"
-      className="hidden min-w-0 items-center lg:flex"
+      className="
+      hidden
+      min-w-0
+      items-center
+      lg:flex
+      "
     >
-      <ol className="flex min-w-0 items-center gap-3">
-        <li className="min-w-0">
+
+      <ol
+        className="
+        flex
+        items-center
+        gap-3
+        text-[15px]
+        tracking-[-0.015em]
+        "
+      >
+
+
+        <li className="max-w-[180px] truncate">
+
           <span
-            className={[
-              "inline-flex h-9 max-w-[190px]",
-              "items-center rounded-xl",
-              "border border-primary/10",
-              "bg-primary/[0.07]",
-              "px-4",
-              "text-[13px] font-semibold",
-              "tracking-[-0.015em]",
-              "text-primary",
-            ].join(" ")}
+            className="
+            font-semibold
+            text-topbar-title
+            "
           >
-            <span className="truncate">
-              {sectionTitle}
-            </span>
+            {sectionTitle}
           </span>
+
         </li>
 
+
+
         {!isSameTitle ? (
+
           <>
+
+
             <li
               aria-hidden="true"
-              className={[
-                "flex h-9 items-center",
-                "text-[14px] font-medium",
-                "text-topbar-subtle/55",
-              ].join(" ")}
+              className="
+              text-topbar-muted/40
+              "
             >
               /
             </li>
 
-            <li className="min-w-0">
+
+
+            <li
+              className="
+              max-w-[180px]
+              truncate
+              "
+            >
+
               <span
-                aria-current="page"
-                className={[
-                  "inline-flex h-9 max-w-[190px]",
-                  "items-center rounded-xl",
-                  "border border-topbar-border/75",
-                  "bg-topbar-surface/80",
-                  "px-4",
-                  "text-[13px] font-medium",
-                  "tracking-[-0.01em]",
-                  "text-topbar-text",
-                  "shadow-[0_4px_14px_rgba(30,20,70,0.035)]",
-                  "backdrop-blur-sm",
-                ].join(" ")}
+                className="
+                font-medium
+                text-topbar-muted
+                "
               >
-                <span className="truncate">
-                  {currentPageTitle}
-                </span>
+
+                {currentPageTitle}
+
               </span>
+
             </li>
+
+
           </>
+
         ) : null}
+
+
       </ol>
+
+
     </nav>
+
   );
 }

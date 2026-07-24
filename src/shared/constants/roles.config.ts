@@ -1,3 +1,9 @@
-export const WEB_ALLOWED_ROLES = ["super_admin", "secretary", "adviser"] as const;
+export const WEB_ALLOWED_ROLES = [
+  "super_admin",
+  "secretary",
+  "supervisor",
+] as const;
 
-export type WebAllowedRole = (typeof WEB_ALLOWED_ROLES)[number];
+
+export type WebAllowedRole =
+  typeof WEB_ALLOWED_ROLES[number];
