@@ -7,21 +7,15 @@ import { Topbar } from "@/app/layouts/components/Topbar";
 import { useLayoutStore } from "@/app/layouts/store/layoutStore";
 import { useLocale } from "@/app/providers/locale";
 
-
 export function AppLayout() {
-
   const isSidebarCollapsed =
     useLayoutStore(
       (state) => state.isSidebarCollapsed,
     );
 
-
   const { direction } = useLocale();
 
-
   const isRtl = direction === "rtl";
-
-
 
   const sidebarOffsetClass =
     isRtl
@@ -32,19 +26,11 @@ export function AppLayout() {
         ? "lg:pl-[72px]"
         : "lg:pl-[258px]";
 
-
-
   return (
-
     <div className="app-shell-bg h-screen overflow-hidden">
-
-
       <Sidebar />
 
-
       <MobileSidebar />
-
-
 
       <div
         className={[
@@ -54,51 +40,44 @@ export function AppLayout() {
           sidebarOffsetClass,
         ].join(" ")}
       >
-
-
+        <div
+          className="
+            shrink-0
+            px-4
+            md:px-6
+            lg:px-8
+          "
+        >
+          <Topbar />
+        </div>
 
         <div
           className="
-          shrink-0
-          px-4
-          md:px-6
-          lg:px-8
+            mt-5
+            shrink-0
+            px-4
+            md:px-6
+            lg:px-8
           "
         >
-
-          <Topbar />
-
           <SubNavigation />
-
         </div>
-
-
-
-
 
         <main
           className="
-          min-h-0
-          flex-1
-          overflow-y-auto
-          px-4
-          pb-6
-          pt-0
-          md:px-6
-          lg:px-8
+            min-h-0
+            flex-1
+            overflow-y-auto
+            px-4
+            pb-6
+            pt-3
+            md:px-6
+            lg:px-8
           "
         >
-
           <Outlet />
-
         </main>
-
-
-
       </div>
-
-
     </div>
-
   );
 }

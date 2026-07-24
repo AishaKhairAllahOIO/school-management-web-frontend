@@ -11,6 +11,7 @@ import {
   Wallet,
   type LucideIcon,
 } from "lucide-react";
+
 import {
   NavLink,
   useLocation,
@@ -157,10 +158,10 @@ function TabItem({
       className={({ isActive }) =>
         [
           "group relative",
-          "inline-flex h-14 min-w-max",
-          "items-center justify-center gap-2.5",
-          "rounded-2xl px-5",
-          "text-[14px] font-medium",
+          "inline-flex h-11 min-w-max",
+          "items-center justify-center gap-2",
+          "rounded-[14px] px-4",
+          "text-[13px] font-medium",
           "transition-all duration-200 ease-out",
           "focus-visible:outline-none",
           "focus-visible:ring-4",
@@ -172,7 +173,7 @@ function TabItem({
               ].join(" ")
             : [
                 "text-muted-foreground",
-                "hover:bg-muted/45",
+                "hover:bg-muted/40",
                 "hover:text-foreground",
               ].join(" "),
         ].join(" ")
@@ -182,8 +183,8 @@ function TabItem({
         <>
           <Icon
             aria-hidden="true"
-            size={18}
-            strokeWidth={1.75}
+            size={17}
+            strokeWidth={1.8}
             className={[
               "shrink-0",
               "transition-colors duration-200",
@@ -204,7 +205,7 @@ function TabItem({
             aria-hidden="true"
             className={[
               "absolute bottom-0",
-              "left-5 right-5",
+              "left-4 right-4",
               "h-[2px]",
               "origin-center rounded-full",
               "bg-primary",
@@ -231,18 +232,18 @@ function DefaultSubNavigation({
       className={[
         "w-full min-w-0",
         "overflow-hidden",
-        "rounded-[26px]",
+        "rounded-[22px]",
         "border border-border/60",
         "bg-card/95",
-        "p-2",
-        "shadow-[0_10px_35px_rgba(38,24,84,0.05)]",
+        "p-1.5",
+        "shadow-[0_8px_28px_rgba(38,24,84,0.045)]",
         "backdrop-blur-sm",
       ].join(" ")}
     >
       <div
         className={[
-          "flex h-14 w-full min-w-0",
-          "items-center gap-1.5",
+          "flex h-11 w-full min-w-0",
+          "items-center gap-1",
           "overflow-x-auto",
           "[scrollbar-width:none]",
           "[&::-webkit-scrollbar]:hidden",

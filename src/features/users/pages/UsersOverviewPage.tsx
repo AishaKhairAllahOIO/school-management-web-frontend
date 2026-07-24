@@ -32,7 +32,7 @@ export function UsersOverviewPage() {
 
   if (countsQuery.isError) {
     return (
-      <section className="space-y-6">
+      <section className="-mt-3 space-y-6">
         <UsersOverviewHeading
           totalStaff={undefined}
         />
@@ -71,7 +71,7 @@ export function UsersOverviewPage() {
   }
 
   return (
-    <section className="space-y-6">
+    <section className="-mt-3 space-y-6">
       <UsersOverviewHeading
         totalStaff={counts.total}
       />
@@ -172,10 +172,8 @@ function UsersOverviewHeading({
   totalStaff?: number;
 }) {
   return (
-    <header className="pt-1">
-      
-
-      <div className="mt-4 flex flex-wrap items-center gap-2">
+    <header>
+      <div className="flex flex-wrap items-center gap-2">
         <span
           className={[
             "inline-flex items-center gap-2",
@@ -234,9 +232,9 @@ function formatTotalStaff(
 
 function UsersOverviewLoading() {
   return (
-    <section className="space-y-6">
+    <section className="-mt-3 space-y-6">
       <div>
-        <div className="mt-4 flex gap-2">
+        <div className="flex gap-2">
           <div className="h-7 w-28 animate-pulse rounded-full bg-muted/55" />
 
           <div className="h-7 w-28 animate-pulse rounded-full bg-muted/45" />
