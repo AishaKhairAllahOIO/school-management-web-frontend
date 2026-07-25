@@ -825,4 +825,68 @@
     background: rgb(var(--card));
     box-shadow: var(--shadow-card);
   }
+
+
+  .academics-primary-surface {
+  background: rgb(var(--primary) / 0.08);
+}
+
+.academics-primary-footer {
+  background: rgb(var(--primary) / 0.045);
+}
+
+.academics-primary-border {
+  border-color: rgb(var(--primary) / 0.20);
+}
+
+.academics-primary-button {
+  border-color: rgb(var(--primary) / 0.25);
+  color: rgb(var(--primary));
+}
+
+.academics-primary-button:hover {
+  background: rgb(var(--primary) / 0.08);
+}
+
+.academics-info-surface {
+  background: rgb(var(--info) / 0.09);
+}
+
+.academics-info-footer {
+  background: rgb(var(--info) / 0.055);
+}
+
+.academics-info-border {
+  border-color: rgb(var(--info) / 0.22);
+}
+
+.academics-info-button {
+  border-color: rgb(var(--info) / 0.28);
+  color: rgb(var(--info));
+}
+
+.academics-info-button:hover {
+  background: rgb(var(--info) / 0.08);
+}
+
+.academics-success-surface {
+  background: rgb(var(--success) / 0.10);
+}
+
+.academics-success-footer {
+  background: rgb(var(--success) / 0.06);
+}
+
+.academics-success-border {
+  border-color: rgb(var(--success) / 0.22);
+}
+
+.academics-success-button {
+  border-color: rgb(var(--success) / 0.28);
+  color: rgb(var(--success));
+}
+
+.academics-success-button:hover {
+  background: rgb(var(--success) / 0.08);
+}
 }

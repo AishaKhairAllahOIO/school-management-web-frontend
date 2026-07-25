@@ -495,29 +495,7 @@ export function StudentEditPage() {
           </div>
         </FormSection>
 
-        <div className="flex justify-end border-t border-border/55 pt-5">
-          <button
-            type="submit"
-            disabled={isSaving}
-            className="inline-flex h-11 items-center gap-2 rounded-xl bg-primary px-6 text-sm font-medium text-primary-foreground shadow-sm transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            {isSaving ? (
-              <Loader2
-                size={16}
-                className="animate-spin"
-              />
-            ) : (
-              <Save
-                size={16}
-                strokeWidth={1.8}
-              />
-            )}
-
-            {isSaving
-              ? "Saving changes..."
-              : "Save all changes"}
-          </button>
-        </div>
+  
     </form>
   );
 }

@@ -1,29 +1,24 @@
 import type { RouteObject } from "react-router-dom";
-import { Navigate } from "react-router-dom";
 
 import { AssessmentComponentsPage } from "@/features/academics/assessments/pages/AssessmentComponentsPage";
 import { ClassroomsPage } from "@/features/academics/classrooms/pages/ClassroomsPage";
 import { GradeConfigurationsPage } from "@/features/academics/grade-configurations/pages/GradeConfigurationsPage";
 import { GradeSubjectsPage } from "@/features/academics/grade-subjects/pages/GradeSubjectsPage";
 import { GradesPage } from "@/features/academics/grades/pages/GradesPage";
-import { AcademicsLayout } from "@/features/academics/shared/layouts/AcademicsLayout";
+import { AcademicsOverviewPage } from "@/features/academics/overview/pages/AcademicsOverviewPage";
 import { SubjectsPage } from "@/features/academics/subjects/pages/SubjectsPage";
+import { TimeSlotsPage } from "@/features/academics/time-slots/pages/TimeSlotsPage";
+
 // import { TeacherAssignmentsPage } from "@/features/academics/teacher-assignments/pages/TeacherAssignmentsPage";
 // import { TeacherWorkloadsPage } from "@/features/academics/teacher-workloads/pages/TeacherWorkloadsPage";
 
 export const academicsRoutes = [
   {
     path: "academics",
-    element: <AcademicsLayout />,
     children: [
       {
         index: true,
-        element: (
-          <Navigate
-            to="grades"
-            replace
-          />
-        ),
+        element: <AcademicsOverviewPage />,
       },
       {
         path: "grades",
@@ -52,10 +47,18 @@ export const academicsRoutes = [
       {
         path: "teacher-workloads",
         element: <SubjectsPage />,
+        // عند تجهيز الصفحة استبدليها بـ:
+        // element: <TeacherWorkloadsPage />,
       },
       {
         path: "teacher-assignments",
         element: <SubjectsPage />,
+        // عند تجهيز الصفحة استبدليها بـ:
+        // element: <TeacherAssignmentsPage />,
+      },
+      {
+        path: "time-slots",
+        element: <TimeSlotsPage />,
       },
     ],
   },

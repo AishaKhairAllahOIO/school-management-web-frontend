@@ -5,7 +5,6 @@ import {
   Home,
   IdCard,
   MapPin,
-  Pencil,
   Phone,
   RefreshCw,
   ShieldCheck,
@@ -128,34 +127,7 @@ export function StudentProfilePage() {
               strokeWidth={1.7}
             />
           }
-          actions={
-            <button
-              type="button"
-              onClick={() =>
-                navigate(
-                  `/users/students/${enrollmentId}/edit`,
-                )
-              }
-              className={[
-                "inline-flex h-11 items-center gap-2",
-                "rounded-xl bg-primary px-5",
-                "text-sm font-medium",
-                "text-primary-foreground",
-                "shadow-sm transition",
-                "hover:bg-primary/90",
-                "focus-visible:outline-none",
-                "focus-visible:ring-4",
-                "focus-visible:ring-primary/10",
-              ].join(" ")}
-            >
-              <Pencil
-                size={16}
-                strokeWidth={1.8}
-              />
-
-              Edit profile
-            </button>
-          }
+          
         />
 
 
