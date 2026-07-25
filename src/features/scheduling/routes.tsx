@@ -20,10 +20,6 @@ export const schedulingRoutes = [
         element: <ExamSchedulesPage />,
       },
       {
-        path: "teachers",
-        element: <ExamSchedulesPage />,
-      },
-      {
         path: "exams",
         element: <ExamSchedulesPage />,
       },

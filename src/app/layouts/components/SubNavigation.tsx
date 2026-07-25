@@ -58,11 +58,7 @@ const subNavigationSections: SubNavigationSection[] =
           path: "/scheduling/classes",
           icon: CalendarDays,
         },
-        {
-          title: "Teachers",
-          path: "/scheduling/teachers",
-          icon: UserCheck,
-        },
+  
         {
           title: "Exams",
           path: "/scheduling/exams",
