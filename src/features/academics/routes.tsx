@@ -9,53 +9,56 @@ import { AcademicsOverviewPage } from "@/features/academics/overview/pages/Acade
 import { SubjectsPage } from "@/features/academics/subjects/pages/SubjectsPage";
 import { TimeSlotsPage } from "@/features/academics/time-slots/pages/TimeSlotsPage";
 
-// import { TeacherAssignmentsPage } from "@/features/academics/teacher-assignments/pages/TeacherAssignmentsPage";
-// import { TeacherWorkloadsPage } from "@/features/academics/teacher-workloads/pages/TeacherWorkloadsPage";
-
 export const academicsRoutes = [
   {
     path: "academics",
+
     children: [
       {
         index: true,
         element: <AcademicsOverviewPage />,
       },
+
       {
         path: "grades",
         element: <GradesPage />,
       },
+
       {
         path: "grade-configurations",
         element: <GradeConfigurationsPage />,
       },
+
       {
         path: "classrooms",
         element: <ClassroomsPage />,
       },
+
       {
         path: "subjects",
         element: <SubjectsPage />,
       },
+
       {
         path: "grade-subjects",
         element: <GradeSubjectsPage />,
       },
+
       {
         path: "assessments",
         element: <AssessmentComponentsPage />,
       },
+
       {
         path: "teacher-workloads",
         element: <SubjectsPage />,
-        // عند تجهيز الصفحة استبدليها بـ:
-        // element: <TeacherWorkloadsPage />,
       },
+
       {
         path: "teacher-assignments",
         element: <SubjectsPage />,
-        // عند تجهيز الصفحة استبدليها بـ:
-        // element: <TeacherAssignmentsPage />,
       },
+
       {
         path: "time-slots",
         element: <TimeSlotsPage />,

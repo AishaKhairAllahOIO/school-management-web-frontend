@@ -33,15 +33,7 @@ export function SettingsWorkspace({
           "lg:sticky lg:top-6",
         ].join(" ")}
       >
-        <div className="px-5 pb-3 pt-5">
-          <h2 className="text-sm font-semibold text-foreground">
-            Academic Management
-          </h2>
-
-          <p className="mt-1 text-xs font-normal leading-5 text-muted-foreground">
-            Choose an area to manage.
-          </p>
-        </div>
+    
 
         <div className="px-3 pb-3">
           {items.map((item, index) => {

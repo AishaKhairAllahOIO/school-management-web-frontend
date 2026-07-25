@@ -1,3 +1,5 @@
+import type { LucideIcon } from "lucide-react";
+
 import {
   BookOpen,
   Building2,
@@ -14,23 +16,23 @@ export type AcademicNavigationItem = {
   label: string;
   description: string;
   path: string;
-  icon: typeof GraduationCap;
+  icon: LucideIcon;
 };
 
 export type AcademicNavigationGroup = {
   id: "structure" | "curriculum" | "teaching";
   label: string;
   description: string;
-  icon: typeof GraduationCap;
+  icon: LucideIcon;
   color: {
     accent: string;
     border: string;
     header: string;
     icon: string;
     iconSurface: string;
-    footer: string;
     button: string;
     buttonHover: string;
+    divider: string;
   };
   items: AcademicNavigationItem[];
 };
@@ -46,10 +48,11 @@ export const academicNavigationGroups: AcademicNavigationGroup[] = [
       border: "border-primary/20",
       header: "bg-primary/[0.055]",
       icon: "text-primary",
-      iconSurface: "bg-primary/[0.08]",
-      footer: "bg-primary/[0.045]",
-      button: "border-primary/25 text-primary",
-      buttonHover: "hover:bg-primary/[0.07]",
+      iconSurface: "bg-primary/[0.09]",
+      button: "border-primary/30 text-primary",
+      buttonHover:
+        "hover:border-primary/45 hover:bg-primary/[0.08]",
+      divider: "divide-primary/15",
     },
     items: [
       {
@@ -80,12 +83,13 @@ export const academicNavigationGroups: AcademicNavigationGroup[] = [
     color: {
       accent: "text-info",
       border: "border-info/25",
-      header: "bg-info/[0.065]",
+      header: "bg-info/[0.07]",
       icon: "text-info",
-      iconSurface: "bg-info/[0.09]",
-      footer: "bg-info/[0.055]",
-      button: "border-info/30 text-info",
-      buttonHover: "hover:bg-info/[0.08]",
+      iconSurface: "bg-info/[0.11]",
+      button: "border-info/35 text-info",
+      buttonHover:
+        "hover:border-info/50 hover:bg-info/[0.1]",
+      divider: "divide-info/15",
     },
     items: [
       {
@@ -116,12 +120,13 @@ export const academicNavigationGroups: AcademicNavigationGroup[] = [
     color: {
       accent: "text-success",
       border: "border-success/25",
-      header: "bg-success/[0.07]",
+      header: "bg-success/[0.075]",
       icon: "text-success",
-      iconSurface: "bg-success/[0.1]",
-      footer: "bg-success/[0.06]",
-      button: "border-success/30 text-success",
-      buttonHover: "hover:bg-success/[0.09]",
+      iconSurface: "bg-success/[0.12]",
+      button: "border-success/35 text-success",
+      buttonHover:
+        "hover:border-success/50 hover:bg-success/[0.1]",
+      divider: "divide-success/15",
     },
     items: [
       {
