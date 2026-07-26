@@ -1,350 +1,236 @@
 import {
-  ChevronDown,
-  Eye,
-  LogOut,
-  Settings,
+  GraduationCap,
+  X,
 } from "lucide-react";
 
-import { useRef } from "react";
-import { useNavigate } from "react-router-dom";
-
-import { useCurrentUser } from "@/app/layouts/hooks/useCurrentUser";
+import { SidebarMenu } from "@/app/layouts/components/SidebarMenu";
+import { useLayoutStore } from "@/app/layouts/store/layoutStore";
 import { useLocale } from "@/app/providers/locale";
-import { useLogout } from "@/features/auth/hooks/use-logout";
-import { useDismissibleLayer } from "@/shared/hooks/use-dismissible-layer";
 
-import { ProfileMenuItem } from "../components/topbar/ProfileMenuItem";
-import type { TopbarMenuProps } from "../components/topbar/topbar.types";
+export function MobileSidebar() {
+  const isOpen = useLayoutStore(
+    (state) =>
+      state.isMobileSidebarOpen,
+  );
 
-export function ProfileMenu({
-  isOpen,
-  onToggle,
-  onClose,
-}: TopbarMenuProps) {
-  const containerRef =
-    useRef<HTMLDivElement>(null);
+  const closeMobileSidebar =
+    useLayoutStore(
+      (state) =>
+        state.closeMobileSidebar,
+    );
 
-  const navigate = useNavigate();
+  const { direction, t } = useLocale();
 
-  const { t } = useLocale();
+  const isRtl = direction === "rtl";
 
-  const { user } = useCurrentUser();
+  const sidebarPositionClass = isRtl
+    ? "right-0 rounded-l-3xl"
+    : "left-0 rounded-r-3xl";
 
-  const logoutMutation = useLogout();
+  const sidebarRadiusClass = isRtl
+    ? "rounded-l-3xl"
+    : "rounded-r-3xl";
 
-  useDismissibleLayer({
-    ref: containerRef,
-    enabled: isOpen,
-    onDismiss: onClose,
-  });
-
-  const displayName = user
-    ? `${user.firstName} ${user.lastName}`.trim()
-    : "Loading...";
-
-  const photoUrl =
-    user?.photoUrl ??
-    "/images/avatar-placeholder.png";
-
-  const roleLabel = user?.role?.[0]
-    ? user.role[0]
-        .split("_")
-        .map(
-          (word) =>
-            word.charAt(0).toUpperCase() +
-            word.slice(1),
-        )
-        .join(" ")
-    : "User";
-
-  const isSuperAdmin =
-    user?.role?.includes("super_admin");
-
-  function navigateAndClose(
-    path: string,
-  ) {
-    onClose();
-    navigate(path);
-  }
-
-  function handleLogout() {
-    onClose();
-    logoutMutation.mutate();
+  if (!isOpen) {
+    return null;
   }
 
   return (
-    <div
-      ref={containerRef}
-      className="relative block"
-    >
+    <div className="fixed inset-0 z-[80] lg:hidden">
       <button
         type="button"
-        onClick={onToggle}
         aria-label={
-          t.layout.topbar.openProfileMenu
+          t.layout.sidebar.closeSidebar
         }
-        aria-expanded={isOpen}
-        aria-haspopup="menu"
+        onClick={closeMobileSidebar}
         className="
-          flex
-          h-[44px]
-          w-[44px]
-          items-center
-          justify-center
-          rounded-[15px]
-          border
-          border-topbar-border/80
-          bg-topbar-surface/85
-          p-[4px]
-          backdrop-blur-xl
-          transition
-          hover:bg-topbar-soft
-          focus-visible:outline-none
-          focus-visible:ring-2
-          focus-visible:ring-ring
-          sm:w-[232px]
-          sm:justify-start
-          sm:gap-[10px]
-          sm:px-[7px]
+          absolute
+          inset-0
+          bg-foreground/45
+          backdrop-blur-[2px]
         "
+      />
+
+      <aside
+        aria-label={
+          t.layout.sidebar.navigation
+        }
+        className={[
+          "sidebar-gradient sidebar-shell",
+          "absolute top-0 z-10",
+          "flex h-full w-[248px] max-w-[86vw] flex-col",
+          "overflow-visible",
+          "text-sidebar-foreground",
+          sidebarPositionClass,
+        ].join(" ")}
       >
-        <img
-          src={photoUrl}
-          alt={displayName}
-          className="
-            h-[34px]
-            w-[34px]
-            shrink-0
-            rounded-full
-            object-cover
-            ring-2
-            ring-topbar-surface
-          "
+        <div
+          aria-hidden="true"
+          className={[
+            "pointer-events-none absolute inset-0",
+            "z-0 overflow-hidden",
+            sidebarRadiusClass,
+          ].join(" ")}
         />
 
-        <span
-          className="
-            hidden
-            min-w-0
-            flex-1
-            flex-col
-            text-start
-            sm:flex
-          "
-        >
-          <span
-            className="
-              truncate
-              text-[13px]
-              font-medium
-              leading-[16px]
-              text-topbar-text
-            "
-          >
-            {displayName}
-          </span>
-
-          <span
-            className="
-              truncate
-              text-[10px]
-              font-normal
-              leading-[14px]
-              tracking-[0.01em]
-              text-topbar-muted
-            "
-          >
-            {roleLabel}
-          </span>
-        </span>
-
-        <span
-          className="
-            hidden
-            h-[28px]
-            w-[28px]
-            shrink-0
-            items-center
-            justify-center
-            rounded-[9px]
-            text-topbar-muted
-            transition
-            sm:flex
-          "
-        >
-          <ChevronDown
-            aria-hidden="true"
-            size={15}
-            strokeWidth={1.9}
-            className={[
-              "transition-transform duration-200",
-              isOpen ? "rotate-180" : "",
-            ].join(" ")}
-          />
-        </span>
-      </button>
-
-      {isOpen && (
         <div
-          role="menu"
           className="
-            topbar-menu-shadow
-            absolute
-            end-0
-            top-full
-            z-[100]
-            mt-3
-            w-[min(250px,calc(100vw-24px))]
-            rounded-[22px]
-            border
-            border-topbar-border/80
-            bg-topbar-surface/95
-            p-[14px]
-            backdrop-blur-2xl
+            relative
+            z-10
+            flex
+            h-full
+            min-h-0
+            flex-col
           "
         >
-          <div
+          <header
             className="
-              mb-3
-              border-b
-              border-topbar-divider
-              px-1
-              pb-3
-            "
-          >
-            <p
-              className="
-                truncate
-                text-sm
-                font-medium
-                text-topbar-text
-              "
-            >
-              {displayName}
-            </p>
-
-            <p
-              className="
-                mt-1
-                truncate
-                text-xs
-                font-normal
-                text-topbar-muted
-              "
-            >
-              {roleLabel}
-            </p>
-          </div>
-
-          <div
-            className="
-              mb-4
+              relative
               flex
+              h-[82px]
+              shrink-0
               items-center
-              gap-[9px]
-              px-1
-              text-[12px]
-              font-normal
-              text-topbar-subtle
+              px-4
+              pe-12
             "
           >
-            <span
-              className="
-                h-[7px]
-                w-[7px]
-                rounded-full
-                bg-topbar-success
-              "
-            />
-
-            {t.layout.topbar.online}
-          </div>
-
-          <div className="space-y-1">
-            <ProfileMenuItem
-              title={
-                t.layout.topbar.viewProfile
-              }
-              icon={Eye}
-              onClick={() =>
-                navigateAndClose("/profile")
-              }
-            />
-
-            {isSuperAdmin && (
-              <ProfileMenuItem
-                title={
-                  t.layout.topbar.manageUsers
-                }
-                icon={Settings}
-                onClick={() =>
-                  navigateAndClose("/users")
-                }
-              />
-            )}
-          </div>
-
-          <div
-            className="
-              mt-3
-              border-t
-              border-topbar-divider
-              pt-3
-            "
-          >
-            <button
-              type="button"
-              onClick={handleLogout}
-              disabled={
-                logoutMutation.isPending
-              }
+            <div
               className="
                 flex
-                h-[40px]
-                w-full
+                min-w-0
                 items-center
-                gap-[12px]
-                rounded-[14px]
-                px-[10px]
-                text-start
-                text-[13px]
-                font-medium
-                text-topbar-danger
+                gap-2.5
+              "
+            >
+              <div
+                className="
+                  flex
+                  h-10
+                  w-10
+                  shrink-0
+                  items-center
+                  justify-center
+                  rounded-2xl
+                  border
+                  border-sidebar-foreground/10
+                  bg-sidebar-foreground/10
+                "
+              >
+                <GraduationCap
+                  aria-hidden="true"
+                  size={22}
+                  strokeWidth={1.8}
+                />
+              </div>
+
+              <div className="min-w-0">
+                <h1
+                  className="
+                    truncate
+                    text-[14px]
+                    font-semibold
+                    leading-5
+                  "
+                >
+                  School Management
+                </h1>
+
+                <p
+                  className="
+                    mt-0.5
+                    truncate
+                    text-[10px]
+                    font-medium
+                    text-sidebar-muted
+                  "
+                >
+                  Administration Platform
+                </p>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={closeMobileSidebar}
+              aria-label={
+                t.layout.sidebar.closeSidebar
+              }
+              className="
+                absolute
+                end-3
+                top-1/2
+                flex
+                h-7
+                w-7
+                -translate-y-1/2
+                items-center
+                justify-center
+                rounded-lg
+                text-sidebar-foreground/60
                 transition
-                hover:bg-topbar-danger-soft
-                disabled:cursor-not-allowed
-                disabled:opacity-60
+                hover:bg-sidebar-foreground/[0.08]
+                hover:text-sidebar-foreground
                 focus-visible:outline-none
                 focus-visible:ring-2
-                focus-visible:ring-topbar-danger
+                focus-visible:ring-sidebar-foreground/30
+              "
+            >
+              <X
+                aria-hidden="true"
+                size={16}
+                strokeWidth={2}
+              />
+            </button>
+          </header>
+
+          <div
+            className="
+              min-h-0
+              flex-1
+              overflow-y-auto
+              px-3
+              pt-0
+            "
+          >
+            <div
+              className="
+                mb-2
+                flex
+                items-center
+                gap-3
+                px-2
               "
             >
               <span
                 className="
-                  flex
-                  h-[30px]
-                  w-[30px]
-                  items-center
-                  justify-center
-                  rounded-[10px]
-                  bg-topbar-danger-icon
-                  text-topbar-danger
+                  text-[10px]
+                  font-semibold
+                  uppercase
+                  tracking-[0.16em]
+                  text-sidebar-muted/80
                 "
               >
-                <LogOut
-                  aria-hidden="true"
-                  size={15}
-                  strokeWidth={1.9}
-                />
+                Main menu
               </span>
 
-              {logoutMutation.isPending
-                ? t.common.loading
-                : t.layout.topbar.logout}
-            </button>
+              <span
+                className="
+                  h-px
+                  flex-1
+                  bg-sidebar-foreground/[0.08]
+                "
+              />
+            </div>
+
+            <SidebarMenu
+              variant="labels"
+              onNavigate={
+                closeMobileSidebar
+              }
+            />
           </div>
         </div>
-      )}
+      </aside>
     </div>
   );
 }
