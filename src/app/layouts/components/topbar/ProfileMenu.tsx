@@ -16,42 +16,21 @@ import { useDismissibleLayer } from "@/shared/hooks/use-dismissible-layer";
 import { ProfileMenuItem } from "./ProfileMenuItem";
 import type { TopbarMenuProps } from "./topbar.types";
 
-
-
 export function ProfileMenu({
   isOpen,
   onToggle,
   onClose,
 }: TopbarMenuProps) {
-
-
   const containerRef =
     useRef<HTMLDivElement>(null);
 
+  const navigate = useNavigate();
 
+  const { t } = useLocale();
 
-  const navigate =
-    useNavigate();
+  const { user } = useCurrentUser();
 
-
-
-  const { t } =
-    useLocale();
-
-
-
-  const {
-    user,
-  } = useCurrentUser();
-
-
-
-  const logoutMutation =
-    useLogout();
-
-
-
-
+  const logoutMutation = useLogout();
 
   useDismissibleLayer({
     ref: containerRef,
@@ -59,99 +38,45 @@ export function ProfileMenu({
     onDismiss: onClose,
   });
 
-
-
-
-
-
-  const fullName =
-    user?.fullName ??
-    (
-      user
-        ? `${user.firstName} ${user.lastName}`
-        : "Loading..."
-    );
-
-
+  const displayName = user
+    ? `${user.firstName} ${user.lastName}`.trim()
+    : "Loading...";
 
   const photoUrl =
     user?.photoUrl ??
     "/images/avatar-placeholder.png";
 
-
-
-
-
-  const roleLabel =
-    user?.role?.[0]
-      ? user.role[0]
-          .split("_")
-          .map(
-            (word) =>
-              word.charAt(0).toUpperCase() +
-              word.slice(1),
-          )
-          .join(" ")
-      : "User";
-
-
-
-
+  const roleLabel = user?.role?.[0]
+    ? user.role[0]
+        .split("_")
+        .map(
+          (word) =>
+            word.charAt(0).toUpperCase() +
+            word.slice(1),
+        )
+        .join(" ")
+    : "User";
 
   const isSuperAdmin =
-    user?.role?.includes(
-      "super_admin",
-    );
-
-
-
-
-
-
+    user?.role?.includes("super_admin");
 
   function navigateAndClose(
-    path:string,
-  ){
-
+    path: string,
+  ) {
     onClose();
-
     navigate(path);
-
   }
 
-
-
-
-
-
-  function handleLogout(){
-
+  function handleLogout() {
     onClose();
-
     logoutMutation.mutate();
-
   }
-
-
-
-
-
-
 
   return (
-
     <div
       ref={containerRef}
-      className="
-      relative
-      hidden
-      lg:block
-      "
+      className="relative block"
     >
-
-
-
-
       <button
         type="button"
         onClick={onToggle}
@@ -161,272 +86,212 @@ export function ProfileMenu({
         aria-expanded={isOpen}
         aria-haspopup="menu"
         className="
-        flex
-        h-[42px]
-        items-center
-        gap-[9px]
-        rounded-[15px]
-        border
-        border-topbar-border/80
-        bg-topbar-surface/85
-        py-[4px]
-        pe-[6px]
-        ps-[6px]
-        backdrop-blur-xl
-        transition
-        hover:bg-topbar-soft
+          flex
+          h-[44px]
+          w-[44px]
+          items-center
+          justify-center
+          rounded-[15px]
+          border
+          border-topbar-border/80
+          bg-topbar-surface/85
+          p-[4px]
+          backdrop-blur-xl
+          transition
+          hover:bg-topbar-soft
+          focus-visible:outline-none
+          focus-visible:ring-2
+          focus-visible:ring-ring
+          lg:w-[232px]
+          lg:justify-start
+          lg:gap-[10px]
+          lg:px-[7px]
         "
       >
-
-
         <img
           src={photoUrl}
-          alt={fullName}
+          alt={displayName}
           className="
-          h-[32px]
-          w-[32px]
-          rounded-full
-          object-cover
-          ring-2
-          ring-topbar-surface
+            h-[34px]
+            w-[34px]
+            shrink-0
+            rounded-full
+            object-cover
+            ring-2
+            ring-topbar-surface
           "
         />
 
-
-
         <span
           className="
-          flex
-          min-w-0
-          max-w-[110px]
-          flex-col
-          text-start
+            hidden
+            min-w-0
+            flex-1
+            flex-col
+            text-start
+            lg:flex
           "
         >
-
           <span
             className="
-            truncate
-            text-[12px]
-            font-bold
-            leading-[15px]
-            text-topbar-text
+              truncate
+              text-[13px]
+              font-medium
+              leading-[16px]
+              text-topbar-text
             "
           >
-            {fullName}
+            {displayName}
           </span>
-
-
 
           <span
             className="
-            truncate
-            text-[10px]
-            font-semibold
-            leading-[14px]
-            text-topbar-muted
+              truncate
+              text-[10px]
+              font-normal
+              leading-[14px]
+              tracking-[0.01em]
+              text-topbar-muted
             "
           >
             {roleLabel}
           </span>
-
-
         </span>
-
-
-
 
         <span
           className="
-          flex
-          h-[28px]
-          w-[28px]
-          items-center
-          justify-center
-          text-topbar-text
+            hidden
+            h-[28px]
+            w-[28px]
+            shrink-0
+            items-center
+            justify-center
+            rounded-[9px]
+            text-topbar-muted
+            transition
+            lg:flex
           "
         >
-
           <ChevronDown
             aria-hidden="true"
-            size={14}
-            strokeWidth={2.3}
+            size={15}
+            strokeWidth={1.9}
+            className={[
+              "transition-transform duration-200",
+              isOpen ? "rotate-180" : "",
+            ].join(" ")}
           />
-
         </span>
-
-
       </button>
 
-
-
-
-
-
-
       {isOpen && (
-
         <div
           role="menu"
           className="
-          topbar-menu-shadow
-          absolute
-          end-0
-          top-full
-          z-50
-          mt-3
-          w-[250px]
-          rounded-[22px]
-          border
-          border-topbar-border/80
-          bg-topbar-surface/95
-          p-[14px]
-          backdrop-blur-2xl
+            topbar-menu-shadow
+            absolute
+            end-0
+            top-full
+            z-[100]
+            mt-3
+            w-[min(250px,calc(100vw-24px))]
+            rounded-[22px]
+            border
+            border-topbar-border/80
+            bg-topbar-surface/95
+            p-[14px]
+            backdrop-blur-2xl
           "
         >
-
-
-
-
-
-          {/* Identity Header */}
-
           <div
             className="
-            mb-3
-            border-b
-            border-topbar-divider
-            px-1
-            pb-3
+              mb-3
+              border-b
+              border-topbar-divider
+              px-1
+              pb-3
             "
           >
-
             <p
               className="
-              truncate
-              text-sm
-              font-bold
-              text-topbar-text
+                truncate
+                text-sm
+                font-medium
+                text-topbar-text
               "
             >
-              {fullName}
+              {displayName}
             </p>
-
 
             <p
               className="
-              mt-1
-              text-xs
-              font-medium
-              text-topbar-muted
+                mt-1
+                truncate
+                text-xs
+                font-normal
+                text-topbar-muted
               "
             >
               {roleLabel}
             </p>
-
-
           </div>
-
-
-
-
-
-
 
           <div
             className="
-            mb-4
-            flex
-            items-center
-            gap-[9px]
-            px-1
-            text-[12px]
-            font-medium
-            text-topbar-subtle
+              mb-4
+              flex
+              items-center
+              gap-[9px]
+              px-1
+              text-[12px]
+              font-normal
+              text-topbar-subtle
             "
           >
-
             <span
               className="
-              h-[7px]
-              w-[7px]
-              rounded-full
-              bg-topbar-success
+                h-[7px]
+                w-[7px]
+                rounded-full
+                bg-topbar-success
               "
             />
 
             {t.layout.topbar.online}
-
-
           </div>
 
-
-
-
-
-
-
-          <div
-            className="
-            space-y-1
-            "
-          >
-
-
+          <div className="space-y-1">
             <ProfileMenuItem
               title={
                 t.layout.topbar.viewProfile
               }
               icon={Eye}
               onClick={() =>
-                navigateAndClose(
-                  "/profile",
-                )
+                navigateAndClose("/profile")
               }
             />
 
-
-
-
             {isSuperAdmin && (
-
               <ProfileMenuItem
                 title={
                   t.layout.topbar.manageUsers
                 }
                 icon={Settings}
                 onClick={() =>
-                  navigateAndClose(
-                    "/users",
-                  )
+                  navigateAndClose("/users")
                 }
               />
-
             )}
-
-
-
           </div>
-
-
-
-
-
-
-
-
 
           <div
             className="
-            mt-3
-            border-t
-            border-topbar-divider
-            pt-3
+              mt-3
+              border-t
+              border-topbar-divider
+              pt-3
             "
           >
-
-
-
             <button
               type="button"
               onClick={handleLogout}
@@ -434,75 +299,52 @@ export function ProfileMenu({
                 logoutMutation.isPending
               }
               className="
-              flex
-              h-[40px]
-              w-full
-              items-center
-              gap-[12px]
-              rounded-[14px]
-              px-[10px]
-              text-start
-              text-[13px]
-              font-bold
-              text-topbar-danger
-              transition
-              hover:bg-topbar-danger-soft
-              disabled:cursor-not-allowed
-              disabled:opacity-60
-              focus-visible:outline-none
-              focus-visible:ring-2
-              focus-visible:ring-topbar-danger
+                flex
+                h-[40px]
+                w-full
+                items-center
+                gap-[12px]
+                rounded-[14px]
+                px-[10px]
+                text-start
+                text-[13px]
+                font-medium
+                text-topbar-danger
+                transition
+                hover:bg-topbar-danger-soft
+                disabled:cursor-not-allowed
+                disabled:opacity-60
+                focus-visible:outline-none
+                focus-visible:ring-2
+                focus-visible:ring-topbar-danger
               "
             >
-
-
               <span
                 className="
-                flex
-                h-[30px]
-                w-[30px]
-                items-center
-                justify-center
-                rounded-[10px]
-                bg-topbar-danger-icon
-                text-topbar-danger
+                  flex
+                  h-[30px]
+                  w-[30px]
+                  items-center
+                  justify-center
+                  rounded-[10px]
+                  bg-topbar-danger-icon
+                  text-topbar-danger
                 "
               >
-
                 <LogOut
                   aria-hidden="true"
                   size={15}
-                  strokeWidth={2.1}
+                  strokeWidth={1.9}
                 />
-
               </span>
 
-
-
-              {
-                logoutMutation.isPending
-                  ? t.common.loading
-                  : t.layout.topbar.logout
-              }
-
-
-
+              {logoutMutation.isPending
+                ? t.common.loading
+                : t.layout.topbar.logout}
             </button>
-
-
           </div>
-
-
-
-
         </div>
-
       )}
-
-
-
     </div>
-
   );
-
 }

@@ -208,7 +208,7 @@ export type GuardianPersonalPayload = {
 export type StudentEnrollmentPayload = {
   academic_year_id: ApiId;
   grade_level_id: ApiId;
-  class_room_id?: ApiId | null;
+  class_room_id: ApiId;
 };
 
 export type RegisterStudentPayload = {

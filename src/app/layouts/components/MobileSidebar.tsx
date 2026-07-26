@@ -1,281 +1,350 @@
 import {
-  ExternalLink,
-  GraduationCap,
-  X,
+  ChevronDown,
+  Eye,
+  LogOut,
+  Settings,
 } from "lucide-react";
 
-import { SidebarMenu } from "@/app/layouts/components/SidebarMenu";
-import { useLayoutStore } from "@/app/layouts/store/layoutStore";
+import { useRef } from "react";
+import { useNavigate } from "react-router-dom";
+
+import { useCurrentUser } from "@/app/layouts/hooks/useCurrentUser";
 import { useLocale } from "@/app/providers/locale";
-import { useGeneralSettings } from "@/features/settings/general/hooks/useGeneralSettings";
+import { useLogout } from "@/features/auth/hooks/use-logout";
+import { useDismissibleLayer } from "@/shared/hooks/use-dismissible-layer";
 
-function getDisplaySchoolName(
-  schoolName: string,
-  shortName: string,
-  maxLength = 22,
-): string {
-  const normalizedShortName =
-    shortName.trim();
+import { ProfileMenuItem } from "../components/topbar/ProfileMenuItem";
+import type { TopbarMenuProps } from "../components/topbar/topbar.types";
 
-  if (normalizedShortName) {
-    return normalizedShortName;
-  }
+export function ProfileMenu({
+  isOpen,
+  onToggle,
+  onClose,
+}: TopbarMenuProps) {
+  const containerRef =
+    useRef<HTMLDivElement>(null);
 
-  const normalizedSchoolName =
-    schoolName.trim();
+  const navigate = useNavigate();
 
-  if (!normalizedSchoolName) {
-    return "";
-  }
+  const { t } = useLocale();
 
-  if (
-    normalizedSchoolName.length <= maxLength
+  const { user } = useCurrentUser();
+
+  const logoutMutation = useLogout();
+
+  useDismissibleLayer({
+    ref: containerRef,
+    enabled: isOpen,
+    onDismiss: onClose,
+  });
+
+  const displayName = user
+    ? `${user.firstName} ${user.lastName}`.trim()
+    : "Loading...";
+
+  const photoUrl =
+    user?.photoUrl ??
+    "/images/avatar-placeholder.png";
+
+  const roleLabel = user?.role?.[0]
+    ? user.role[0]
+        .split("_")
+        .map(
+          (word) =>
+            word.charAt(0).toUpperCase() +
+            word.slice(1),
+        )
+        .join(" ")
+    : "User";
+
+  const isSuperAdmin =
+    user?.role?.includes("super_admin");
+
+  function navigateAndClose(
+    path: string,
   ) {
-    return normalizedSchoolName;
+    onClose();
+    navigate(path);
   }
 
-  return normalizedSchoolName
-    .split(/\s+/)
-    .filter(Boolean)
-    .map((word) =>
-      word.charAt(0).toUpperCase(),
-    )
-    .join("");
-}
-
-function normalizeExternalUrl(
-  url: string,
-): string | null {
-  const normalizedUrl = url.trim();
-
-  if (!normalizedUrl) {
-    return null;
-  }
-
-  if (
-    normalizedUrl.startsWith("http://") ||
-    normalizedUrl.startsWith("https://")
-  ) {
-    return normalizedUrl;
-  }
-
-  return `https://${normalizedUrl}`;
-}
-
-type SchoolLogoProps = {
-  logoUrl: string | null;
-  schoolName: string;
-};
-
-function SchoolLogo({
-  logoUrl,
-  schoolName,
-}: SchoolLogoProps) {
-  if (logoUrl) {
-    return (
-      <img
-        src={logoUrl}
-        alt={`${schoolName} logo`}
-        draggable={false}
-        className="h-9 w-9 object-contain"
-      />
-    );
+  function handleLogout() {
+    onClose();
+    logoutMutation.mutate();
   }
 
   return (
-    <GraduationCap
-      aria-hidden="true"
-      size={27}
-      strokeWidth={1.8}
-      className="text-sidebar-foreground"
-    />
-  );
-}
-
-export function MobileSidebar() {
-  const isOpen = useLayoutStore(
-    (state) =>
-      state.isMobileSidebarOpen,
-  );
-
-  const closeMobileSidebar =
-    useLayoutStore(
-      (state) =>
-        state.closeMobileSidebar,
-    );
-
-  const { direction, t } = useLocale();
-
-  const {
-    data: generalSettings,
-    isLoading: isGeneralSettingsLoading,
-  } = useGeneralSettings();
-
-  const isRtl = direction === "rtl";
-
-  const sidebarPositionClass = isRtl
-    ? "right-0 rounded-l-3xl"
-    : "left-0 rounded-r-3xl";
-
-  const sidebarRadiusClass = isRtl
-    ? "rounded-l-3xl"
-    : "rounded-r-3xl";
-
-  const schoolName =
-    generalSettings?.schoolName.trim() ??
-    "";
-
-  const shortName =
-    generalSettings?.shortName.trim() ??
-    "";
-
-  const schoolDisplayName =
-    getDisplaySchoolName(
-      schoolName,
-      shortName,
-    );
-
-  const schoolLogoUrl =
-    generalSettings?.logoUrl ?? null;
-
-  const schoolWebsiteUrl =
-    normalizeExternalUrl(
-      generalSettings?.website ?? "",
-    );
-
-  if (!isOpen) {
-    return null;
-  }
-
-  return (
-    <div className="fixed inset-0 z-[80] lg:hidden">
+    <div
+      ref={containerRef}
+      className="relative block"
+    >
       <button
         type="button"
+        onClick={onToggle}
         aria-label={
-          t.layout.sidebar.closeSidebar
+          t.layout.topbar.openProfileMenu
         }
-        onClick={closeMobileSidebar}
-        className="absolute inset-0 bg-foreground/45 backdrop-blur-[2px]"
-      />
-
-      <aside
-        aria-label={
-          t.layout.sidebar.navigation
-        }
-        className={[
-          "sidebar-gradient sidebar-shell absolute top-0 z-10 flex h-full w-[282px] max-w-[86vw] flex-col overflow-hidden text-sidebar-foreground",
-          sidebarPositionClass,
-        ].join(" ")}
+        aria-expanded={isOpen}
+        aria-haspopup="menu"
+        className="
+          flex
+          h-[44px]
+          w-[44px]
+          items-center
+          justify-center
+          rounded-[15px]
+          border
+          border-topbar-border/80
+          bg-topbar-surface/85
+          p-[4px]
+          backdrop-blur-xl
+          transition
+          hover:bg-topbar-soft
+          focus-visible:outline-none
+          focus-visible:ring-2
+          focus-visible:ring-ring
+          sm:w-[232px]
+          sm:justify-start
+          sm:gap-[10px]
+          sm:px-[7px]
+        "
       >
+        <img
+          src={photoUrl}
+          alt={displayName}
+          className="
+            h-[34px]
+            w-[34px]
+            shrink-0
+            rounded-full
+            object-cover
+            ring-2
+            ring-topbar-surface
+          "
+        />
+
+        <span
+          className="
+            hidden
+            min-w-0
+            flex-1
+            flex-col
+            text-start
+            sm:flex
+          "
+        >
+          <span
+            className="
+              truncate
+              text-[13px]
+              font-medium
+              leading-[16px]
+              text-topbar-text
+            "
+          >
+            {displayName}
+          </span>
+
+          <span
+            className="
+              truncate
+              text-[10px]
+              font-normal
+              leading-[14px]
+              tracking-[0.01em]
+              text-topbar-muted
+            "
+          >
+            {roleLabel}
+          </span>
+        </span>
+
+        <span
+          className="
+            hidden
+            h-[28px]
+            w-[28px]
+            shrink-0
+            items-center
+            justify-center
+            rounded-[9px]
+            text-topbar-muted
+            transition
+            sm:flex
+          "
+        >
+          <ChevronDown
+            aria-hidden="true"
+            size={15}
+            strokeWidth={1.9}
+            className={[
+              "transition-transform duration-200",
+              isOpen ? "rotate-180" : "",
+            ].join(" ")}
+          />
+        </span>
+      </button>
+
+      {isOpen && (
         <div
-          aria-hidden="true"
-          className={[
-            "pointer-events-none absolute inset-0 z-0 overflow-hidden",
-            sidebarRadiusClass,
-          ].join(" ")}
+          role="menu"
+          className="
+            topbar-menu-shadow
+            absolute
+            end-0
+            top-full
+            z-[100]
+            mt-3
+            w-[min(250px,calc(100vw-24px))]
+            rounded-[22px]
+            border
+            border-topbar-border/80
+            bg-topbar-surface/95
+            p-[14px]
+            backdrop-blur-2xl
+          "
         >
           <div
-            className="sidebar-pattern absolute inset-0"
-            style={{
-              backgroundPosition: "center",
-              backgroundRepeat: "repeat",
-              backgroundSize: "350px",
-            }}
-          />
-        </div>
+            className="
+              mb-3
+              border-b
+              border-topbar-divider
+              px-1
+              pb-3
+            "
+          >
+            <p
+              className="
+                truncate
+                text-sm
+                font-medium
+                text-topbar-text
+              "
+            >
+              {displayName}
+            </p>
 
-        <header className="relative z-10 flex h-[76px] shrink-0 items-center border-b border-sidebar-foreground/10 px-5">
-          <div className="flex min-w-0 flex-1 items-center gap-3">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center">
-              {isGeneralSettingsLoading ? (
-                <span
-                  aria-hidden="true"
-                  className="h-8 w-8 animate-pulse rounded-lg bg-sidebar-foreground/10"
-                />
-              ) : (
-                <SchoolLogo
-                  logoUrl={schoolLogoUrl}
-                  schoolName={
-                    schoolName ||
-                    schoolDisplayName
-                  }
-                />
-              )}
-            </div>
-
-            <div className="min-w-0 flex-1">
-              {isGeneralSettingsLoading ? (
-                <span className="block h-3 w-28 animate-pulse rounded bg-sidebar-foreground/10" />
-              ) : (
-                <h1
-                  title={schoolName}
-                  className="truncate text-center text-[13px] font-semibold tracking-[-0.01em] text-sidebar-foreground"
-                >
-                  {schoolDisplayName}
-                </h1>
-              )}
-            </div>
+            <p
+              className="
+                mt-1
+                truncate
+                text-xs
+                font-normal
+                text-topbar-muted
+              "
+            >
+              {roleLabel}
+            </p>
           </div>
 
-          <button
-            type="button"
-            onClick={closeMobileSidebar}
-            aria-label={
-              t.layout.sidebar.closeSidebar
-            }
-            className={[
-              "flex h-8 w-8 shrink-0 items-center justify-center rounded-full",
-              "bg-sidebar-foreground/5 text-sidebar-muted",
-              "transition duration-300 hover:bg-sidebar-foreground/10 hover:text-sidebar-foreground",
-              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sidebar-foreground/30",
-              "motion-reduce:transition-none",
-            ].join(" ")}
+          <div
+            className="
+              mb-4
+              flex
+              items-center
+              gap-[9px]
+              px-1
+              text-[12px]
+              font-normal
+              text-topbar-subtle
+            "
           >
-            <X
-              aria-hidden="true"
-              size={16}
+            <span
+              className="
+                h-[7px]
+                w-[7px]
+                rounded-full
+                bg-topbar-success
+              "
             />
-          </button>
-        </header>
 
-        <div className="relative z-10 min-h-0 flex-1 overflow-y-auto px-3 py-4">
-          <SidebarMenu
-            variant="labels"
-            onNavigate={closeMobileSidebar}
-          />
-        </div>
+            {t.layout.topbar.online}
+          </div>
 
-        {schoolWebsiteUrl && (
-          <div className="relative z-10 border-t border-sidebar-foreground/10 px-4 pb-4 pt-4">
-            <a
-              href={schoolWebsiteUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={[
-                "flex h-10 items-center justify-between rounded-2xl",
-                "bg-sidebar-foreground/5 px-3",
-                "text-[11px] font-semibold text-sidebar-muted",
-                "transition hover:bg-sidebar-foreground/10 hover:text-sidebar-foreground",
-                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sidebar-foreground/30",
-                "motion-reduce:transition-none",
-              ].join(" ")}
-            >
-              <span>
-                {
-                  t.layout.sidebar
-                    .schoolWebsite
+          <div className="space-y-1">
+            <ProfileMenuItem
+              title={
+                t.layout.topbar.viewProfile
+              }
+              icon={Eye}
+              onClick={() =>
+                navigateAndClose("/profile")
+              }
+            />
+
+            {isSuperAdmin && (
+              <ProfileMenuItem
+                title={
+                  t.layout.topbar.manageUsers
                 }
+                icon={Settings}
+                onClick={() =>
+                  navigateAndClose("/users")
+                }
+              />
+            )}
+          </div>
+
+          <div
+            className="
+              mt-3
+              border-t
+              border-topbar-divider
+              pt-3
+            "
+          >
+            <button
+              type="button"
+              onClick={handleLogout}
+              disabled={
+                logoutMutation.isPending
+              }
+              className="
+                flex
+                h-[40px]
+                w-full
+                items-center
+                gap-[12px]
+                rounded-[14px]
+                px-[10px]
+                text-start
+                text-[13px]
+                font-medium
+                text-topbar-danger
+                transition
+                hover:bg-topbar-danger-soft
+                disabled:cursor-not-allowed
+                disabled:opacity-60
+                focus-visible:outline-none
+                focus-visible:ring-2
+                focus-visible:ring-topbar-danger
+              "
+            >
+              <span
+                className="
+                  flex
+                  h-[30px]
+                  w-[30px]
+                  items-center
+                  justify-center
+                  rounded-[10px]
+                  bg-topbar-danger-icon
+                  text-topbar-danger
+                "
+              >
+                <LogOut
+                  aria-hidden="true"
+                  size={15}
+                  strokeWidth={1.9}
+                />
               </span>
 
-              <ExternalLink
-                aria-hidden="true"
-                size={13}
-                strokeWidth={1.8}
-              />
-            </a>
+              {logoutMutation.isPending
+                ? t.common.loading
+                : t.layout.topbar.logout}
+            </button>
           </div>
-        )}
-      </aside>
+        </div>
+      )}
     </div>
   );
 }

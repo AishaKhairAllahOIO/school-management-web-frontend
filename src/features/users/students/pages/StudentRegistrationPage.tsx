@@ -127,7 +127,8 @@ export function StudentRegistrationPage() {
       Boolean(
         form.enrollment
           .academic_year_id &&
-          form.enrollment.grade_level_id,
+          form.enrollment.grade_level_id &&
+          form.enrollment.class_room_id,
       ),
     [form.enrollment],
   );
@@ -227,7 +228,7 @@ export function StudentRegistrationPage() {
 
           class_room_id:
             form.enrollment
-              .class_room_id || null,
+              .class_room_id,
         },
       };
 
@@ -412,6 +413,7 @@ export function StudentRegistrationPage() {
                   form.enrollment
                     .class_room_id
                 }
+                classroomOptional={false}
                 onAcademicYearChange={(
                   value,
                 ) => {
