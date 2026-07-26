@@ -79,7 +79,7 @@ export function ActionMenu({
           <button
             type="button"
             onClick={handleEdit}
-            className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-xs font-black text-indigo-600 transition hover:bg-indigo-50"
+            className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-xs font-black text-primary transition hover:bg-primary/[0.07]"
           >
             <Edit3 size={15} />
             Edit

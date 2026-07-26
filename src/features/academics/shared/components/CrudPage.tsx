@@ -13,6 +13,8 @@ import {
   type ReactNode,
 } from "react";
 
+import { useAcademicTheme } from "../hooks/useAcademicTheme";
+
 type BaseEntity = {
   id: string;
 };
@@ -156,6 +158,9 @@ deleteTitle = "Delete record?",
 deleteDescription = () =>
   "This record will be permanently deleted.",
 }: CrudPageProps<TEntity, TCreate, TUpdate>) {
+  const academicTheme = useAcademicTheme();
+  const SectionIcon = academicTheme.icon;
+
   const [dialogRow, setDialogRow] =
     useState<TEntity | "new" | null>(
       null,
@@ -449,151 +454,112 @@ deleteDescription = () =>
   }
 
   return (
-    <div className="space-y-5">
-      <section className="overflow-hidden rounded-3xl border border-border/70 bg-card shadow-soft">
-        <header className="flex flex-col gap-4 border-b border-border/60 px-5 py-5 sm:px-6 lg:flex-row lg:items-center lg:justify-between">
-          <div className="min-w-0">
-            <h1 className="text-2xl font-black tracking-[-0.035em] text-foreground">
-              {title}
-            </h1>
-            <p className="mt-1.5 max-w-2xl text-sm leading-6 text-muted-foreground">
-              {description}
-            </p>
-          </div>
+    <div className="space-y-5" style={academicTheme.style}>
+      <section className="overflow-hidden rounded-[28px] border border-border/65 bg-card shadow-[0_14px_45px_rgba(38,24,84,0.06)]">
+        <header className="relative overflow-hidden border-b border-border/55 px-6 py-6 sm:px-7">
+          <div className="absolute inset-x-0 top-0 h-[3px] bg-primary" />
+          <div className="absolute -right-16 -top-20 h-56 w-56 rounded-full bg-primary/[0.07] blur-3xl" />
 
-          <button
-            type="button"
-            onClick={openCreate}
-            className="inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-xl bg-primary px-6 text-sm font-bold text-primary-foreground shadow-sm transition hover:-translate-y-0.5 hover:bg-primary/90"
-          >
-            <Plus size={17} />
-            {addLabel}
-          </button>
-        </header>
+          <div className="relative flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+            <div className="flex min-w-0 items-start gap-4">
+              <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-primary/15 bg-primary/[0.08] text-primary">
+                <SectionIcon size={25} strokeWidth={1.75} />
+              </span>
 
-       
-        {rows.length === 0 ? (
-  <div className="px-6 py-16 text-center">
-    <h2 className="text-base font-bold text-foreground">
-      {emptyTitle}
-    </h2>
+              <div className="min-w-0">
+                <h1 className="text-[28px] font-bold tracking-[-0.035em] text-foreground">
+                  {title}
+                </h1>
+                <p className="mt-1 text-sm font-semibold text-primary">
+                  Academic {academicTheme.label}
+                </p>
+                <p className="mt-1.5 max-w-2xl text-sm leading-6 text-muted-foreground">
+                  {description}
+                </p>
+              </div>
+            </div>
 
-    <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-muted-foreground">
-      {emptyDescription}
-    </p>
-
-    <button
-      type="button"
-      onClick={openCreate}
-      className="mt-5 inline-flex h-10 items-center gap-2 rounded-xl bg-primary px-5 text-xs font-bold text-primary-foreground"
-    >
-      <Plus size={15} />
-      {addLabel}
-    </button>
-  </div>
-) : (
-  <div className="relative overflow-x-auto">
-  <table className="w-full min-w-[860px] border-separate border-spacing-0">
-    <thead>
-      <tr className="bg-[#faf9ff]">
-        {columns.map((column) => (
-          <th
-            key={column.key}
-            className={[
-              "border-b border-border/70 px-6 py-4",
-              "text-[11px] font-extrabold uppercase",
-              "tracking-[0.055em] text-muted-foreground",
-              column.align === "center"
-                ? "text-center"
-                : column.align === "right"
-                  ? "text-right"
-                  : "text-left",
-            ].join(" ")}
-          >
-            {column.header}
-          </th>
-        ))}
-
-        <th
-          className={[
-            "sticky right-0 z-20",
-            "min-w-[174px]",
-            "border-b border-l border-border/70",
-            "bg-[#faf9ff] px-6 py-4",
-            "text-right text-[11px] font-extrabold",
-            "uppercase tracking-[0.055em]",
-            "text-muted-foreground",
-          ].join(" ")}
-        >
-          Actions
-        </th>
-      </tr>
-    </thead>
-
-    <tbody>
-{rows.map((row, rowIndex) => (        <tr
-          key={row.id}
-          className={[
-            "group transition-all duration-200",
-            "hover:bg-primary/[0.035]",
-            rowIndex % 2 === 0
-              ? "bg-card"
-              : "bg-muted/[0.12]",
-          ].join(" ")}
-        >
-          {columns.map((column, columnIndex) => (
-            <td
-              key={column.key}
-              className={[
-                "border-b border-border/50 px-6 py-[18px]",
-                "text-sm text-foreground",
-                "align-middle transition-colors",
-                columnIndex === 0
-                  ? "font-bold"
-                  : "font-medium",
-                column.align === "center"
-                  ? "text-center"
-                  : column.align === "right"
-                    ? "text-right"
-                    : "text-left",
-              ].join(" ")}
+            <button
+              type="button"
+              onClick={openCreate}
+              className="inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-xl bg-primary px-5 text-sm font-semibold text-primary-foreground shadow-[0_8px_22px_hsl(var(--primary)/0.22)] transition hover:-translate-y-0.5 hover:bg-primary/92"
             >
-              {column.render(row)}
-            </td>
-          ))}
+              <Plus size={17} />
+              {addLabel}
+            </button>
+          </div>
+        </header>
+      </section>
 
-          <td
-            className={[
-              "sticky right-0 z-10",
-              "border-b border-l border-border/50",
-              "px-5 py-4 text-right",
-              "transition-colors duration-200",
-              rowIndex % 2 === 0
-                ? "bg-card"
-                : "bg-[#fcfbff]",
-              "group-hover:bg-[#f8f5ff]",
-            ].join(" ")}
-          >
-            <RowActions
-              disabled={Boolean(
-                deleteMutation.isPending,
-              )}
-              onView={() => {
-                void openView(row);
-              }}
-              onEdit={() => {
-                void openEdit(row);
-              }}
-              onDelete={() => {
-                setDeletingRow(row);
-              }}
-            />
-          </td>
-        </tr>
-      ))}
-    </tbody>
-  </table>
-</div>
+      <section className="overflow-hidden rounded-[24px] border border-border/65 bg-card shadow-[0_12px_40px_rgba(38,24,84,0.05)]">
+        {rows.length === 0 ? (
+          <div className="px-6 py-16 text-center">
+            <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl border border-primary/15 bg-primary/[0.07] text-primary">
+              <SectionIcon size={24} strokeWidth={1.7} />
+            </span>
+            <h2 className="mt-4 text-base font-semibold text-foreground">{emptyTitle}</h2>
+            <p className="mx-auto mt-1.5 max-w-md text-sm leading-6 text-muted-foreground">{emptyDescription}</p>
+            <button type="button" onClick={openCreate} className="mt-5 inline-flex h-10 items-center gap-2 rounded-xl bg-primary px-5 text-xs font-semibold text-primary-foreground">
+              <Plus size={15} />
+              {addLabel}
+            </button>
+          </div>
+        ) : (
+          <div className="relative overflow-x-auto">
+            <table className="w-full min-w-[860px] border-separate border-spacing-0">
+              <thead>
+                <tr className="bg-primary/[0.045]">
+                  {columns.map((column) => (
+                    <th
+                      key={column.key}
+                      className={[
+                        "border-b border-primary/10 px-6 py-4",
+                        "text-[11px] font-bold uppercase tracking-[0.055em] text-primary",
+                        column.align === "center" ? "text-center" : column.align === "right" ? "text-right" : "text-left",
+                      ].join(" ")}
+                    >
+                      {column.header}
+                    </th>
+                  ))}
+                  <th className="sticky right-0 z-20 min-w-[174px] border-b border-l border-primary/10 bg-primary/[0.045] px-6 py-4 text-right text-[11px] font-bold uppercase tracking-[0.055em] text-primary">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {rows.map((row) => (
+                  <tr key={row.id} className="group bg-card transition-colors duration-150 hover:bg-primary/[0.025]">
+                    {columns.map((column, columnIndex) => (
+                      <td
+                        key={column.key}
+                        className={[
+                          "border-b border-border/45 px-6 py-[17px] text-sm text-foreground align-middle",
+                          columnIndex === 0 ? "font-semibold" : "font-normal",
+                          column.align === "center" ? "text-center" : column.align === "right" ? "text-right" : "text-left",
+                        ].join(" ")}
+                      >
+                        {column.render(row)}
+                      </td>
+                    ))}
+                    <td className="sticky right-0 z-10 border-b border-l border-border/45 bg-card px-5 py-4 text-right transition-colors group-hover:bg-[hsl(var(--primary)/0.025)]">
+                      <RowActions
+                        disabled={Boolean(deleteMutation.isPending)}
+                        onView={() => void openView(row)}
+                        onEdit={() => void openEdit(row)}
+                        onDelete={() => setDeletingRow(row)}
+                      />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <div className="flex items-center border-t border-border/45 bg-muted/[0.12] px-6 py-3.5 text-xs text-muted-foreground">
+              <span className="mr-2 inline-flex h-7 w-7 items-center justify-center rounded-lg bg-primary/[0.08] text-primary">
+                <SectionIcon size={14} />
+              </span>
+              Showing {rows.length} {rows.length === 1 ? "record" : "records"}
+            </div>
+          </div>
         )}
       </section>
 
@@ -601,9 +567,7 @@ deleteDescription = () =>
         <DetailsDrawer
           row={viewingRow}
           columns={columns}
-          isLoading={
-            isLoadingDetails
-          }
+          isLoading={isLoadingDetails}
           error={detailsError}
           onClose={() => {
             if (!isLoadingDetails) {
@@ -621,40 +585,17 @@ deleteDescription = () =>
 
       {dialogRow ? (
         <EditorDialog
-          title={
-            dialogRow === "new"
-              ? addLabel
-              : `Edit ${title}`
-          }
+          title={dialogRow === "new" ? addLabel : `Edit ${title}`}
           fields={fields}
           values={values}
           errors={formErrors}
-          isEdit={
-            dialogRow !== "new"
-          }
-          isLoading={
-            isLoadingDetails
-          }
+          isEdit={dialogRow !== "new"}
+          isLoading={isLoadingDetails}
           error={detailsError}
-          isSubmitting={
-            isSubmitting
-          }
-          onChange={(
-            fieldName,
-            value,
-          ) => {
-            setValues(
-              (current) => ({
-                ...current,
-                [fieldName]: value,
-              }),
-            );
-            setFormErrors(
-              (current) => ({
-                ...current,
-                [fieldName]: "",
-              }),
-            );
+          isSubmitting={isSubmitting}
+          onChange={(fieldName, value) => {
+            setValues((current) => ({ ...current, [fieldName]: value }));
+            setFormErrors((current) => ({ ...current, [fieldName]: "" }));
           }}
           onClose={closeDialog}
           onSubmit={submit}
@@ -662,27 +603,16 @@ deleteDescription = () =>
       ) : null}
 
       <DeleteDialog
-        open={
-          deletingRow !== null
-        }
+        open={deletingRow !== null}
         title={deleteTitle}
-        description={
-          deletingRow
-            ? deleteDescription(
-                deletingRow,
-              )
-            : ""
-        }
-        isPending={Boolean(
-          deleteMutation.isPending,
-        )}
-        onClose={() =>
-          setDeletingRow(null)
-        }
+        description={deletingRow ? deleteDescription(deletingRow) : ""}
+        isPending={Boolean(deleteMutation.isPending)}
+        onClose={() => setDeletingRow(null)}
         onConfirm={confirmDelete}
       />
     </div>
   );
+
 }
 
 function RowActions({
@@ -896,7 +826,7 @@ function DetailsDrawer<
                 </h2>
 
                 <p className="mt-1 text-xs text-muted-foreground">
-                  Latest information retrieved from the server.
+                  Record details
                 </p>
               </div>
             </div>
@@ -935,7 +865,7 @@ function DetailsDrawer<
                 </p>
 
                 <p className="mt-1 text-xs text-muted-foreground">
-                  Retrieving the latest record information.
+                  Loading record details.
                 </p>
               </div>
             </div>
@@ -1130,7 +1060,7 @@ function EditorDialog<
                 </h2>
 
                 <p className="mt-1 text-xs leading-5 text-muted-foreground">
-                  Complete the required information and save your changes.
+                  Enter the details below.
                 </p>
               </div>
             </div>
@@ -1592,7 +1522,7 @@ function DeleteDialog({
                 </p>
 
                 <p className="mt-1 text-[11px] leading-5 text-red-600/80">
-                  Related records may prevent deletion. The server will validate the operation before removing this item.
+                  The server will validate this action before deletion.
                 </p>
               </div>
             </div>

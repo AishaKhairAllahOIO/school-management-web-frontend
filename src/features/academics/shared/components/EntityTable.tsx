@@ -19,7 +19,7 @@ export function EntityTable<T>({ columns, rows, getRowId, emptyText, actions }: 
   return (
     <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white">
       <table className="w-full min-w-[760px] text-left text-xs">
-        <thead className="bg-slate-50 text-slate-500">
+        <thead className="bg-primary/[0.045] text-primary">
           <tr>
             {columns.map((column) => (
               <th key={column.key} className={["px-4 py-3 font-black", column.className].join(" ")}>{column.header}</th>
@@ -29,7 +29,7 @@ export function EntityTable<T>({ columns, rows, getRowId, emptyText, actions }: 
         </thead>
         <tbody>
           {rows.map((row) => (
-            <tr key={getRowId(row)} className="border-t border-slate-100">
+            <tr key={getRowId(row)} className="border-t border-slate-100 transition-colors hover:bg-primary/[0.025]">
               {columns.map((column) => (
                 <td key={column.key} className={["px-4 py-4 font-semibold text-slate-600", column.className].join(" ")}>{column.render(row)}</td>
               ))}

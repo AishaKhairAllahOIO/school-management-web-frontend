@@ -20,7 +20,7 @@ export function AcademicsPageShell({ title, description, addLabel, onAdd, childr
         <button
           type="button"
           onClick={onAdd}
-          className="flex h-11 shrink-0 items-center gap-2 rounded-xl bg-indigo-600 px-5 text-sm font-black text-white shadow-sm"
+          className="flex h-11 shrink-0 items-center gap-2 rounded-xl bg-primary px-5 text-sm font-black text-primary-foreground shadow-sm"
         >
           <Plus size={16} />
           {addLabel}

@@ -18,7 +18,7 @@ export function EntityDialog({ title, children, onClose, onSubmit, submitLabel =
           <button
             type="button"
             onClick={onClose}
-            className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 text-slate-500 hover:bg-slate-50"
+            className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 text-slate-500 hover:bg-primary/[0.05]"
           >
             <X size={16} />
           </button>
@@ -28,7 +28,7 @@ export function EntityDialog({ title, children, onClose, onSubmit, submitLabel =
           <button type="button" onClick={onClose} className="h-10 rounded-xl border border-slate-200 px-4 text-sm font-black text-slate-600">
             Cancel
           </button>
-          <button type="button" onClick={onSubmit} className="h-10 rounded-xl bg-indigo-600 px-4 text-sm font-black text-white">
+          <button type="button" onClick={onSubmit} className="h-10 rounded-xl bg-primary px-4 text-sm font-black text-primary-foreground">
             {submitLabel}
           </button>
         </div>
