@@ -1,34 +1,49 @@
+import { lazy, Suspense } from "react";
 import type { RouteObject } from "react-router-dom";
 import { Navigate } from "react-router-dom";
+import { Loader2 } from "lucide-react";
 
-import { AnnouncementsPage } from "@/features/communications/announcements/pages/AnnouncementsPage";
-import { ComplaintsPage } from "@/features/communications/complaints/pages/ComplaintsPage";
-import { MessagesPage } from "@/features/communications/messages/pages/MessagesPage";
-import { NotificationsPage } from "@/features/communications/notifications/pages/NotificationsPage";
+// 1. التحميل الكسول للصفحة لتحسين الأداء (Code Splitting)
+const CommunicationsPage = lazy(() =>
+  import("@/features/communications/pages/CommunicationsPage").then((module) => ({
+    default: module.CommunicationsPage,
+  }))
+);
 
+// 2. مكون التحميل المؤقت أثناء جلب الصفحة من السيرفر
+const PageFallback = () => (
+  <div className="flex items-center justify-center min-h-[60vh] w-full text-primary">
+    <Loader2 className="w-8 h-8 animate-spin" />
+  </div>
+);
+
+// 3. تصدير مسارات التواصل والإشعارات
 export const communicationsRoutes = [
   {
-    path: "communication",
+    path: "communications",
     children: [
+      // التوجيه الافتراضي إلى التبويب الأول (التعاميم)
       {
         index: true,
         element: <Navigate to="announcements" replace />,
       },
+      // مسار التعاميم والإعلانات
       {
         path: "announcements",
-        element: <AnnouncementsPage />,
+        element: (
+          <Suspense fallback={<PageFallback />}>
+            <CommunicationsPage />
+          </Suspense>
+        ),
       },
+      // مسار الأنشطة والرحلات المدرسية
       {
-        path: "notifications",
-        element: <NotificationsPage />,
-      },
-      {
-        path: "messages",
-        element: <MessagesPage />,
-      },
-      {
-        path: "complaints",
-        element: <ComplaintsPage />,
+        path: "activities",
+        element: (
+          <Suspense fallback={<PageFallback />}>
+            <CommunicationsPage />
+          </Suspense>
+        ),
       },
     ],
   },

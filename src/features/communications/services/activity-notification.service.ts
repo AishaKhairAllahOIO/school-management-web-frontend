@@ -1,5 +1,5 @@
 import { axiosClient } from "@/services/axios/axiosClient";
-import { API_ENDPOINTS } from "@/services/api/endpoints"; // 👈 استيراد مساراتك المركزية
+import { API_ENDPOINTS } from "@/services/api/endpoints";
 import type {
   Activity,
   ActivityPayload,
@@ -8,11 +8,11 @@ import type {
   PaymentAlertPayload,
   AdvisorAlertPayload,
   StaffAlertPayload,
-} from "../types/communication.types";
+} from "../types/activity-notification.types";
 
 export const communicationService = {
   // ==========================================
-  // 1. خدمات الأنشطة (Activities Services)
+  // 1. خدمات الأنشطة (Activities)
   // ==========================================
   getAllActivities: async (): Promise<Activity[]> => {
     const response = await axiosClient.get(API_ENDPOINTS.COMMUNICATIONS.ACTIVITIES);
@@ -30,6 +30,7 @@ export const communicationService = {
   },
 
   updateActivity: async (id: string | number, payload: Partial<ActivityPayload>) => {
+    // الباك إند يطلب POST للتعديل
     const response = await axiosClient.post(API_ENDPOINTS.COMMUNICATIONS.UPDATE_ACTIVITY(id), payload);
     return response.data;
   },
@@ -40,7 +41,7 @@ export const communicationService = {
   },
 
   // ==========================================
-  // 2. خدمات الإعلانات (Announcements Services)
+  // 2. خدمات الإعلانات (Announcements)
   // ==========================================
   getCreatedAnnouncements: async (): Promise<Announcement[]> => {
     const response = await axiosClient.get(API_ENDPOINTS.COMMUNICATIONS.MY_ANNOUNCEMENTS);
@@ -58,6 +59,7 @@ export const communicationService = {
   },
 
   updateAnnouncement: async (id: string | number, payload: Partial<AnnouncementPayload>) => {
+    // الباك إند يطلب POST للتعديل
     const response = await axiosClient.post(API_ENDPOINTS.COMMUNICATIONS.UPDATE_ANNOUNCEMENT(id), payload);
     return response.data;
   },
@@ -68,7 +70,7 @@ export const communicationService = {
   },
 
   // ==========================================
-  // 3. خدمات التنبيهات الجماعية (Bulk Alerts Services)
+  // 3. خدمات التنبيهات الجماعية (Bulk Alerts)
   // ==========================================
   sendPaymentAlert: async (payload: PaymentAlertPayload) => {
     const response = await axiosClient.post(API_ENDPOINTS.COMMUNICATIONS.PAYMENT_ALERTS, payload);
