@@ -204,4 +204,24 @@ export const API_ENDPOINTS = {
     PAYMENT: (id: ApiId) =>
       `/admin/finance/contracts/payments/${id}`,
   },
+  COMMUNICATIONS: {
+     
+    ACTIVITIES: "/auth/activities/all",
+    ACTIVITY: (id: string | number) => `/auth/activity/${id}`,
+    CREATE_ACTIVITY: "/api/auth/activity",
+    UPDATE_ACTIVITY: (id: string | number) => `/auth/activity/update/${id}`,  
+
+     
+    ANNOUNCEMENTS: "/auth/announcements",  
+    MY_ANNOUNCEMENTS: "/auth/creater/show/announcements",  
+    STAFF_ANNOUNCEMENTS: "/auth/staff-announcements",  
+    UPDATE_ANNOUNCEMENT: (id: string | number) => `/auth/announcement/update/${id}`,  
+    DELETE_ANNOUNCEMENT: (id: string | number) => `/auth/announcements/${id}`,
+
+    
+    PAYMENT_ALERTS: "/auth/payment-alerts",
+    ADVISOR_ALERTS: "/auth/advisor-alerts",
+    STAFF_ALERTS: "/auth/staff-alerts",
+    DELETE_ALERT: (id: string | number) => `/auth/alerts/${id}`,
+  },
 } as const;
