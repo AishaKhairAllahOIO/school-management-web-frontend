@@ -26,161 +26,193 @@ const groupVisualStyles = {
   },
 } as const;
 
+const statisticsItems = new Set([
+  "grades",
+  "classrooms",
+  "subjects",
+]);
+
+function normalizeItemLabel(label: string) {
+  return label
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, "-");
+}
+
+function shouldShowStatistics(label: string) {
+  return statisticsItems.has(
+    normalizeItemLabel(label),
+  );
+}
+
 export function AcademicsOverviewPage() {
   return (
     <section
       aria-label="Academics overview"
       className="-mt-3 min-w-0"
     >
-      <div className="flex min-w-0 flex-col gap-2.5">
-        {academicNavigationGroups.map((group) => {
-          const GroupIcon = group.icon;
-          const visualStyle = groupVisualStyles[group.id];
+      <div className="flex min-w-0 flex-col gap-3">
+        {academicNavigationGroups.map(
+          (group) => {
+            const GroupIcon = group.icon;
+            const visualStyle =
+              groupVisualStyles[group.id];
 
-          return (
-            <article
-              key={group.id}
-              className={[
-                "relative min-w-0 overflow-hidden rounded-[22px]",
-                "border bg-card",
-                "shadow-[0_10px_30px_rgba(38,24,84,0.05)]",
-                group.color.border,
-              ].join(" ")}
-            >
-              <span
-                aria-hidden="true"
+            return (
+              <article
+                key={group.id}
                 className={[
-                  "absolute inset-x-0 top-0 z-10 h-[3px]",
-                  visualStyle.topAccent,
-                ].join(" ")}
-              />
-
-              <header
-                className={[
-                  "flex min-h-[61px] items-center gap-3",
-                  "border-b bg-card px-5 py-3 sm:px-6",
-                  visualStyle.divider,
+                  "relative min-w-0 overflow-hidden rounded-[22px]",
+                  "border bg-card",
+                  "shadow-[0_10px_30px_rgba(38,24,84,0.05)]",
+                  group.color.border,
                 ].join(" ")}
               >
                 <span
+                  aria-hidden="true"
                   className={[
-                    "flex h-10 w-10 shrink-0 items-center justify-center",
-                    "rounded-[13px]",
-                    visualStyle.iconSurface,
-                    group.color.icon,
+                    "absolute inset-x-0 top-0 z-10 h-[3px]",
+                    visualStyle.topAccent,
+                  ].join(" ")}
+                />
+
+                <header
+                  className={[
+                    "flex min-h-[68px] items-center gap-3",
+                    "border-b bg-card px-5 py-3 sm:px-6",
+                    visualStyle.divider,
                   ].join(" ")}
                 >
-                  <GroupIcon
-                    size={20}
-                    strokeWidth={1.9}
-                  />
-                </span>
-
-                <div className="min-w-0">
-                  <h2
+                  <span
                     className={[
-                      "text-[15px] font-semibold tracking-[-0.01em]",
-                      group.color.accent,
+                      "flex h-10 w-10 shrink-0 items-center justify-center",
+                      "rounded-[13px]",
+                      visualStyle.iconSurface,
+                      group.color.icon,
                     ].join(" ")}
                   >
-                    {group.label}
-                  </h2>
+                    <GroupIcon
+                      size={20}
+                      strokeWidth={1.9}
+                    />
+                  </span>
 
-                  <p className="mt-0.5 truncate text-[12px] leading-4 text-muted-foreground">
-                    {group.description}
-                  </p>
-                </div>
-              </header>
-
-              <div
-                className={[
-                  "grid min-w-0 grid-cols-1 divide-y bg-card",
-                  "md:grid-cols-3 md:divide-x md:divide-y-0",
-                  group.color.divider,
-                ].join(" ")}
-              >
-                {group.items.map((item) => {
-                  const ItemIcon = item.icon;
-
-                  return (
-                    <section
-                      key={item.path}
-                      className="flex min-w-0 flex-col bg-card"
+                  <div className="min-w-0">
+                    <h2
+                      className={[
+                        "text-[17px] font-semibold leading-5 tracking-[-0.01em]",
+                        group.color.accent,
+                      ].join(" ")}
                     >
-                      <div className="flex min-h-[78px] min-w-0 items-center gap-3 px-5 py-3">
-                        <span
-                          className={[
-                            "flex h-10 w-10 shrink-0 items-center justify-center",
-                            "rounded-[13px]",
-                            visualStyle.iconSurface,
-                            group.color.icon,
-                          ].join(" ")}
-                        >
-                          <ItemIcon
-                            size={19}
-                            strokeWidth={1.9}
-                          />
-                        </span>
+                      {group.label}
+                    </h2>
 
-                        <div className="min-w-0 flex-1">
-                          <h3 className="truncate text-[13px] font-semibold leading-5 text-foreground">
-                            {item.label}
-                          </h3>
+                    <p className="mt-1 text-[13px] leading-5 text-muted-foreground">
+                      {group.description}
+                    </p>
+                  </div>
+                </header>
 
-                          <p className="mt-0.5 line-clamp-2 text-[11px] leading-4 text-muted-foreground">
-                            {item.description}
-                          </p>
-                        </div>
+                <div
+                  className={[
+                    "grid min-w-0 grid-cols-1 divide-y bg-card",
+                    "md:grid-cols-3 md:divide-x md:divide-y-0",
+                    group.color.divider,
+                  ].join(" ")}
+                >
+                  {group.items.map((item) => {
+                    const ItemIcon =
+                      item.icon;
 
-                        <div
-                          className={[
-                            "shrink-0 border-s ps-3 text-right",
-                            visualStyle.divider,
-                          ].join(" ")}
-                        >
-                          <div className="text-[14px] font-semibold leading-4 text-foreground">
-                            _
-                          </div>
+                    const showStatistics =
+                      shouldShowStatistics(
+                        item.label,
+                      );
 
-                          <div className="mt-0.5 text-[8px] font-medium uppercase tracking-[0.08em] text-muted-foreground">
-                            Items
-                          </div>
-                        </div>
-                      </div>
-
-                      <Link
-                        to={item.path}
-                        className={[
-                          "group flex min-h-[36px] items-center justify-between",
-                          "border-t px-5",
-                          "text-[11px] font-semibold",
-                          "transition-colors duration-200",
-                          "focus-visible:outline-none",
-                          "focus-visible:ring-4",
-                          "focus-visible:ring-inset",
-                          "focus-visible:ring-primary/10",
-                          visualStyle.divider,
-                          visualStyle.footerSurface,
-                          group.color.accent,
-                          group.color.buttonHover,
-                        ].join(" ")}
+                    return (
+                      <section
+                        key={item.path}
+                        className="flex min-w-0 flex-col bg-card"
                       >
-                        <span>View</span>
+                        <div className="flex min-h-[88px] min-w-0 items-center gap-3 px-5 py-3">
+                          <span
+                            className={[
+                              "flex h-10 w-10 shrink-0 items-center justify-center",
+                              "rounded-[13px]",
+                              visualStyle.iconSurface,
+                              group.color.icon,
+                            ].join(" ")}
+                          >
+                            <ItemIcon
+                              size={19}
+                              strokeWidth={1.9}
+                            />
+                          </span>
 
-                        <ArrowRight
-                          aria-hidden="true"
-                          size={15}
-                          strokeWidth={2}
-                          className="transition-transform duration-200 group-hover:translate-x-1"
-                        />
-                      </Link>
-                    </section>
-                  );
-                })}
-              </div>
-            </article>
-          );
-        })}
+                          <div className="min-w-0 flex-1">
+                            <h3 className="truncate text-[15px] font-semibold leading-5 text-foreground">
+                              {item.label}
+                            </h3>
+
+                            <p className="mt-1 line-clamp-2 text-[12px] leading-[18px] text-muted-foreground">
+                              {
+                                item.description
+                              }
+                            </p>
+                          </div>
+
+                          {showStatistics ? (
+                            <div
+                              className={[
+                                "min-w-[48px] shrink-0 border-s ps-3 text-right",
+                                visualStyle.divider,
+                              ].join(" ")}
+                            >
+                              <div className="text-[17px] font-semibold leading-5 text-foreground">
+                                —
+                              </div>
+
+                              <div className="mt-1 text-[9px] font-medium uppercase tracking-[0.07em] text-muted-foreground">
+                                Items
+                              </div>
+                            </div>
+                          ) : null}
+                        </div>
+
+                        <Link
+                          to={item.path}
+                          className={[
+                            "group flex min-h-[38px] items-center justify-between",
+                            "border-t px-5",
+                            "text-[12px] font-semibold",
+                            "transition-colors duration-200",
+                            "focus-visible:outline-none",
+                            "focus-visible:ring-4",
+                            "focus-visible:ring-inset",
+                            "focus-visible:ring-primary/10",
+                            visualStyle.divider,
+                            visualStyle.footerSurface,
+                            group.color.accent,
+                            group.color.buttonHover,
+                          ].join(" ")}
+                        >
+                          <span>View</span>
+
+                          <ArrowRight
+                            aria-hidden="true"
+                            size={15}
+                            strokeWidth={2}
+                            className="transition-transform duration-200 group-hover:translate-x-1"
+                          />
+                        </Link>
+                      </section>
+                    );
+                  })}
+                </div>
+              </article>
+            );
+          },
+        )}
       </div>
     </section>
   );

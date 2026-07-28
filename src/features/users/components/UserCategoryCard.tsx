@@ -111,17 +111,15 @@ export function UserCategoryCard({
               "focus-visible:ring-4",
               "focus-visible:ring-primary/10",
             ].join(" ")}
-          >
-            
-          </Link>
+          />
         </div>
 
         <div className="mt-3">
-          <h2 className="text-[16px] font-semibold tracking-[-0.02em] text-foreground">
+          <h2 className="text-[18px] font-semibold tracking-[-0.02em] text-foreground">
             {title}
           </h2>
 
-          <p className="mt-1 min-h-9 line-clamp-2 text-[12px] font-normal leading-[18px] text-muted-foreground">
+          <p className="mt-1 min-h-9 line-clamp-2 text-[13px] font-normal leading-[19px] text-muted-foreground">
             {description}
           </p>
         </div>
@@ -137,24 +135,24 @@ export function UserCategoryCard({
               ].join(" ")}
             >
               <div>
-                <strong className="block text-[22px] font-semibold leading-none tracking-[-0.04em] text-foreground">
+                <strong className="block text-[24px] font-semibold leading-none tracking-[-0.04em] text-foreground">
                   {formatCount(count)}
                 </strong>
 
-                <span className="mt-1 block text-[10px] font-normal text-muted-foreground">
+                <span className="mt-1 block text-[11px] font-normal text-muted-foreground">
                   {countLabel}
                 </span>
               </div>
 
               {hasSecondaryCount ? (
                 <div className="border-l border-border/60 pl-3">
-                  <strong className="block text-[19px] font-semibold leading-none tracking-[-0.035em] text-foreground">
+                  <strong className="block text-[21px] font-semibold leading-none tracking-[-0.035em] text-foreground">
                     {formatCount(
                       secondaryCount,
                     )}
                   </strong>
 
-                  <span className="mt-1 block text-[10px] font-normal text-muted-foreground">
+                  <span className="mt-1 block text-[11px] font-normal text-muted-foreground">
                     {secondaryCountLabel}
                   </span>
                 </div>
@@ -176,7 +174,7 @@ export function UserCategoryCard({
           footerTextClassName,
         ].join(" ")}
       >
-        <span className="text-[11px] font-medium">
+        <span className="text-[12px] font-medium">
           {viewLabel}
         </span>
 
