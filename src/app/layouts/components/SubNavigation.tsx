@@ -94,19 +94,10 @@ const subNavigationSections: SubNavigationSection[] =
           path: "/communications/announcements",
           icon: Bell,
         },
+         
         {
-          title: "Notifications",
-          path: "/communications/notifications",
-          icon: Bell,
-        },
-        {
-          title: "Messages",
-          path: "/communications/messages",
-          icon: FileText,
-        },
-        {
-          title: "Complaints",
-          path: "/communications/complaints",
+          title: "activities",
+          path: "/communications/activities",
           icon: FileText,
         },
       ],
