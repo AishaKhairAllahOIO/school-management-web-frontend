@@ -38,7 +38,7 @@ type PersonState = {
   nationality: string;
   address: string;
   phone_number: string;
-  url_photo: File | null;
+  photo_url: File | null;
 };
 
 type FormState = {
@@ -63,7 +63,7 @@ const emptyPerson: PersonState = {
   nationality: "syrian",
   address: "",
   phone_number: "",
-  url_photo: null,
+  photo_url: null,
 };
 
 const initialState: FormState = {
@@ -189,7 +189,7 @@ export function StudentRegistrationPage() {
     const file =
       event.target.files?.[0] ?? null;
 
-    updateStudent("url_photo", file);
+    updateStudent("photo_url", file);
 
     setStudentPreview((current) => {
       if (current) {
@@ -307,7 +307,7 @@ export function StudentRegistrationPage() {
                 />
               }
               completed={Boolean(
-                form.student.url_photo,
+                form.student.photo_url,
               )}
             >
               <div className="flex flex-col items-center gap-5 sm:flex-row">

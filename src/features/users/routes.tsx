@@ -58,6 +58,10 @@ import {
   StaffEditPage,
 } from "@/features/users/staff/pages/StaffEditPage";
 
+import {
+  StaffImportPage,
+} from "@/features/users/staff/pages/StaffImportPage";
+
 export const usersRoutes = [
   {
     path: "users",
@@ -91,6 +95,12 @@ export const usersRoutes = [
       {
         path: "students/:enrollmentId",
         element: <StudentProfilePage />,
+      },
+
+
+      {
+        path: "staff/import",
+        element: <StaffImportPage />,
       },
 
       {

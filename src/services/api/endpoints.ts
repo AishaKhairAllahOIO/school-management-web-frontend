@@ -46,45 +46,45 @@ export const API_ENDPOINTS = {
       `/admin/settings/classrooms/${classroomId}`,
   },
 
-  STUDENTS: {
-    REGISTER: "/admin/student/register",
+ STUDENTS: {
+  REGISTER: "/admin/student/register",
 
-    IMPORT: "/admin/student/import",
+  IMPORT: "/admin/student/import",
 
-    IMPORT_STATUS: (batchId: ApiId) =>
-      `/admin/student/import-batches/${batchId}/status`,
+  IMPORT_STATUS: (batchId: ApiId) =>
+    `/admin/student/import-batches/${batchId}/status`,
 
-    IMPORT_ERRORS: (batchId: ApiId) =>
-      `/admin/student/import-batches/${batchId}/errors/export`,
+  IMPORT_ERRORS: (batchId: ApiId) =>
+    `/admin/student/import-batches/${batchId}/errors/export`,
 
-    IMPORT_HISTORY: "/admin/student/import-batches/history",
+  IMPORT_HISTORY:
+    "/admin/student/import-batches/history",
 
-    FILTER: "/admin/students/filter",
+  FILTER: "/admin/students/filter",
 
-    SEARCH: "/admin/students/search",
+  SEARCH: "/admin/students/search",
 
-    DETAILS: (studentId: ApiId) =>
-      `/admin/students/${studentId}`,
+  DETAILS: (studentId: ApiId) =>
+    `/admin/students/${studentId}`,
 
-    FULL_PROFILE: (enrollmentId: ApiId) =>
-      `/admin/students/${enrollmentId}/full-profile`,
+  FULL_PROFILE: (enrollmentId: ApiId) =>
+    `/admin/students/${enrollmentId}/full-profile`,
 
-    PERSONAL: (studentId: ApiId) =>
-      `/admin/students/${studentId}/personal`,
+  PERSONAL: (studentId: ApiId) =>
+    `/admin/students/${studentId}/personal`,
 
-    GUARDIAN_PERSONAL: (guardianId: ApiId) =>
-      `/admin/students/guardians/${guardianId}/personal`,
+  GUARDIAN_PERSONAL: (guardianId: ApiId) =>
+    `/admin/students/guardians/${guardianId}/personal`,
 
-    ENROLLMENT: (enrollmentId: ApiId) =>
-      `/admin/students/enrollments/${enrollmentId}`,
+  ENROLLMENT: (enrollmentId: ApiId) =>
+    `/admin/students/enrollments/${enrollmentId}`,
 
-    TOGGLE_ACCOUNT_STATUS: (enrollmentId: ApiId) =>
-      `/admin/students/${enrollmentId}/toggle-account-status`,
+  TOGGLE_ACCOUNT_STATUS: (enrollmentId: ApiId) =>
+    `/admin/students/${enrollmentId}/toggle-account-status`,
 
-    DELETE: (studentId: ApiId) =>
-      `/admin/students/${studentId}`,
-  },
-
+  DELETE: (enrollmentId: ApiId) =>
+    `/admin/students/${enrollmentId}`,
+},
   STAFF: {
     REGISTER: "/admin/staff/register",
 

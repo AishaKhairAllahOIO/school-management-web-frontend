@@ -30,7 +30,6 @@ import type {
   UpdateStudentPersonalPayload,
 } from "../types/student.types";
 
-
 function unwrapResponse<T>(
   response: ApiResponse<T> | T,
 ): T {
@@ -45,11 +44,9 @@ function unwrapResponse<T>(
   return response as T;
 }
 
-
 function normalizeToggleAccountResponse(
   response: ToggleStudentAccountResponse & {
     enrollment_id?: ApiId;
-
     account_status?:
       ToggleStudentAccountResponse["accountStatus"];
   },
@@ -69,9 +66,6 @@ function normalizeToggleAccountResponse(
 }
 
 export const studentApi = {
-  /**
-   * عرض قائمة الطلاب.
-   */
   async list(
     filters: StudentListFilters = {},
   ): Promise<StudentListResponse> {
@@ -87,9 +81,6 @@ export const studentApi = {
     return unwrapResponse(response.data);
   },
 
-  /**
-   * البحث عن الطلاب.
-   */
   async search(
     params: StudentSearchParams,
   ): Promise<StudentListResponse> {
@@ -117,11 +108,6 @@ export const studentApi = {
     return unwrapResponse(response.data);
   },
 
-  /**
-   * جلب معلومات الطالب الأساسية.
-   *
-   * هذا endpoint يستخدم studentId وليس enrollmentId.
-   */
   async getDetails(
     studentId: ApiId,
   ): Promise<StudentDetails> {
@@ -168,24 +154,17 @@ export const studentApi = {
     return unwrapResponse(response.data);
   },
 
-  /**
-   * تعديل البيانات الشخصية للطالب.
-   *
-   * هذا endpoint يستخدم studentId.
-   */
   async updatePersonal(
     studentId: ApiId,
     payload: UpdateStudentPersonalPayload,
-  ): Promise<StudentDetails["student"]> {
+  ): Promise<StudentFullProfile> {
     const formData =
       buildStudentPersonalFormData(
         payload,
       );
 
     const response = await axiosClient.post<
-      ApiResponse<
-        StudentDetails["student"]
-      >
+      ApiResponse<StudentFullProfile>
     >(
       API_ENDPOINTS.STUDENTS.PERSONAL(
         studentId,
@@ -196,56 +175,33 @@ export const studentApi = {
     return unwrapResponse(response.data);
   },
 
-  /**
-   * تعديل بيانات ولي الأمر.
-   *
-   * هذا endpoint يستخدم guardianId.
-   */
   async updateGuardian(
     guardianId: ApiId,
     payload: UpdateGuardianPersonalPayload,
-  ): Promise<
-    NonNullable<
-      StudentDetails["guardian"]
-    >
-  > {
+  ): Promise<StudentFullProfile> {
     const formData =
       buildGuardianPersonalFormData(
         payload,
       );
 
     const response = await axiosClient.post<
-      ApiResponse<
-        NonNullable<
-          StudentDetails["guardian"]
-        >
-      >
+      ApiResponse<StudentFullProfile>
     >(
-      API_ENDPOINTS.STUDENTS
-        .GUARDIAN_PERSONAL(
-          guardianId,
-        ),
+      API_ENDPOINTS.STUDENTS.GUARDIAN_PERSONAL(
+        guardianId,
+      ),
       formData,
     );
 
     return unwrapResponse(response.data);
   },
 
-  /**
-   * تعديل بيانات القيد الأكاديمي.
-   *
-   * هذا endpoint يستخدم enrollmentId.
-   */
   async updateEnrollment(
     enrollmentId: ApiId,
     payload: UpdateStudentEnrollmentPayload,
-  ): Promise<
-    StudentFullProfile["enrollment"]
-  > {
+  ): Promise<StudentFullProfile> {
     const response = await axiosClient.post<
-      ApiResponse<
-        StudentFullProfile["enrollment"]
-      >
+      ApiResponse<StudentFullProfile>
     >(
       API_ENDPOINTS.STUDENTS.ENROLLMENT(
         enrollmentId,
@@ -256,12 +212,6 @@ export const studentApi = {
     return unwrapResponse(response.data);
   },
 
-  /**
-   * تفعيل أو تعطيل حساب الطالب.
-   *
-   * مهم:
-   * يجب تمرير enrollmentId وليس studentId.
-   */
   async toggleAccountStatus(
     enrollmentId: ApiId,
   ): Promise<ToggleStudentAccountResponse> {
@@ -269,7 +219,6 @@ export const studentApi = {
       ApiResponse<
         ToggleStudentAccountResponse & {
           enrollment_id?: ApiId;
-
           account_status?:
             ToggleStudentAccountResponse["accountStatus"];
         }
@@ -290,12 +239,6 @@ export const studentApi = {
     );
   },
 
-  /**
-   * سحب الطالب أو حذف القيد.
-   *
-   * الباك يبحث عن Enrollment،
-   * لذلك يجب تمرير enrollmentId.
-   */
   async remove(
     enrollmentId: ApiId,
   ): Promise<DeleteStudentResponse> {
@@ -310,23 +253,16 @@ export const studentApi = {
       );
 
     if (
-      typeof response.data ===
-        "object" &&
+      typeof response.data === "object" &&
       response.data !== null &&
       "data" in response.data
     ) {
       return response.data.data;
     }
 
-    return null;
+    return {};
   },
 
-  /**
-   * رفع ملف Excel أو CSV.
-   *
-   * الباك يتوقع اسم الحقل:
-   * excel_file
-   */
   async importFile(
     file: File,
   ): Promise<StudentImportStartResponse> {
@@ -348,9 +284,6 @@ export const studentApi = {
     return unwrapResponse(response.data);
   },
 
-  /**
-   * متابعة حالة عملية الاستيراد.
-   */
   async getImportStatus(
     batchId: ApiId,
   ): Promise<StudentImportBatchStatus> {
@@ -367,9 +300,6 @@ export const studentApi = {
     return unwrapResponse(response.data);
   },
 
-  /**
-   * جلب سجل عمليات الاستيراد.
-   */
   async getImportHistory(
     page = 1,
   ): Promise<StudentImportHistoryResponse> {
@@ -390,9 +320,6 @@ export const studentApi = {
     return unwrapResponse(response.data);
   },
 
-  /**
-   * تحميل ملف أخطاء الاستيراد.
-   */
   async exportImportErrors(
     batchId: ApiId,
   ): Promise<Blob> {

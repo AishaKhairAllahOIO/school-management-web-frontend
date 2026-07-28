@@ -47,6 +47,19 @@ export const staffKeys = {
       },
     ] as const,
 
+  imports: () =>
+    [
+      ...staffKeys.all,
+      "imports",
+    ] as const,
+
+  importStatus: (batchId: ApiId) =>
+    [
+      ...staffKeys.imports(),
+      "status",
+      batchId,
+    ] as const,
+
   details: () =>
     [
       ...staffKeys.all,

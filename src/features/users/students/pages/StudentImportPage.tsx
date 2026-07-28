@@ -4,7 +4,6 @@ import {
   useState,
 } from "react";
 import {
-  AlertCircle,
   CheckCircle2,
   Clock3,
   Download,
@@ -292,22 +291,7 @@ export function StudentImportPage() {
               </div>
             ) : null}
 
-            <div className="mt-4 flex items-start gap-3 rounded-[16px] border border-amber-500/20 bg-amber-500/[0.055] p-4">
-              <AlertCircle
-                size={17}
-                strokeWidth={1.75}
-                className="mt-0.5 shrink-0 text-amber-600"
-              />
-
-              <p className="text-xs font-normal leading-5 text-foreground">
-                Leave{" "}
-                <code className="rounded bg-amber-500/[0.1] px-1.5 py-0.5 font-medium text-amber-700">
-                  class_room_name
-                </code>{" "}
-                empty when no classroom is
-                assigned.
-              </p>
-            </div>
+       
           </ImportPanel>
 
           <ImportPanel

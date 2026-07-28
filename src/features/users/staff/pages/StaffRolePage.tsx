@@ -118,7 +118,7 @@ export function StaffRolePage({
   }
 
   function openImportDialog() {
-    // سيتم فتح نافذة الاستيراد هنا.
+    navigate("/users/staff/import");
   }
 
   function viewStaff(

@@ -19,6 +19,8 @@ import type {
   RegisterStaffValues,
   StaffAccountStatus,
   StaffPaginator,
+  StaffImportBatchStatus,
+  StaffImportStartResponse,
   StaffProfile,
   StaffRole,
   UpdateStaffEmploymentValues,
@@ -608,4 +610,44 @@ export const staffApi = {
       ),
     );
   },
+
+  async importFile(
+    file: File,
+  ): Promise<StaffImportStartResponse> {
+    const formData = new FormData();
+    formData.append("excel_file", file);
+
+    const response = await axiosClient.post<
+      ApiResponse<StaffImportStartResponse>
+    >(
+      "/admin/staff/import",
+      formData,
+    );
+
+    return unwrap(response.data);
+  },
+
+  async getImportStatus(
+    batchId: ApiId,
+  ): Promise<StaffImportBatchStatus> {
+    const response = await axiosClient.get<
+      ApiResponse<StaffImportBatchStatus>
+    >(
+      `/admin/staff/import-batches/${batchId}/status`,
+    );
+
+    return unwrap(response.data);
+  },
+
+  async exportImportErrors(
+    batchId: ApiId,
+  ): Promise<Blob> {
+    const response = await axiosClient.get<Blob>(
+      `/admin/staff/import-batches/${batchId}/errors/export`,
+      { responseType: "blob" },
+    );
+
+    return response.data;
+  },
+
 };

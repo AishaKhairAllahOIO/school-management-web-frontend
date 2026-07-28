@@ -214,3 +214,33 @@ export type StaffSectionConfig = {
 
   color: StaffSectionColor;
 };
+
+export type StaffImportBatchStatusValue =
+  | "pending"
+  | "processing"
+  | "completed"
+  | "failed";
+
+export type StaffImportStartResponse = {
+  batchId?: ApiId;
+  batch_id?: ApiId;
+  status: StaffImportBatchStatusValue;
+  totalRows?: number;
+  total_rows?: number;
+};
+
+export type StaffImportBatchStatus = {
+  batchId?: ApiId;
+  batch_id?: ApiId;
+  status: StaffImportBatchStatusValue;
+  successfulRows?: number;
+  successful_rows?: number;
+  failedRows?: number;
+  failed_rows?: number;
+  totalRows?: number;
+  total_rows?: number;
+  processedRows?: number;
+  processed_rows?: number;
+  message?: string | null;
+};
+

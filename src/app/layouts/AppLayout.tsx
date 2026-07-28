@@ -27,14 +27,14 @@ export function AppLayout() {
         : "lg:pl-[258px]";
 
   return (
-    <div className="app-shell-bg h-screen overflow-hidden">
+    <div className="app-shell-bg min-h-screen">
       <Sidebar />
 
       <MobileSidebar />
 
       <div
         className={[
-          "flex h-screen flex-col",
+          "flex min-h-screen flex-col",
           "transition-all duration-300 ease-out",
           "motion-reduce:transition-none",
           sidebarOffsetClass,
@@ -65,9 +65,7 @@ export function AppLayout() {
 
         <main
           className="
-            min-h-0
             flex-1
-            overflow-y-auto
             px-4
             pb-6
             pt-3
