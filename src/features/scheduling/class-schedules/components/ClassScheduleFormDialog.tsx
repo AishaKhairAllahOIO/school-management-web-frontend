@@ -1,4 +1,4 @@
-import { X } from "lucide-react";
+import { CalendarDays, Loader2, Save, X } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import {
@@ -11,6 +11,13 @@ import type {
   ScheduleStatus,
   WeekDay,
 } from "@/features/scheduling/class-schedules/types/class-schedule.types";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/shared/ui/select";
 
 type SelectOption = {
   label: string;
@@ -88,7 +95,7 @@ export function ClassScheduleFormDialog({
 
   function updateField<K extends keyof CreateClassSchedulePayload>(
     key: K,
-    value: CreateClassSchedulePayload[K]
+    value: CreateClassSchedulePayload[K],
   ) {
     setForm((current) => ({ ...current, [key]: value }));
   }
@@ -101,149 +108,135 @@ export function ClassScheduleFormDialog({
     });
   }
 
-  return (
-    <div className="fixed inset-0 z-[120] flex items-center justify-center bg-black/35 px-4 backdrop-blur-sm">
-      <div className="schedule-dialog-card w-full max-w-2xl rounded-[28px] p-6 shadow-floating ring-1 ring-border/70">
-        <div className="mb-5 flex items-start justify-between gap-4">
-          <div>
-            <h2 className="text-lg font-bold text-foreground">
-              {mode === "create" ? "Add Class Schedule" : "Edit Class Schedule"}
-            </h2>
+  const canSubmit = Boolean(
+    form.classroomId &&
+      form.subjectId &&
+      form.teacherId &&
+      form.timeSlotId &&
+      form.academicYearId,
+  );
 
-            <p className="mt-1 text-sm text-muted-foreground">
-              Assign classroom, subject, teacher, day and time slot.
-            </p>
+  return (
+    <div
+      className="fixed inset-0 z-[120] flex items-center justify-center bg-slate-950/30 p-4 backdrop-blur-[5px]"
+      onMouseDown={(event) => {
+        if (event.target === event.currentTarget && !isSubmitting) onClose();
+      }}
+    >
+      <div className="w-full max-w-[660px] overflow-hidden rounded-[26px] border border-border/55 bg-card shadow-[0_28px_90px_rgba(15,10,40,0.22)]">
+        <header className="flex items-start justify-between gap-4 border-b border-border/45 px-5 py-4.5">
+          <div className="flex items-start gap-3">
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px] bg-primary/[0.09] text-primary">
+              <CalendarDays size={18} strokeWidth={1.8} />
+            </span>
+
+            <div>
+              <h2 className="text-[16px] font-semibold tracking-[-0.015em] text-foreground">
+                {mode === "create" ? "Add Class Schedule" : "Edit Class Schedule"}
+              </h2>
+              <p className="mt-1 text-[11px] leading-5 text-muted-foreground">
+                Assign a subject, teacher, classroom and time without changing the current API payload.
+              </p>
+            </div>
           </div>
 
           <button
             type="button"
+            aria-label="Close dialog"
+            disabled={isSubmitting}
             onClick={onClose}
-            className="flex h-9 w-9 items-center justify-center rounded-full bg-background/80 text-muted-foreground transition hover:bg-muted hover:text-foreground"
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[11px] border border-border/60 bg-background text-muted-foreground transition hover:bg-muted/45 hover:text-foreground disabled:opacity-50"
           >
-            <X size={17} />
+            <X size={15} strokeWidth={1.8} />
           </button>
-        </div>
+        </header>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <div className="grid gap-4 md:grid-cols-2">
+        <form onSubmit={handleSubmit} className="p-5">
+          <div className="grid gap-4 sm:grid-cols-2">
             <Field label="Classroom">
-              <select
-                required
-                className="field-input"
+              <ScheduleSelect
                 value={form.classroomId}
-                onChange={(e) => updateField("classroomId", e.target.value)}
-              >
-                <option value="">Select classroom</option>
-                {classroomOptions.map((item) => (
-                  <option key={item.value} value={item.value}>
-                    {item.label}
-                  </option>
-                ))}
-              </select>
+                placeholder="Select classroom"
+                options={classroomOptions}
+                onChange={(value) => updateField("classroomId", value)}
+              />
             </Field>
 
             <Field label="Subject">
-              <select
-                required
-                className="field-input"
+              <ScheduleSelect
                 value={form.subjectId}
-                onChange={(e) => updateField("subjectId", e.target.value)}
-              >
-                <option value="">Select subject</option>
-                {subjectOptions.map((item) => (
-                  <option key={item.value} value={item.value}>
-                    {item.label}
-                  </option>
-                ))}
-              </select>
+                placeholder="Select subject"
+                options={subjectOptions}
+                onChange={(value) => updateField("subjectId", value)}
+              />
             </Field>
 
             <Field label="Teacher">
-              <select
-                required
-                className="field-input"
+              <ScheduleSelect
                 value={form.teacherId}
-                onChange={(e) => updateField("teacherId", e.target.value)}
-              >
-                <option value="">Select teacher</option>
-                {teacherOptions.map((item) => (
-                  <option key={item.value} value={item.value}>
-                    {item.label}
-                  </option>
-                ))}
-              </select>
+                placeholder="Select teacher"
+                options={teacherOptions}
+                onChange={(value) => updateField("teacherId", value)}
+              />
             </Field>
 
             <Field label="Day">
-              <select
-                className="field-input"
+              <ScheduleSelect
                 value={form.day}
-                onChange={(e) => updateField("day", e.target.value as WeekDay)}
-              >
-                {weekDays.map((day) => (
-                  <option key={day} value={day}>
-                    {day}
-                  </option>
-                ))}
-              </select>
+                placeholder="Select day"
+                options={weekDays.map((day) => ({ label: day, value: day }))}
+                onChange={(value) => updateField("day", value as WeekDay)}
+              />
             </Field>
 
             <Field label="Time Slot">
-              <select
-                required
-                className="field-input"
+              <ScheduleSelect
                 value={form.timeSlotId}
-                onChange={(e) => updateField("timeSlotId", e.target.value)}
-              >
-                <option value="">Select time slot</option>
-                {timeSlots.map((slot) => (
-                  <option key={slot.id} value={slot.id}>
-                    {slot.label}
-                  </option>
-                ))}
-              </select>
+                placeholder="Select time slot"
+                options={timeSlots.map((slot) => ({ label: slot.label, value: slot.id }))}
+                onChange={(value) => updateField("timeSlotId", value)}
+              />
             </Field>
 
             <Field label="Room Number">
               <input
-                className="field-input"
+                className="h-11 w-full rounded-[13px] border border-border/70 bg-background px-3.5 text-sm font-normal text-foreground outline-none transition placeholder:text-muted-foreground/75 hover:border-border focus:border-primary/45 focus:ring-4 focus:ring-primary/10"
                 placeholder="Optional"
                 value={form.roomNumber ?? ""}
-                onChange={(e) => updateField("roomNumber", e.target.value)}
+                onChange={(event) => updateField("roomNumber", event.target.value)}
               />
             </Field>
 
             <Field label="Status">
-              <select
-                className="field-input"
+              <ScheduleSelect
                 value={form.status}
-                onChange={(e) =>
-                  updateField("status", e.target.value as ScheduleStatus)
-                }
-              >
-                {statusOptions.map((status) => (
-                  <option key={status.value} value={status.value}>
-                    {status.label}
-                  </option>
-                ))}
-              </select>
+                placeholder="Select status"
+                options={statusOptions}
+                onChange={(value) => updateField("status", value as ScheduleStatus)}
+              />
             </Field>
           </div>
 
-          <div className="flex justify-end gap-3 border-t border-border/70 pt-5">
+          <div className="mt-5 flex justify-end gap-2.5 border-t border-border/45 pt-4">
             <button
               type="button"
               onClick={onClose}
-              className="h-10 rounded-xl bg-muted px-4 text-xs font-bold text-muted-foreground transition hover:bg-muted/80"
+              disabled={isSubmitting}
+              className="h-9 rounded-full border border-border/65 bg-background px-4 text-[12px] font-medium text-foreground/75 transition hover:bg-muted/45 hover:text-foreground disabled:opacity-50"
             >
               Cancel
             </button>
 
             <button
               type="submit"
-              disabled={isSubmitting}
-              className="h-10 rounded-xl bg-primary px-5 text-xs font-bold text-primary-foreground shadow-soft transition hover:bg-primary/90 disabled:opacity-60"
+              disabled={!canSubmit || isSubmitting}
+              className="inline-flex h-9 items-center gap-2 rounded-full bg-primary px-4 text-[12px] font-medium text-primary-foreground shadow-[0_8px_20px_rgba(98,74,180,0.16)] transition hover:-translate-y-0.5 hover:bg-primary/90 disabled:cursor-not-allowed disabled:translate-y-0 disabled:opacity-50"
             >
+              {isSubmitting ? (
+                <Loader2 size={14} className="animate-spin" />
+              ) : (
+                <Save size={14} strokeWidth={1.8} />
+              )}
               {isSubmitting
                 ? "Saving..."
                 : mode === "create"
@@ -257,17 +250,40 @@ export function ClassScheduleFormDialog({
   );
 }
 
-function Field({
-  label,
-  children,
-}: {
-  label: string;
-  children: React.ReactNode;
-}) {
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <label className="space-y-2">
-      <span className="text-xs font-bold text-muted-foreground">{label}</span>
+    <label className="block">
+      <span className="mb-1.5 block text-[11px] font-medium text-foreground/85">
+        {label}
+      </span>
       {children}
     </label>
+  );
+}
+
+function ScheduleSelect({
+  value,
+  placeholder,
+  options,
+  onChange,
+}: {
+  value: string;
+  placeholder: string;
+  options: SelectOption[];
+  onChange: (value: string) => void;
+}) {
+  return (
+    <Select value={value || undefined} onValueChange={onChange}>
+      <SelectTrigger className="h-11 rounded-[13px] border-border/70 bg-background px-3.5 text-sm font-normal shadow-none focus:ring-4 focus:ring-primary/10">
+        <SelectValue placeholder={placeholder} />
+      </SelectTrigger>
+      <SelectContent className="rounded-[14px] border-border/60 p-1.5 shadow-[0_18px_55px_rgba(24,16,55,0.16)]">
+        {options.map((item) => (
+          <SelectItem key={item.value} value={item.value} className="rounded-[10px] text-sm font-normal">
+            {item.label}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
   );
 }

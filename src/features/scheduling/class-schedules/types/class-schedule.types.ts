@@ -16,31 +16,21 @@ export type TimeSlot = {
 
 export type ClassSchedule = {
   id: string;
-
   classroomId: string;
   subjectId: string;
   teacherId: string;
-
   day: WeekDay;
   timeSlotId: string;
   roomNumber?: string | null;
-
   academicYearId: string;
   status: ScheduleStatus;
-
   createdAt: string;
   updatedAt: string;
 };
 
-export type CreateClassSchedulePayload = {
-  classroomId: string;
-  subjectId: string;
-  teacherId: string;
-  day: WeekDay;
-  timeSlotId: string;
-  roomNumber?: string | null;
-  academicYearId: string;
-  status: ScheduleStatus;
-};
+export type CreateClassSchedulePayload = Omit<
+  ClassSchedule,
+  "id" | "createdAt" | "updatedAt"
+>;
 
 export type UpdateClassSchedulePayload = Partial<CreateClassSchedulePayload>;
