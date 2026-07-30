@@ -8,6 +8,8 @@ import {
   useState,
 } from "react";
 
+import { ConfirmationDialog } from "@/shared/ui/confirmation-dialog";
+
 import {
   useCreateAcademicStage,
   useDeleteAcademicStage,
@@ -43,6 +45,9 @@ export function AcademicStagesSection({
   const [openMenuId, setOpenMenuId] =
     useState<string | null>(null);
 
+  const [pendingDelete, setPendingDelete] =
+    useState<AcademicStage | null>(null);
+
   const createStage =
     useCreateAcademicStage();
 
@@ -65,19 +70,7 @@ export function AcademicStagesSection({
   function handleDelete(
     stage: AcademicStage,
   ) {
-    const stageLabel =
-      academicStageLabels[stage.type] ??
-      stage.type;
-
-    const confirmed = window.confirm(
-      `Delete academic stage "${stageLabel}"?\n\nGrades connected to this stage may prevent deletion.`,
-    );
-
-    if (!confirmed) {
-      return;
-    }
-
-    deleteStage.mutate(stage.id);
+    setPendingDelete(stage);
     setOpenMenuId(null);
   }
 
@@ -223,6 +216,23 @@ export function AcademicStagesSection({
           }}
         />
       ) : null}
+
+      <ConfirmationDialog
+        open={Boolean(pendingDelete)}
+        onOpenChange={(open) => {
+          if (!open) setPendingDelete(null);
+        }}
+        title="Delete academic stage?"
+        description="Grades connected to this stage may prevent deletion."
+        itemName={pendingDelete ? academicStageLabels[pendingDelete.type] ?? pendingDelete.type : undefined}
+        isPending={deleteStage.isPending}
+        onConfirm={() => {
+          if (!pendingDelete) return;
+          deleteStage.mutate(pendingDelete.id, {
+            onSuccess: () => setPendingDelete(null),
+          });
+        }}
+      />
     </>
   );
 }

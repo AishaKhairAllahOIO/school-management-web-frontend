@@ -9,6 +9,8 @@ import {
   useState,
 } from "react";
 
+import { ConfirmationDialog } from "@/shared/ui/confirmation-dialog";
+
 import {
   useCreateAcademicYear,
   useDeleteAcademicYear,
@@ -41,6 +43,9 @@ export function AcademicYearsSection({
   const [openMenuId, setOpenMenuId] =
     useState<string | null>(null);
 
+  const [pendingDelete, setPendingDelete] =
+    useState<AcademicYear | null>(null);
+
   const createYear =
     useCreateAcademicYear();
 
@@ -64,15 +69,7 @@ export function AcademicYearsSection({
   function handleDelete(
     year: AcademicYear,
   ) {
-    const confirmed = window.confirm(
-      `Delete academic year "${year.name}"?\n\nThis action cannot be undone.`,
-    );
-
-    if (!confirmed) {
-      return;
-    }
-
-    deleteYear.mutate(year.id);
+    setPendingDelete(year);
     setOpenMenuId(null);
   }
 
@@ -242,6 +239,23 @@ export function AcademicYearsSection({
           }}
         />
       ) : null}
+
+      <ConfirmationDialog
+        open={Boolean(pendingDelete)}
+        onOpenChange={(open) => {
+          if (!open) setPendingDelete(null);
+        }}
+        title="Delete academic year?"
+        description="This action cannot be undone."
+        itemName={pendingDelete ? pendingDelete.name : undefined}
+        isPending={deleteYear.isPending}
+        onConfirm={() => {
+          if (!pendingDelete) return;
+          deleteYear.mutate(pendingDelete.id, {
+            onSuccess: () => setPendingDelete(null),
+          });
+        }}
+      />
     </>
   );
 }

@@ -19,14 +19,13 @@ export function SchedulePreview({
 
   if (items.length === 0) {
     return (
-      <div className="rounded-[16px] border border-dashed border-border bg-card p-6 text-center">
-        <p className="text-sm font-medium text-foreground">
+      <div className="rounded-[14px] border border-dashed border-border/70 bg-muted/[0.12] p-5 text-center">
+        <p className="text-[13px] font-medium text-foreground">
           No working days selected
         </p>
 
-        <p className="mt-1 text-xs font-normal text-muted-foreground">
-          Select at least one working day to build
-          the preview.
+        <p className="mt-1 text-[11px] leading-5 text-muted-foreground">
+          Select at least one working day to build the preview.
         </p>
       </div>
     );
@@ -35,8 +34,7 @@ export function SchedulePreview({
   return (
     <div className="space-y-2">
       {items.map((item, index) => {
-        const isBreak =
-          item.type === "break";
+        const isBreak = item.type === "break";
 
         return (
           <div
@@ -46,40 +44,34 @@ export function SchedulePreview({
               "gap-3 rounded-[13px]",
               "border px-3 py-2.5",
               isBreak
-                ? "border-amber-200/60 bg-amber-50/60"
-                : "border-border/60 bg-card",
+                ? "border-amber-200/55 bg-amber-50/55"
+                : "border-border/55 bg-background",
             ].join(" ")}
           >
-            <div className="flex min-w-0 items-center gap-3">
+            <div className="flex min-w-0 items-center gap-2.5">
               <span
                 className={[
                   "flex h-7 w-7 shrink-0",
                   "items-center justify-center",
-                  "rounded-lg",
+                  "rounded-[9px]",
                   isBreak
                     ? "bg-amber-100 text-amber-600"
                     : "bg-primary/[0.07] text-primary",
                 ].join(" ")}
               >
                 {isBreak ? (
-                  <Coffee
-                    size={14}
-                    strokeWidth={1.8}
-                  />
+                  <Coffee size={13} strokeWidth={1.8} />
                 ) : (
-                  <BookOpen
-                    size={14}
-                    strokeWidth={1.8}
-                  />
+                  <BookOpen size={13} strokeWidth={1.8} />
                 )}
               </span>
 
-              <span className="truncate text-xs font-medium text-foreground">
+              <span className="truncate text-[12px] font-medium text-foreground">
                 {item.label}
               </span>
             </div>
 
-            <span className="shrink-0 text-[11px] font-normal text-muted-foreground">
+            <span className="shrink-0 text-[12px] font-medium text-muted-foreground">
               {item.time}
             </span>
           </div>
@@ -88,19 +80,11 @@ export function SchedulePreview({
 
       <div className="flex items-center justify-between rounded-[13px] bg-primary px-3 py-2.5 text-primary-foreground shadow-sm">
         <div className="flex items-center gap-2.5">
-          <Flag
-            size={15}
-            strokeWidth={1.8}
-          />
-
-          <span className="text-xs font-medium">
-            End of Day
-          </span>
+          <Flag size={14} strokeWidth={1.8} />
+          <span className="text-[12px] font-medium">End of Day</span>
         </div>
 
-        <span className="text-xs font-medium">
-          {endTime}
-        </span>
+        <span className="text-[12px] font-medium">{endTime}</span>
       </div>
     </div>
   );

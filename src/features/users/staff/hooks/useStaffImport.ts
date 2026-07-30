@@ -3,7 +3,7 @@ import { toast } from "sonner";
 import { getAxiosErrorMessage } from "@/services/axios/axiosError";
 import type { ApiId } from "../../shared/types/api.types";
 import { staffApi } from "../api/staff.api";
-import type { StaffImportBatchStatusValue, StaffImportStartResponse } from "../types/staff.types";
+import type { StaffImportBatchStatusValue, StaffImportStartResponse, StaffRole } from "../types/staff.types";
 import { staffKeys } from "./staff.keys";
 
 const FINAL_STATUSES: StaffImportBatchStatusValue[] = ["completed", "failed"];
@@ -16,10 +16,10 @@ export function getStaffImportBatchId(response: StaffImportStartResponse): ApiId
   return id;
 }
 
-export function useImportStaff() {
+export function useImportStaff(role: StaffRole) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (file: File) => staffApi.importFile(file),
+    mutationFn: (file: File) => staffApi.importFile(role, file),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: staffKeys.all });
       toast.success("The file was uploaded and staff processing has started.");

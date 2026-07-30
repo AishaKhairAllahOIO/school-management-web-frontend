@@ -103,6 +103,8 @@ export type StudentListItem = {
   photoUrl?: string | null;
   phoneNumber?: string | null;
   accountStatus?: AccountStatus;
+  isDeleted?: boolean;
+  deletedAt?: string | null;
 };
 
 export type StudentListFilters = {

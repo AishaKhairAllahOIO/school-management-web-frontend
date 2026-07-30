@@ -60,6 +60,25 @@ export function useStaffByRole(
   });
 }
 
+export function useStaffSearch(
+  role: StaffRole,
+  name: string,
+  page = 1,
+  perPage = 15,
+) {
+  const normalizedName = name.trim();
+
+  return useQuery({
+    queryKey: staffKeys.roleSearch(role, normalizedName, page, perPage),
+    queryFn: () => staffApi.searchByRole(role, normalizedName, page, perPage),
+    enabled: normalizedName.length >= 2,
+
+    // Never display the previous directory page as a search result.
+    // Each search term must render only its own server response.
+    placeholderData: undefined,
+  });
+}
+
 export function useStaffDetails(
   staffId:
     | ApiId
@@ -279,6 +298,54 @@ export function useDeleteStaff(
         queryKey:
           staffKeys.role(role),
       });
+    },
+  });
+}
+
+
+export function useRestoreStaff(
+  role: StaffRole,
+) {
+  const queryClient =
+    useQueryClient();
+
+  return useMutation({
+    mutationFn: (
+      staffId: ApiId,
+    ) =>
+      staffApi.restore(
+        staffId,
+      ),
+
+    onSuccess: async (
+      staff,
+      staffId,
+    ) => {
+      queryClient.setQueryData(
+        staffKeys.detail(
+          staffId,
+        ),
+        staff,
+      );
+
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey:
+            staffKeys.role(role),
+        }),
+
+        queryClient.invalidateQueries({
+          queryKey:
+            staffKeys.detail(
+              staffId,
+            ),
+        }),
+
+        queryClient.invalidateQueries({
+          queryKey:
+            staffKeys.profile(),
+        }),
+      ]);
     },
   });
 }

@@ -1,5 +1,14 @@
 import { useState } from "react";
 
+import { DatePicker } from "@/shared/ui/date-picker";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/shared/ui/select";
+
 import type {
   AcademicTerm,
   CreateAcademicTermPayload,
@@ -7,17 +16,15 @@ import type {
 import {
   BaseDialog,
   DialogActions,
+  DialogCheckbox,
   DialogField,
-  dialogInputClass,
 } from "./BaseDialog";
 
 type Props = {
   value: AcademicTerm | null;
   academicYearId: string;
   onClose: () => void;
-  onSave: (
-    payload: CreateAcademicTermPayload,
-  ) => void;
+  onSave: (payload: CreateAcademicTermPayload) => void;
 };
 
 const semesterOptions = [
@@ -33,19 +40,13 @@ export function AcademicTermDialog({
   onSave,
 }: Props) {
   const [semesterName, setSemesterName] =
-    useState(
-      value?.semesterName ?? "First_Term",
-    );
-
+    useState(value?.semesterName ?? "First_Term");
   const [startDate, setStartDate] =
     useState(value?.startDate ?? "");
-
   const [endDate, setEndDate] =
     useState(value?.endDate ?? "");
-
   const [isCurrent, setIsCurrent] =
     useState(value?.isCurrent ?? false);
-
   const [isFinalTerm, setIsFinalTerm] =
     useState(value?.isFinalTerm ?? false);
 
@@ -58,93 +59,80 @@ export function AcademicTermDialog({
 
   return (
     <BaseDialog
-      title={
-        value
-          ? "Edit Academic Term"
-          : "Add Academic Term"
-      }
+      title={value ? "Edit Academic Term" : "Add Academic Term"}
+      description="Configure the term name, dates and current status."
       onClose={onClose}
     >
       <DialogField label="Semester Name">
-        <select
+        <Select
           value={semesterName}
-          onChange={(event) =>
-            setSemesterName(event.target.value)
+          onValueChange={(value) =>
+            setSemesterName(
+              value as (typeof semesterOptions)[number],
+            )
           }
-          className={dialogInputClass}
         >
-          {semesterOptions.map((option) => (
-            <option key={option} value={option}>
-              {option.replaceAll("_", " ")}
-            </option>
-          ))}
-        </select>
+          <SelectTrigger className="h-11 rounded-[13px]">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {semesterOptions.map((option) => (
+              <SelectItem key={option} value={option}>
+                {option.replaceAll("_", " ")}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </DialogField>
 
-      <DialogField label="Start Date">
-        <input
-          type="date"
-          value={startDate}
-          onChange={(event) =>
-            setStartDate(event.target.value)
-          }
-          className={dialogInputClass}
-        />
-      </DialogField>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <DialogField label="Start Date">
+          <DatePicker
+            value={startDate}
+            onChange={setStartDate}
+            placeholder="Select start date"
+            max={endDate || undefined}
+          />
+        </DialogField>
 
-      <DialogField label="End Date">
-        <input
-          type="date"
-          value={endDate}
-          onChange={(event) =>
-            setEndDate(event.target.value)
-          }
-          className={dialogInputClass}
-        />
-      </DialogField>
+        <DialogField label="End Date">
+          <DatePicker
+            value={endDate}
+            onChange={setEndDate}
+            placeholder="Select end date"
+            min={startDate || undefined}
+          />
+        </DialogField>
+      </div>
 
-      <label className="flex items-center gap-3">
-        <input
-          type="checkbox"
+      <div className="grid gap-2.5 sm:grid-cols-2">
+        <DialogCheckbox
           checked={isCurrent}
-          onChange={(event) =>
-            setIsCurrent(event.target.checked)
-          }
+          onChange={setIsCurrent}
+          label="Current term"
         />
 
-        <span className="text-sm font-semibold">
-          Current term
-        </span>
-      </label>
-
-      <label className="flex items-center gap-3">
-        <input
-          type="checkbox"
+        <DialogCheckbox
           checked={isFinalTerm}
-          onChange={(event) =>
-            setIsFinalTerm(event.target.checked)
-          }
+          onChange={setIsFinalTerm}
+          label="Final term"
         />
-
-        <span className="text-sm font-semibold">
-          Final term
-        </span>
-      </label>
+      </div>
 
       <DialogActions
-  onClose={onClose}
-  disabled={!canSave}
-  onSave={() =>
-    onSave({
-      academicYearId: Number(academicYearId),
-      semesterName,
-      startDate,
-      endDate,
-      isCurrent,
-      isFinalTerm,
-    })
-  }
-/>
+        onClose={onClose}
+        disabled={!canSave}
+        onSave={() =>
+          onSave({
+            academicYearId: Number(academicYearId),
+            semesterName,
+            startDate,
+            endDate,
+            isCurrent,
+            isFinalTerm,
+          })
+        }
+      />
     </BaseDialog>
   );
 }

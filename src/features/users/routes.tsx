@@ -99,13 +99,13 @@ export const usersRoutes = [
 
 
       {
-        path: "staff/import",
-        element: <StaffImportPage />,
+        path: "teachers",
+        element: <TeachersPage />,
       },
 
       {
-        path: "teachers",
-        element: <TeachersPage />,
+        path: "teachers/import",
+        element: <StaffImportPage role="teacher" />,
       },
 
       {
@@ -135,6 +135,11 @@ export const usersRoutes = [
       },
 
       {
+        path: "supervisors/import",
+        element: <StaffImportPage role="adviser" />,
+      },
+
+      {
         path: "supervisors/new",
         element: (
           <StaffRegistrationPage role="adviser" />
@@ -158,6 +163,11 @@ export const usersRoutes = [
       {
         path: "secretaries",
         element: <SecretariesPage />,
+      },
+
+      {
+        path: "secretaries/import",
+        element: <StaffImportPage role="secretary" />,
       },
 
       {
@@ -187,6 +197,11 @@ export const usersRoutes = [
       },
 
       {
+        path: "counselors/import",
+        element: <StaffImportPage role="counselor" />,
+      },
+
+      {
         path: "counselors/new",
         element: (
           <StaffRegistrationPage role="counselor" />
@@ -210,6 +225,11 @@ export const usersRoutes = [
       {
         path: "service-staff",
         element: <ServiceStaffPage />,
+      },
+
+      {
+        path: "service-staff/import",
+        element: <StaffImportPage role="service_staff" />,
       },
 
       {

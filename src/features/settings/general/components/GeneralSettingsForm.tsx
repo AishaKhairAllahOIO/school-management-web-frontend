@@ -1,5 +1,6 @@
 import {
   Building2,
+  Check,
   Globe2,
   Loader2,
   Mail,
@@ -8,17 +9,12 @@ import {
   Save,
 } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  useState,
-  type InputHTMLAttributes,
-} from "react";
-import {
-  useForm,
-  type Path,
-} from "react-hook-form";
+import { useState, type InputHTMLAttributes } from "react";
+import { useForm, useWatch, type Path } from "react-hook-form";
 
 import { GeneralSettingsDangerZone } from "./GeneralSettingsDangerZone";
 import { SchoolGallery } from "./SchoolGallery";
+import { SchoolLocationMap } from "./SchoolLocationMap";
 import { SchoolLogoUpload } from "./SchoolLogoUpload";
 
 import { useUpdateGeneralSettings } from "@/features/settings/general/hooks/useGeneralSettings";
@@ -33,13 +29,12 @@ type GeneralSettingsFormProps = {
   initialData: GeneralSettings;
 };
 
-type TextInputProps =
-  InputHTMLAttributes<HTMLInputElement> & {
-    label: string;
-    required?: boolean;
-    icon?: typeof Building2;
-    error?: string;
-  };
+type TextInputProps = InputHTMLAttributes<HTMLInputElement> & {
+  label: string;
+  required?: boolean;
+  icon?: typeof Building2;
+  error?: string;
+};
 
 function TextInput({
   label,
@@ -50,21 +45,10 @@ function TextInput({
   ...props
 }: TextInputProps) {
   return (
-    <label
-      className={[
-        "block min-w-0",
-        className ?? "",
-      ].join(" ")}
-    >
+    <label className={["block min-w-0", className ?? ""].join(" ")}>
       <span className="mb-2 block text-xs font-semibold text-foreground/80">
         {label}
-
-        {required ? (
-          <span className="text-destructive">
-            {" "}
-            *
-          </span>
-        ) : null}
+        {required ? <span className="text-destructive"> *</span> : null}
       </span>
 
       <div className="relative">
@@ -79,40 +63,22 @@ function TextInput({
         <input
           {...props}
           className={[
-            "h-12 w-full rounded-[16px]",
-            "border border-border/80",
-            "bg-background",
+            "h-11 w-full rounded-[14px] border border-border/80 bg-background",
             "shadow-[0_1px_2px_rgba(15,23,42,0.04)]",
-            "text-sm font-medium text-foreground",
-            "outline-none transition duration-200",
-            "placeholder:font-normal",
-            "placeholder:text-muted-foreground/80",
-            "hover:border-border",
-            "hover:bg-background",
-            "focus:border-primary/55",
-            "focus:bg-background",
-            "focus:ring-4 focus:ring-primary/[0.10]",
-            "disabled:cursor-not-allowed",
-            "disabled:opacity-60",
-            Icon
-              ? "pl-11 pr-4"
-              : "px-4",
+            "text-sm font-normal text-foreground outline-none transition duration-200",
+            "placeholder:font-normal placeholder:text-muted-foreground/80",
+            "hover:border-border focus:border-primary/55 focus:ring-4 focus:ring-primary/[0.10]",
+            "disabled:cursor-not-allowed disabled:opacity-60",
+            Icon ? "pl-11 pr-4" : "px-4",
             error
-              ? [
-                  "border-destructive/35",
-                  "bg-destructive/[0.025]",
-                  "focus:border-destructive/40",
-                  "focus:ring-destructive/[0.07]",
-                ].join(" ")
+              ? "border-destructive/35 bg-destructive/[0.025] focus:border-destructive/40 focus:ring-destructive/[0.07]"
               : "",
           ].join(" ")}
         />
       </div>
 
       {error ? (
-        <p className="mt-1.5 px-1 text-[11px] font-medium text-destructive">
-          {error}
-        </p>
+        <p className="mt-1.5 px-1 text-[11px] font-medium text-destructive">{error}</p>
       ) : null}
     </label>
   );
@@ -128,30 +94,13 @@ function SectionHeader({
   icon: typeof Building2;
 }) {
   return (
-    <div className="mb-6 flex items-start gap-3.5">
-      <span
-        className={[
-          "flex h-10 w-10 shrink-0",
-          "items-center justify-center",
-          "rounded-[15px]",
-          "bg-primary/[0.08]",
-          "text-primary",
-        ].join(" ")}
-      >
-        <Icon
-          size={18}
-          strokeWidth={1.75}
-        />
+    <div className="mb-5 flex items-start gap-3 pr-11">
+      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[13px] bg-primary/[0.08] text-primary">
+        <Icon size={17} strokeWidth={1.75} />
       </span>
-
       <div className="min-w-0 pt-0.5">
-        <h2 className="text-[15px] font-semibold text-foreground">
-          {title}
-        </h2>
-
-        <p className="mt-1 max-w-xl text-xs leading-5 text-muted-foreground">
-          {description}
-        </p>
+        <h2 className="text-[15px] font-semibold text-foreground">{title}</h2>
+        <p className="mt-1 max-w-xl text-xs leading-5 text-muted-foreground">{description}</p>
       </div>
     </div>
   );
@@ -160,250 +109,190 @@ function SectionHeader({
 function SettingsCard({
   children,
   className,
+  completed = false,
+  completedLabel = "Section completed",
 }: {
   children: React.ReactNode;
   className?: string;
+  completed?: boolean;
+  completedLabel?: string;
 }) {
   return (
     <section
       className={[
-        "rounded-[26px]",
-        "border border-border/45",
-        "bg-card",
-        "p-5 sm:p-6",
-        "shadow-[0_10px_35px_rgba(30,20,70,0.035)]",
-        "transition duration-300",
-        "hover:border-border/65",
-        "hover:shadow-[0_14px_42px_rgba(30,20,70,0.055)]",
+        "relative h-full min-h-[390px] rounded-[24px] border border-border/45 bg-card p-5",
+        "shadow-[0_10px_35px_rgba(30,20,70,0.035)] transition duration-300",
+        "hover:border-border/65 hover:shadow-[0_14px_42px_rgba(30,20,70,0.055)]",
         className ?? "",
       ].join(" ")}
     >
+      {completed ? (
+        <span
+          className="absolute right-5 top-5 z-10 flex h-8 w-8 items-center justify-center rounded-full border border-emerald-500/20 bg-emerald-500/10 text-emerald-600 sm:right-6 sm:top-6"
+          title={completedLabel}
+          aria-label={completedLabel}
+        >
+          <Check size={17} strokeWidth={2.5} />
+        </span>
+      ) : null}
       {children}
     </section>
   );
 }
 
-function getDefaultValues(
-  data: GeneralSettings,
-): GeneralSettingsFormValues {
+function getDefaultValues(data: GeneralSettings): GeneralSettingsFormValues {
   return {
     schoolName: data.schoolName ?? "",
     shortName: data.shortName ?? "",
     description: data.description ?? "",
     phoneNumber: data.phoneNumber ?? "",
-    emergencyPhoneNumber:
-      data.emergencyPhoneNumber ?? "",
+    emergencyPhoneNumber: data.emergencyPhoneNumber ?? "",
     email: data.email ?? "",
     website: data.website ?? "",
     address: data.address ?? "",
     city: data.city ?? "",
     country: data.country ?? "",
     location: {
-      latitude:
-        data.location.latitude === null
-          ? ""
-          : String(data.location.latitude),
-      longitude:
-        data.location.longitude === null
-          ? ""
-          : String(data.location.longitude),
+      latitude: data.location.latitude === null ? "" : String(data.location.latitude),
+      longitude: data.location.longitude === null ? "" : String(data.location.longitude),
     },
   };
 }
 
-export function GeneralSettingsForm({
-  initialData,
-}: GeneralSettingsFormProps) {
+function isNonEmpty(value: string | undefined) {
+  return Boolean(value?.trim());
+}
+
+function isValidLatitude(value: string) {
+  const number = Number(value);
+  return value.trim() !== "" && Number.isFinite(number) && number >= -90 && number <= 90;
+}
+
+function isValidLongitude(value: string) {
+  const number = Number(value);
+  return value.trim() !== "" && Number.isFinite(number) && number >= -180 && number <= 180;
+}
+
+export function GeneralSettingsForm({ initialData }: GeneralSettingsFormProps) {
   const formVersion = [
     initialData.id || "uninitialized",
     initialData.updatedAt ?? "",
     initialData.logoUrl ?? "",
   ].join("-");
 
-  return (
-    <GeneralSettingsFormContent
-      key={formVersion}
-      initialData={initialData}
-    />
-  );
+  return <GeneralSettingsFormContent key={formVersion} initialData={initialData} />;
 }
 
-function GeneralSettingsFormContent({
-  initialData,
-}: GeneralSettingsFormProps) {
-  const updateMutation =
-    useUpdateGeneralSettings();
-
-  const [selectedLogo, setSelectedLogo] =
-    useState<File | null>(null);
-
-  const [logoError, setLogoError] =
-    useState<string | undefined>();
+function GeneralSettingsFormContent({ initialData }: GeneralSettingsFormProps) {
+  const updateMutation = useUpdateGeneralSettings();
+  const [selectedLogo, setSelectedLogo] = useState<File | null>(null);
+  const [logoError, setLogoError] = useState<string | undefined>();
 
   const {
     register,
+    control,
     handleSubmit,
     reset,
     setError,
     clearErrors,
-    formState: {
-      errors,
-      isDirty,
-    },
+    formState: { errors, isDirty },
   } = useForm<GeneralSettingsFormValues>({
-    resolver: zodResolver(
-      generalSettingsSchema,
-    ),
-    defaultValues:
-      getDefaultValues(initialData),
+    resolver: zodResolver(generalSettingsSchema),
+    defaultValues: getDefaultValues(initialData),
   });
 
-  const isInitialized =
-    initialData.id.trim().length > 0;
+  const values = useWatch({ control });
+  const schoolName = values.schoolName ?? "";
+  const shortName = values.shortName ?? "";
+  const description = values.description ?? "";
+  const phoneNumber = values.phoneNumber ?? "";
+  const emergencyPhoneNumber = values.emergencyPhoneNumber ?? "";
+  const email = values.email ?? "";
+  const country = values.country ?? "";
+  const city = values.city ?? "";
+  const address = values.address ?? "";
+  const latitude = values.location?.latitude ?? "";
+  const longitude = values.location?.longitude ?? "";
 
-  const hasUnsavedChanges =
-    isDirty || selectedLogo !== null;
+  const identityComplete =
+    isNonEmpty(schoolName) && isNonEmpty(shortName) && isNonEmpty(description);
+  const contactComplete =
+    isNonEmpty(phoneNumber) && isNonEmpty(emergencyPhoneNumber) && isNonEmpty(email);
+  const addressComplete =
+    isNonEmpty(country) &&
+    isNonEmpty(city) &&
+    isNonEmpty(address) &&
+    isValidLatitude(latitude) &&
+    isValidLongitude(longitude);
 
-  function applyServerValidationErrors(
-    error: unknown,
-  ) {
-    const validationErrors =
-      getAxiosValidationErrors(error);
+  const isInitialized = initialData.id.trim().length > 0;
+  const hasUnsavedChanges = isDirty || selectedLogo !== null;
 
-    setLogoError(
-      validationErrors.logo?.[0],
-    );
+  function applyServerValidationErrors(error: unknown) {
+    const validationErrors = getAxiosValidationErrors(error);
+    setLogoError(validationErrors.logo?.[0]);
 
     const fieldMappings: Array<{
       apiField: string;
       formField: Path<GeneralSettingsFormValues>;
     }> = [
-      {
-        apiField: "schoolName",
-        formField: "schoolName",
-      },
-      {
-        apiField: "shortName",
-        formField: "shortName",
-      },
-      {
-        apiField: "description",
-        formField: "description",
-      },
-      {
-        apiField: "phoneNumber",
-        formField: "phoneNumber",
-      },
-      {
-        apiField: "emergencyPhoneNumber",
-        formField: "emergencyPhoneNumber",
-      },
-      {
-        apiField: "email",
-        formField: "email",
-      },
-      {
-        apiField: "website",
-        formField: "website",
-      },
-      {
-        apiField: "address",
-        formField: "address",
-      },
-      {
-        apiField: "city",
-        formField: "city",
-      },
-      {
-        apiField: "country",
-        formField: "country",
-      },
-      {
-        apiField: "location.latitude",
-        formField: "location.latitude",
-      },
-      {
-        apiField: "location.longitude",
-        formField: "location.longitude",
-      },
+      { apiField: "schoolName", formField: "schoolName" },
+      { apiField: "shortName", formField: "shortName" },
+      { apiField: "description", formField: "description" },
+      { apiField: "phoneNumber", formField: "phoneNumber" },
+      { apiField: "emergencyPhoneNumber", formField: "emergencyPhoneNumber" },
+      { apiField: "email", formField: "email" },
+      { apiField: "website", formField: "website" },
+      { apiField: "address", formField: "address" },
+      { apiField: "city", formField: "city" },
+      { apiField: "country", formField: "country" },
+      { apiField: "location.latitude", formField: "location.latitude" },
+      { apiField: "location.longitude", formField: "location.longitude" },
     ];
 
     for (const mapping of fieldMappings) {
-      const message =
-        validationErrors[
-          mapping.apiField
-        ]?.[0];
-
-      if (!message) {
-        continue;
+      const message = validationErrors[mapping.apiField]?.[0];
+      if (message) {
+        setError(mapping.formField, { type: "server", message });
       }
-
-      setError(mapping.formField, {
-        type: "server",
-        message,
-      });
     }
   }
 
-  function onSubmit(
-    values: GeneralSettingsFormValues,
-  ) {
+  function onSubmit(formValues: GeneralSettingsFormValues) {
     clearErrors();
     setLogoError(undefined);
 
     updateMutation.mutate(
       {
-        schoolName:
-          values.schoolName.trim(),
-        shortName:
-          values.shortName.trim(),
-        description:
-          values.description.trim(),
-        phoneNumber:
-          values.phoneNumber.trim(),
-        emergencyPhoneNumber:
-          values.emergencyPhoneNumber.trim(),
-        email:
-          values.email.trim(),
-        website:
-          values.website?.trim() ?? "",
-        address:
-          values.address.trim(),
-        city:
-          values.city.trim(),
-        country:
-          values.country.trim(),
+        schoolName: formValues.schoolName.trim(),
+        shortName: formValues.shortName.trim(),
+        description: formValues.description.trim(),
+        phoneNumber: formValues.phoneNumber.trim(),
+        emergencyPhoneNumber: formValues.emergencyPhoneNumber.trim(),
+        email: formValues.email.trim(),
+        website: formValues.website?.trim() ?? "",
+        address: formValues.address.trim(),
+        city: formValues.city.trim(),
+        country: formValues.country.trim(),
         location: {
-          latitude: Number(
-            values.location.latitude,
-          ),
-          longitude: Number(
-            values.location.longitude,
-          ),
+          latitude: Number(formValues.location.latitude),
+          longitude: Number(formValues.location.longitude),
         },
-        logo:
-          selectedLogo ?? undefined,
+        logo: selectedLogo ?? undefined,
       },
       {
         onSuccess: (settings) => {
           setSelectedLogo(null);
           setLogoError(undefined);
-
-          reset(
-            getDefaultValues(settings),
-          );
+          reset(getDefaultValues(settings));
         },
-        onError:
-          applyServerValidationErrors,
+        onError: applyServerValidationErrors,
       },
     );
   }
 
   function handleCancel() {
-    reset(
-      getDefaultValues(initialData),
-    );
-
+    reset(getDefaultValues(initialData));
     clearErrors();
     setSelectedLogo(null);
     setLogoError(undefined);
@@ -415,343 +304,214 @@ function GeneralSettingsFormContent({
       className="mx-auto w-full max-w-[1500px]"
     >
       {!isInitialized ? (
-        <div
-          className={[
-            "mb-5 rounded-[22px]",
-            "border border-primary/10",
-            "bg-primary/[0.035]",
-            "px-5 py-4 sm:px-6",
-          ].join(" ")}
-        >
+        <div className="mb-5 rounded-[22px] border border-primary/10 bg-primary/[0.035] px-5 py-4 sm:px-6">
           <div className="flex items-start gap-3.5">
             <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[15px] bg-primary/[0.09] text-primary">
-              <Building2
-                size={18}
-                strokeWidth={1.75}
-              />
+              <Building2 size={18} strokeWidth={1.75} />
             </span>
-
             <div className="pt-0.5">
-              <p className="text-sm font-semibold text-foreground">
-                Complete the school profile
-              </p>
-
+              <p className="text-sm font-semibold text-foreground">Complete the school profile</p>
               <p className="mt-1 text-xs leading-5 text-muted-foreground">
-                Fill in the required information
-                and save the form to initialize
-                the school settings.
+                Fill in the required information and save the form to initialize the school settings.
               </p>
             </div>
           </div>
         </div>
       ) : null}
 
-      <div className="space-y-5">
-        <SettingsCard>
-          <SectionHeader
-            title="School Identity"
-            description="Manage the school's name, description and visual identity."
-            icon={Building2}
-          />
-
-          <div className="grid gap-6 lg:grid-cols-[minmax(230px,290px)_minmax(0,1fr)]">
-            <SchoolLogoUpload
-              currentLogoUrl={
-                initialData.logoUrl
-              }
-              selectedFile={
-                selectedLogo
-              }
-              error={logoError}
-              disabled={
-                updateMutation.isPending
-              }
-              onFileChange={(file) => {
-                setLogoError(undefined);
-                setSelectedLogo(file);
-              }}
+      <div className="space-y-4">
+        <div className="grid items-stretch gap-4 xl:grid-cols-2">
+          <SettingsCard completed={identityComplete} completedLabel="School identity completed">
+            <SectionHeader
+              title="School Identity"
+              description="Manage the school's name, short name and description."
+              icon={Building2}
             />
 
-            <div className="grid content-start gap-5 md:grid-cols-2">
+            <div className="grid gap-4 md:grid-cols-2">
               <TextInput
                 label="School Name"
                 required
-                error={
-                  errors.schoolName?.message
-                }
+                error={errors.schoolName?.message}
                 {...register("schoolName")}
               />
-
               <TextInput
                 label="Short Name"
                 required
-                error={
-                  errors.shortName?.message
-                }
+                error={errors.shortName?.message}
                 {...register("shortName")}
               />
 
               <label className="md:col-span-2">
                 <span className="mb-2 block text-xs font-semibold text-foreground/80">
-                  Description
-
-                  <span className="text-destructive">
-                    {" "}
-                    *
-                  </span>
+                  Description <span className="text-destructive">*</span>
                 </span>
-
                 <textarea
-                  rows={7}
+                  rows={6}
                   {...register("description")}
                   className={[
-                    "w-full resize-none",
-                    "rounded-[18px]",
-                    "border border-border/80",
-                    "bg-background",
+                    "min-h-[140px] max-h-[380px] w-full resize-y rounded-[14px]",
+                    "border border-border/80 bg-background px-4 py-3.5",
                     "shadow-[0_1px_2px_rgba(15,23,42,0.04)]",
-                    "px-4 py-3.5",
-                    "text-sm font-medium leading-6",
-                    "text-foreground",
-                    "outline-none transition duration-200",
-                    "placeholder:text-muted-foreground/80",
-                    "hover:border-border",
-                    "hover:bg-background",
-                    "focus:border-primary/55",
-                    "focus:bg-background",
-                    "focus:ring-4 focus:ring-primary/[0.10]",
-                    "disabled:cursor-not-allowed",
-                    "disabled:opacity-60",
+                    "text-sm font-normal leading-6 text-foreground outline-none transition duration-200",
+                    "placeholder:font-normal placeholder:text-muted-foreground/80",
+                    "hover:border-border focus:border-primary/55 focus:ring-4 focus:ring-primary/[0.10]",
+                    "disabled:cursor-not-allowed disabled:opacity-60",
                     errors.description?.message
-                      ? [
-                          "border-destructive/35",
-                          "bg-destructive/[0.025]",
-                          "focus:border-destructive/40",
-                          "focus:ring-destructive/[0.07]",
-                        ].join(" ")
+                      ? "border-destructive/35 bg-destructive/[0.025] focus:border-destructive/40 focus:ring-destructive/[0.07]"
                       : "",
                   ].join(" ")}
                 />
-
-                {errors.description
-                  ?.message ? (
+                {errors.description?.message ? (
                   <p className="mt-1.5 px-1 text-[11px] font-medium text-destructive">
-                    {
-                      errors.description
-                        .message
-                    }
+                    {errors.description.message}
                   </p>
                 ) : null}
               </label>
             </div>
-          </div>
-        </SettingsCard>
+          </SettingsCard>
 
-        <div className="grid gap-5 xl:grid-cols-2">
-          <SettingsCard>
+          <SettingsCard completed={contactComplete} completedLabel="Contact information completed">
             <SectionHeader
               title="Contact Information"
               description="Manage the primary contact channels used by the school."
               icon={Phone}
             />
 
-            <div className="grid gap-5 md:grid-cols-2">
+            <div className="grid gap-4 md:grid-cols-2">
               <TextInput
                 label="Phone Number"
                 required
                 icon={Phone}
-                error={
-                  errors.phoneNumber?.message
-                }
+                error={errors.phoneNumber?.message}
                 {...register("phoneNumber")}
               />
-
               <TextInput
                 label="Emergency Phone"
                 required
                 icon={Phone}
-                error={
-                  errors
-                    .emergencyPhoneNumber
-                    ?.message
-                }
-                {...register(
-                  "emergencyPhoneNumber",
-                )}
+                error={errors.emergencyPhoneNumber?.message}
+                {...register("emergencyPhoneNumber")}
               />
-
               <TextInput
                 label="Email Address"
                 required
                 type="email"
                 icon={Mail}
-                error={
-                  errors.email?.message
-                }
+                error={errors.email?.message}
                 {...register("email")}
               />
-
               <TextInput
                 label="Website"
                 type="url"
                 icon={Globe2}
-                error={
-                  errors.website?.message
-                }
+                error={errors.website?.message}
                 {...register("website")}
               />
             </div>
           </SettingsCard>
+        </div>
 
-          <SettingsCard>
+        <div className="grid items-stretch gap-4 xl:grid-cols-2">
+          <SettingsCard completed={addressComplete} completedLabel="Address and location completed">
             <SectionHeader
               title="Address & Location"
               description="Update the school's physical address and geographic coordinates."
               icon={MapPin}
             />
 
-            <div className="grid gap-5 md:grid-cols-2">
+            <div className="grid gap-4 md:grid-cols-2">
               <TextInput
                 label="Country"
                 required
-                error={
-                  errors.country?.message
-                }
+                error={errors.country?.message}
                 {...register("country")}
               />
-
               <TextInput
                 label="City"
                 required
-                error={
-                  errors.city?.message
-                }
+                error={errors.city?.message}
                 {...register("city")}
               />
-
               <TextInput
                 label="Full Address"
                 required
                 icon={MapPin}
                 className="md:col-span-2"
-                error={
-                  errors.address?.message
-                }
+                error={errors.address?.message}
                 {...register("address")}
               />
-
               <TextInput
                 label="Latitude"
                 required
                 inputMode="decimal"
-                error={
-                  errors.location?.latitude
-                    ?.message
-                }
-                {...register(
-                  "location.latitude",
-                )}
+                error={errors.location?.latitude?.message}
+                {...register("location.latitude")}
               />
-
               <TextInput
                 label="Longitude"
                 required
                 inputMode="decimal"
-                error={
-                  errors.location?.longitude
-                    ?.message
-                }
-                {...register(
-                  "location.longitude",
-                )}
+                error={errors.location?.longitude?.message}
+                {...register("location.longitude")}
               />
             </div>
           </SettingsCard>
+
+          <SchoolLocationMap
+            schoolName={schoolName}
+            latitude={latitude}
+            longitude={longitude}
+          />
         </div>
 
-        <SchoolGallery
-          images={initialData.images}
-        />
+<div
+  className={[
+    "grid items-start gap-4",
+    "xl:grid-cols-[240px_minmax(0,1fr)]",
+  ].join(" ")}
+>          <SchoolLogoUpload
+            currentLogoUrl={initialData.logoUrl}
+            selectedFile={selectedLogo}
+            error={logoError}
+            disabled={updateMutation.isPending}
+            onFileChange={(file) => {
+              setLogoError(undefined);
+              setSelectedLogo(file);
+            }}
+          />
+
+          <SchoolGallery images={initialData.images} />
+        </div>
 
         {isInitialized ? (
           <GeneralSettingsDangerZone
-            schoolName={
-              initialData.schoolName
-            }
-            shortName={
-              initialData.shortName
-            }
+            schoolName={initialData.schoolName}
+            shortName={initialData.shortName}
           />
         ) : null}
       </div>
 
-      <div
-        className={[
-          "sticky bottom-0 z-10",
-          "mt-6 flex flex-col-reverse gap-3",
-          "rounded-t-[22px]",
-          "border-t border-border/45",
-          "bg-background/85",
-          "px-5 py-4 sm:px-6",
-          "backdrop-blur-xl",
-          "sm:flex-row sm:items-center",
-          "sm:justify-end",
-        ].join(" ")}
-      >
+      <div className="sticky bottom-0 z-10 mt-6 flex flex-col-reverse gap-3 rounded-t-[22px] border-t border-border/45 bg-background/85 px-5 py-4 backdrop-blur-xl sm:flex-row sm:items-center sm:justify-end sm:px-6">
         <button
           type="button"
           onClick={handleCancel}
-          disabled={
-            !hasUnsavedChanges ||
-            updateMutation.isPending
-          }
-          className={[
-            "h-11 rounded-full",
-            "bg-muted/55 px-6",
-            "text-sm font-semibold",
-            "text-foreground/75",
-            "transition duration-200",
-            "hover:bg-muted",
-            "hover:text-foreground",
-            "disabled:cursor-not-allowed",
-            "disabled:opacity-45",
-          ].join(" ")}
+          disabled={!hasUnsavedChanges || updateMutation.isPending}
+          className="h-11 rounded-full bg-muted/55 px-6 text-sm font-semibold text-foreground/75 transition hover:bg-muted hover:text-foreground disabled:cursor-not-allowed disabled:opacity-45"
         >
           Cancel
         </button>
 
         <button
           type="submit"
-          disabled={
-            !hasUnsavedChanges ||
-            updateMutation.isPending
-          }
-          className={[
-            "flex h-11 items-center",
-            "justify-center gap-2",
-            "rounded-full bg-primary",
-            "px-6",
-            "text-sm font-semibold",
-            "text-primary-foreground",
-            "shadow-[0_10px_24px_rgba(98,74,180,0.2)]",
-            "transition duration-200",
-            "hover:-translate-y-0.5",
-            "hover:bg-primary/90",
-            "hover:shadow-[0_14px_30px_rgba(98,74,180,0.25)]",
-            "disabled:cursor-not-allowed",
-            "disabled:translate-y-0",
-            "disabled:opacity-55",
-          ].join(" ")}
+          disabled={!hasUnsavedChanges || updateMutation.isPending}
+          className="flex h-11 items-center justify-center gap-2 rounded-full bg-primary px-6 text-sm font-semibold text-primary-foreground shadow-[0_10px_24px_rgba(98,74,180,0.2)] transition duration-200 hover:-translate-y-0.5 hover:bg-primary/90 hover:shadow-[0_14px_30px_rgba(98,74,180,0.25)] disabled:cursor-not-allowed disabled:translate-y-0 disabled:opacity-55"
         >
           {updateMutation.isPending ? (
-            <Loader2
-              size={16}
-              className="animate-spin"
-            />
+            <Loader2 size={16} className="animate-spin" />
           ) : (
             <Save size={16} />
           )}
-
           {updateMutation.isPending
             ? "Saving..."
             : isInitialized

@@ -145,91 +145,76 @@ function CardHeadingSkeleton() {
 
 function GeneralSettingsLoading() {
   return (
-    <div className="mx-auto w-full max-w-[1500px] space-y-5">
-      <section
-        className={[
-          "rounded-[26px]",
-          "border border-border/45",
-          "bg-card",
-          "p-5 sm:p-6",
-          "shadow-[0_10px_35px_rgba(30,20,70,0.035)]",
-        ].join(" ")}
-      >
-        <CardHeadingSkeleton />
-
-        <div className="grid gap-6 lg:grid-cols-[minmax(230px,290px)_minmax(0,1fr)]">
-          <div>
-            <SkeletonLine className="h-4 w-24" />
-            <SkeletonLine className="mt-2 h-3 w-48 max-w-full" />
-            <SkeletonLine className="mt-3 h-[210px] w-full rounded-[20px]" />
-            <div className="mt-3 grid grid-cols-2 gap-2">
-              <SkeletonLine className="h-10 rounded-xl" />
-              <SkeletonLine className="h-10 rounded-xl" />
-            </div>
-          </div>
-
-          <div className="grid content-start gap-5 md:grid-cols-2">
-            <FieldSkeleton />
-            <FieldSkeleton />
-
-            <div className="md:col-span-2">
-              <SkeletonLine className="h-3 w-20" />
-              <SkeletonLine className="mt-2 h-44 w-full rounded-[18px]" />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <div className="grid gap-5 xl:grid-cols-2">
-        {[0, 1].map((item) => (
+    <div className="mx-auto w-full max-w-[1500px] space-y-4">
+      <div className="grid gap-4 xl:grid-cols-2">
+        {[0, 1].map((card) => (
           <section
-            key={item}
-            className={[
-              "rounded-[26px]",
-              "border border-border/45",
-              "bg-card",
-              "p-5 sm:p-6",
-              "shadow-[0_10px_35px_rgba(30,20,70,0.035)]",
-            ].join(" ")}
+            key={card}
+            className="min-h-[390px] rounded-[24px] border border-border/45 bg-card p-5 shadow-[0_10px_35px_rgba(30,20,70,0.035)]"
           >
             <CardHeadingSkeleton />
-
-            <div className="grid gap-5 sm:grid-cols-2">
+            <div className="grid gap-4 sm:grid-cols-2">
               <FieldSkeleton />
               <FieldSkeleton />
-              <FieldSkeleton className="sm:col-span-2" />
-              <FieldSkeleton className="sm:col-span-2" />
+              {card === 0 ? (
+                <div className="sm:col-span-2">
+                  <SkeletonLine className="h-3 w-20" />
+                  <SkeletonLine className="mt-2 h-[140px] w-full rounded-[14px]" />
+                </div>
+              ) : (
+                <>
+                  <FieldSkeleton />
+                  <FieldSkeleton />
+                </>
+              )}
             </div>
           </section>
         ))}
       </div>
 
-      <section
-        className={[
-          "rounded-[26px]",
-          "border border-border/45",
-          "bg-card",
-          "p-5 sm:p-6",
-          "shadow-[0_10px_35px_rgba(30,20,70,0.035)]",
-        ].join(" ")}
-      >
-        <CardHeadingSkeleton />
+      <div className="grid gap-4 xl:grid-cols-2">
+        <section className="min-h-[390px] rounded-[24px] border border-border/45 bg-card p-5 shadow-[0_10px_35px_rgba(30,20,70,0.035)]">
+          <CardHeadingSkeleton />
+          <div className="grid gap-4 sm:grid-cols-2">
+            <FieldSkeleton />
+            <FieldSkeleton />
+            <FieldSkeleton className="sm:col-span-2" />
+            <FieldSkeleton />
+            <FieldSkeleton />
+          </div>
+        </section>
 
-        <SkeletonLine className="h-32 w-full rounded-[20px]" />
+        <section className="min-h-[390px] overflow-hidden rounded-[24px] border border-border/45 bg-card shadow-[0_10px_35px_rgba(30,20,70,0.035)]">
+          <div className="p-5">
+            <CardHeadingSkeleton />
+          </div>
+          <SkeletonLine className="h-[300px] w-full rounded-none" />
+        </section>
+      </div>
 
-        <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {[0, 1, 2, 3].map((item) => (
-            <div key={item}>
-              <SkeletonLine className="aspect-[4/3] w-full rounded-[18px]" />
-              <SkeletonLine className="mt-3 h-3 w-2/3" />
-            </div>
-          ))}
-        </div>
-      </section>
+      <div className="grid items-start gap-4 xl:grid-cols-[320px_minmax(0,1fr)]">
+        <section className="rounded-[24px] border border-border/45 bg-card p-5 shadow-[0_10px_35px_rgba(30,20,70,0.035)]">
+          <CardHeadingSkeleton />
+          <SkeletonLine className="h-[210px] w-full rounded-[16px]" />
+          <SkeletonLine className="mt-3 h-10 w-full rounded-full" />
+        </section>
 
-      <div className="flex justify-end gap-3 rounded-[22px] border border-border/45 bg-card p-4">
-        <SkeletonLine className="h-11 w-28 rounded-xl" />
-        <SkeletonLine className="h-11 w-36 rounded-xl" />
+        <section className="rounded-[24px] border border-border/45 bg-card p-5 shadow-[0_10px_35px_rgba(30,20,70,0.035)]">
+          <CardHeadingSkeleton />
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5">
+            {[0, 1, 2, 3, 4].map((item) => (
+              <div key={item}>
+                <SkeletonLine className="aspect-square w-full rounded-[14px]" />
+                <SkeletonLine className="mt-2 h-9 w-full rounded-[11px]" />
+              </div>
+            ))}
+          </div>
+        </section>
+      </div>
+
+      <div className="flex justify-end gap-3 rounded-t-[22px] border-t border-border/45 bg-card/80 p-4">
+        <SkeletonLine className="h-11 w-28 rounded-full" />
+        <SkeletonLine className="h-11 w-36 rounded-full" />
       </div>
     </div>
   );

@@ -1,5 +1,4 @@
 import {
-  CalendarRange,
   Check,
   Flag,
   Layers3,
@@ -8,6 +7,15 @@ import {
   useMemo,
   useState,
 } from "react";
+
+import { ConfirmationDialog } from "@/shared/ui/confirmation-dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/shared/ui/select";
 
 import {
   useCreateAcademicTerm,
@@ -54,6 +62,9 @@ export function AcademicTermsSection({
 
   const [openMenuId, setOpenMenuId] =
     useState<string | null>(null);
+
+  const [pendingDelete, setPendingDelete] =
+    useState<AcademicTerm | null>(null);
 
   const createTerm =
     useCreateAcademicTerm();
@@ -108,21 +119,7 @@ export function AcademicTermsSection({
   function handleDelete(
     term: AcademicTerm,
   ) {
-    const semesterLabel =
-      term.semesterName.replaceAll(
-        "_",
-        " ",
-      );
-
-    const confirmed = window.confirm(
-      `Delete "${semesterLabel}"?\n\nThis action cannot be undone.`,
-    );
-
-    if (!confirmed) {
-      return;
-    }
-
-    deleteTerm.mutate(term.id);
+    setPendingDelete(term);
     setOpenMenuId(null);
   }
 
@@ -141,60 +138,35 @@ export function AcademicTermsSection({
             <span className="mb-2 block text-xs font-medium text-foreground">
               Academic Year
             </span>
-
-            <div className="relative">
-              <select
-                value={selectedYearId}
-                onChange={(event) =>
-                  setSelectedYearId(
-                    event.target.value,
-                  )
-                }
-                disabled={
-                  academicYears.length === 0
-                }
-                className={[
-                  "h-11 w-full appearance-none",
-                  "rounded-[14px]",
-                  "border border-border/75",
-                  "bg-background px-4 pr-10",
-                  "text-sm font-normal",
-                  "text-foreground outline-none",
-                  "transition-all",
-                  "focus:border-primary/40",
-                  "focus:ring-4",
-                  "focus:ring-primary/10",
-                  "disabled:cursor-not-allowed",
-                  "disabled:opacity-60",
-                ].join(" ")}
-              >
+            <Select
+              value={selectedYearId || "none"}
+              disabled={academicYears.length === 0}
+              onValueChange={(value) =>
+                setSelectedYearId(
+                  value === "none" ? "" : value,
+                )
+              }
+            >
+              <SelectTrigger className="h-11 rounded-[14px] px-4">
+                <SelectValue placeholder="Select academic year" />
+              </SelectTrigger>
+              <SelectContent>
                 {academicYears.length === 0 ? (
-                  <option value="">
+                  <SelectItem value="none" disabled>
                     No academic years available
-                  </option>
+                  </SelectItem>
                 ) : null}
 
                 {academicYears.map((year) => (
-                  <option
+                  <SelectItem
                     key={year.id}
                     value={year.id}
                   >
                     {year.name}
-                  </option>
+                  </SelectItem>
                 ))}
-              </select>
-
-              <CalendarRange
-                size={16}
-                strokeWidth={1.75}
-                className={[
-                  "pointer-events-none absolute",
-                  "right-3 top-1/2",
-                  "-translate-y-1/2",
-                  "text-muted-foreground",
-                ].join(" ")}
-              />
-            </div>
+              </SelectContent>
+            </Select>
           </label>
         </div>
       </SectionHeader>
@@ -371,6 +343,23 @@ export function AcademicTermsSection({
           }}
         />
       ) : null}
+
+      <ConfirmationDialog
+        open={Boolean(pendingDelete)}
+        onOpenChange={(open) => {
+          if (!open) setPendingDelete(null);
+        }}
+        title="Delete academic term?"
+        description="This action cannot be undone."
+        itemName={pendingDelete ? pendingDelete.semesterName.replaceAll("_", " ") : undefined}
+        isPending={deleteTerm.isPending}
+        onConfirm={() => {
+          if (!pendingDelete) return;
+          deleteTerm.mutate(pendingDelete.id, {
+            onSuccess: () => setPendingDelete(null),
+          });
+        }}
+      />
     </>
   );
 }

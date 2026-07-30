@@ -23,16 +23,15 @@ export function SettingsWorkspace({
   hint,
 }: Props) {
   return (
-    <div className="grid min-w-0 items-start gap-5 lg:grid-cols-[230px_minmax(0,1fr)]">
+    <div className="grid min-w-0 items-start gap-4 lg:grid-cols-[220px_minmax(0,1fr)]">
       <aside
         className={[
-          "overflow-hidden rounded-[22px]",
-          "border border-border/60 bg-card",
-          "shadow-[0_10px_32px_rgba(30,20,70,0.045)]",
-          "lg:sticky lg:top-4",
+          "overflow-hidden rounded-[20px]",
+          "border border-border/55 bg-card",
+          "shadow-[0_8px_26px_rgba(30,20,70,0.04)]",
         ].join(" ")}
       >
-        <div className="p-2.5">
+        <div className="p-2">
           {items.map((item) => {
             const active = item.id === activeId;
 
@@ -43,14 +42,14 @@ export function SettingsWorkspace({
                 onClick={() => onChange(item.id)}
                 aria-current={active ? "page" : undefined}
                 className={[
-                  "group flex w-full items-center gap-3",
-                  "rounded-[15px] px-3 py-3 text-left",
+                  "group flex w-full items-center gap-2.5",
+                  "rounded-[14px] px-3 py-2.5 text-left",
                   "transition-all duration-200",
                   "focus-visible:outline-none focus-visible:ring-4",
                   "focus-visible:ring-primary/10",
                   active
                     ? "bg-primary/[0.07] text-primary"
-                    : "text-muted-foreground hover:bg-muted/35 hover:text-foreground",
+                    : "text-muted-foreground hover:bg-muted/30 hover:text-foreground",
                 ].join(" ")}
               >
                 <span
@@ -59,7 +58,7 @@ export function SettingsWorkspace({
                     "rounded-[11px] transition-colors",
                     active
                       ? "bg-primary/10 text-primary"
-                      : "bg-muted/50 text-muted-foreground group-hover:text-foreground",
+                      : "bg-muted/45 text-muted-foreground group-hover:text-foreground",
                   ].join(" ")}
                 >
                   {item.icon}
@@ -79,8 +78,8 @@ export function SettingsWorkspace({
         </div>
 
         {hint ? (
-          <div className="border-t border-border/45 p-3">
-            <div className="rounded-[14px] bg-primary/[0.045] px-3 py-3">
+          <div className="border-t border-border/40 p-2.5">
+            <div className="rounded-[13px] bg-primary/[0.04] px-3 py-2.5">
               <p className="text-[10px] leading-4 text-muted-foreground">
                 {hint}
               </p>
@@ -91,9 +90,9 @@ export function SettingsWorkspace({
 
       <main
         className={[
-          "min-w-0 overflow-hidden rounded-[22px]",
-          "border border-border/60 bg-card p-4",
-          "shadow-[0_10px_32px_rgba(30,20,70,0.045)]",
+          "min-w-0 overflow-hidden rounded-[20px]",
+          "border border-border/55 bg-card p-4",
+          "shadow-[0_8px_26px_rgba(30,20,70,0.04)]",
           "sm:p-5",
         ].join(" ")}
       >

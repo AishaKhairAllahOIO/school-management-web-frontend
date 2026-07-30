@@ -11,6 +11,7 @@ import {
   Phone,
   Power,
   Trash2,
+  RotateCcw,
   UserRound,
 } from "lucide-react";
 
@@ -24,6 +25,7 @@ type StudentCardProps = {
   index: number;
   isDeleting?: boolean;
   isToggling?: boolean;
+  isRestoring?: boolean;
 
   onView: (
     student: StudentListItem,
@@ -38,6 +40,10 @@ type StudentCardProps = {
   ) => void;
 
   onToggleStatus: (
+    student: StudentListItem,
+  ) => void;
+
+  onRestore: (
     student: StudentListItem,
   ) => void;
 };
@@ -89,10 +95,12 @@ export function StudentCard({
   index,
   isDeleting = false,
   isToggling = false,
+  isRestoring = false,
   onView,
   onEdit,
   onDelete,
   onToggleStatus,
+  onRestore,
 }: StudentCardProps) {
   const fullName =
     student.fullName?.trim() ||
@@ -110,9 +118,15 @@ export function StudentCard({
     normalizedAccountStatus ===
       "active";
 
+  const isDeleted = Boolean(
+    student.isDeleted ||
+      student.deletedAt,
+  );
+
   const isBusy =
     isDeleting ||
-    isToggling;
+    isToggling ||
+    isRestoring;
 
   return (
     <motion.article
@@ -350,61 +364,99 @@ export function StudentCard({
           <ArrowUpRight className="h-4 w-4 shrink-0" />
         </button>
 
-        <ActionButton
-          label={`Edit ${fullName}`}
-          onClick={() =>
-            onEdit(student)
-          }
-          disabled={isBusy}
-        >
-          <Pencil className="h-4 w-4" />
-        </ActionButton>
+        {isDeleted ? (
+          <button
+            type="button"
+            onClick={() =>
+              onRestore(student)
+            }
+            disabled={isBusy}
+            className={[
+              "col-span-3 inline-flex h-10",
+              "items-center justify-center gap-2",
+              "rounded-xl border px-4",
+              "border-success/20 bg-success/10",
+              "text-xs font-semibold text-success",
+              "transition-colors",
+              "hover:bg-success/15",
+              "focus-visible:outline-none",
+              "focus-visible:ring-4",
+              "focus-visible:ring-success/10",
+              "disabled:cursor-not-allowed",
+              "disabled:opacity-50",
+            ].join(" ")}
+          >
+            {isRestoring ? (
+              <Spinner />
+            ) : (
+              <RotateCcw className="h-4 w-4" />
+            )}
 
-        <ActionButton
-          label={
-            isEnabled
-              ? "Disable account"
-              : "Enable account"
-          }
-          onClick={() =>
-            onToggleStatus(
-              student,
-            )
-          }
-          disabled={isBusy}
-          className={[
-            "text-warning",
-            "hover:border-warning/20",
-            "hover:bg-warning/10",
-            "hover:text-warning",
-          ].join(" ")}
-        >
-          {isToggling ? (
-            <Spinner />
-          ) : (
-            <Power className="h-4 w-4" />
-          )}
-        </ActionButton>
+            <span>
+              {isRestoring
+                ? "Restoring..."
+                : "Restore student"}
+            </span>
+          </button>
+        ) : (
+          <>
+            <ActionButton
+              label={`Edit ${fullName}`}
+              onClick={() =>
+                onEdit(student)
+              }
+              disabled={isBusy}
+            >
+              <Pencil className="h-4 w-4" />
+            </ActionButton>
 
-        <ActionButton
-          label={`Delete ${fullName}`}
-          onClick={() =>
-            onDelete(student)
-          }
-          disabled={isBusy}
-          className={[
-            "text-destructive",
-            "hover:border-destructive/20",
-            "hover:bg-destructive/10",
-            "hover:text-destructive",
-          ].join(" ")}
-        >
-          {isDeleting ? (
-            <Spinner />
-          ) : (
-            <Trash2 className="h-4 w-4" />
-          )}
-        </ActionButton>
+            <ActionButton
+              label={
+                isEnabled
+                  ? "Disable account"
+                  : "Enable account"
+              }
+              onClick={() =>
+                onToggleStatus(
+                  student,
+                )
+              }
+              disabled={isBusy}
+              className={[
+                "text-warning",
+                "hover:border-warning/20",
+                "hover:bg-warning/10",
+                "hover:text-warning",
+              ].join(" ")}
+            >
+              {isToggling ? (
+                <Spinner />
+              ) : (
+                <Power className="h-4 w-4" />
+              )}
+            </ActionButton>
+
+            <ActionButton
+              label={`Delete ${fullName}`}
+              onClick={() =>
+                onDelete(student)
+              }
+              disabled={isBusy}
+              className={[
+                "text-destructive",
+                "hover:border-destructive/20",
+                "hover:bg-destructive/10",
+                "hover:text-destructive",
+              ].join(" ")}
+            >
+              {isDeleting ? (
+                <Spinner />
+              ) : (
+                <Trash2 className="h-4 w-4" />
+              )}
+            </ActionButton>
+          </>
+        )}
       </div>
     </motion.article>
   );

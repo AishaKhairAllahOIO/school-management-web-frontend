@@ -91,7 +91,8 @@ export const API_ENDPOINTS = {
   STAFF: {
     REGISTER: "/admin/staff/register",
 
-    IMPORT: "/admin/staff/import",
+    IMPORT: (role: string) =>
+      `/admin/staff/import/${encodeURIComponent(role)}`,
 
     IMPORT_STATUS: (batchId: ApiId) =>
       `/admin/staff/import-batches/${batchId}/status`,

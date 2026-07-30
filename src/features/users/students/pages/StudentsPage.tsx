@@ -25,6 +25,7 @@ import { StudentsPagination } from "../components/list/StudentsPagination";
 
 import {
   useDeleteStudent,
+  useRestoreStudent,
   useStudentSearch,
   useStudents,
   useToggleStudentAccount,
@@ -88,6 +89,11 @@ export function StudentsPage() {
   ] = useState<ApiId>();
 
   const [
+    pendingRestoreId,
+    setPendingRestoreId,
+  ] = useState<ApiId>();
+
+  const [
     pendingToggleId,
     setPendingToggleId,
   ] = useState<ApiId>();
@@ -117,6 +123,9 @@ export function StudentsPage() {
 
   const toggleMutation =
     useToggleStudentAccount();
+
+  const restoreMutation =
+    useRestoreStudent();
 
   const students =
     activeQuery.data?.data ?? [];
@@ -214,6 +223,33 @@ export function StudentsPage() {
       );
     } finally {
       setPendingDeleteId(
+        undefined,
+      );
+    }
+  }
+
+  async function restoreStudent(
+    student: StudentListItem,
+  ) {
+    const confirmed =
+      window.confirm(
+        `Restore "${student.fullName}"? The enrollment will become active again and the account will be enabled.`,
+      );
+
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      setPendingRestoreId(
+        student.enrollmentId,
+      );
+
+      await restoreMutation.mutateAsync(
+        student.enrollmentId,
+      );
+    } finally {
+      setPendingRestoreId(
         undefined,
       );
     }
@@ -809,6 +845,10 @@ export function StudentsPage() {
                   pendingDeleteId ===
                   student.enrollmentId
                 }
+                isRestoring={
+                  pendingRestoreId ===
+                  student.enrollmentId
+                }
                 isToggling={
                   pendingToggleId ===
                   student.enrollmentId
@@ -824,6 +864,9 @@ export function StudentsPage() {
                 }
                 onToggleStatus={
                   toggleStudent
+                }
+                onRestore={
+                  restoreStudent
                 }
               />
             ),

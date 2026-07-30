@@ -11,6 +11,7 @@ import {
   Pencil,
   Phone,
   Power,
+  RotateCcw,
   Trash2,
 } from "lucide-react";
 
@@ -25,6 +26,7 @@ type StaffCardProps = {
 
   pendingToggle?: boolean;
   pendingDelete?: boolean;
+  pendingRestore?: boolean;
 
   onView: (
     staff: StaffProfile,
@@ -39,6 +41,10 @@ type StaffCardProps = {
   ) => void;
 
   onDelete: (
+    staff: StaffProfile,
+  ) => void;
+
+  onRestore: (
     staff: StaffProfile,
   ) => void;
 };
@@ -157,10 +163,12 @@ export function StaffCard({
   color,
   pendingToggle = false,
   pendingDelete = false,
+  pendingRestore = false,
   onView,
   onEdit,
   onToggleStatus,
   onDelete,
+  onRestore,
 }: StaffCardProps) {
   const fullName =
     staff.fullName?.trim() ||
@@ -185,7 +193,8 @@ export function StaffCard({
 
   const isBusy =
     pendingToggle ||
-    pendingDelete;
+    pendingDelete ||
+    pendingRestore;
 
   const roleDescription =
     staff.specialization ??
@@ -411,63 +420,101 @@ export function StaffCard({
           <ArrowUpRight className="h-4 w-4 shrink-0" />
         </button>
 
-        <ActionButton
-          label="Edit profile"
-          onClick={() =>
-            onEdit(staff)
-          }
-          disabled={
-            isBusy ||
-            isDeleted
-          }
-          color={color}
-        >
-          <Pencil className="h-4 w-4" />
-        </ActionButton>
+        {isDeleted ? (
+          <button
+            type="button"
+            onClick={() =>
+              onRestore(staff)
+            }
+            disabled={isBusy}
+            className={[
+              "col-span-3 inline-flex h-10",
+              "items-center justify-center gap-2",
+              "rounded-xl border px-4",
+              "border-success/20 bg-success/10",
+              "text-xs font-semibold text-success",
+              "transition-colors",
+              "hover:bg-success/15",
+              "focus-visible:outline-none",
+              "focus-visible:ring-4",
+              "focus-visible:ring-success/10",
+              "disabled:cursor-not-allowed",
+              "disabled:opacity-50",
+            ].join(" ")}
+          >
+            {pendingRestore ? (
+              <Spinner />
+            ) : (
+              <RotateCcw className="h-4 w-4" />
+            )}
 
+            <span>
+              {pendingRestore
+                ? "Restoring..."
+                : "Restore staff member"}
+            </span>
+          </button>
+        ) : (
+          <>
         <ActionButton
-          label={
-            isEnabled
-              ? "Disable account"
-              : "Enable account"
-          }
-          onClick={() =>
-            onToggleStatus(
-              staff,
-            )
-          }
-          disabled={
-            isBusy ||
-            isDeleted
-          }
-          color={color}
-          className="text-warning hover:border-warning/20 hover:bg-warning/10 hover:text-warning"
-        >
-          {pendingToggle ? (
-            <Spinner />
-          ) : (
-            <Power className="h-4 w-4" />
-          )}
-        </ActionButton>
-
-        <ActionButton
-          label="Delete staff member"
-          onClick={() =>
-            onDelete(staff)
-          }
-          disabled={
-            isBusy ||
-            isDeleted
-          }
-          color={color}
-          className="text-destructive hover:border-destructive/20 hover:bg-destructive/10 hover:text-destructive"
-        >
-          {pendingDelete ? (
-            <Spinner />
-          ) : (
-            <Trash2 className="h-4 w-4" />
-          )}
-        </ActionButton>
+                      label="Edit profile"
+                      onClick={() =>
+                        onEdit(staff)
+                      }
+                      disabled={
+                        isBusy ||
+                        isDeleted
+                      }
+                      color={color}
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </ActionButton>
+            
+                    <ActionButton
+                      label={
+                        isEnabled
+                          ? "Disable account"
+                          : "Enable account"
+                      }
+                      onClick={() =>
+                        onToggleStatus(
+                          staff,
+                        )
+                      }
+                      disabled={
+                        isBusy ||
+                        isDeleted
+                      }
+                      color={color}
+                      className="text-warning hover:border-warning/20 hover:bg-warning/10 hover:text-warning"
+                    >
+                      {pendingToggle ? (
+                        <Spinner />
+                      ) : (
+                        <Power className="h-4 w-4" />
+                      )}
+                    </ActionButton>
+            
+                    <ActionButton
+                      label="Delete staff member"
+                      onClick={() =>
+                        onDelete(staff)
+                      }
+                      disabled={
+                        isBusy ||
+                        isDeleted
+                      }
+                      color={color}
+                      className="text-destructive hover:border-destructive/20 hover:bg-destructive/10 hover:text-destructive"
+                    >
+                      {pendingDelete ? (
+                        <Spinner />
+                      ) : (
+                        <Trash2 className="h-4 w-4" />
+                      )}
+                    </ActionButton>
+          </>
+        )}
       </div>
     </article>
   );

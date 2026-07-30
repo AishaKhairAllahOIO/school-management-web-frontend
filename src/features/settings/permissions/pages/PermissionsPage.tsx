@@ -1,117 +1,141 @@
 import {
+  BarChart3,
+  BookOpen,
   Box,
+  CalendarCheck,
+  CalendarDays,
   ChevronRight,
-
+  Cog,
   LayoutGrid,
   LockKeyhole,
-  
+  MessageCircle,
   Shield,
   Users,
-  BookOpen,
-  CalendarCheck,
   Wallet,
-  BarChart3,
-  Cog,
-  ChevronLeft,
-  ChevronDown,
 } from "lucide-react";
 
 const stats = [
   {
     label: "Total Permissions",
-    value: "28",
-    description: "All system permissions",
+    value: "41",
+    description: "All permission actions",
     icon: LayoutGrid,
-    color: "bg-primary/10 text-primary",
+    color: "bg-primary/[0.09] text-primary",
   },
   {
-    label: "Module Access",
-    value: "14",
-    description: "Accessible modules",
+    label: "System Modules",
+    value: "8",
+    description: "Sidebar-aligned modules",
     icon: Box,
-    color: "bg-info/10 text-info",
+    color: "bg-info/[0.09] text-info",
   },
   {
     label: "Full Access",
-    value: "12",
-    description: "Full control permissions",
+    value: "31",
+    description: "Fully granted actions",
     icon: Shield,
-    color: "bg-success/10 text-success",
+    color: "bg-success/[0.09] text-success",
   },
   {
     label: "Restricted",
-    value: "2",
-    description: "Limited access permissions",
+    value: "10",
+    description: "Limited or blocked actions",
     icon: LockKeyhole,
-    color: "bg-warning/10 text-warning",
+    color: "bg-warning/[0.09] text-warning",
   },
 ];
 
 const modules = [
   {
     name: "Users",
-    description: "Manage students, teachers, parents and staff",
+    description: "Students, teachers, parents and staff",
     permissions: 6,
     icon: Users,
-    color: "bg-primary/10 text-primary",
+    color: "bg-primary/[0.09] text-primary",
   },
   {
-    name: "Academic",
-    description: "Manage classes, sections, subjects and curriculum",
-    permissions: 5,
+    name: "Academics",
+    description: "Years, terms, stages, subjects and grades",
+    permissions: 7,
     icon: BookOpen,
-    color: "bg-info/10 text-info",
+    color: "bg-info/[0.09] text-info",
   },
   {
     name: "Attendance",
-    description: "Track attendance for students and staff",
+    description: "Student and staff attendance records",
     permissions: 4,
     icon: CalendarCheck,
-    color: "bg-success/10 text-success",
+    color: "bg-success/[0.09] text-success",
+  },
+  {
+    name: "Scheduling",
+    description: "Timetables, periods and school schedules",
+    permissions: 5,
+    icon: CalendarDays,
+    color: "bg-primary/[0.09] text-primary",
   },
   {
     name: "Finance",
-    description: "Manage fees, payments and salaries",
+    description: "Fees, payments, expenses and salaries",
     permissions: 5,
     icon: Wallet,
-    color: "bg-warning/10 text-warning",
+    color: "bg-warning/[0.09] text-warning",
+  },
+  {
+    name: "Communications",
+    description: "Announcements, messages and notifications",
+    permissions: 4,
+    icon: MessageCircle,
+    color: "bg-info/[0.09] text-info",
   },
   {
     name: "Reports",
-    description: "View and generate system reports",
+    description: "Operational reports and analytics",
     permissions: 4,
     icon: BarChart3,
-    color: "bg-primary/10 text-primary",
+    color: "bg-success/[0.09] text-success",
   },
   {
     name: "Settings",
-    description: "System settings and configurations",
-    permissions: 4,
+    description: "General, academic, roles and permissions settings",
+    permissions: 6,
     icon: Cog,
-    color: "bg-info/10 text-info",
+    color: "bg-primary/[0.09] text-primary",
   },
 ];
 
 const matrix = [
-  ["Users", "Full Access", "Full Access", "Full Access"],
-  ["Academic", "Full Access", "Full Access", "Limited Access"],
-  ["Attendance", "Full Access", "Full Access", "Full Access"],
+  ["Users", "Full Access", "Full Access", "Limited Access"],
+  ["Academics", "Full Access", "Limited Access", "Full Access"],
+  ["Attendance", "Full Access", "Limited Access", "Full Access"],
+  ["Scheduling", "Full Access", "Limited Access", "Limited Access"],
   ["Finance", "Full Access", "Full Access", "No Access"],
+  ["Communications", "Full Access", "Full Access", "Limited Access"],
   ["Reports", "Full Access", "Limited Access", "Limited Access"],
   ["Settings", "Full Access", "No Access", "No Access"],
 ];
 
-function AccessBadge({ value }: { value: string }) {
+function AccessBadge({
+  value,
+}: {
+  value: string;
+}) {
   const className =
     value === "Full Access"
-      ? "bg-success/10 text-success"
+      ? "bg-success/[0.09] text-success"
       : value === "Limited Access"
-        ? "bg-warning/10 text-warning"
-        : "bg-destructive/10 text-destructive";
+        ? "bg-warning/[0.09] text-warning"
+        : "bg-destructive/[0.08] text-destructive";
 
   return (
     <span
-      className={`inline-flex min-w-[86px] justify-center rounded-full px-3 py-1 text-[11px] font-bold ${className}`}
+      className={[
+        "inline-flex justify-center",
+        "rounded-full px-2.5 py-1",
+        "text-[9px] font-medium",
+        "whitespace-nowrap",
+        className,
+      ].join(" ")}
     >
       {value}
     </span>
@@ -120,79 +144,83 @@ function AccessBadge({ value }: { value: string }) {
 
 export function PermissionsPage() {
   return (
-    <div className="soft-card rounded-3xl p-6">
-      <div className="mb-7 flex items-start justify-between gap-4">
-        <div>
-          <h1 className="text-[28px] font-bold tracking-[-0.04em] text-foreground">
-            Permissions
-          </h1>
-
-          <p className="mt-2 text-sm text-muted-foreground">
-            Manage and configure permissions for each role in the system.
-          </p>
-        </div>
-
-        
-      </div>
-
-      <section className="mb-7 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+    <div className="space-y-5">
+      <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         {stats.map((item) => {
           const Icon = item.icon;
 
           return (
             <article
               key={item.label}
-              className="rounded-3xl border border-border/70 bg-card p-5"
+              className={[
+                "rounded-[22px]",
+                "border border-border/45",
+                "bg-card p-4",
+                "shadow-[0_8px_28px_rgba(30,20,70,0.03)]",
+              ].join(" ")}
             >
-              <div className="flex items-center justify-between gap-4">
+              <div className="flex items-start justify-between gap-3">
                 <span
-                  className={`flex h-14 w-14 items-center justify-center rounded-2xl ${item.color}`}
+                  className={[
+                    "flex h-10 w-10",
+                    "items-center justify-center",
+                    "rounded-[14px]",
+                    item.color,
+                  ].join(" ")}
                 >
-                  <Icon size={25} strokeWidth={1.9} />
+                  <Icon size={18} strokeWidth={1.8} />
                 </span>
 
-                <div className="h-9 w-16 rounded-full bg-primary/5" />
+                <span className="rounded-full bg-muted/[0.35] px-2.5 py-1 text-[9px] font-medium text-muted-foreground">
+                  Overview
+                </span>
               </div>
 
-              <div className="mt-5">
-                <p className="text-sm font-medium text-muted-foreground">
-                  {item.label}
-                </p>
+              <p className="mt-4 text-[11px] font-medium text-muted-foreground">
+                {item.label}
+              </p>
 
-                <h3 className="mt-1 text-[2rem] font-bold leading-none tracking-[-0.04em] text-foreground">
-                  {item.value}
-                </h3>
+              <p className="mt-1 text-[24px] font-semibold tracking-[-0.03em] text-foreground">
+                {item.value}
+              </p>
 
-                <p className="mt-3 text-sm text-muted-foreground">
-                  {item.description}
-                </p>
-              </div>
+              <p className="mt-1 text-[10px] text-muted-foreground">
+                {item.description}
+              </p>
             </article>
           );
         })}
       </section>
 
-      <section className="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
-        <div className="rounded-3xl border border-border/70 bg-card">
-          <div className="border-b border-border/70 p-5">
-            <h2 className="text-base font-bold text-foreground">
-              System Modules & Permissions
+      <section className="grid items-start gap-5 2xl:grid-cols-[minmax(0,1.12fr)_minmax(430px,0.88fr)]">
+        <article className="overflow-hidden rounded-[24px] border border-border/45 bg-card shadow-[0_10px_35px_rgba(30,20,70,0.035)]">
+          <header className="border-b border-border/45 px-5 py-4">
+            <h2 className="text-[14px] font-semibold text-foreground">
+              System Modules
             </h2>
 
-            <p className="mt-2 text-sm text-muted-foreground">
-              Manage permissions for each module in the system
+            <p className="mt-1 text-[10px] text-muted-foreground">
+              Modules match the main sidebar. Dashboard is role-specific and is not treated as a permission module.
             </p>
-          </div>
+          </header>
 
-          <div className="overflow-hidden">
-            <table className="w-full text-left">
+          <div className="hidden lg:block">
+            <table className="w-full table-fixed text-left">
+              <colgroup>
+                <col className="w-[25%]" />
+                <col className="w-[39%]" />
+                <col className="w-[14%]" />
+                <col className="w-[14%]" />
+                <col className="w-[8%]" />
+              </colgroup>
+
               <thead>
-                <tr className="border-b border-border/70 text-xs font-semibold text-muted-foreground">
-                  <th className="px-5 py-4">Module</th>
-                  <th className="px-5 py-4">Description</th>
-                  <th className="px-5 py-4 text-center">Total Permissions</th>
-                  <th className="px-5 py-4 text-center">Status</th>
-                  <th className="px-5 py-4" />
+                <tr className="border-b border-border/45 bg-muted/[0.12] text-[10px] font-medium text-muted-foreground">
+                  <th className="px-4 py-3">Module</th>
+                  <th className="px-4 py-3">Description</th>
+                  <th className="px-3 py-3 text-center">Permissions</th>
+                  <th className="px-3 py-3 text-center">Status</th>
+                  <th className="px-2 py-3" />
                 </tr>
               </thead>
 
@@ -203,41 +231,51 @@ export function PermissionsPage() {
                   return (
                     <tr
                       key={item.name}
-                      className="border-b border-border/60 last:border-0"
+                      className="border-b border-border/40 last:border-0 transition hover:bg-muted/[0.10]"
                     >
-                      <td className="px-5 py-4">
-                        <div className="flex items-center gap-3">
+                      <td className="px-4 py-3.5">
+                        <div className="flex min-w-0 items-center gap-2.5">
                           <span
-                            className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl ${item.color}`}
+                            className={[
+                              "flex h-9 w-9 shrink-0",
+                              "items-center justify-center",
+                              "rounded-[12px]",
+                              item.color,
+                            ].join(" ")}
                           >
-                            <Icon size={18} />
+                            <Icon size={16} strokeWidth={1.8} />
                           </span>
 
-                          <span className="text-sm font-bold text-foreground">
+                          <span className="truncate text-[11px] font-semibold text-foreground">
                             {item.name}
                           </span>
                         </div>
                       </td>
 
-                      <td className="px-5 py-4 text-sm text-muted-foreground">
-                        {item.description}
+                      <td className="px-4 py-3.5">
+                        <p className="line-clamp-2 text-[10px] leading-4 text-muted-foreground">
+                          {item.description}
+                        </p>
                       </td>
 
-                      <td className="px-5 py-4 text-center text-sm font-semibold text-foreground">
+                      <td className="px-3 py-3.5 text-center text-[11px] font-semibold text-foreground">
                         {item.permissions}
                       </td>
 
-                      <td className="px-5 py-4 text-center">
-                        <span className="rounded-full bg-success/10 px-3 py-1 text-xs font-bold text-success">
+                      <td className="px-3 py-3.5 text-center">
+                        <span className="rounded-full bg-success/[0.09] px-2.5 py-1 text-[9px] font-medium text-success">
                           Active
                         </span>
                       </td>
 
-                      <td className="px-5 py-4 text-right">
-                        <ChevronRight
-                          size={17}
-                          className="text-muted-foreground"
-                        />
+                      <td className="px-2 py-3.5 text-right">
+                        <button
+                          type="button"
+                          aria-label={`View ${item.name} permissions`}
+                          className="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground transition hover:bg-muted/45 hover:text-foreground"
+                        >
+                          <ChevronRight size={15} />
+                        </button>
                       </td>
                     </tr>
                   );
@@ -246,51 +284,95 @@ export function PermissionsPage() {
             </table>
           </div>
 
-          <div className="flex items-center justify-between border-t border-border/70 p-5">
-            <p className="text-sm text-muted-foreground">
-              Showing 1 to 6 of 6 modules
+          <div className="grid gap-2 p-3 lg:hidden">
+            {modules.map((item) => {
+              const Icon = item.icon;
+
+              return (
+                <article
+                  key={item.name}
+                  className="rounded-[17px] border border-border/45 bg-muted/[0.08] p-3"
+                >
+                  <div className="flex items-start gap-3">
+                    <span
+                      className={[
+                        "flex h-9 w-9 shrink-0",
+                        "items-center justify-center",
+                        "rounded-[12px]",
+                        item.color,
+                      ].join(" ")}
+                    >
+                      <Icon size={16} strokeWidth={1.8} />
+                    </span>
+
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <h3 className="text-[11px] font-semibold text-foreground">
+                          {item.name}
+                        </h3>
+
+                        <span className="rounded-full bg-success/[0.09] px-2.5 py-1 text-[9px] font-medium text-success">
+                          Active
+                        </span>
+                      </div>
+
+                      <p className="mt-1 text-[10px] leading-4 text-muted-foreground">
+                        {item.description}
+                      </p>
+
+                      <div className="mt-2 flex items-center justify-between">
+                        <span className="text-[10px] text-muted-foreground">
+                          Permissions
+                        </span>
+
+                        <span className="text-[11px] font-semibold text-foreground">
+                          {item.permissions}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+
+          <footer className="flex flex-wrap items-center justify-between gap-3 border-t border-border/45 px-5 py-3.5">
+            <p className="text-[10px] text-muted-foreground">
+              Showing 8 of 8 modules
             </p>
 
-            <div className="flex items-center gap-2">
-              <button className="flex h-9 w-9 items-center justify-center rounded-xl border border-border/70 text-muted-foreground">
-                <ChevronLeft size={15} />
-              </button>
+            <span className="rounded-full border border-border/60 bg-background px-3 py-1.5 text-[10px] font-medium text-foreground/75">
+              8 modules
+            </span>
+          </footer>
+        </article>
 
-              <button className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-sm font-bold text-primary-foreground">
-                1
-              </button>
-
-              <button className="flex h-9 w-9 items-center justify-center rounded-xl border border-border/70 text-muted-foreground">
-                <ChevronRight size={15} />
-              </button>
-            </div>
-
-            <button className="flex h-9 items-center gap-2 rounded-xl border border-border/70 px-3 text-sm font-semibold text-foreground">
-              10 per page
-              <ChevronDown size={14} />
-            </button>
-          </div>
-        </div>
-
-        <div className="rounded-3xl border border-border/70 bg-card">
-          <div className="border-b border-border/70 p-5">
-            <h2 className="text-base font-bold text-foreground">
+        <article className="overflow-hidden rounded-[24px] border border-border/45 bg-card shadow-[0_10px_35px_rgba(30,20,70,0.035)]">
+          <header className="border-b border-border/45 px-5 py-4">
+            <h2 className="text-[14px] font-semibold text-foreground">
               Role Permissions Matrix
             </h2>
 
-            <p className="mt-2 text-sm text-muted-foreground">
-              Overview of permissions by role
+            <p className="mt-1 text-[10px] text-muted-foreground">
+              Access comparison by role.
             </p>
-          </div>
+          </header>
 
-          <div className="overflow-hidden">
-            <table className="w-full text-left">
+          <div className="hidden xl:block">
+            <table className="w-full table-fixed text-left">
+              <colgroup>
+                <col className="w-[25%]" />
+                <col className="w-[25%]" />
+                <col className="w-[25%]" />
+                <col className="w-[25%]" />
+              </colgroup>
+
               <thead>
-                <tr className="border-b border-border/70 text-xs font-semibold text-muted-foreground">
-                  <th className="px-5 py-4">Module</th>
-                  <th className="px-4 py-4 text-center">Super Admin</th>
-                  <th className="px-4 py-4 text-center">Secretary</th>
-                  <th className="px-4 py-4 text-center">Supervisor</th>
+                <tr className="border-b border-border/45 bg-muted/[0.12] text-[10px] font-medium text-muted-foreground">
+                  <th className="px-3 py-3">Module</th>
+                  <th className="px-2 py-3 text-center">Super Admin</th>
+                  <th className="px-2 py-3 text-center">Secretary</th>
+                  <th className="px-2 py-3 text-center">Supervisor</th>
                 </tr>
               </thead>
 
@@ -298,21 +380,21 @@ export function PermissionsPage() {
                 {matrix.map((row) => (
                   <tr
                     key={row[0]}
-                    className="border-b border-border/60 last:border-0"
+                    className="border-b border-border/40 last:border-0"
                   >
-                    <td className="px-5 py-5 text-sm font-bold text-foreground">
+                    <td className="px-3 py-3.5 text-[11px] font-semibold text-foreground">
                       {row[0]}
                     </td>
 
-                    <td className="px-4 py-5 text-center">
+                    <td className="px-2 py-3.5 text-center">
                       <AccessBadge value={row[1]} />
                     </td>
 
-                    <td className="px-4 py-5 text-center">
+                    <td className="px-2 py-3.5 text-center">
                       <AccessBadge value={row[2]} />
                     </td>
 
-                    <td className="px-4 py-5 text-center">
+                    <td className="px-2 py-3.5 text-center">
                       <AccessBadge value={row[3]} />
                     </td>
                   </tr>
@@ -321,23 +403,68 @@ export function PermissionsPage() {
             </table>
           </div>
 
-          <div className="flex flex-wrap items-center gap-5 border-t border-border/70 p-5">
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <span className="h-3 w-3 rounded-full bg-success" />
-              Full Access
-            </div>
+          <div className="grid gap-2 p-3 xl:hidden">
+            {matrix.map((row) => (
+              <article
+                key={row[0]}
+                className="rounded-[17px] border border-border/45 bg-muted/[0.08] p-3"
+              >
+                <h3 className="text-[11px] font-semibold text-foreground">
+                  {row[0]}
+                </h3>
 
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <span className="h-3 w-3 rounded-full bg-warning" />
-              Limited Access
-            </div>
+                <div className="mt-3 grid gap-2">
+                  {[
+                    ["Super Admin", row[1]],
+                    ["Secretary", row[2]],
+                    ["Supervisor", row[3]],
+                  ].map(([role, access]) => (
+                    <div
+                      key={role}
+                      className="flex items-center justify-between gap-3"
+                    >
+                      <span className="text-[10px] text-muted-foreground">
+                        {role}
+                      </span>
 
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <span className="h-3 w-3 rounded-full bg-destructive" />
-              No Access
-            </div>
+                      <AccessBadge value={access} />
+                    </div>
+                  ))}
+                </div>
+              </article>
+            ))}
           </div>
-        </div>
+
+          <footer className="flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-border/45 px-5 py-3.5">
+            {[
+              {
+                label: "Full Access",
+                className: "bg-success",
+              },
+              {
+                label: "Limited Access",
+                className: "bg-warning",
+              },
+              {
+                label: "No Access",
+                className: "bg-destructive",
+              },
+            ].map((item) => (
+              <div
+                key={item.label}
+                className="flex items-center gap-2 text-[10px] text-muted-foreground"
+              >
+                <span
+                  className={[
+                    "h-2 w-2 rounded-full",
+                    item.className,
+                  ].join(" ")}
+                />
+                {item.label}
+              </div>
+            ))}
+          </footer>
+        </article>
       </section>
     </div>
   );

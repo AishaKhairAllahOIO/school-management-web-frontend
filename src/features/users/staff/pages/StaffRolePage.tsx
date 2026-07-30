@@ -1,4 +1,6 @@
 import {
+  useEffect,
+  useMemo,
   useState,
 } from "react";
 
@@ -33,7 +35,9 @@ import {
 
 import {
   useDeleteStaff,
+  useRestoreStaff,
   useStaffByRole,
+  useStaffSearch,
   useToggleStaffStatus,
 } from "../hooks/useStaff";
 
@@ -87,16 +91,31 @@ export function StaffRolePage({
   ] = useState<ApiId>();
 
   const [
+    pendingRestoreId,
+    setPendingRestoreId,
+  ] = useState<ApiId>();
+
+  const [
     pendingDeleteId,
     setPendingDeleteId,
   ] = useState<ApiId>();
 
-  const query =
-    useStaffByRole(
-      role,
-      page,
-      12,
-    );
+  const normalizedSearch = searchTerm.trim();
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      setDebouncedSearch(normalizedSearch);
+    }, 350);
+
+    return () => window.clearTimeout(timer);
+  }, [normalizedSearch]);
+
+  const isSearchMode = debouncedSearch.length >= 2;
+
+  const listQuery = useStaffByRole(role, page, 12);
+  const searchQuery = useStaffSearch(role, debouncedSearch, page, 12);
+  const query = isSearchMode ? searchQuery : listQuery;
 
   const toggleStatus =
     useToggleStaffStatus(
@@ -106,8 +125,20 @@ export function StaffRolePage({
   const deleteStaff =
     useDeleteStaff(role);
 
-  const staff =
-    query.data?.data ?? [];
+  const restoreStaffMutation =
+    useRestoreStaff(role);
+
+  const staff = useMemo(() => {
+    const items = query.data?.data ?? [];
+
+    return [...items].sort((left, right) => {
+      const result = left.fullName.localeCompare(right.fullName, undefined, {
+        sensitivity: "base",
+      });
+
+      return sortDirection === "asc" ? result : -result;
+    });
+  }, [query.data?.data, sortDirection]);
 
   const total =
     query.data?.total ??
@@ -118,7 +149,7 @@ export function StaffRolePage({
   }
 
   function openImportDialog() {
-    navigate("/users/staff/import");
+    navigate(`${config.listPath}/import`);
   }
 
   function viewStaff(
@@ -195,6 +226,33 @@ export function StaffRolePage({
       );
     } finally {
       setPendingDeleteId(
+        undefined,
+      );
+    }
+  }
+
+  async function restoreStaff(
+    item: StaffProfile,
+  ) {
+    const confirmed =
+      window.confirm(
+        `Restore ${item.fullName}? Their staff record and user account will be reactivated.`,
+      );
+
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      setPendingRestoreId(
+        item.id,
+      );
+
+      await restoreStaffMutation.mutateAsync(
+        item.id,
+      );
+    } finally {
+      setPendingRestoreId(
         undefined,
       );
     }
@@ -607,6 +665,10 @@ export function StaffRolePage({
                   pendingToggleId ===
                   item.id
                 }
+                pendingRestore={
+                  pendingRestoreId ===
+                  item.id
+                }
                 pendingDelete={
                   pendingDeleteId ===
                   item.id
@@ -622,6 +684,9 @@ export function StaffRolePage({
                 }
                 onDelete={
                   removeStaff
+                }
+                onRestore={
+                  restoreStaff
                 }
               />
             ),
