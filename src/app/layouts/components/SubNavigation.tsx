@@ -111,6 +111,11 @@ const subNavigationSections: SubNavigationSection[] =
           path: "/settings/financial",
           icon: Wallet,
         },
+         {
+          title: "Attendance",
+          path: "/settings/attendance",
+          icon: Wallet,
+        },
         {
           title: "Roles",
           path: "/settings/roles",
