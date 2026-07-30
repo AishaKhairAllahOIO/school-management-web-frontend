@@ -20,6 +20,13 @@ import {
 } from "react";
 
 import { useAcademicTheme } from "../hooks/useAcademicTheme";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/shared/ui/select";
 
 type BaseEntity = {
   id: string;
@@ -466,7 +473,7 @@ pageSizeOptions = [6, 10, 15, 25],
           size={28}
           className="mx-auto text-destructive"
         />
-        <h1 className="mt-4 text-xl font-bold text-foreground">
+        <h1 className="mt-4 text-xl font-medium text-foreground">
           Failed to load{" "}
           {title.toLowerCase()}
         </h1>
@@ -478,7 +485,7 @@ pageSizeOptions = [6, 10, 15, 25],
           <button
             type="button"
             onClick={onRetry}
-            className="mt-5 inline-flex h-10 items-center gap-2 rounded-xl bg-[var(--academic-accent)] px-5 text-xs font-bold text-white"
+            className="mt-5 inline-flex h-10 items-center gap-2 rounded-full bg-[var(--academic-accent)] px-5 text-xs font-semibold text-white"
           >
             <RefreshCw size={15} />
             Try Again
@@ -500,15 +507,15 @@ pageSizeOptions = [6, 10, 15, 25],
 
           <div className="relative flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
             <div className="flex min-w-0 items-start gap-4">
-              <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-[var(--academic-border)] bg-[var(--academic-soft)] text-[var(--academic-accent)]">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px] border border-[var(--academic-border)] bg-[var(--academic-soft)] text-[var(--academic-accent)]">
                 <SectionIcon size={25} strokeWidth={1.75} />
               </span>
 
               <div className="min-w-0">
-                <h1 className="text-[24px] font-bold tracking-[-0.035em] text-foreground">
+                <h1 className="text-[24px] font-semibold tracking-[-0.035em] text-foreground">
                   {title}
                 </h1>
-                <p className="mt-1 text-sm font-semibold text-[var(--academic-accent)]">
+                <p className="mt-1 text-sm font-normal text-[var(--academic-accent)]">
                   Academic {academicTheme.label}
                 </p>
                 <p className="mt-1.5 max-w-2xl text-sm leading-6 text-muted-foreground">
@@ -520,7 +527,7 @@ pageSizeOptions = [6, 10, 15, 25],
             <button
               type="button"
               onClick={openCreate}
-              className="inline-flex h-10 shrink-0 items-center justify-center gap-2 rounded-xl bg-[var(--academic-accent)] px-5 text-sm font-semibold text-white shadow-[0_10px_24px_var(--academic-shadow)] transition hover:-translate-y-0.5 hover:bg-[var(--academic-accent)]/92"
+              className="inline-flex h-10 shrink-0 items-center justify-center gap-2 rounded-full bg-[var(--academic-accent)] px-5 text-sm font-semibold text-white shadow-[0_10px_24px_var(--academic-shadow)] transition hover:-translate-y-0.5 hover:bg-[var(--academic-accent)]/92"
             >
               <Plus size={17} />
               {addLabel}
@@ -534,12 +541,12 @@ pageSizeOptions = [6, 10, 15, 25],
           <TableSkeleton columns={columns.length} rows={currentPageSize} />
         ) : rows.length === 0 ? (
           <div className="px-6 py-16 text-center">
-            <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl border border-[var(--academic-border)] bg-[var(--academic-soft)] text-[var(--academic-accent)]">
+            <span className="mx-auto flex h-10 w-10 items-center justify-center rounded-[14px] border border-[var(--academic-border)] bg-[var(--academic-soft)] text-[var(--academic-accent)]">
               <SectionIcon size={24} strokeWidth={1.7} />
             </span>
-            <h2 className="mt-4 text-base font-semibold text-foreground">{emptyTitle}</h2>
+            <h2 className="mt-4 text-base font-medium text-foreground">{emptyTitle}</h2>
             <p className="mx-auto mt-1.5 max-w-md text-sm leading-6 text-muted-foreground">{emptyDescription}</p>
-            <button type="button" onClick={openCreate} className="mt-5 inline-flex h-10 items-center gap-2 rounded-xl bg-[var(--academic-accent)] px-5 text-xs font-semibold text-white">
+            <button type="button" onClick={openCreate} className="mt-5 inline-flex h-10 items-center gap-2 rounded-full bg-[var(--academic-accent)] px-5 text-xs font-semibold text-white">
               <Plus size={15} />
               {addLabel}
             </button>
@@ -552,9 +559,9 @@ pageSizeOptions = [6, 10, 15, 25],
                 style={{
                   gridTemplateColumns: [
                     ...columns.map((_, index) =>
-                      index === 0 ? "minmax(220px, 1.55fr)" : "minmax(145px, 1fr)",
+                      index === 0 ? "minmax(0, 1.35fr)" : "minmax(0, 1fr)",
                     ),
-                    "minmax(150px, 0.72fr)",
+                    "132px",
                   ].join(" "),
                 }}
               >
@@ -562,14 +569,14 @@ pageSizeOptions = [6, 10, 15, 25],
                   <span
                     key={column.key}
                     className={[
-                      "text-[10px] font-extrabold uppercase tracking-[0.12em] text-muted-foreground/70",
+                      "text-[10px] font-medium uppercase tracking-[0.12em] text-muted-foreground/70",
                       column.align === "center" ? "text-center" : column.align === "right" ? "text-right" : "text-left",
                     ].join(" ")}
                   >
                     {column.header}
                   </span>
                 ))}
-                <span className="text-right text-[10px] font-extrabold uppercase tracking-[0.12em] text-muted-foreground/70">
+                <span className="text-right text-[10px] font-medium uppercase tracking-[0.12em] text-muted-foreground/70">
                   Actions
                 </span>
               </div>
@@ -590,9 +597,9 @@ pageSizeOptions = [6, 10, 15, 25],
                       style={{
                         gridTemplateColumns: [
                           ...columns.map((_, index) =>
-                            index === 0 ? "minmax(220px, 1.55fr)" : "minmax(145px, 1fr)",
+                            index === 0 ? "minmax(0, 1.35fr)" : "minmax(0, 1fr)",
                           ),
-                          "minmax(150px, 0.72fr)",
+                          "132px",
                         ].join(" "),
                       }}
                     >
@@ -605,10 +612,10 @@ pageSizeOptions = [6, 10, 15, 25],
                             column.align === "center" ? "md:text-center" : column.align === "right" ? "md:text-right" : "md:text-left",
                           ].join(" ")}
                         >
-                          <span className="mb-1 block text-[9px] font-extrabold uppercase tracking-[0.11em] text-muted-foreground/65 md:hidden">
+                          <span className="mb-1 block text-[9px] font-medium uppercase tracking-[0.11em] text-muted-foreground/65 md:hidden">
                             {column.header}
                           </span>
-                          <div className={columnIndex === 0 ? "text-sm font-semibold text-foreground" : "text-sm font-medium text-foreground/80"}>
+                          <div className={columnIndex === 0 ? "text-sm font-medium text-foreground" : "text-sm font-normal text-foreground/80"}>
                             {column.render(row)}
                           </div>
                         </div>
@@ -712,9 +719,9 @@ function TableSkeleton({
 }) {
   const gridTemplateColumns = [
     ...Array.from({ length: columns }, (_, index) =>
-      index === 0 ? "minmax(220px, 1.55fr)" : "minmax(145px, 1fr)",
+      index === 0 ? "minmax(0, 1.35fr)" : "minmax(0, 1fr)",
     ),
-    "minmax(150px, 0.72fr)",
+    "132px",
   ].join(" ");
 
   return (
@@ -744,7 +751,7 @@ function TableSkeleton({
               {Array.from({ length: columns + 1 }).map((__, columnIndex) => (
                 <div key={columnIndex} className="flex min-w-0 items-center gap-3">
                   {columnIndex === 0 ? (
-                    <span className="h-10 w-10 shrink-0 rounded-2xl bg-[var(--academic-soft)]" />
+                    <span className="h-10 w-10 shrink-0 rounded-[14px] bg-[var(--academic-soft)]" />
                   ) : null}
                   <div className="w-full space-y-2">
                     <span
@@ -764,7 +771,7 @@ function TableSkeleton({
         ))}
       </div>
 
-      <div className="mt-4 flex items-center justify-between rounded-2xl border border-border/55 bg-muted/10 px-5 py-3.5">
+      <div className="mt-4 flex items-center justify-between rounded-[14px] border border-border/55 bg-muted/10 px-5 py-3.5">
         <span className="h-3 w-40 animate-pulse rounded-full bg-muted" />
         <span className="h-9 w-56 animate-pulse rounded-xl bg-muted" />
       </div>
@@ -803,21 +810,41 @@ function TablePagination({
     <div className="flex flex-col gap-3 border-t border-border/55 bg-muted/15 px-5 py-3.5 sm:flex-row sm:items-center sm:justify-between sm:px-6">
       <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-muted-foreground">
         <span>
-          Showing <strong className="font-semibold text-foreground">{firstVisibleRecord}-{lastVisibleRecord}</strong> of{" "}
-          <strong className="font-semibold text-foreground">{totalRecords}</strong>
+          Showing <strong className="font-medium text-foreground">{firstVisibleRecord}-{lastVisibleRecord}</strong> of{" "}
+          <strong className="font-medium text-foreground">{totalRecords}</strong>
         </span>
 
         <label className="flex items-center gap-2">
           <span>Rows</span>
-          <select
-            value={pageSize}
-            onChange={(event) => onPageSizeChange(Number(event.target.value))}
-            className="h-8 rounded-lg border border-border/70 bg-card px-2.5 text-xs font-semibold text-foreground outline-none transition focus:border-[var(--academic-accent)] focus:ring-2 focus:ring-[var(--academic-ring)]"
+          <Select
+            value={String(pageSize)}
+            onValueChange={(value) =>
+              onPageSizeChange(Number(value))
+            }
           >
-            {pageSizeOptions.map((size) => (
-              <option key={size} value={size}>{size}</option>
-            ))}
-          </select>
+            <SelectTrigger
+              aria-label="Rows per page"
+              className="h-8 w-[74px] rounded-[10px] border-border/70 bg-card px-2.5 text-xs font-medium"
+            >
+              <SelectValue />
+            </SelectTrigger>
+
+            <SelectContent
+              position="popper"
+              sideOffset={6}
+              className="z-[160] min-w-[74px] rounded-[14px] border-border/60 p-1.5"
+            >
+              {pageSizeOptions.map((size) => (
+                <SelectItem
+                  key={size}
+                  value={String(size)}
+                  className="rounded-[10px] text-xs"
+                >
+                  {size}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </label>
       </div>
 
@@ -938,9 +965,9 @@ function ActionButton({
     ].join(" "),
 
     delete: [
-      "border-red-200",
+      "border-destructive/20",
       "bg-red-50/70",
-      "text-red-500",
+      "text-destructive",
       "hover:border-red-300",
       "hover:bg-red-100/70",
       "hover:text-red-600",
@@ -978,7 +1005,7 @@ function ActionButton({
           "pointer-events-none absolute bottom-full left-1/2 z-50",
           "mb-2 -translate-x-1/2 whitespace-nowrap",
           "rounded-lg bg-foreground px-2.5 py-1.5",
-          "text-[10px] font-bold text-white",
+          "text-[10px] font-semibold text-white",
           "opacity-0 shadow-xl transition-opacity",
           "group-hover/action:opacity-100",
           "group-focus-within/action:opacity-100",
@@ -1032,7 +1059,7 @@ function DetailsDrawer<
       <aside
         className={[
           "absolute inset-y-0 right-0",
-          "flex w-full max-w-[480px] flex-col",
+          "flex w-full max-w-[440px] flex-col",
           "border-l border-border/70 bg-card",
           "shadow-[-24px_0_60px_rgba(15,23,42,0.16)]",
           "animate-in slide-in-from-right duration-300",
@@ -1043,7 +1070,7 @@ function DetailsDrawer<
             "relative overflow-hidden",
             "border-b border-border/60",
             "bg-card",
-            "px-6 py-6",
+            "px-5 py-4",
           ].join(" ")}
         >
           <div className="absolute -right-14 -top-14 h-36 w-36 rounded-full bg-[var(--academic-soft)] blur-2xl" />
@@ -1052,8 +1079,8 @@ function DetailsDrawer<
             <div className="flex items-start gap-4">
               <span
                 className={[
-                  "flex h-12 w-12 shrink-0 items-center",
-                  "justify-center rounded-2xl",
+                  "flex h-10 w-10 shrink-0 items-center",
+                  "justify-center rounded-[14px]",
                   "border border-[var(--academic-border)]",
                   "bg-card text-[var(--academic-accent)] shadow-sm",
                 ].join(" ")}
@@ -1062,11 +1089,11 @@ function DetailsDrawer<
               </span>
 
               <div>
-                <p className="text-[10px] font-extrabold uppercase tracking-[0.12em] text-[var(--academic-accent)]">
+                <p className="text-[10px] font-medium uppercase tracking-[0.12em] text-[var(--academic-accent)]">
                   Record information
                 </p>
 
-                <h2 className="mt-1 text-xl font-black tracking-tight text-foreground">
+                <h2 className="mt-1 text-[17px] font-semibold tracking-tight text-foreground">
                   View details
                 </h2>
 
@@ -1083,7 +1110,7 @@ function DetailsDrawer<
               onClick={onClose}
               className={[
                 "flex h-10 w-10 shrink-0 items-center justify-center",
-                "rounded-xl border border-border/70 bg-card",
+                "rounded-full border border-border/70 bg-card",
                 "text-muted-foreground shadow-sm transition",
                 "hover:bg-muted hover:text-foreground",
                 "disabled:opacity-50",
@@ -1098,14 +1125,14 @@ function DetailsDrawer<
           {isLoading ? (
             <div className="flex min-h-[260px] items-center justify-center">
               <div className="text-center">
-                <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--academic-soft)]">
+                <span className="mx-auto flex h-10 w-10 items-center justify-center rounded-[14px] bg-[var(--academic-soft)]">
                   <Loader2
                     size={24}
                     className="animate-spin text-[var(--academic-accent)]"
                   />
                 </span>
 
-                <p className="mt-4 text-sm font-bold text-foreground">
+                <p className="mt-4 text-sm font-medium text-foreground">
                   Loading details
                 </p>
 
@@ -1115,13 +1142,13 @@ function DetailsDrawer<
               </div>
             </div>
           ) : error ? (
-            <div className="rounded-2xl border border-destructive/20 bg-destructive/5 p-5">
+            <div className="rounded-[14px] border border-destructive/20 bg-destructive/5 p-5">
               <AlertTriangle
                 size={22}
                 className="text-destructive"
               />
 
-              <p className="mt-3 text-sm font-bold text-destructive">
+              <p className="mt-3 text-sm font-semibold text-destructive">
                 Failed to load details
               </p>
 
@@ -1135,7 +1162,7 @@ function DetailsDrawer<
                 <div
                   key={column.key}
                   className={[
-                    "group rounded-2xl border border-border/60",
+                    "group rounded-[14px] border border-border/60",
                     "bg-muted/[0.14] p-4",
                     "transition-all duration-200",
                     "hover:border-[var(--academic-border)]",
@@ -1156,11 +1183,11 @@ function DetailsDrawer<
                     </span>
 
                     <div className="min-w-0">
-                      <dt className="text-[10px] font-extrabold uppercase tracking-[0.075em] text-muted-foreground">
+                      <dt className="text-[10px] font-medium uppercase tracking-[0.075em] text-muted-foreground">
                         {column.header}
                       </dt>
 
-                      <dd className="mt-1.5 break-words text-sm font-bold text-foreground">
+                      <dd className="mt-1.5 break-words text-sm font-medium text-foreground">
                         {column.render(row)}
                       </dd>
                     </div>
@@ -1177,8 +1204,8 @@ function DetailsDrawer<
             disabled={isLoading}
             onClick={onClose}
             className={[
-              "h-10 rounded-xl border border-border/70",
-              "bg-card px-5 text-xs font-bold text-foreground",
+              "h-10 rounded-full border border-border/70",
+              "bg-card px-5 text-xs font-medium text-foreground",
               "transition hover:bg-muted",
               "disabled:opacity-50",
             ].join(" ")}
@@ -1243,7 +1270,7 @@ function EditorDialog<
       aria-modal="true"
       className={[
         "fixed inset-0 z-50 flex items-center justify-center",
-        "bg-foreground/40 p-4 backdrop-blur-[3px]",
+        "bg-slate-950/30 p-4 backdrop-blur-[5px]",
       ].join(" ")}
       onMouseDown={(event) => {
         if (
@@ -1257,9 +1284,9 @@ function EditorDialog<
     >
       <div
         className={[
-          "max-h-[92vh] w-full max-w-2xl overflow-hidden",
-          "rounded-[28px] border border-border/70 bg-card",
-          "shadow-[0_28px_90px_rgba(15,23,42,0.24)]",
+          "max-h-[92vh] w-full max-w-[620px] overflow-visible",
+          "rounded-[24px] border border-border/55 bg-card",
+          "shadow-[0_28px_90px_rgba(15,10,40,0.22)]",
           "animate-in zoom-in-95 fade-in duration-200",
         ].join(" ")}
       >
@@ -1268,7 +1295,7 @@ function EditorDialog<
             "relative overflow-hidden",
             "border-b border-border/60",
             "bg-card",
-            "px-6 py-6",
+            "px-5 py-4",
           ].join(" ")}
         >
           <div className="absolute -right-12 -top-16 h-40 w-40 rounded-full bg-[var(--academic-soft)] blur-3xl" />
@@ -1277,8 +1304,8 @@ function EditorDialog<
             <div className="flex items-start gap-4">
               <span
                 className={[
-                  "flex h-12 w-12 shrink-0 items-center",
-                  "justify-center rounded-2xl",
+                  "flex h-10 w-10 shrink-0 items-center",
+                  "justify-center rounded-[14px]",
                   "border border-[var(--academic-border)]",
                   "bg-card text-[var(--academic-accent)] shadow-sm",
                 ].join(" ")}
@@ -1291,13 +1318,13 @@ function EditorDialog<
               </span>
 
               <div>
-                <p className="text-[10px] font-extrabold uppercase tracking-[0.12em] text-[var(--academic-accent)]">
+                <p className="text-[10px] font-medium uppercase tracking-[0.12em] text-[var(--academic-accent)]">
                   {isEdit
                     ? "Update record"
                     : "Create record"}
                 </p>
 
-                <h2 className="mt-1 text-xl font-black tracking-tight text-foreground">
+                <h2 className="mt-1 text-[17px] font-semibold tracking-tight text-foreground">
                   {title}
                 </h2>
 
@@ -1314,7 +1341,7 @@ function EditorDialog<
               onClick={onClose}
               className={[
                 "flex h-10 w-10 shrink-0 items-center justify-center",
-                "rounded-xl border border-border/70 bg-card",
+                "rounded-full border border-border/70 bg-card",
                 "text-muted-foreground shadow-sm transition",
                 "hover:bg-muted hover:text-foreground",
                 "disabled:opacity-50",
@@ -1325,9 +1352,9 @@ function EditorDialog<
           </div>
         </header>
 
-        <div className="max-h-[62vh] overflow-y-auto p-6">
+        <div className="max-h-[64vh] overflow-y-auto px-5 py-5 [scrollbar-width:thin]">
           {isLoading ? (
-            <div className="mb-6 flex h-28 items-center justify-center rounded-2xl border border-border/50 bg-muted/20">
+            <div className="mb-6 flex h-28 items-center justify-center rounded-[14px] border border-border/50 bg-muted/20">
               <div className="text-center">
                 <Loader2
                   size={23}
@@ -1342,7 +1369,7 @@ function EditorDialog<
           ) : null}
 
           {error ? (
-            <div className="mb-6 rounded-2xl border border-destructive/20 bg-destructive/5 p-4">
+            <div className="mb-6 rounded-[14px] border border-destructive/20 bg-destructive/5 p-4">
               <div className="flex items-start gap-3">
                 <AlertTriangle
                   size={19}
@@ -1350,7 +1377,7 @@ function EditorDialog<
                 />
 
                 <div>
-                  <p className="text-sm font-bold text-destructive">
+                  <p className="text-sm font-semibold text-destructive">
                     Unable to load the record
                   </p>
 
@@ -1362,7 +1389,7 @@ function EditorDialog<
             </div>
           ) : null}
 
-          <div className="grid gap-5 md:grid-cols-2">
+          <div className="grid gap-4 md:grid-cols-2">
             {fields.map((field) => {
               const disabled =
                 isSubmitting ||
@@ -1374,13 +1401,13 @@ function EditorDialog<
                 <label
                   key={field.name}
                   className={[
-                    "block rounded-2xl",
+                    "block rounded-[14px]",
                     field.full
                       ? "md:col-span-2"
                       : "",
                   ].join(" ")}
                 >
-                  <span className="mb-2 flex items-center gap-1 text-xs font-extrabold text-foreground">
+                  <span className="mb-1.5 flex items-center gap-1 text-[11px] font-medium text-foreground">
                     {field.label}
 
                     {field.required ? (
@@ -1443,8 +1470,8 @@ function EditorDialog<
             disabled={isSubmitting}
             onClick={onClose}
             className={[
-              "h-11 rounded-xl border border-border/70",
-              "bg-card px-6 text-sm font-bold text-foreground",
+              "h-10 rounded-full border border-border/70",
+              "bg-card px-6 text-sm font-medium text-foreground",
               "transition hover:bg-muted",
               "disabled:opacity-50",
             ].join(" ")}
@@ -1462,8 +1489,8 @@ function EditorDialog<
             onClick={onSubmit}
             className={[
               "flex h-11 items-center justify-center gap-2",
-              "rounded-xl bg-[var(--academic-accent)] px-6",
-              "text-sm font-bold text-white",
+              "rounded-full bg-[var(--academic-accent)] px-6",
+              "text-sm font-semibold text-white",
               "shadow-sm transition",
               "hover:-translate-y-0.5",
               "hover:bg-[var(--academic-accent)]/90 hover:shadow-md",
@@ -1535,7 +1562,7 @@ function FieldControl<
           }
           className="h-4 w-4 accent-[var(--academic-accent)]"
         />
-        <span className="text-sm font-semibold text-foreground">
+        <span className="text-sm font-medium text-foreground">
           Enabled
         </span>
       </span>
@@ -1593,7 +1620,7 @@ function FieldControl<
                   className="h-4 w-4 accent-[var(--academic-accent)]"
                 />
 
-                <span className="text-sm font-semibold text-foreground">
+                <span className="text-sm font-medium text-foreground">
                   {
                     option.label
                   }
@@ -1607,38 +1634,58 @@ function FieldControl<
   }
 
   if (field.type === "select") {
-    return (
-      <select
-        value={String(
-          value ?? "",
-        )}
-        disabled={disabled}
-        onChange={(event) =>
-          onChange(
-            event.target.value,
-          )
-        }
-        className={`h-11 px-4 ${baseClass}`}
-      >
-        <option value="">
-          Select {field.label}
-        </option>
+    const selectedValue = String(
+      value ?? "",
+    );
 
-        {field.options?.map(
-          (option) => (
-            <option
-              key={
-                option.value
-              }
-              value={
-                option.value
-              }
+    return (
+      <Select
+        value={selectedValue || undefined}
+        disabled={disabled}
+        onValueChange={(nextValue) =>
+          onChange(nextValue)
+        }
+      >
+        <SelectTrigger
+          aria-invalid={hasError}
+          className={[
+            "h-11 w-full rounded-[13px] px-3.5",
+            "border bg-background",
+            "text-sm font-normal text-foreground",
+            "focus:ring-4 focus:ring-[var(--academic-ring)]",
+            hasError
+              ? "border-destructive/60"
+              : "border-border/70",
+          ].join(" ")}
+        >
+          <SelectValue
+            placeholder={`Select ${field.label}`}
+          />
+        </SelectTrigger>
+
+        <SelectContent
+          position="popper"
+          sideOffset={7}
+          collisionPadding={16}
+          className={[
+            "z-[160] max-h-[280px]",
+            "rounded-[16px]",
+            "border border-border/60",
+            "bg-popover p-1.5",
+            "shadow-[0_18px_55px_rgba(24,16,55,0.18)]",
+          ].join(" ")}
+        >
+          {field.options?.map((option) => (
+            <SelectItem
+              key={option.value}
+              value={option.value}
+              className="rounded-[11px] py-2.5 text-sm font-normal"
             >
               {option.label}
-            </option>
-          ),
-        )}
-      </select>
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
     );
   }
 
@@ -1693,7 +1740,7 @@ function DeleteDialog({
       aria-modal="true"
       className={[
         "fixed inset-0 z-50 flex items-center justify-center",
-        "bg-foreground/40 p-4 backdrop-blur-[3px]",
+        "bg-slate-950/30 p-4 backdrop-blur-[5px]",
       ].join(" ")}
       onMouseDown={(event) => {
         if (
@@ -1706,8 +1753,8 @@ function DeleteDialog({
     >
       <div
         className={[
-          "w-full max-w-md overflow-hidden",
-          "rounded-[28px] border border-red-200/70 bg-card",
+          "w-full max-w-[420px] overflow-hidden",
+          "rounded-[24px] border border-destructive/20 bg-card",
           "shadow-[0_28px_90px_rgba(15,23,42,0.25)]",
           "animate-in zoom-in-95 fade-in duration-200",
         ].join(" ")}
@@ -1716,7 +1763,7 @@ function DeleteDialog({
           className={[
             "relative overflow-hidden",
             "bg-gradient-to-br",
-            "from-red-50 via-card to-card",
+            "from-destructive/[0.045] via-card to-card",
             "px-6 pb-5 pt-6",
           ].join(" ")}
         >
@@ -1725,21 +1772,21 @@ function DeleteDialog({
           <div className="relative flex items-start gap-4">
             <span
               className={[
-                "flex h-12 w-12 shrink-0 items-center",
-                "justify-center rounded-2xl",
-                "border border-red-200",
-                "bg-red-50 text-red-500 shadow-sm",
+                "flex h-10 w-10 shrink-0 items-center",
+                "justify-center rounded-[14px]",
+                "border border-destructive/20",
+                "bg-destructive/[0.08] text-destructive shadow-sm",
               ].join(" ")}
             >
               <Trash2 size={23} />
             </span>
 
             <div className="pt-0.5">
-              <p className="text-[10px] font-extrabold uppercase tracking-[0.11em] text-red-500">
+              <p className="text-[10px] font-medium uppercase tracking-[0.11em] text-destructive">
                 Permanent action
               </p>
 
-              <h2 className="mt-1 text-xl font-black tracking-tight text-foreground">
+              <h2 className="mt-1 text-[17px] font-semibold tracking-tight text-foreground">
                 {title}
               </h2>
             </div>
@@ -1751,19 +1798,19 @@ function DeleteDialog({
             {description}
           </p>
 
-          <div className="mt-5 rounded-2xl border border-red-200/70 bg-red-50/70 p-4">
+          <div className="mt-5 rounded-[14px] border border-destructive/20/70 bg-red-50/70 p-4">
             <div className="flex items-start gap-3">
               <AlertTriangle
                 size={18}
-                className="mt-0.5 shrink-0 text-red-500"
+                className="mt-0.5 shrink-0 text-destructive"
               />
 
               <div>
-                <p className="text-xs font-bold text-red-700">
+                <p className="text-xs font-semibold text-destructive">
                   This action cannot be undone
                 </p>
 
-                <p className="mt-1 text-[11px] leading-5 text-red-600/80">
+                <p className="mt-1 text-[11px] leading-5 text-destructive/75">
                   The server will validate this action before deletion.
                 </p>
               </div>
@@ -1784,8 +1831,8 @@ function DeleteDialog({
             disabled={isPending}
             onClick={onClose}
             className={[
-              "h-11 rounded-xl border border-border/70",
-              "bg-card px-6 text-sm font-bold text-foreground",
+              "h-10 rounded-full border border-border/70",
+              "bg-card px-6 text-sm font-medium text-foreground",
               "transition hover:bg-muted",
               "disabled:opacity-50",
             ].join(" ")}
@@ -1799,11 +1846,11 @@ function DeleteDialog({
             onClick={onConfirm}
             className={[
               "flex h-11 items-center justify-center gap-2",
-              "rounded-xl bg-red-500 px-6",
-              "text-sm font-bold text-white",
+              "rounded-full bg-destructive px-6",
+              "text-sm font-semibold text-white",
               "shadow-sm transition",
               "hover:-translate-y-0.5",
-              "hover:bg-red-600 hover:shadow-md",
+              "hover:bg-destructive/90 hover:shadow-md",
               "disabled:translate-y-0 disabled:opacity-50",
             ].join(" ")}
           >
