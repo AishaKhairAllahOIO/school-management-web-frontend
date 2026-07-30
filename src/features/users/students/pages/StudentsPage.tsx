@@ -3,7 +3,6 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import {
-  ArrowLeft,
   ArrowUpAZ,
   Download,
   Filter,
@@ -20,6 +19,7 @@ import { useNavigate } from "react-router-dom";
 
 import type { ApiId } from "../../shared/types/api.types";
 import { ConfirmActionDialog } from "../../shared/components/ConfirmActionDialog";
+import { UsersOverviewBackLink } from "../../shared/components/UsersOverviewBackLink";
 import { exportStudentsToExcel } from "../../shared/utils/export-users-xlsx";
 import { studentApi } from "../api/student.api";
 import {
@@ -304,6 +304,8 @@ export function StudentsPage() {
 
   return (
     <section className="space-y-5">
+      <UsersOverviewBackLink />
+
       <header
         className={[
           "relative overflow-hidden rounded-[26px]",
@@ -323,37 +325,11 @@ export function StudentsPage() {
         />
 
         <div className="relative flex flex-col gap-6 xl:flex-row xl:items-center xl:justify-between">
-          <div className="relative min-w-0 pt-2">
-            <button
-              type="button"
-              aria-label="Back to users"
-              title="Back to users"
-              onClick={() =>
-                navigate("/users")
-              }
-              className={[
-                "absolute left-2 top-0",
-                "inline-flex h-7 w-7",
-                "items-center justify-center",
-                "rounded-full text-primary",
-                "transition duration-200",
-                "hover:-translate-x-0.5",
-                "hover:bg-primary/[0.08]",
-                "focus-visible:outline-none",
-                "focus-visible:ring-4",
-                "focus-visible:ring-primary/10",
-              ].join(" ")}
-            >
-              <ArrowLeft
-                className="h-4 w-4"
-                strokeWidth={1.9}
-              />
-            </button>
-
+          <div className="relative min-w-0">
             <div className="flex min-w-0 items-start gap-3.5">
               <span
                 className={[
-                  "mt-5 flex h-10 w-12 shrink-0",
+                  "flex h-10 w-12 shrink-0",
                   "items-center justify-center",
                   "rounded-[17px]",
                   "bg-primary/[0.08]",

@@ -7,7 +7,6 @@ import {
 } from "react";
 
 import {
-   ArrowLeft,
   ArrowUpAZ,
   BriefcaseBusiness,
   Download,
@@ -24,6 +23,7 @@ import {
 } from "react-router-dom";
 
 import { ConfirmActionDialog } from "../../shared/components/ConfirmActionDialog";
+import { UsersOverviewBackLink } from "../../shared/components/UsersOverviewBackLink";
 import { exportStaffToExcel } from "../../shared/utils/export-users-xlsx";
 import { staffApi } from "../api/staff.api";
 
@@ -249,6 +249,8 @@ export function StaffRolePage({
 
   return (
     <section className="space-y-5">
+      <UsersOverviewBackLink />
+
       <header
         className={[
           "relative overflow-hidden rounded-[26px]",
@@ -273,38 +275,11 @@ export function StaffRolePage({
         />
 
         <div className="relative flex flex-col gap-6 xl:flex-row xl:items-center xl:justify-between">
-          <div className="relative min-w-0 pt-2">
-  <button
-    type="button"
-    aria-label="Back to users"
-    title="Back to users"
-    onClick={() =>
-      navigate("/users")
-    }
-    className={[
-      "absolute left-2 top-0",
-      "inline-flex h-7 w-7",
-      "items-center justify-center",
-      "rounded-full",
-      "transition duration-200",
-      config.color.text,
-      config.color.hover,
-      "hover:-translate-x-0.5",
-      "focus-visible:outline-none",
-      "focus-visible:ring-4",
-      config.color.ring,
-    ].join(" ")}
-  >
-    <ArrowLeft
-      className="h-4 w-4"
-      strokeWidth={1.9}
-    />
-  </button>
-
+          <div className="relative min-w-0">
   <div className="flex min-w-0 items-start gap-3.5">
     <span
       className={[
-        "mt-5 flex h-10 w-12 shrink-0",
+        "flex h-10 w-12 shrink-0",
         "items-center justify-center",
         "rounded-[17px]",
         config.color.light,
