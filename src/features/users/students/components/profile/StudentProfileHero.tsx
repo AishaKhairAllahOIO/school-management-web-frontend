@@ -69,12 +69,12 @@ export function StudentProfileHero({
           </h1>
 
           <div className="mt-6 flex flex-wrap gap-2">
-            <span className="inline-flex items-center gap-2 rounded-2xl border border-border bg-card/75 px-4 py-2.5 text-sm font-bold text-foreground backdrop-blur">
+            <span className="inline-flex items-center gap-2 rounded-2xl border border-border bg-card/75 px-4 py-2.5 text-sm font-medium text-foreground backdrop-blur">
               <IdCard className="h-4 w-4 text-primary" />
               Student #{student.id}
             </span>
 
-            <span className="inline-flex items-center gap-2 rounded-2xl border border-border bg-card/75 px-4 py-2.5 text-sm font-bold text-foreground backdrop-blur">
+            <span className="inline-flex items-center gap-2 rounded-2xl border border-border bg-card/75 px-4 py-2.5 text-sm font-medium text-foreground backdrop-blur">
               <GraduationCap className="h-4 w-4 text-primary" />
               {gradeLabel(enrollment)}
             </span>
@@ -82,7 +82,7 @@ export function StudentProfileHero({
             {student.phoneNumber ? (
               <span
                 dir="ltr"
-                className="inline-flex items-center gap-2 rounded-2xl border border-border bg-card/75 px-4 py-2.5 text-sm font-bold text-foreground backdrop-blur"
+                className="inline-flex items-center gap-2 rounded-2xl border border-border bg-card/75 px-4 py-2.5 text-sm font-medium text-foreground backdrop-blur"
               >
                 <Phone className="h-4 w-4 text-primary" />
                 {student.phoneNumber}

@@ -2,6 +2,16 @@ import {
   UserRound,
 } from "lucide-react";
 
+import { DatePicker } from "@/shared/ui/date-picker";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/shared/ui/select";
+
+
 import {
   StaffFormField,
 } from "../fields/StaffFormField";
@@ -143,18 +153,13 @@ export function StaffPersonalFormSection({
           label="Birth date"
           required
         >
-          <input
-            required
-            disabled={disabled}
-            type="date"
+          <DatePicker
             value={values.birth_date}
-            onChange={(event) =>
-              updateValue(
-                "birth_date",
-                event.target.value,
-              )
+            onChange={(value) =>
+              updateValue("birth_date", value)
             }
-            className={fieldClassName}
+            placeholder="Select birth date"
+            disabled={disabled}
           />
         </StaffFormField>
 
@@ -179,63 +184,42 @@ export function StaffPersonalFormSection({
         </StaffFormField>
 
         <StaffFormField label="Gender">
-          <select
-            disabled={disabled}
+          <Select
             value={values.gender}
-            onChange={(event) =>
-              updateValue(
-                "gender",
-                event.target.value as StaffGender,
-              )
+            disabled={disabled}
+            onValueChange={(value) =>
+              updateValue("gender", value as StaffGender)
             }
-            className={fieldClassName}
           >
-            <option value="male">
-              Male
-            </option>
-
-            <option value="female">
-              Female
-            </option>
-          </select>
+            <SelectTrigger className="h-12 rounded-[15px]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="male">Male</SelectItem>
+              <SelectItem value="female">Female</SelectItem>
+            </SelectContent>
+          </Select>
         </StaffFormField>
 
         <StaffFormField label="Nationality">
-          <select
+          <Select
+            value={values.nationality ?? "syrian"}
             disabled={disabled}
-            value={
-              values.nationality ??
-              "syrian"
+            onValueChange={(value) =>
+              updateValue("nationality", value as StaffNationality)
             }
-            onChange={(event) =>
-              updateValue(
-                "nationality",
-                event.target
-                  .value as StaffNationality,
-              )
-            }
-            className={fieldClassName}
           >
-            <option value="syrian">
-              Syrian
-            </option>
-
-            <option value="lebanese">
-              Lebanese
-            </option>
-
-            <option value="palestinian">
-              Palestinian
-            </option>
-
-            <option value="jordanian">
-              Jordanian
-            </option>
-
-            <option value="other">
-              Other
-            </option>
-          </select>
+            <SelectTrigger className="h-12 rounded-[15px]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="syrian">Syrian</SelectItem>
+              <SelectItem value="lebanese">Lebanese</SelectItem>
+              <SelectItem value="palestinian">Palestinian</SelectItem>
+              <SelectItem value="jordanian">Jordanian</SelectItem>
+              <SelectItem value="other">Other</SelectItem>
+            </SelectContent>
+          </Select>
         </StaffFormField>
 
                 <StaffFormField

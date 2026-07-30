@@ -22,6 +22,16 @@ import {
   useParams,
 } from "react-router-dom";
 
+import { DatePicker } from "@/shared/ui/date-picker";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/shared/ui/select";
+
+
 import {
   fieldClassName,
   FormField,
@@ -1097,43 +1107,27 @@ export function StudentEditPage() {
 
         <div className="mt-4 max-w-sm">
           <FormField label="Enrollment status">
-            <select
-              value={
-                enrollment.enrollment_status
-              }
+            <Select
+              value={enrollment.enrollment_status}
               disabled={isSaving}
-              onChange={(event) =>
-                setEnrollment(
-                  (current) => ({
-                    ...current,
-                    enrollment_status:
-                      event.target
-                        .value as EnrollmentStatus,
-                  }),
-                )
+              onValueChange={(value) =>
+                setEnrollment((current) => ({
+                  ...current,
+                  enrollment_status: value as EnrollmentStatus,
+                }))
               }
-              className={fieldClassName}
             >
-              <option value="pending">
-                Pending
-              </option>
-
-              <option value="enrolled">
-                Enrolled
-              </option>
-
-              <option value="suspended">
-                Suspended
-              </option>
-
-              <option value="withdrawn">
-                Withdrawn
-              </option>
-
-              <option value="completed">
-                Completed
-              </option>
-            </select>
+              <SelectTrigger className="h-12 rounded-[15px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="pending">Pending</SelectItem>
+                <SelectItem value="enrolled">Enrolled</SelectItem>
+                <SelectItem value="suspended">Suspended</SelectItem>
+                <SelectItem value="withdrawn">Withdrawn</SelectItem>
+                <SelectItem value="completed">Completed</SelectItem>
+              </SelectContent>
+            </Select>
           </FormField>
         </div>
       </FormSection>
@@ -1210,38 +1204,30 @@ function EditablePersonSection({
         ))}
 
         <FormField label="Birth date">
-          <input
-            type="date"
+          <DatePicker
             value={value.birth_date}
-            onChange={(event) =>
-              update(
-                "birth_date",
-                event.target.value,
-              )
+            onChange={(nextValue) =>
+              update("birth_date", nextValue)
             }
-            className={fieldClassName}
+            placeholder="Select birth date"
           />
         </FormField>
 
         <FormField label="Gender">
-          <select
+          <Select
             value={value.gender}
-            onChange={(event) =>
-              update(
-                "gender",
-                event.target.value,
-              )
+            onValueChange={(nextValue) =>
+              update("gender", nextValue)
             }
-            className={fieldClassName}
           >
-            <option value="male">
-              Male
-            </option>
-
-            <option value="female">
-              Female
-            </option>
-          </select>
+            <SelectTrigger className="h-12 rounded-[15px]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="male">Male</SelectItem>
+              <SelectItem value="female">Female</SelectItem>
+            </SelectContent>
+          </Select>
         </FormField>
 
         <FormField

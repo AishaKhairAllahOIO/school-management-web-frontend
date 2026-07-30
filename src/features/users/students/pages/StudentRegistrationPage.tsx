@@ -14,6 +14,16 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
+import { DatePicker } from "@/shared/ui/date-picker";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/shared/ui/select";
+
+
 import {
   fieldClassName,
   FormField,
@@ -563,17 +573,13 @@ function PersonFormSection({
           label="Birth date"
           required
         >
-          <input
-            required
-            type="date"
+          <DatePicker
             value={value.birth_date}
-            onChange={(event) =>
-              onChange(
-                "birth_date",
-                event.target.value,
-              )
+            onChange={(nextValue) =>
+              onChange("birth_date", nextValue)
             }
-            className={fieldClassName}
+            placeholder="Select birth date"
+            required
           />
         </FormField>
 
@@ -598,25 +604,20 @@ function PersonFormSection({
           label="Gender"
           required
         >
-          <select
+          <Select
             value={value.gender}
-            onChange={(event) =>
-              onChange(
-                "gender",
-                event.target
-                  .value as UserGender,
-              )
+            onValueChange={(nextValue) =>
+              onChange("gender", nextValue as UserGender)
             }
-            className={fieldClassName}
           >
-            <option value="male">
-              Male
-            </option>
-
-            <option value="female">
-              Female
-            </option>
-          </select>
+            <SelectTrigger className="h-12 rounded-[15px]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="male">Male</SelectItem>
+              <SelectItem value="female">Female</SelectItem>
+            </SelectContent>
+          </Select>
         </FormField>
 
         <FormField

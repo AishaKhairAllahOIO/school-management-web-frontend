@@ -147,9 +147,9 @@ export function StudentCard({
       }}
       aria-busy={isBusy}
       className={[
-        "group relative flex min-h-[365px]",
+        "group relative flex min-h-[315px]",
         "h-full flex-col overflow-hidden",
-        "rounded-[24px] border",
+        "rounded-[20px] border",
         "border-primary/20 bg-card",
         "shadow-[var(--shadow-card)]",
         "transition-[transform,border-color,box-shadow]",
@@ -166,7 +166,7 @@ export function StudentCard({
         className="absolute inset-x-0 top-0 h-[3px] bg-primary"
       />
 
-      <div className="flex flex-1 flex-col p-5">
+      <div className="flex flex-1 flex-col p-4">
         <div className="flex items-start justify-between gap-4">
           <button
             type="button"
@@ -189,8 +189,8 @@ export function StudentCard({
                   }
                   alt={fullName}
                   className={[
-                    "h-14 w-14 shrink-0",
-                    "rounded-[18px]",
+                    "h-12 w-12 shrink-0",
+                    "rounded-[15px]",
                     "border border-primary/20",
                     "object-cover",
                     "shadow-[var(--shadow-soft)]",
@@ -200,15 +200,15 @@ export function StudentCard({
                 <div
                   aria-hidden="true"
                   className={[
-                    "flex h-14 w-14 shrink-0",
+                    "flex h-12 w-12 shrink-0",
                     "items-center justify-center",
-                    "rounded-[18px]",
+                    "rounded-[15px]",
                     "bg-primary/[0.08]",
                     "text-primary",
                   ].join(" ")}
                 >
                   {fullName ? (
-                    <span className="text-base font-semibold">
+                    <span className="text-sm font-medium">
                       {getInitials(
                         fullName,
                       )}
@@ -220,11 +220,11 @@ export function StudentCard({
               )}
 
               <div className="min-w-0">
-                <h2 className="truncate text-[17px] font-semibold tracking-[-0.025em] text-foreground">
+                <h2 className="truncate text-[15px] font-medium tracking-[-0.015em] text-foreground">
                   {fullName}
                 </h2>
 
-                <p className="mt-1 truncate text-[13px] font-normal text-muted-foreground">
+                <p className="mt-0.5 truncate text-[11px] font-normal text-muted-foreground">
                   {student.grade
                     ?.name
                     ? `${student.grade.name} student`
@@ -257,7 +257,7 @@ export function StudentCard({
           </button>
         </div>
 
-        <div className="mt-4 flex items-center justify-between gap-3">
+        <div className="mt-3 flex items-center justify-between gap-3">
           <StudentStatusBadge
             status={
               student.status

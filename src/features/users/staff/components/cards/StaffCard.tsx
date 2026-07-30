@@ -205,8 +205,8 @@ export function StaffCard({
     <article
       aria-busy={isBusy}
       className={[
-        "group relative flex min-h-[365px] flex-col overflow-hidden",
-        "rounded-[24px] border bg-card",
+        "group relative flex min-h-[315px] flex-col overflow-hidden",
+        "rounded-[20px] border bg-card",
         color.border,
         "shadow-[var(--shadow-card)]",
         "transition-[transform,border-color,box-shadow] duration-300",
@@ -224,7 +224,7 @@ export function StaffCard({
         ].join(" ")}
       />
 
-      <div className="flex flex-1 flex-col p-5">
+      <div className="flex flex-1 flex-col p-4">
         <div className="flex items-start justify-between gap-4">
           <button
             type="button"
@@ -257,7 +257,7 @@ export function StaffCard({
                   aria-hidden="true"
                   className={[
                     "flex h-14 w-14 shrink-0 items-center justify-center",
-                    "rounded-[18px]",
+                    "rounded-[15px]",
                     color.light,
                     color.text,
                     "text-base font-semibold",
@@ -270,11 +270,11 @@ export function StaffCard({
               )}
 
               <div className="min-w-0">
-                <h2 className="truncate text-[17px] font-semibold tracking-[-0.025em] text-foreground">
+                <h2 className="truncate text-[15px] font-medium tracking-[-0.015em] text-foreground">
                   {fullName}
                 </h2>
 
-                <p className="mt-1 truncate text-[13px] font-normal text-muted-foreground">
+                <p className="mt-0.5 truncate text-[11px] font-normal text-muted-foreground">
                   {formatText(
                     roleDescription,
                     "Staff member",

@@ -3,6 +3,15 @@ import {
   RotateCcw,
 } from "lucide-react";
 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/shared/ui/select";
+
+
 import type {
   EnrollmentStatus,
   StudentListFilters,
@@ -58,79 +67,34 @@ export function StudentsFiltersBar({
 
   return (
     <div className="grid w-full grid-cols-[minmax(0,1fr)_42px] gap-2">
-      <label className="relative min-w-0">
-        <span className="sr-only">
-          Enrollment status
-        </span>
-
-        <Filter
-          className={[
-            "pointer-events-none absolute left-3.5 top-1/2",
-            "h-4 w-4 -translate-y-1/2",
-            filters.status
-              ? "text-primary"
-              : "text-muted-foreground",
-          ].join(" ")}
-          strokeWidth={1.8}
-        />
-
-        <select
-          value={filters.status ?? ""}
-          onChange={(event) =>
-            onFiltersChange({
-              ...filters,
-              page: 1,
-              status: event.target.value
-                ? (event.target
-                    .value as EnrollmentStatus)
-                : undefined,
-            })
-          }
-          className={[
-            "h-10 w-full appearance-none rounded-xl",
-            "border border-primary/20",
-            "bg-card/80",
-            "pl-10 pr-9",
-            "text-xs font-semibold",
-            filters.status
-              ? "text-primary"
-              : "text-muted-foreground",
-            "outline-none",
-            "transition-colors",
-            "hover:bg-primary/[0.05]",
-            "focus:ring-2",
-            "focus:ring-primary/10",
-          ].join(" ")}
-        >
-          <option value="">
-            All statuses
-          </option>
-
-          {statusOptions.map(
-            (option) => (
-              <option
-                key={option.value}
-                value={option.value}
-              >
-                {option.label}
-              </option>
-            ),
-          )}
-        </select>
-
-        <span
-          aria-hidden="true"
-          className={[
-            "pointer-events-none absolute right-3.5 top-1/2",
-            "h-0 w-0 -translate-y-1/2",
-            "border-x-[4px] border-t-[5px]",
-            "border-x-transparent",
-            filters.status
-              ? "border-t-primary"
-              : "border-t-muted-foreground",
-          ].join(" ")}
-        />
-      </label>
+      <Select
+        value={filters.status ?? "all"}
+        onValueChange={(value) =>
+          onFiltersChange({
+            ...filters,
+            page: 1,
+            status:
+              value === "all"
+                ? undefined
+                : (value as EnrollmentStatus),
+          })
+        }
+      >
+        <SelectTrigger className="h-10 rounded-xl border-primary/20 bg-card/80 px-3 text-xs font-medium">
+          <div className="flex min-w-0 items-center gap-2">
+            <Filter className="h-4 w-4 shrink-0" strokeWidth={1.8} />
+            <SelectValue placeholder="All statuses" />
+          </div>
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">All statuses</SelectItem>
+          {statusOptions.map((option) => (
+            <SelectItem key={option.value} value={option.value}>
+              {option.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
 
       <button
         type="button"

@@ -1,5 +1,7 @@
 import { useState } from "react";
 
+import { toast } from "sonner";
+
 import {
   ArrowLeft,
   ArrowUpAZ,
@@ -17,6 +19,16 @@ import {
 import { useNavigate } from "react-router-dom";
 
 import type { ApiId } from "../../shared/types/api.types";
+import { ConfirmActionDialog } from "../../shared/components/ConfirmActionDialog";
+import { exportStudentsToExcel } from "../../shared/utils/export-users-xlsx";
+import { studentApi } from "../api/student.api";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/shared/ui/select";
 
 import { StudentCard } from "../components/list/StudentCard";
 import { StudentsEmptyState } from "../components/list/StudentsEmptyState";
@@ -80,8 +92,13 @@ export function StudentsPage() {
       defaultFilters,
     );
 
-  const [isExporting] =
+  const [isExporting, setIsExporting] =
     useState(false);
+
+  const [dialogAction, setDialogAction] = useState<
+    | { type: "delete" | "restore" | "toggle"; student: StudentListItem }
+    | null
+  >(null);
 
   const [
     pendingDeleteId,
@@ -181,8 +198,53 @@ export function StudentsPage() {
     setFilters(defaultFilters);
   }
 
-  function handleExport() {
-    // سيتم ربط Export API هنا.
+  async function handleExport() {
+    try {
+      setIsExporting(true);
+
+      const perPage = 100;
+      const firstPage = isSearchMode
+        ? await studentApi.search({
+            q: normalizedSearch,
+            page: 1,
+            per_page: perPage,
+          })
+        : await studentApi.list({
+            ...filters,
+            page: 1,
+            per_page: perPage,
+          });
+
+      const allStudents = [...firstPage.data];
+      const lastPage = firstPage.meta?.last_page ?? 1;
+
+      for (let page = 2; page <= lastPage; page += 1) {
+        const response = isSearchMode
+          ? await studentApi.search({
+              q: normalizedSearch,
+              page,
+              per_page: perPage,
+            })
+          : await studentApi.list({
+              ...filters,
+              page,
+              per_page: perPage,
+            });
+
+        allStudents.push(...response.data);
+      }
+
+      exportStudentsToExcel(
+        allStudents,
+        isSearchMode ? "filtered-students.xlsx" : "students.xlsx",
+      );
+
+      toast.success(`${allStudents.length} students exported.`);
+    } catch {
+      toast.error("Students could not be exported.");
+    } finally {
+      setIsExporting(false);
+    }
   }
 
   function openStudent(
@@ -201,101 +263,42 @@ export function StudentsPage() {
     );
   }
 
-  async function deleteStudent(
-    student: StudentListItem,
-  ) {
-    const confirmed =
-      window.confirm(
-        `Withdraw "${student.fullName}" from the school? The enrollment will be removed and the account will be disabled.`,
-      );
-
-    if (!confirmed) {
-      return;
-    }
-
-    try {
-      setPendingDeleteId(
-        student.enrollmentId,
-      );
-
-      await deleteMutation.mutateAsync(
-        student.enrollmentId,
-      );
-    } finally {
-      setPendingDeleteId(
-        undefined,
-      );
-    }
+  function deleteStudent(student: StudentListItem) {
+    setDialogAction({ type: "delete", student });
   }
 
-  async function restoreStudent(
-    student: StudentListItem,
-  ) {
-    const confirmed =
-      window.confirm(
-        `Restore "${student.fullName}"? The enrollment will become active again and the account will be enabled.`,
-      );
-
-    if (!confirmed) {
-      return;
-    }
-
-    try {
-      setPendingRestoreId(
-        student.enrollmentId,
-      );
-
-      await restoreMutation.mutateAsync(
-        student.enrollmentId,
-      );
-    } finally {
-      setPendingRestoreId(
-        undefined,
-      );
-    }
+  function restoreStudent(student: StudentListItem) {
+    setDialogAction({ type: "restore", student });
   }
 
-  async function toggleStudent(
-    student: StudentListItem,
-  ) {
-    const normalizedStatus =
-      String(
-        student.accountStatus ??
-          "",
-      ).toLowerCase();
+  function toggleStudent(student: StudentListItem) {
+    setDialogAction({ type: "toggle", student });
+  }
 
-    const isEnabled =
-      normalizedStatus ===
-        "enabled" ||
-      normalizedStatus ===
-        "active";
-
-    const nextAction =
-      isEnabled
-        ? "disable"
-        : "enable";
-
-    const confirmed =
-      window.confirm(
-        `Are you sure you want to ${nextAction} "${student.fullName}"'s account?`,
-      );
-
-    if (!confirmed) {
+  async function confirmStudentAction() {
+    if (!dialogAction) {
       return;
     }
 
-    try {
-      setPendingToggleId(
-        student.enrollmentId,
-      );
+    const { type, student } = dialogAction;
 
-      await toggleMutation.mutateAsync(
-        student.enrollmentId,
-      );
+    try {
+      if (type === "delete") {
+        setPendingDeleteId(student.enrollmentId);
+        await deleteMutation.mutateAsync(student.enrollmentId);
+      } else if (type === "restore") {
+        setPendingRestoreId(student.enrollmentId);
+        await restoreMutation.mutateAsync(student.enrollmentId);
+      } else {
+        setPendingToggleId(student.enrollmentId);
+        await toggleMutation.mutateAsync(student.enrollmentId);
+      }
+
+      setDialogAction(null);
     } finally {
-      setPendingToggleId(
-        undefined,
-      );
+      setPendingDeleteId(undefined);
+      setPendingRestoreId(undefined);
+      setPendingToggleId(undefined);
     }
   }
 
@@ -439,69 +442,39 @@ export function StudentsPage() {
                 ) : null}
               </div>
 
-              <label className="relative min-w-0">
-                <span className="sr-only">
-                  Enrollment status
-                </span>
-
-                <Filter
+              <Select
+                value={filters.status ?? "all"}
+                onValueChange={(value) =>
+                  changeStatus(value === "all" ? "" : value)
+                }
+              >
+                <SelectTrigger
+                  aria-label="Enrollment status"
                   className={[
-                    "pointer-events-none absolute left-3 top-1/2",
-                    "h-4 w-4 -translate-y-1/2",
+                    "h-10 w-full rounded-xl border",
+                    "border-primary/20 bg-card/80",
+                    "px-3 text-xs font-medium",
                     filters.status
                       ? "text-primary"
                       : "text-muted-foreground",
-                  ].join(" ")}
-                  strokeWidth={1.8}
-                />
-
-                <select
-                  value={
-                    filters.status ??
-                    ""
-                  }
-                  onChange={(event) =>
-                    changeStatus(
-                      event.target.value,
-                    )
-                  }
-                  className={[
-                    "h-10 w-full appearance-none",
-                    "rounded-xl border",
-                    "border-primary/20",
-                    "bg-card/80",
-                    "pl-9 pr-8",
-                    "text-xs font-semibold",
-                    filters.status
-                      ? "text-primary"
-                      : "text-muted-foreground",
-                    "outline-none",
-                    "transition-colors",
-                    "hover:bg-primary/[0.05]",
-                    "focus:ring-2",
-                    "focus:ring-primary/10",
+                    "focus:ring-2 focus:ring-primary/10",
                   ].join(" ")}
                 >
-                  <option value="">
-                    All statuses
-                  </option>
+                  <div className="flex min-w-0 items-center gap-2">
+                    <Filter className="h-4 w-4 shrink-0" strokeWidth={1.8} />
+                    <SelectValue placeholder="All statuses" />
+                  </div>
+                </SelectTrigger>
 
-                  {statusOptions.map(
-                    (option) => (
-                      <option
-                        key={
-                          option.value
-                        }
-                        value={
-                          option.value
-                        }
-                      >
-                        {option.label}
-                      </option>
-                    ),
-                  )}
-                </select>
-              </label>
+                <SelectContent>
+                  <SelectItem value="all">All statuses</SelectItem>
+                  {statusOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
 
               <button
                 type="button"
@@ -910,6 +883,59 @@ export function StudentsPage() {
           }}
         />
       ) : null}
+
+      <ConfirmActionDialog
+        open={Boolean(dialogAction)}
+        title={
+          dialogAction?.type === "delete"
+            ? "Withdraw Student?"
+            : dialogAction?.type === "restore"
+              ? "Restore Student?"
+              : "Change Account Status?"
+        }
+        description={
+          dialogAction?.type === "delete"
+            ? "The enrollment will be withdrawn and the account will be disabled."
+            : dialogAction?.type === "restore"
+              ? "The enrollment and account will become active again."
+              : "This changes whether the student can access the school system."
+        }
+        confirmLabel={
+          dialogAction?.type === "delete"
+            ? "Withdraw"
+            : dialogAction?.type === "restore"
+              ? "Restore"
+              : "Confirm"
+        }
+        pendingLabel={
+          dialogAction?.type === "delete"
+            ? "Withdrawing..."
+            : dialogAction?.type === "restore"
+              ? "Restoring..."
+              : "Updating..."
+        }
+        tone={dialogAction?.type === "restore" ? "restore" : dialogAction?.type === "delete" ? "danger" : "neutral"}
+        isPending={
+          deleteMutation.isPending ||
+          restoreMutation.isPending ||
+          toggleMutation.isPending
+        }
+        details={
+          dialogAction ? (
+            <span>
+              <span className="font-medium text-foreground">
+                {dialogAction.student.fullName}
+              </span>
+              {" · "}
+              {dialogAction.student.grade?.name ?? "No grade assigned"}
+            </span>
+          ) : null
+        }
+        onClose={() => setDialogAction(null)}
+        onConfirm={() => {
+          void confirmStudentAction();
+        }}
+      />
     </section>
   );
 }
