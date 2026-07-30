@@ -1,112 +1,70 @@
 import {
   Edit3,
-  MoreHorizontal,
   Trash2,
 } from "lucide-react";
 
 type Props = {
   isOpen: boolean;
-
-  onOpenChange: (
-    open: boolean,
-  ) => void;
-
+  onOpenChange: (open: boolean) => void;
   onEdit: () => void;
-
   onDelete?: () => void;
 };
 
 export function ActionMenu({
-  isOpen,
   onOpenChange,
   onEdit,
   onDelete,
 }: Props) {
   return (
-    <div className="relative inline-flex">
+    <div className="inline-flex items-center justify-end gap-2">
       <button
         type="button"
-        aria-label="Open actions"
-        aria-expanded={isOpen}
-        onClick={() =>
-          onOpenChange(!isOpen)
-        }
+        aria-label="Edit"
+        title="Edit"
+        onClick={() => {
+          onOpenChange(false);
+          onEdit();
+        }}
         className={[
-          "flex h-9 w-9 items-center justify-center",
-          "rounded-full border border-border/70",
-          "bg-card text-muted-foreground",
+          "inline-flex h-10 w-10 shrink-0 items-center justify-center",
+          "rounded-full border border-primary/15",
+          "bg-primary/[0.045] text-primary",
+          "shadow-[0_3px_12px_rgba(98,68,220,0.06)]",
           "transition-all duration-200",
-          "hover:border-primary/20",
-          "hover:bg-primary/[0.045]",
-          "hover:text-primary",
-          "focus-visible:outline-none",
-          "focus-visible:ring-4",
+          "hover:-translate-y-0.5 hover:border-primary/25",
+          "hover:bg-primary/[0.09] hover:shadow-[0_6px_18px_rgba(98,68,220,0.12)]",
+          "active:translate-y-0 active:scale-95",
+          "focus-visible:outline-none focus-visible:ring-4",
           "focus-visible:ring-primary/10",
         ].join(" ")}
       >
-        <MoreHorizontal
-          size={17}
-          strokeWidth={1.8}
-        />
+        <Edit3 size={16} strokeWidth={1.8} />
       </button>
 
-      {isOpen ? (
-        <div
+      {onDelete ? (
+        <button
+          type="button"
+          aria-label="Delete"
+          title="Delete"
+          onClick={() => {
+            onOpenChange(false);
+            onDelete();
+          }}
           className={[
-            "absolute right-0 top-11 z-30",
-            "min-w-36 rounded-[16px]",
-            "border border-border/65",
-            "bg-card p-1.5",
-            "shadow-[0_16px_45px_rgba(20,15,50,0.14)]",
+            "inline-flex h-10 w-10 shrink-0 items-center justify-center",
+            "rounded-full border border-destructive/20",
+            "bg-destructive/[0.035] text-destructive",
+            "shadow-[0_3px_12px_rgba(220,38,38,0.04)]",
+            "transition-all duration-200",
+            "hover:-translate-y-0.5 hover:border-destructive/30",
+            "hover:bg-destructive/[0.075] hover:shadow-[0_6px_18px_rgba(220,38,38,0.09)]",
+            "active:translate-y-0 active:scale-95",
+            "focus-visible:outline-none focus-visible:ring-4",
+            "focus-visible:ring-destructive/10",
           ].join(" ")}
         >
-          <button
-            type="button"
-            onClick={() => {
-              onOpenChange(false);
-              onEdit();
-            }}
-            className={[
-              "flex w-full items-center gap-2.5",
-              "rounded-xl px-3 py-2.5",
-              "text-xs font-medium text-foreground",
-              "transition-colors",
-              "hover:bg-primary/[0.06]",
-              "hover:text-primary",
-            ].join(" ")}
-          >
-            <Edit3
-              size={14}
-              strokeWidth={1.8}
-            />
-
-            Edit
-          </button>
-
-          {onDelete ? (
-            <button
-              type="button"
-              onClick={() => {
-                onOpenChange(false);
-                onDelete();
-              }}
-              className={[
-                "flex w-full items-center gap-2.5",
-                "rounded-xl px-3 py-2.5",
-                "text-xs font-medium text-destructive",
-                "transition-colors",
-                "hover:bg-destructive/[0.07]",
-              ].join(" ")}
-            >
-              <Trash2
-                size={14}
-                strokeWidth={1.8}
-              />
-
-              Delete
-            </button>
-          ) : null}
-        </div>
+          <Trash2 size={16} strokeWidth={1.8} />
+        </button>
       ) : null}
     </div>
   );

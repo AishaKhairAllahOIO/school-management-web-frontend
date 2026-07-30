@@ -166,7 +166,7 @@ export function SchoolScheduleSection({
         description="Set working days, lesson duration and break timing for the daily school routine."
       />
 
-      <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_340px]">
+      <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_300px]">
         <div className="space-y-5">
           <SchedulePanel
             icon={<Clock3 size={18} />}
@@ -516,7 +516,7 @@ export function SchoolScheduleSection({
           </div>
         </div>
 
-        <aside className="xl:sticky xl:top-6 xl:self-start">
+        <aside className="min-w-0 self-start">
           <SchedulePanel
             icon={<Clock3 size={18} />}
             title="Day Preview"

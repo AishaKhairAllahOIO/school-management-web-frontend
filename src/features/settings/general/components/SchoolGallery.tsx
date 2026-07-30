@@ -407,16 +407,18 @@ export function SchoolGallery({
                           className={[
                             "h-10 w-full",
                             "rounded-[14px]",
-                            "border border-transparent",
-                            "bg-muted/[0.42]",
+                            "border border-border/80",
+                            "bg-background",
+                            "shadow-[0_1px_2px_rgba(15,23,42,0.04)]",
                             "px-3",
                             "text-sm font-medium",
                             "text-foreground",
                             "outline-none transition",
-                            "hover:bg-muted/60",
-                            "focus:border-primary/20",
+                            "hover:border-border",
+                            "hover:bg-background",
+                            "focus:border-primary/55",
                             "focus:bg-background",
-                            "focus:ring-4 focus:ring-primary/[0.07]",
+                            "focus:ring-4 focus:ring-primary/[0.10]",
                           ].join(" ")}
                         />
                       </label>
@@ -845,7 +847,7 @@ function EditSchoolImageDialog({
                     event.target.value,
                   )
                 }
-                className="h-12 w-full rounded-[16px] border border-transparent bg-muted/[0.4] px-4 text-sm font-medium text-foreground outline-none transition hover:bg-muted/55 focus:border-primary/20 focus:bg-background focus:ring-4 focus:ring-primary/[0.07] disabled:opacity-60"
+                className="h-12 w-full rounded-[16px] border border-border/80 bg-background px-4 text-sm font-medium text-foreground shadow-[0_1px_2px_rgba(15,23,42,0.04)] outline-none transition hover:border-border hover:bg-background focus:border-primary/55 focus:bg-background focus:ring-4 focus:ring-primary/[0.10] disabled:opacity-60"
               />
             </label>
 
@@ -863,7 +865,7 @@ function EditSchoolImageDialog({
                 onChange={
                   handleReplacementFile
                 }
-                className="block w-full rounded-[16px] bg-muted/[0.4] p-3 text-xs text-muted-foreground file:mr-3 file:rounded-full file:border-0 file:bg-card file:px-4 file:py-2 file:text-xs file:font-semibold file:text-foreground disabled:opacity-60"
+                className="block w-full rounded-[16px] border border-border/80 bg-background p-3 text-xs text-muted-foreground shadow-[0_1px_2px_rgba(15,23,42,0.04)] transition hover:border-border file:mr-3 file:rounded-full file:border-0 file:bg-muted file:px-4 file:py-2 file:text-xs file:font-semibold file:text-foreground disabled:opacity-60"
               />
             </label>
           </div>

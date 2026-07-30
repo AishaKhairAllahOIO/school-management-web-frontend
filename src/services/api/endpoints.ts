@@ -84,6 +84,9 @@ export const API_ENDPOINTS = {
 
   DELETE: (enrollmentId: ApiId) =>
     `/admin/students/${enrollmentId}`,
+
+  RESTORE: (enrollmentId: ApiId) =>
+  `/admin/students/${enrollmentId}/student/restore`,
 },
   STAFF: {
     REGISTER: "/admin/staff/register",
@@ -123,6 +126,32 @@ export const API_ENDPOINTS = {
 
     DELETE: (staffId: ApiId) =>
       `/admin/staff/${staffId}`,
+
+    LIST: "/admin/staff/showAllStaff",
+
+RESTORE: (staffId: ApiId) =>
+  `/admin/staff/${staffId}/restore`,
+
+ASSIGNMENTS: (staffId: ApiId) =>
+  `/admin/staff/${staffId}/assignments`,
+
+ASSIGNMENT: (
+  staffId: ApiId,
+  assignmentId: ApiId,
+) =>
+  `/admin/staff/${staffId}/assignments/${assignmentId}`,
+
+WORKLOADS: (staffId: ApiId) =>
+  `/admin/staff/${staffId}/workloads`,
+
+WORKLOAD: (
+  staffId: ApiId,
+  workloadId: ApiId,
+) =>
+  `/admin/staff/${staffId}/workloads/${workloadId}`,
+
+ROLE_SEARCH: (role: string) =>
+  `/admin/staff/role/${encodeURIComponent(role)}/search`,
   },
 
   ACADEMICS: {
@@ -167,7 +196,7 @@ export const API_ENDPOINTS = {
         `/subject/setting/assessment/subject/update/${assessmentId}`,
 
       DELETE: (assessmentId: ApiId) =>
-        `/subject/setting/assessment/subject/delete${assessmentId}`,
+        `/subject/setting/assessment/subject/delete/${assessmentId}`,
     },
   },
 

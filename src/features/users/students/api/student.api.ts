@@ -84,8 +84,7 @@ export const studentApi = {
   async search(
     params: StudentSearchParams,
   ): Promise<StudentListResponse> {
-    const normalizedQuery =
-      params.q.trim();
+    const normalizedQuery = params.q.trim();
 
     if (normalizedQuery.length < 2) {
       throw new Error(
@@ -261,6 +260,20 @@ export const studentApi = {
     }
 
     return {};
+  },
+
+  async restore(
+    enrollmentId: ApiId,
+  ): Promise<StudentFullProfile> {
+    const response = await axiosClient.post<
+      ApiResponse<StudentFullProfile>
+    >(
+      API_ENDPOINTS.STUDENTS.RESTORE(
+        enrollmentId,
+      ),
+    );
+
+    return unwrapResponse(response.data);
   },
 
   async importFile(

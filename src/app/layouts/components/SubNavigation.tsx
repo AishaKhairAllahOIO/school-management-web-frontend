@@ -76,16 +76,7 @@ const subNavigationSections: SubNavigationSection[] =
         },
       ],
     },
-    {
-      basePath: "/finance",
-      items: [
-        {
-          title: "Operations",
-          path: "/finance",
-          icon: Wallet,
-        },
-      ],
-    },
+
     {
       basePath: "/communications",
       items: [

@@ -30,6 +30,7 @@ function displayValue(
   value:
     | string
     | number
+    | boolean
     | null
     | undefined,
   fallback = "Not specified",
@@ -42,19 +43,72 @@ function displayValue(
     return fallback;
   }
 
+  if (typeof value === "boolean") {
+    return value ? "Yes" : "No";
+  }
+
   return String(value);
 }
 
-function referenceValue(
-  reference: NamedEntity | null | undefined,
+function formatDateTime(
+  value:
+    | string
+    | null
+    | undefined,
+  fallback = "Not recorded",
 ) {
-  return reference?.name ?? "Not assigned";
+  if (!value) {
+    return fallback;
+  }
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+
+  return new Intl.DateTimeFormat(
+    "en-GB",
+    {
+      year: "numeric",
+      month: "short",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+    },
+  ).format(date);
+}
+
+function referenceValue(
+  reference:
+    | NamedEntity
+    | null
+    | undefined,
+  fallbackId:
+    | string
+    | number
+    | null
+    | undefined,
+) {
+  if (reference?.name) {
+    return reference.name;
+  }
+
+  if (
+    fallbackId !== null &&
+    fallbackId !== undefined &&
+    fallbackId !== ""
+  ) {
+    return `ID: ${fallbackId}`;
+  }
+
+  return "Not assigned";
 }
 
 function enrollmentDateValue(
   enrollment: StudentEnrollment,
 ) {
-  return displayValue(
+  return formatDateTime(
     enrollment.enrollmentDate,
     "Not recorded",
   );
@@ -113,334 +167,311 @@ export function StudentProfilePage() {
 
   return (
     <div className="space-y-5 pb-8">
-        <StudentPageHeader
-          title={student.fullName}
-          description="Review personal information, guardian details and the current academic placement."
-          showBackButton
-          backLabel="Back to students"
-          onBack={() => navigate("/users/students")}
-          photoUrl={student.photoUrl}
-          photoAlt={student.fullName}
-          icon={
-            <UserRound
-              size={23}
-              strokeWidth={1.7}
-            />
-          }
-          
-        />
+      <StudentPageHeader
+        title={student.fullName}
+        description="Review all personal, guardian, account and academic enrollment information."
+        showBackButton
+        backLabel="Back to students"
+        onBack={() =>
+          navigate("/users/students")
+        }
+        photoUrl={student.photoUrl}
+        photoAlt={student.fullName}
+        icon={
+          <UserRound
+            size={23}
+            strokeWidth={1.7}
+          />
+        }
+      />
 
-
-        <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1.15fr)_minmax(340px,.85fr)]">
-          <StudentProfileSection
-            title="Student information"
-            description="Identity, birth and contact information."
+      <StudentProfileSection
+        title="Student information"
+        description="Complete identity, account, birth and contact information."
+        icon={
+          <UserRound
+            size={18}
+            strokeWidth={1.7}
+          />
+        }
+      >
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          <ProfileInfoCard
             icon={
               <UserRound
                 size={18}
                 strokeWidth={1.7}
               />
             }
-          >
-            <div className="grid gap-3 sm:grid-cols-2">
-              <ProfileInfoCard
-                icon={
-                  <UserRound
-                    size={18}
-                    strokeWidth={1.7}
-                  />
-                }
-                label="Full name"
-                value={student.fullName}
-              />
+            label="Full name"
+            value={student.fullName}
+            className="sm:col-span-2"
+          />
 
-              <ProfileInfoCard
-                icon={
-                  <IdCard
-                    size={18}
-                    strokeWidth={1.7}
-                  />
-                }
-                label="Student reference"
-                value={displayValue(
-                  student.id,
-                )}
-              />
+        
 
-              <ProfileInfoCard
-                icon={
-                  <UsersRound
-                    size={18}
-                    strokeWidth={1.7}
-                  />
-                }
-                label="Father name"
-                value={displayValue(
-                  student.fatherName,
-                )}
-              />
-
-              <ProfileInfoCard
-                icon={
-                  <UsersRound
-                    size={18}
-                    strokeWidth={1.7}
-                  />
-                }
-                label="Mother name"
-                value={displayValue(
-                  student.motherName,
-                )}
-              />
-
-              <ProfileInfoCard
-                icon={
-                  <CalendarDays
-                    size={18}
-                    strokeWidth={1.7}
-                  />
-                }
-                label="Birth date"
-                value={displayValue(
-                  student.birthDate,
-                )}
-              />
-
-              <ProfileInfoCard
-                icon={
-                  <MapPin
-                    size={18}
-                    strokeWidth={1.7}
-                  />
-                }
-                label="Birth place"
-                value={displayValue(
-                  student.birthPlace,
-                )}
-              />
-
-              <ProfileInfoCard
-                icon={
-                  <IdCard
-                    size={18}
-                    strokeWidth={1.7}
-                  />
-                }
-                label="Gender"
-                value={displayValue(
-                  student.gender,
-                )}
-              />
-
-              <ProfileInfoCard
-                icon={
-                  <IdCard
-                    size={18}
-                    strokeWidth={1.7}
-                  />
-                }
-                label="Nationality"
-                value={displayValue(
-                  student.nationality,
-                )}
-              />
-
-              <ProfileInfoCard
-                icon={
-                  <Phone
-                    size={18}
-                    strokeWidth={1.7}
-                  />
-                }
-                label="Phone number"
-                value={
-                  <span dir="ltr">
-                    {displayValue(
-                      student.phoneNumber,
-                    )}
-                  </span>
-                }
-              />
-
-              <ProfileInfoCard
-                icon={
-                  <Home
-                    size={18}
-                    strokeWidth={1.7}
-                  />
-                }
-                label="Address"
-                value={displayValue(
-                  student.address,
-                )}
-                className="sm:col-span-2"
-              />
-            </div>
-          </StudentProfileSection>
-
-          <StudentProfileSection
-            title="Guardian information"
-            description="Primary family and emergency contact."
+          <ProfileInfoCard
             icon={
               <UsersRound
                 size={18}
                 strokeWidth={1.7}
               />
             }
-          >
-            {guardian ? (
-              <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
-                <ProfileInfoCard
-                  icon={
-                    <UsersRound
-                      size={18}
-                      strokeWidth={1.7}
-                    />
-                  }
-                  label="Full name"
-                  value={guardian.fullName}
-                />
-
-                <ProfileInfoCard
-                  icon={
-                    <Phone
-                      size={18}
-                      strokeWidth={1.7}
-                    />
-                  }
-                  label="Phone number"
-                  value={
-                    <span dir="ltr">
-                      {displayValue(
-                        guardian.phoneNumber,
-                      )}
-                    </span>
-                  }
-                />
-
-                <ProfileInfoCard
-                  icon={
-                    <MapPin
-                      size={18}
-                      strokeWidth={1.7}
-                    />
-                  }
-                  label="Birth place"
-                  value={displayValue(
-                    guardian.birthPlace,
-                  )}
-                />
-
-                <ProfileInfoCard
-                  icon={
-                    <Home
-                      size={18}
-                      strokeWidth={1.7}
-                    />
-                  }
-                  label="Address"
-                  value={displayValue(
-                    guardian.address,
-                  )}
-                />
-              </div>
-            ) : (
-              <div className="rounded-[18px] border border-dashed border-amber-500/25 bg-amber-500/[0.045] p-6 text-center">
-                <span className="mx-auto flex h-11 w-11 items-center justify-center rounded-[14px] bg-amber-500/[0.1] text-amber-600">
-                  <UsersRound
-                    size={20}
-                    strokeWidth={1.7}
-                  />
-                </span>
-
-                <p className="mt-4 text-sm font-medium text-foreground">
-                  No guardian linked
-                </p>
-
-                <p className="mt-1 text-xs font-normal leading-5 text-muted-foreground">
-                  This student does not currently
-                  have a guardian record.
-                </p>
-              </div>
+            label="Father name"
+            value={displayValue(
+              student.fatherName,
             )}
-          </StudentProfileSection>
-        </div>
+          />
 
-        <StudentProfileSection
-          title="Academic enrollment"
-          description="Current academic year, grade, classroom and enrollment state."
-          icon={
-            <GraduationCap
-              size={18}
-              strokeWidth={1.7}
-            />
-          }
-        >
+          <ProfileInfoCard
+            icon={
+              <UsersRound
+                size={18}
+                strokeWidth={1.7}
+              />
+            }
+            label="Mother name"
+            value={displayValue(
+              student.motherName,
+            )}
+          />
+
+          <ProfileInfoCard
+            icon={
+              <CalendarDays
+                size={18}
+                strokeWidth={1.7}
+              />
+            }
+            label="Birth date"
+            value={displayValue(
+              student.birthDate,
+            )}
+          />
+
+          <ProfileInfoCard
+            icon={
+              <MapPin
+                size={18}
+                strokeWidth={1.7}
+              />
+            }
+            label="Birth place"
+            value={displayValue(
+              student.birthPlace,
+            )}
+          />
+
+          <ProfileInfoCard
+            icon={
+              <IdCard
+                size={18}
+                strokeWidth={1.7}
+              />
+            }
+            label="Gender"
+            value={displayValue(
+              student.gender,
+            )}
+          />
+
+          <ProfileInfoCard
+            icon={
+              <IdCard
+                size={18}
+                strokeWidth={1.7}
+              />
+            }
+            label="Nationality"
+            value={displayValue(
+              student.nationality,
+            )}
+          />
+
+          <ProfileInfoCard
+            icon={
+              <Phone
+                size={18}
+                strokeWidth={1.7}
+              />
+            }
+            label="Phone number"
+            value={
+              <span dir="ltr">
+                {displayValue(
+                  student.phoneNumber,
+                )}
+              </span>
+            }
+          />
+
+          <ProfileInfoCard
+            icon={
+              <ShieldCheck
+                size={18}
+                strokeWidth={1.7}
+              />
+            }
+            label="Account status"
+            value={
+              <span className="capitalize">
+                {displayValue(
+                  student.accountStatus,
+                )}
+              </span>
+            }
+          />
+
+          <ProfileInfoCard
+            icon={
+              <ShieldCheck
+                size={18}
+                strokeWidth={1.7}
+              />
+            }
+            label="Record status"
+            value={
+              <span className="capitalize">
+                {displayValue(
+                  student.recordStatus,
+                )}
+              </span>
+            }
+          />
+
+          <ProfileInfoCard
+            icon={
+              <Home
+                size={18}
+                strokeWidth={1.7}
+              />
+            }
+            label="Address"
+            value={displayValue(
+              student.address,
+            )}
+            className="sm:col-span-2 xl:col-span-4"
+          />
+        </div>
+      </StudentProfileSection>
+
+      <StudentProfileSection
+        title="Guardian information"
+        description="Complete guardian identity, account, birth and contact information."
+        icon={
+          <UsersRound
+            size={18}
+            strokeWidth={1.7}
+          />
+        }
+      >
+        {guardian ? (
           <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
             <ProfileInfoCard
               icon={
-                <CalendarDays
+                <UsersRound
                   size={18}
                   strokeWidth={1.7}
                 />
               }
-              label="Academic year"
-              value={referenceValue(
-                enrollment.academicYear,
-              )}
+              label="Full name"
+              value={guardian.fullName}
+              className="sm:col-span-2"
             />
 
             <ProfileInfoCard
               icon={
-                <BookOpen
+                <UsersRound
                   size={18}
                   strokeWidth={1.7}
                 />
               }
-              label="Grade"
-              value={referenceValue(
-                enrollment.grade,
-              )}
-            />
-
-            <ProfileInfoCard
-              icon={
-                <GraduationCap
-                  size={18}
-                  strokeWidth={1.7}
-                />
-              }
-              label="Classroom"
-              value={referenceValue(
-                enrollment.classroom,
-              )}
-            />
-
-            <ProfileInfoCard
-              icon={
-                <CalendarDays
-                  size={18}
-                  strokeWidth={1.7}
-                />
-              }
-              label="Enrollment date"
-              value={enrollmentDateValue(
-                enrollment,
-              )}
-            />
-
-            <ProfileInfoCard
-              icon={
-                <CalendarDays
-                  size={18}
-                  strokeWidth={1.7}
-                />
-              }
-              label="Completed at"
+              label="Father name"
               value={displayValue(
-                enrollment.completedAt,
-                "Not completed",
+                guardian.fatherName,
               )}
+            />
+
+            <ProfileInfoCard
+              icon={
+                <UsersRound
+                  size={18}
+                  strokeWidth={1.7}
+                />
+              }
+              label="Mother name"
+              value={displayValue(
+                guardian.motherName,
+              )}
+            />
+
+            <ProfileInfoCard
+              icon={
+                <CalendarDays
+                  size={18}
+                  strokeWidth={1.7}
+                />
+              }
+              label="Birth date"
+              value={displayValue(
+                guardian.birthDate,
+              )}
+            />
+
+            <ProfileInfoCard
+              icon={
+                <MapPin
+                  size={18}
+                  strokeWidth={1.7}
+                />
+              }
+              label="Birth place"
+              value={displayValue(
+                guardian.birthPlace,
+              )}
+            />
+
+            <ProfileInfoCard
+              icon={
+                <IdCard
+                  size={18}
+                  strokeWidth={1.7}
+                />
+              }
+              label="Gender"
+              value={displayValue(
+                guardian.gender,
+              )}
+            />
+
+            <ProfileInfoCard
+              icon={
+                <IdCard
+                  size={18}
+                  strokeWidth={1.7}
+                />
+              }
+              label="Nationality"
+              value={displayValue(
+                guardian.nationality,
+              )}
+            />
+
+            <ProfileInfoCard
+              icon={
+                <Phone
+                  size={18}
+                  strokeWidth={1.7}
+                />
+              }
+              label="Phone number"
+              value={
+                <span dir="ltr">
+                  {displayValue(
+                    guardian.phoneNumber,
+                  )}
+                </span>
+              }
             />
 
             <ProfileInfoCard
@@ -450,87 +481,227 @@ export function StudentProfilePage() {
                   strokeWidth={1.7}
                 />
               }
-              label="Record state"
+              label="Account status"
               value={
-                enrollment.isDeleted
-                  ? "Withdrawn / deleted"
-                  : "Active record"
+                <span className="capitalize">
+                  {displayValue(
+                    guardian.accountStatus,
+                  )}
+                </span>
               }
             />
-          </div>
-        </StudentProfileSection>
 
-        <section className="grid gap-4 sm:grid-cols-2">
-          <StatusSummaryCard
+            <ProfileInfoCard
+              icon={
+                <ShieldCheck
+                  size={18}
+                  strokeWidth={1.7}
+                />
+              }
+              label="Record status"
+              value={
+                <span className="capitalize">
+                  {displayValue(
+                    guardian.recordStatus,
+                  )}
+                </span>
+              }
+            />
+
+            <ProfileInfoCard
+              icon={
+                <Home
+                  size={18}
+                  strokeWidth={1.7}
+                />
+              }
+              label="Address"
+              value={displayValue(
+                guardian.address,
+              )}
+              className="sm:col-span-2 xl:col-span-4"
+            />
+          </div>
+        ) : (
+          <div className="rounded-[18px] border border-dashed border-amber-500/25 bg-amber-500/[0.045] p-6 text-center">
+            <span className="mx-auto flex h-11 w-11 items-center justify-center rounded-[14px] bg-amber-500/[0.1] text-amber-600">
+              <UsersRound
+                size={20}
+                strokeWidth={1.7}
+              />
+            </span>
+
+            <p className="mt-4 text-sm font-medium text-foreground">
+              No guardian linked
+            </p>
+
+            <p className="mt-1 text-xs leading-5 text-muted-foreground">
+              This student does not currently
+              have a guardian record.
+            </p>
+          </div>
+        )}
+      </StudentProfileSection>
+
+      <StudentProfileSection
+        title="Academic enrollment"
+        description="Complete enrollment identifiers, placement, status and timeline."
+        icon={
+          <GraduationCap
+            size={18}
+            strokeWidth={1.7}
+          />
+        }
+      >
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+         
+
+          <ProfileInfoCard
             icon={
-              <ShieldCheck
-                size={19}
+              <CalendarDays
+                size={18}
                 strokeWidth={1.7}
               />
             }
-            label="Account status"
-          >
-            <span className="text-lg font-semibold capitalize text-foreground">
-              {displayValue(
-                student.accountStatus,
-              )}
-            </span>
-          </StatusSummaryCard>
+            label="Academic year"
+            value={referenceValue(
+              enrollment.academicYear,
+              enrollment.academicYearId,
+            )}
+          />
 
-          <StatusSummaryCard
+       
+          <ProfileInfoCard
+            icon={
+              <BookOpen
+                size={18}
+                strokeWidth={1.7}
+              />
+            }
+            label="Grade"
+            value={referenceValue(
+              enrollment.grade,
+              enrollment.gradeId,
+            )}
+          />
+
+        
+
+          <ProfileInfoCard
             icon={
               <GraduationCap
-                size={19}
+                size={18}
+                strokeWidth={1.7}
+              />
+            }
+            label="Classroom"
+            value={referenceValue(
+              enrollment.classroom,
+              enrollment.classroomId,
+            )}
+          />
+
+
+          <ProfileInfoCard
+            icon={
+              <ShieldCheck
+                size={18}
                 strokeWidth={1.7}
               />
             }
             label="Enrollment status"
-          >
-            <StudentStatusBadge
-              status={
-                enrollment.enrollmentStatus
-              }
-            />
-          </StatusSummaryCard>
-        </section>
-    </div>
-  );
-}
+            value={
+              <StudentStatusBadge
+                status={
+                  enrollment.enrollmentStatus
+                }
+              />
+            }
+          />
 
-function StatusSummaryCard({
-  icon,
-  label,
-  children,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <article
-      className={[
-        "rounded-[20px]",
-        "border border-border/60",
-        "bg-card p-5",
-        "shadow-[0_10px_30px_rgba(30,20,70,0.045)]",
-      ].join(" ")}
-    >
-      <div className="flex items-center gap-3">
-        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px] bg-primary/[0.07] text-primary">
-          {icon}
-        </span>
+          <ProfileInfoCard
+            icon={
+              <CalendarDays
+                size={18}
+                strokeWidth={1.7}
+              />
+            }
+            label="Enrollment date"
+            value={enrollmentDateValue(
+              enrollment,
+            )}
+          />
 
-        <div>
-          <p className="text-[10px] font-medium uppercase tracking-[0.12em] text-muted-foreground">
-            {label}
-          </p>
+          <ProfileInfoCard
+            icon={
+              <CalendarDays
+                size={18}
+                strokeWidth={1.7}
+              />
+            }
+            label="Completed at"
+            value={formatDateTime(
+              enrollment.completedAt,
+              "Not completed",
+            )}
+          />
 
-          <div className="mt-1.5">
-            {children}
-          </div>
+          <ProfileInfoCard
+            icon={
+              <ShieldCheck
+                size={18}
+                strokeWidth={1.7}
+              />
+            }
+            label="Deleted"
+            value={displayValue(
+              enrollment.isDeleted,
+            )}
+          />
+
+          <ProfileInfoCard
+            icon={
+              <CalendarDays
+                size={18}
+                strokeWidth={1.7}
+              />
+            }
+            label="Deleted at"
+            value={formatDateTime(
+              enrollment.deletedAt,
+              "Not deleted",
+            )}
+          />
+
+          <ProfileInfoCard
+            icon={
+              <CalendarDays
+                size={18}
+                strokeWidth={1.7}
+              />
+            }
+            label="Created at"
+            value={formatDateTime(
+              enrollment.createdAt,
+            )}
+          />
+
+          <ProfileInfoCard
+            icon={
+              <CalendarDays
+                size={18}
+                strokeWidth={1.7}
+              />
+            }
+            label="Last updated at"
+            value={formatDateTime(
+              enrollment.updatedAt,
+            )}
+          />
+
         </div>
-      </div>
-    </article>
+      </StudentProfileSection>
+    </div>
   );
 }
 
@@ -579,7 +750,7 @@ function ProfileErrorState({
           {title}
         </h1>
 
-        <p className="mt-2 text-sm font-normal leading-6 text-muted-foreground">
+        <p className="mt-2 text-sm leading-6 text-muted-foreground">
           {description}
         </p>
 

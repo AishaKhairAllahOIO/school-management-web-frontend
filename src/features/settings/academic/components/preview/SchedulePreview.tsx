@@ -33,7 +33,7 @@ export function SchedulePreview({
   }
 
   return (
-    <div className="space-y-2.5">
+    <div className="space-y-2">
       {items.map((item, index) => {
         const isBreak =
           item.type === "break";
@@ -43,8 +43,8 @@ export function SchedulePreview({
             key={`${item.type}-${item.time}-${index}`}
             className={[
               "flex items-center justify-between",
-              "gap-4 rounded-[15px]",
-              "border px-4 py-3",
+              "gap-3 rounded-[13px]",
+              "border px-3 py-2.5",
               isBreak
                 ? "border-amber-200/60 bg-amber-50/60"
                 : "border-border/60 bg-card",
@@ -53,9 +53,9 @@ export function SchedulePreview({
             <div className="flex min-w-0 items-center gap-3">
               <span
                 className={[
-                  "flex h-8 w-8 shrink-0",
+                  "flex h-7 w-7 shrink-0",
                   "items-center justify-center",
-                  "rounded-xl",
+                  "rounded-lg",
                   isBreak
                     ? "bg-amber-100 text-amber-600"
                     : "bg-primary/[0.07] text-primary",
@@ -86,7 +86,7 @@ export function SchedulePreview({
         );
       })}
 
-      <div className="flex items-center justify-between rounded-[15px] bg-primary px-4 py-3 text-primary-foreground shadow-sm">
+      <div className="flex items-center justify-between rounded-[13px] bg-primary px-3 py-2.5 text-primary-foreground shadow-sm">
         <div className="flex items-center gap-2.5">
           <Flag
             size={15}

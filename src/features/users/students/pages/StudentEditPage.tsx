@@ -7,9 +7,13 @@ import {
   useState,
 } from "react";
 import {
+  CalendarDays,
   GraduationCap,
+  IdCard,
+  Image,
   Loader2,
   Save,
+  ShieldCheck,
   UserRound,
   UsersRound,
 } from "lucide-react";
@@ -39,10 +43,7 @@ import type {
   UserGender,
 } from "../types/student.types";
 
-type UnknownRecord = Record<
-  string,
-  unknown
->;
+type UnknownRecord = Record<string, unknown>;
 
 type EditablePerson = {
   first_name: string;
@@ -202,14 +203,13 @@ function normalizeGender(
 function normalizeEnrollmentStatus(
   value: unknown,
 ): EnrollmentStatus {
-  const allowedStatuses: EnrollmentStatus[] =
-    [
-      "pending",
-      "enrolled",
-      "suspended",
-      "withdrawn",
-      "completed",
-    ];
+  const allowedStatuses: EnrollmentStatus[] = [
+    "pending",
+    "enrolled",
+    "suspended",
+    "withdrawn",
+    "completed",
+  ];
 
   return allowedStatuses.includes(
     value as EnrollmentStatus,
@@ -218,19 +218,80 @@ function normalizeEnrollmentStatus(
     : "enrolled";
 }
 
+function getNameParts(
+  person: unknown,
+): {
+  firstName: string;
+  lastName: string;
+} {
+  const directFirstName = getString(
+    person,
+    ["firstName", "first_name"],
+  );
+
+  const directLastName = getString(
+    person,
+    ["lastName", "last_name"],
+  );
+
+  if (
+    directFirstName ||
+    directLastName
+  ) {
+    return {
+      firstName: directFirstName,
+      lastName: directLastName,
+    };
+  }
+
+  const fullName = getString(
+    person,
+    ["fullName", "full_name"],
+  ).trim();
+
+  if (!fullName) {
+    return {
+      firstName: "",
+      lastName: "",
+    };
+  }
+
+  const fatherName = getString(
+    person,
+    ["fatherName", "father_name"],
+  ).trim();
+
+  const parts = fullName
+    .split(/\s+/)
+    .filter(Boolean);
+
+  const firstName = parts.shift() ?? "";
+
+  const remainingParts = parts.filter(
+    (part, index) =>
+      !(
+        index === 0 &&
+        fatherName &&
+        part.toLowerCase() ===
+          fatherName.toLowerCase()
+      ),
+  );
+
+  return {
+    firstName,
+    lastName: remainingParts.join(" "),
+  };
+}
+
 function mapPersonToForm(
   person: unknown,
 ): EditablePerson {
-  return {
-    first_name: getString(person, [
-      "firstName",
-      "first_name",
-    ]),
+  const { firstName, lastName } =
+    getNameParts(person);
 
-    last_name: getString(person, [
-      "lastName",
-      "last_name",
-    ]),
+  return {
+    first_name: firstName,
+    last_name: lastName,
 
     father_name: getString(person, [
       "fatherName",
@@ -285,11 +346,57 @@ function getProfileSection(
     return directSection;
   }
 
-  const nestedData = getValue(profile, [
-    "data",
-  ]);
+  const nestedData = getValue(
+    profile,
+    ["data"],
+  );
 
   return getValue(nestedData, keys);
+}
+
+function displayValue(
+  value: unknown,
+  fallback = "Not specified",
+): string {
+  if (
+    value === undefined ||
+    value === null ||
+    value === ""
+  ) {
+    return fallback;
+  }
+
+  return String(value);
+}
+
+function formatDateTime(
+  value: unknown,
+  fallback = "Not recorded",
+): string {
+  if (
+    value === undefined ||
+    value === null ||
+    value === ""
+  ) {
+    return fallback;
+  }
+
+  const date = new Date(String(value));
+
+  if (Number.isNaN(date.getTime())) {
+    return String(value);
+  }
+
+  return new Intl.DateTimeFormat(
+    "en-GB",
+    {
+      year: "numeric",
+      month: "short",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+    },
+  ).format(date);
 }
 
 export function StudentEditPage() {
@@ -361,13 +468,11 @@ export function StudentEditPage() {
       mapPersonToForm(studentData),
     );
 
-    if (guardianData) {
-      setGuardian(
-        mapPersonToForm(guardianData),
-      );
-    } else {
-      setGuardian(emptyPerson);
-    }
+    setGuardian(
+      guardianData
+        ? mapPersonToForm(guardianData)
+        : emptyPerson,
+    );
 
     setEnrollment({
       academic_year_id: getIdString(
@@ -460,7 +565,11 @@ export function StudentEditPage() {
 
     const studentId = getValue(
       studentData,
-      ["id", "studentId", "student_id"],
+      [
+        "id",
+        "studentId",
+        "student_id",
+      ],
     );
 
     const guardianId = getValue(
@@ -483,17 +592,14 @@ export function StudentEditPage() {
       studentMutation.mutateAsync({
         studentId:
           studentId as string | number,
-
         payload:
           student as UpdateStudentPersonalPayload,
       }),
 
       enrollmentMutation.mutateAsync({
         enrollmentId,
-
         payload: {
           ...enrollment,
-
           class_room_id:
             enrollment.class_room_id ||
             null,
@@ -509,8 +615,9 @@ export function StudentEditPage() {
       tasks.push(
         guardianMutation.mutateAsync({
           guardianId:
-            guardianId as string | number,
-
+            guardianId as
+              | string
+              | number,
           payload:
             guardian as UpdateGuardianPersonalPayload,
         }),
@@ -553,7 +660,7 @@ export function StudentEditPage() {
             loaded
           </h1>
 
-          <p className="mt-2 text-sm font-normal leading-6 text-muted-foreground">
+          <p className="mt-2 text-sm leading-6 text-muted-foreground">
             The profile may be unavailable or
             you may not have permission to
             edit it.
@@ -573,14 +680,22 @@ export function StudentEditPage() {
     );
   }
 
+  const studentData =
+    getProfileSection(
+      profileQuery.data,
+      ["student"],
+    );
+
   const guardianData =
     getProfileSection(
       profileQuery.data,
-      [
-        "guardian",
-        "guardian_data",
-        "guardianData",
-      ],
+      ["guardian"],
+    );
+
+  const enrollmentData =
+    getProfileSection(
+      profileQuery.data,
+      ["enrollment"],
     );
 
   const isSaving =
@@ -597,6 +712,14 @@ export function StudentEditPage() {
         title="Edit student"
         description="Update personal details, guardian information and academic placement."
         showBackButton
+        photoUrl={getString(
+          studentData,
+          ["photoUrl", "photo_url"],
+        )}
+        photoAlt={getString(
+          studentData,
+          ["fullName", "full_name"],
+        )}
         icon={
           <UserRound
             size={23}
@@ -640,6 +763,79 @@ export function StudentEditPage() {
         }
       />
 
+      <FormSection
+        eyebrow="System records"
+        title="Student metadata"
+        description="Identifiers and account information returned by the server."
+        icon={
+          <IdCard
+            size={18}
+            strokeWidth={1.7}
+          />
+        }
+      >
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          <ReadOnlyInfo
+            label="Student ID"
+            value={displayValue(
+              getValue(studentData, ["id"]),
+            )}
+          />
+
+          <ReadOnlyInfo
+            label="Student user ID"
+            value={displayValue(
+              getValue(studentData, [
+                "userId",
+                "user_id",
+              ]),
+            )}
+          />
+
+          <ReadOnlyInfo
+            label="Account status"
+            value={displayValue(
+              getValue(studentData, [
+                "accountStatus",
+                "account_status",
+              ]),
+            )}
+          />
+
+          <ReadOnlyInfo
+            label="Record status"
+            value={displayValue(
+              getValue(studentData, [
+                "recordStatus",
+                "record_status",
+              ]),
+            )}
+          />
+
+          <ReadOnlyInfo
+            label="Current full name"
+            value={displayValue(
+              getValue(studentData, [
+                "fullName",
+                "full_name",
+              ]),
+            )}
+            className="sm:col-span-2"
+          />
+
+          <ReadOnlyInfo
+            label="Photo URL"
+            value={displayValue(
+              getValue(studentData, [
+                "photoUrl",
+                "photo_url",
+              ]),
+            )}
+            className="sm:col-span-2"
+          />
+        </div>
+      </FormSection>
+
       <EditablePersonSection
         eyebrow="Student details"
         title="Personal information"
@@ -655,19 +851,109 @@ export function StudentEditPage() {
       />
 
       {guardianData ? (
-        <EditablePersonSection
-          eyebrow="Family contact"
-          title="Guardian information"
-          description="Update the linked guardian's personal and contact details."
-          icon={
-            <UsersRound
-              size={18}
-              strokeWidth={1.7}
-            />
-          }
-          value={guardian}
-          onChange={setGuardian}
-        />
+        <>
+          <FormSection
+            eyebrow="System records"
+            title="Guardian metadata"
+            description="Guardian identifiers and account information."
+            icon={
+              <UsersRound
+                size={18}
+                strokeWidth={1.7}
+              />
+            }
+          >
+            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+              <ReadOnlyInfo
+                label="Guardian ID"
+                value={displayValue(
+                  getValue(
+                    guardianData,
+                    ["id"],
+                  ),
+                )}
+              />
+
+              <ReadOnlyInfo
+                label="Guardian user ID"
+                value={displayValue(
+                  getValue(
+                    guardianData,
+                    ["userId", "user_id"],
+                  ),
+                )}
+              />
+
+              <ReadOnlyInfo
+                label="Account status"
+                value={displayValue(
+                  getValue(
+                    guardianData,
+                    [
+                      "accountStatus",
+                      "account_status",
+                    ],
+                  ),
+                )}
+              />
+
+              <ReadOnlyInfo
+                label="Record status"
+                value={displayValue(
+                  getValue(
+                    guardianData,
+                    [
+                      "recordStatus",
+                      "record_status",
+                    ],
+                  ),
+                )}
+              />
+
+              <ReadOnlyInfo
+                label="Current full name"
+                value={displayValue(
+                  getValue(
+                    guardianData,
+                    [
+                      "fullName",
+                      "full_name",
+                    ],
+                  ),
+                )}
+                className="sm:col-span-2"
+              />
+
+              <ReadOnlyInfo
+                label="Photo URL"
+                value={displayValue(
+                  getValue(
+                    guardianData,
+                    [
+                      "photoUrl",
+                      "photo_url",
+                    ],
+                  ),
+                )}
+                className="sm:col-span-2"
+              />
+            </div>
+          </FormSection>
+
+          <EditablePersonSection
+            eyebrow="Family contact"
+            title="Guardian information"
+            description="Update the linked guardian's personal and contact details."
+            icon={
+              <UsersRound
+                size={18}
+                strokeWidth={1.7}
+              />
+            }
+            value={guardian}
+            onChange={setGuardian}
+          />
+        </>
       ) : null}
 
       <FormSection
@@ -681,6 +967,91 @@ export function StudentEditPage() {
           />
         }
       >
+        <div className="mb-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          <ReadOnlyInfo
+            label="Enrollment ID"
+            value={displayValue(
+              getValue(enrollmentData, [
+                "id",
+              ]),
+            )}
+          />
+
+          <ReadOnlyInfo
+            label="Linked student ID"
+            value={displayValue(
+              getValue(enrollmentData, [
+                "studentId",
+                "student_id",
+              ]),
+            )}
+          />
+
+          <ReadOnlyInfo
+            label="Created at"
+            value={formatDateTime(
+              getValue(enrollmentData, [
+                "createdAt",
+                "created_at",
+              ]),
+            )}
+          />
+
+          <ReadOnlyInfo
+            label="Updated at"
+            value={formatDateTime(
+              getValue(enrollmentData, [
+                "updatedAt",
+                "updated_at",
+              ]),
+            )}
+          />
+
+          <ReadOnlyInfo
+            label="Enrollment date"
+            value={formatDateTime(
+              getValue(enrollmentData, [
+                "enrollmentDate",
+                "enrollment_date",
+              ]),
+            )}
+          />
+
+          <ReadOnlyInfo
+            label="Completed at"
+            value={formatDateTime(
+              getValue(enrollmentData, [
+                "completedAt",
+                "completed_at",
+              ]),
+              "Not completed",
+            )}
+          />
+
+          <ReadOnlyInfo
+            label="Deleted"
+            value={
+              getValue(enrollmentData, [
+                "isDeleted",
+                "is_deleted",
+              ])
+                ? "Yes"
+                : "No"
+            }
+          />
+
+          <ReadOnlyInfo
+            label="Deleted at"
+            value={formatDateTime(
+              getValue(enrollmentData, [
+                "deletedAt",
+                "deleted_at",
+              ]),
+              "Not deleted",
+            )}
+          />
+        </div>
+
         <StudentAcademicFields
           academicYearId={
             enrollment.academic_year_id
@@ -698,8 +1069,7 @@ export function StudentEditPage() {
             setEnrollment(
               (current) => ({
                 ...current,
-                academic_year_id:
-                  value,
+                academic_year_id: value,
                 class_room_id: "",
               }),
             )
@@ -808,34 +1178,13 @@ function EditablePersonSection({
       <div className="grid gap-4 md:grid-cols-2">
         {(
           [
-            [
-              "first_name",
-              "First name",
-            ],
-            [
-              "last_name",
-              "Last name",
-            ],
-            [
-              "father_name",
-              "Father name",
-            ],
-            [
-              "mother_name",
-              "Mother name",
-            ],
-            [
-              "birth_place",
-              "Birth place",
-            ],
-            [
-              "nationality",
-              "Nationality",
-            ],
-            [
-              "phone_number",
-              "Phone number",
-            ],
+            ["first_name", "First name"],
+            ["last_name", "Last name"],
+            ["father_name", "Father name"],
+            ["mother_name", "Mother name"],
+            ["birth_place", "Birth place"],
+            ["nationality", "Nationality"],
+            ["phone_number", "Phone number"],
           ] as const
         ).map(([key, label]) => (
           <FormField
@@ -912,5 +1261,71 @@ function EditablePersonSection({
         </FormField>
       </div>
     </FormSection>
+  );
+}
+
+function ReadOnlyInfo({
+  label,
+  value,
+  className = "",
+}: {
+  label: string;
+  value: string;
+  className?: string;
+}) {
+  return (
+    <article
+      className={[
+        "rounded-[16px]",
+        "border border-border/60",
+        "bg-muted/[0.22]",
+        "px-4 py-3.5",
+        className,
+      ].join(" ")}
+    >
+      <div className="flex items-start gap-3">
+        <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-[10px] bg-primary/[0.07] text-primary">
+          {label.toLowerCase().includes("date") ||
+          label.toLowerCase().includes("at") ? (
+            <CalendarDays
+              size={15}
+              strokeWidth={1.7}
+            />
+          ) : label
+              .toLowerCase()
+              .includes("status") ||
+            label
+              .toLowerCase()
+              .includes("deleted") ? (
+            <ShieldCheck
+              size={15}
+              strokeWidth={1.7}
+            />
+          ) : label
+              .toLowerCase()
+              .includes("photo") ? (
+            <Image
+              size={15}
+              strokeWidth={1.7}
+            />
+          ) : (
+            <IdCard
+              size={15}
+              strokeWidth={1.7}
+            />
+          )}
+        </span>
+
+        <div className="min-w-0">
+          <p className="text-[11px] font-medium uppercase tracking-[0.08em] text-muted-foreground">
+            {label}
+          </p>
+
+          <p className="mt-1 break-words text-sm font-medium text-foreground">
+            {value}
+          </p>
+        </div>
+      </div>
+    </article>
   );
 }
