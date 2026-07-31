@@ -14,6 +14,8 @@ import {
   StaffPageHero,
 } from "../components/layout/StaffPageHero";
 
+import { UserPageBackButton } from "../../shared/components/UserPageBackButton";
+
 import {
   StaffContactFormSection,
 } from "../components/sections/StaffContactFormSection";
@@ -370,8 +372,14 @@ export function StaffEditPage({
       onSubmit={handleSubmit}
       className="space-y-5 pb-8"
     >
+      <UserPageBackButton
+        label={`Back to ${config.pluralLabel}`}
+        onClick={() => navigate(config.listPath)}
+      />
+
       <StaffPageHero
         mode="edit"
+        showBackButton={false}
         title={`Edit ${staff.fullName}`}
         description={`Update the ${config.singularLabel.toLowerCase()}'s personal and employment information.`}
         backLabel={`Back to ${config.pluralLabel}`}
@@ -393,21 +401,23 @@ export function StaffEditPage({
         }
       />
 
-      <StaffPhotoFormSection
-        color={config.color}
-        mode="edit"
-        photoUrl={visiblePhoto}
-        disabled={isSaving}
-        onChange={handlePhotoChange}
-        onRemove={removePhoto}
-      />
+      <div className="grid items-start gap-5 xl:grid-cols-[340px_minmax(0,1fr)]">
+        <StaffPhotoFormSection
+          color={config.color}
+          mode="edit"
+          photoUrl={visiblePhoto}
+          disabled={isSaving}
+          onChange={handlePhotoChange}
+          onRemove={removePhoto}
+        />
 
-      <StaffPersonalFormSection
-        color={config.color}
-        values={values}
-        disabled={isSaving}
-        updateValue={updateValue}
-      />
+        <StaffPersonalFormSection
+          color={config.color}
+          values={values}
+          disabled={isSaving}
+          updateValue={updateValue}
+        />      </div>
+
 
       <StaffContactFormSection
         color={config.color}

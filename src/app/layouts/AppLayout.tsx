@@ -20,11 +20,11 @@ export function AppLayout() {
   const sidebarOffsetClass =
     isRtl
       ? isSidebarCollapsed
-        ? "lg:pr-[72px]"
-        : "lg:pr-[258px]"
+        ? "lg:pr-[70px]"
+        : "lg:pr-[248px]"
       : isSidebarCollapsed
-        ? "lg:pl-[72px]"
-        : "lg:pl-[258px]";
+        ? "lg:pl-[70px]"
+        : "lg:pl-[248px]";
 
   return (
     <div className="app-shell-bg min-h-screen">
@@ -35,7 +35,7 @@ export function AppLayout() {
       <div
         className={[
           "flex min-h-screen flex-col",
-          "transition-all duration-300 ease-out",
+          "transition-[padding] duration-300 ease-out",
           "motion-reduce:transition-none",
           sidebarOffsetClass,
         ].join(" ")}

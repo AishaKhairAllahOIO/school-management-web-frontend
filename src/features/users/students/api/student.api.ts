@@ -1,6 +1,11 @@
 import { API_ENDPOINTS } from "@/services/api/endpoints";
 import { axiosClient } from "@/services/axios/axiosClient";
 
+import {
+  normalizeApiDateOnly,
+  normalizeApiDateTime,
+} from "../../shared/utils/api-date";
+
 import type {
   ApiId,
   ApiMessageResponse,
@@ -65,6 +70,55 @@ function normalizeToggleAccountResponse(
   };
 }
 
+
+function normalizePersonProfile<T extends {
+  birthDate?: string | null;
+}>(person: T): T {
+  return {
+    ...person,
+    birthDate: normalizeApiDateOnly(person.birthDate),
+  };
+}
+
+function normalizeStudentFullProfile(
+  profile: StudentFullProfile,
+): StudentFullProfile {
+  return {
+    ...profile,
+    student: normalizePersonProfile(profile.student),
+    guardian: profile.guardian
+      ? normalizePersonProfile(profile.guardian)
+      : null,
+    enrollment: {
+      ...profile.enrollment,
+      enrollmentDate: normalizeApiDateOnly(profile.enrollment.enrollmentDate),
+      completedAt: normalizeApiDateTime(profile.enrollment.completedAt),
+      deletedAt: normalizeApiDateTime(profile.enrollment.deletedAt),
+      createdAt: normalizeApiDateTime(profile.enrollment.createdAt),
+      updatedAt: normalizeApiDateTime(profile.enrollment.updatedAt),
+      academicYear: profile.enrollment.academicYear
+        ? {
+            ...profile.enrollment.academicYear,
+            startDate: normalizeApiDateOnly(profile.enrollment.academicYear.startDate),
+            endDate: normalizeApiDateOnly(profile.enrollment.academicYear.endDate),
+          }
+        : profile.enrollment.academicYear,
+    },
+  };
+}
+
+function normalizeStudentListResponse(
+  response: StudentListResponse,
+): StudentListResponse {
+  return {
+    ...response,
+    data: response.data.map((student) => ({
+      ...student,
+      deletedAt: normalizeApiDateTime(student.deletedAt),
+    })),
+  };
+}
+
 export const studentApi = {
   async list(
     filters: StudentListFilters = {},
@@ -78,7 +132,9 @@ export const studentApi = {
       },
     );
 
-    return unwrapResponse(response.data);
+    return normalizeStudentListResponse(
+      unwrapResponse(response.data),
+    );
   },
 
   async search(
@@ -104,7 +160,9 @@ export const studentApi = {
       },
     );
 
-    return unwrapResponse(response.data);
+    return normalizeStudentListResponse(
+      unwrapResponse(response.data),
+    );
   },
 
   async getDetails(
@@ -118,7 +176,15 @@ export const studentApi = {
       ),
     );
 
-    return unwrapResponse(response.data);
+    const details = unwrapResponse(response.data);
+
+    return {
+      ...details,
+      student: normalizePersonProfile(details.student),
+      guardian: details.guardian
+        ? normalizePersonProfile(details.guardian)
+        : null,
+    };
   },
 
   async getFullProfile(
@@ -132,7 +198,7 @@ export const studentApi = {
       ),
     );
 
-    return unwrapResponse(response.data);
+    return normalizeStudentFullProfile(unwrapResponse(response.data));
   },
 
   async register(
@@ -150,7 +216,7 @@ export const studentApi = {
       formData,
     );
 
-    return unwrapResponse(response.data);
+    return normalizeStudentFullProfile(unwrapResponse(response.data));
   },
 
   async updatePersonal(
@@ -171,7 +237,7 @@ export const studentApi = {
       formData,
     );
 
-    return unwrapResponse(response.data);
+    return normalizeStudentFullProfile(unwrapResponse(response.data));
   },
 
   async updateGuardian(
@@ -192,7 +258,7 @@ export const studentApi = {
       formData,
     );
 
-    return unwrapResponse(response.data);
+    return normalizeStudentFullProfile(unwrapResponse(response.data));
   },
 
   async updateEnrollment(
@@ -208,7 +274,7 @@ export const studentApi = {
       payload,
     );
 
-    return unwrapResponse(response.data);
+    return normalizeStudentFullProfile(unwrapResponse(response.data));
   },
 
   async toggleAccountStatus(
@@ -273,7 +339,7 @@ export const studentApi = {
       ),
     );
 
-    return unwrapResponse(response.data);
+    return normalizeStudentFullProfile(unwrapResponse(response.data));
   },
 
   async importFile(

@@ -1,3 +1,5 @@
+import { AuthenticatedUserImage } from "../../../shared/components/AuthenticatedUserImage";
+
 import type {
   ChangeEvent,
 } from "react";
@@ -50,11 +52,11 @@ export function StaffPhotoEditor({
   onRemove,
 }: StaffPhotoEditorProps) {
   return (
-    <div className="grid gap-4 lg:grid-cols-[160px_1fr]">
+    <div className="grid gap-4">
       <div
         className={[
           "relative mx-auto",
-          "h-40 w-40 overflow-hidden",
+          "h-32 w-32 overflow-hidden",
           "rounded-[26px]",
           "border border-border/70",
           "bg-muted/30",
@@ -63,7 +65,7 @@ export function StaffPhotoEditor({
         ].join(" ")}
       >
         {photoUrl ? (
-          <img
+          <AuthenticatedUserImage
             src={photoUrl}
             alt="Staff profile"
             className="h-full w-full object-cover"
@@ -98,13 +100,13 @@ export function StaffPhotoEditor({
 
       <div
         className={[
-          "flex min-h-40 flex-col",
+          "flex flex-col",
           "justify-center",
           "rounded-[22px]",
           "border border-dashed",
           "border-border",
           "bg-muted/20",
-          "p-5",
+          "p-4",
         ].join(" ")}
       >
         <div className="flex items-start gap-3">

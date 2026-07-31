@@ -1,4 +1,5 @@
 import {
+  type ChangeEvent,
   type Dispatch,
   type FormEvent,
   type ReactNode,
@@ -7,13 +8,10 @@ import {
   useState,
 } from "react";
 import {
-  CalendarDays,
+  Camera,
   GraduationCap,
-  IdCard,
-  Image,
   Loader2,
   Save,
-  ShieldCheck,
   UserRound,
   UsersRound,
 } from "lucide-react";
@@ -39,16 +37,14 @@ import {
 } from "../components/form/StudentFormPrimitives";
 import { StudentAcademicFields } from "../components/form/StudentAcademicFields";
 import { StudentPageHeader } from "../components/shared/StudentPageHeader";
+import { UserPageBackButton } from "../../shared/components/UserPageBackButton";
+import { AuthenticatedUserImage } from "../../shared/components/AuthenticatedUserImage";
 import {
   useStudentFullProfile,
-  useUpdateGuardian,
-  useUpdateStudentEnrollment,
   useUpdateStudentPersonal,
 } from "../hooks/useStudents";
 import type {
   EnrollmentStatus,
-  UpdateGuardianPersonalPayload,
-  UpdateStudentEnrollmentPayload,
   UpdateStudentPersonalPayload,
   UserGender,
 } from "../types/student.types";
@@ -66,6 +62,7 @@ type EditablePerson = {
   nationality: string;
   address: string;
   phone_number: string;
+  photo_url: File | null;
 };
 
 type EditableEnrollment = {
@@ -86,6 +83,7 @@ const emptyPerson: EditablePerson = {
   nationality: "",
   address: "",
   phone_number: "",
+  photo_url: null,
 };
 
 const emptyEnrollment: EditableEnrollment = {
@@ -340,6 +338,7 @@ function mapPersonToForm(
       "phone_number",
       "phone",
     ]),
+    photo_url: null,
   };
 }
 
@@ -364,51 +363,6 @@ function getProfileSection(
   return getValue(nestedData, keys);
 }
 
-function displayValue(
-  value: unknown,
-  fallback = "Not specified",
-): string {
-  if (
-    value === undefined ||
-    value === null ||
-    value === ""
-  ) {
-    return fallback;
-  }
-
-  return String(value);
-}
-
-function formatDateTime(
-  value: unknown,
-  fallback = "Not recorded",
-): string {
-  if (
-    value === undefined ||
-    value === null ||
-    value === ""
-  ) {
-    return fallback;
-  }
-
-  const date = new Date(String(value));
-
-  if (Number.isNaN(date.getTime())) {
-    return String(value);
-  }
-
-  return new Intl.DateTimeFormat(
-    "en-GB",
-    {
-      year: "numeric",
-      month: "short",
-      day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
-    },
-  ).format(date);
-}
-
 export function StudentEditPage() {
   const navigate = useNavigate();
 
@@ -425,12 +379,6 @@ export function StudentEditPage() {
       enrollmentId,
     );
 
-  const guardianMutation =
-    useUpdateGuardian(enrollmentId);
-
-  const enrollmentMutation =
-    useUpdateStudentEnrollment();
-
   const [student, setStudent] =
     useState<EditablePerson>(
       emptyPerson,
@@ -445,6 +393,15 @@ export function StudentEditPage() {
     useState<EditableEnrollment>(
       emptyEnrollment,
     );
+
+  const [studentPhotoUrl, setStudentPhotoUrl] =
+    useState<string | null>(null);
+  const [guardianPhotoUrl, setGuardianPhotoUrl] =
+    useState<string | null>(null);
+  const [studentPreview, setStudentPreview] =
+    useState<string | null>(null);
+  const [guardianPreview, setGuardianPreview] =
+    useState<string | null>(null);
 
   useEffect(() => {
     if (!profileQuery.data) {
@@ -482,6 +439,15 @@ export function StudentEditPage() {
       guardianData
         ? mapPersonToForm(guardianData)
         : emptyPerson,
+    );
+
+    setStudentPhotoUrl(
+      getString(studentData, ["photoUrl", "photo_url"]) || null,
+    );
+    setGuardianPhotoUrl(
+      guardianData
+        ? getString(guardianData, ["photoUrl", "photo_url"]) || null
+        : null,
     );
 
     setEnrollment({
@@ -541,6 +507,49 @@ export function StudentEditPage() {
     });
   }, [profileQuery.data]);
 
+  useEffect(() => {
+    return () => {
+      if (studentPreview) URL.revokeObjectURL(studentPreview);
+      if (guardianPreview) URL.revokeObjectURL(guardianPreview);
+    };
+  }, [studentPreview, guardianPreview]);
+
+  function selectPhoto(
+    target: "student" | "guardian",
+    event: ChangeEvent<HTMLInputElement>,
+  ) {
+    const file = event.target.files?.[0] ?? null;
+    if (!file) return;
+
+    const preview = URL.createObjectURL(file);
+
+    if (target === "student") {
+      if (studentPreview) URL.revokeObjectURL(studentPreview);
+      setStudentPreview(preview);
+      setStudent((current) => ({ ...current, photo_url: file }));
+    } else {
+      if (guardianPreview) URL.revokeObjectURL(guardianPreview);
+      setGuardianPreview(preview);
+      setGuardian((current) => ({ ...current, photo_url: file }));
+    }
+
+    event.target.value = "";
+  }
+
+  function removePhoto(target: "student" | "guardian") {
+    if (target === "student") {
+      if (studentPreview) URL.revokeObjectURL(studentPreview);
+      setStudentPreview(null);
+      setStudentPhotoUrl(null);
+      setStudent((current) => ({ ...current, photo_url: null }));
+    } else {
+      if (guardianPreview) URL.revokeObjectURL(guardianPreview);
+      setGuardianPreview(null);
+      setGuardianPhotoUrl(null);
+      setGuardian((current) => ({ ...current, photo_url: null }));
+    }
+  }
+
   async function submit(
     event: FormEvent,
   ) {
@@ -582,15 +591,6 @@ export function StudentEditPage() {
       ],
     );
 
-    const guardianId = getValue(
-      guardianData,
-      [
-        "id",
-        "guardianId",
-        "guardian_id",
-      ],
-    );
-
     if (
       studentId === undefined ||
       studentId === null
@@ -598,43 +598,30 @@ export function StudentEditPage() {
       return;
     }
 
-    const tasks: Promise<unknown>[] = [
-      studentMutation.mutateAsync({
-        studentId:
-          studentId as string | number,
-        payload:
-          student as UpdateStudentPersonalPayload,
-      }),
+    const payload: UpdateStudentPersonalPayload = {
+      ...student,
+      photo_url: student.photo_url,
+      guardian_first_name: guardianData ? guardian.first_name : undefined,
+      guardian_last_name: guardianData ? guardian.last_name : undefined,
+      guardian_father_name: guardianData ? guardian.father_name : undefined,
+      guardian_mother_name: guardianData ? guardian.mother_name : undefined,
+      guardian_birth_date: guardianData ? guardian.birth_date : undefined,
+      guardian_birth_place: guardianData ? guardian.birth_place : undefined,
+      guardian_gender: guardianData ? guardian.gender : undefined,
+      guardian_nationality: guardianData ? guardian.nationality : undefined,
+      guardian_address: guardianData ? guardian.address : undefined,
+      guardian_phone_number: guardianData ? guardian.phone_number : undefined,
+      guardian_photo_url: guardianData ? guardian.photo_url : undefined,
+      academic_year_id: enrollment.academic_year_id || undefined,
+      grade_level_id: enrollment.grade_level_id || undefined,
+      class_room_id: enrollment.class_room_id || undefined,
+      enrollment_status: enrollment.enrollment_status,
+    };
 
-      enrollmentMutation.mutateAsync({
-        enrollmentId,
-        payload: {
-          ...enrollment,
-          class_room_id:
-            enrollment.class_room_id ||
-            null,
-        } as UpdateStudentEnrollmentPayload,
-      }),
-    ];
-
-    if (
-      guardianData &&
-      guardianId !== undefined &&
-      guardianId !== null
-    ) {
-      tasks.push(
-        guardianMutation.mutateAsync({
-          guardianId:
-            guardianId as
-              | string
-              | number,
-          payload:
-            guardian as UpdateGuardianPersonalPayload,
-        }),
-      );
-    }
-
-    await Promise.all(tasks);
+    await studentMutation.mutateAsync({
+      studentId: studentId as string | number,
+      payload,
+    });
 
     navigate(
       `/users/students/${enrollmentId}`,
@@ -709,19 +696,21 @@ export function StudentEditPage() {
     );
 
   const isSaving =
-    studentMutation.isPending ||
-    guardianMutation.isPending ||
-    enrollmentMutation.isPending;
+    studentMutation.isPending;
 
   return (
     <form
       onSubmit={submit}
       className="space-y-5 pb-8"
     >
+      <UserPageBackButton
+        label="Back to students"
+        onClick={() => navigate(`/users/students/${enrollmentId}`)}
+      />
+
       <StudentPageHeader
         title="Edit student"
         description="Update personal details, guardian information and academic placement."
-        showBackButton
         photoUrl={getString(
           studentData,
           ["photoUrl", "photo_url"],
@@ -773,182 +762,44 @@ export function StudentEditPage() {
         }
       />
 
-      <FormSection
-        eyebrow="System records"
-        title="Student metadata"
-        description="Identifiers and account information returned by the server."
-        icon={
-          <IdCard
-            size={18}
-            strokeWidth={1.7}
-          />
-        }
-      >
-        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-          <ReadOnlyInfo
-            label="Student ID"
-            value={displayValue(
-              getValue(studentData, ["id"]),
-            )}
-          />
+      <div className="grid items-start gap-5 xl:grid-cols-[340px_minmax(0,1fr)]">
+        <PersonPhotoSection
+          title="Student photo"
+          description="Update the student profile photo."
+          photoUrl={studentPreview ?? studentPhotoUrl}
+          authenticated={!studentPreview}
+          disabled={isSaving}
+          onChange={(event) => selectPhoto("student", event)}
+          onRemove={() => removePhoto("student")}
+        />
 
-          <ReadOnlyInfo
-            label="Student user ID"
-            value={displayValue(
-              getValue(studentData, [
-                "userId",
-                "user_id",
-              ]),
-            )}
-          />
+        <EditablePersonSection
+          eyebrow="Student details"
+          title="Personal information"
+          description="Update identity, birth and contact details."
+          icon={
+            <UserRound
+              size={18}
+              strokeWidth={1.7}
+            />
+          }
+          value={student}
+          onChange={setStudent}
+        />
 
-          <ReadOnlyInfo
-            label="Account status"
-            value={displayValue(
-              getValue(studentData, [
-                "accountStatus",
-                "account_status",
-              ]),
-            )}
-          />
-
-          <ReadOnlyInfo
-            label="Record status"
-            value={displayValue(
-              getValue(studentData, [
-                "recordStatus",
-                "record_status",
-              ]),
-            )}
-          />
-
-          <ReadOnlyInfo
-            label="Current full name"
-            value={displayValue(
-              getValue(studentData, [
-                "fullName",
-                "full_name",
-              ]),
-            )}
-            className="sm:col-span-2"
-          />
-
-          <ReadOnlyInfo
-            label="Photo URL"
-            value={displayValue(
-              getValue(studentData, [
-                "photoUrl",
-                "photo_url",
-              ]),
-            )}
-            className="sm:col-span-2"
-          />
-        </div>
-      </FormSection>
-
-      <EditablePersonSection
-        eyebrow="Student details"
-        title="Personal information"
-        description="Update identity, birth and contact details."
-        icon={
-          <UserRound
-            size={18}
-            strokeWidth={1.7}
-          />
-        }
-        value={student}
-        onChange={setStudent}
-      />
+      </div>
 
       {guardianData ? (
-        <>
-          <FormSection
-            eyebrow="System records"
-            title="Guardian metadata"
-            description="Guardian identifiers and account information."
-            icon={
-              <UsersRound
-                size={18}
-                strokeWidth={1.7}
-              />
-            }
-          >
-            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-              <ReadOnlyInfo
-                label="Guardian ID"
-                value={displayValue(
-                  getValue(
-                    guardianData,
-                    ["id"],
-                  ),
-                )}
-              />
-
-              <ReadOnlyInfo
-                label="Guardian user ID"
-                value={displayValue(
-                  getValue(
-                    guardianData,
-                    ["userId", "user_id"],
-                  ),
-                )}
-              />
-
-              <ReadOnlyInfo
-                label="Account status"
-                value={displayValue(
-                  getValue(
-                    guardianData,
-                    [
-                      "accountStatus",
-                      "account_status",
-                    ],
-                  ),
-                )}
-              />
-
-              <ReadOnlyInfo
-                label="Record status"
-                value={displayValue(
-                  getValue(
-                    guardianData,
-                    [
-                      "recordStatus",
-                      "record_status",
-                    ],
-                  ),
-                )}
-              />
-
-              <ReadOnlyInfo
-                label="Current full name"
-                value={displayValue(
-                  getValue(
-                    guardianData,
-                    [
-                      "fullName",
-                      "full_name",
-                    ],
-                  ),
-                )}
-                className="sm:col-span-2"
-              />
-
-              <ReadOnlyInfo
-                label="Photo URL"
-                value={displayValue(
-                  getValue(
-                    guardianData,
-                    [
-                      "photoUrl",
-                      "photo_url",
-                    ],
-                  ),
-                )}
-                className="sm:col-span-2"
-              />
-            </div>
-          </FormSection>
+        <div className="grid items-start gap-5 xl:grid-cols-[340px_minmax(0,1fr)]">
+          <PersonPhotoSection
+            title="Guardian photo"
+            description="Update the guardian profile photo."
+            photoUrl={guardianPreview ?? guardianPhotoUrl}
+            authenticated={!guardianPreview}
+            disabled={isSaving}
+            onChange={(event) => selectPhoto("guardian", event)}
+            onRemove={() => removePhoto("guardian")}
+          />
 
           <EditablePersonSection
             eyebrow="Family contact"
@@ -963,7 +814,7 @@ export function StudentEditPage() {
             value={guardian}
             onChange={setGuardian}
           />
-        </>
+        </div>
       ) : null}
 
       <FormSection
@@ -977,91 +828,6 @@ export function StudentEditPage() {
           />
         }
       >
-        <div className="mb-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-          <ReadOnlyInfo
-            label="Enrollment ID"
-            value={displayValue(
-              getValue(enrollmentData, [
-                "id",
-              ]),
-            )}
-          />
-
-          <ReadOnlyInfo
-            label="Linked student ID"
-            value={displayValue(
-              getValue(enrollmentData, [
-                "studentId",
-                "student_id",
-              ]),
-            )}
-          />
-
-          <ReadOnlyInfo
-            label="Created at"
-            value={formatDateTime(
-              getValue(enrollmentData, [
-                "createdAt",
-                "created_at",
-              ]),
-            )}
-          />
-
-          <ReadOnlyInfo
-            label="Updated at"
-            value={formatDateTime(
-              getValue(enrollmentData, [
-                "updatedAt",
-                "updated_at",
-              ]),
-            )}
-          />
-
-          <ReadOnlyInfo
-            label="Enrollment date"
-            value={formatDateTime(
-              getValue(enrollmentData, [
-                "enrollmentDate",
-                "enrollment_date",
-              ]),
-            )}
-          />
-
-          <ReadOnlyInfo
-            label="Completed at"
-            value={formatDateTime(
-              getValue(enrollmentData, [
-                "completedAt",
-                "completed_at",
-              ]),
-              "Not completed",
-            )}
-          />
-
-          <ReadOnlyInfo
-            label="Deleted"
-            value={
-              getValue(enrollmentData, [
-                "isDeleted",
-                "is_deleted",
-              ])
-                ? "Yes"
-                : "No"
-            }
-          />
-
-          <ReadOnlyInfo
-            label="Deleted at"
-            value={formatDateTime(
-              getValue(enrollmentData, [
-                "deletedAt",
-                "deleted_at",
-              ]),
-              "Not deleted",
-            )}
-          />
-        </div>
-
         <StudentAcademicFields
           academicYearId={
             enrollment.academic_year_id
@@ -1132,6 +898,81 @@ export function StudentEditPage() {
         </div>
       </FormSection>
     </form>
+  );
+}
+
+function PersonPhotoSection({
+  title,
+  description,
+  photoUrl,
+  authenticated,
+  disabled,
+  onChange,
+  onRemove,
+}: {
+  title: string;
+  description: string;
+  photoUrl: string | null;
+  authenticated: boolean;
+  disabled: boolean;
+  onChange: (event: ChangeEvent<HTMLInputElement>) => void;
+  onRemove: () => void;
+}) {
+  return (
+    <FormSection
+      eyebrow="Profile"
+      title={title}
+      description={description}
+      icon={<Camera size={18} strokeWidth={1.7} />}
+      completed={Boolean(photoUrl)}
+    >
+      <div className="flex flex-col items-center gap-5 sm:flex-row">
+        <div className="flex h-36 w-28 shrink-0 items-center justify-center overflow-hidden rounded-[20px] border border-border/60 bg-primary/[0.035]">
+          {photoUrl ? (
+            authenticated ? (
+              <AuthenticatedUserImage
+                src={photoUrl}
+                alt={title}
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              <img
+                src={photoUrl}
+                alt={title}
+                className="h-full w-full object-cover"
+              />
+            )
+          ) : (
+            <Camera size={35} strokeWidth={1.4} className="text-primary" />
+          )}
+        </div>
+
+        <div className="flex flex-wrap gap-3">
+          <label className="inline-flex h-11 cursor-pointer items-center gap-2 rounded-xl border border-primary/20 bg-primary/[0.06] px-5 text-sm font-medium text-primary transition hover:bg-primary/[0.1]">
+            <Camera size={16} strokeWidth={1.8} />
+            Choose photo
+            <input
+              type="file"
+              accept="image/png,image/jpeg,image/webp"
+              className="hidden"
+              disabled={disabled}
+              onChange={onChange}
+            />
+          </label>
+
+          {photoUrl && !authenticated ? (
+            <button
+              type="button"
+              disabled={disabled}
+              onClick={onRemove}
+              className="inline-flex h-11 items-center rounded-xl border border-border/70 bg-card px-4 text-sm font-medium text-foreground transition hover:bg-muted/40 disabled:opacity-60"
+            >
+              Remove
+            </button>
+          ) : null}
+        </div>
+      </div>
+    </FormSection>
   );
 }
 
@@ -1250,68 +1091,3 @@ function EditablePersonSection({
   );
 }
 
-function ReadOnlyInfo({
-  label,
-  value,
-  className = "",
-}: {
-  label: string;
-  value: string;
-  className?: string;
-}) {
-  return (
-    <article
-      className={[
-        "rounded-[16px]",
-        "border border-border/60",
-        "bg-muted/[0.22]",
-        "px-4 py-3.5",
-        className,
-      ].join(" ")}
-    >
-      <div className="flex items-start gap-3">
-        <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-[10px] bg-primary/[0.07] text-primary">
-          {label.toLowerCase().includes("date") ||
-          label.toLowerCase().includes("at") ? (
-            <CalendarDays
-              size={15}
-              strokeWidth={1.7}
-            />
-          ) : label
-              .toLowerCase()
-              .includes("status") ||
-            label
-              .toLowerCase()
-              .includes("deleted") ? (
-            <ShieldCheck
-              size={15}
-              strokeWidth={1.7}
-            />
-          ) : label
-              .toLowerCase()
-              .includes("photo") ? (
-            <Image
-              size={15}
-              strokeWidth={1.7}
-            />
-          ) : (
-            <IdCard
-              size={15}
-              strokeWidth={1.7}
-            />
-          )}
-        </span>
-
-        <div className="min-w-0">
-          <p className="text-[11px] font-medium uppercase tracking-[0.08em] text-muted-foreground">
-            {label}
-          </p>
-
-          <p className="mt-1 break-words text-sm font-medium text-foreground">
-            {value}
-          </p>
-        </div>
-      </div>
-    </article>
-  );
-}

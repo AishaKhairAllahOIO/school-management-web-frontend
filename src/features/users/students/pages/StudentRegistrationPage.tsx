@@ -31,6 +31,7 @@ import {
 } from "../components/form/StudentFormPrimitives";
 import { StudentAcademicFields } from "../components/form/StudentAcademicFields";
 import { StudentPageHeader } from "../components/shared/StudentPageHeader";
+import { UserPageBackButton } from "../../shared/components/UserPageBackButton";
 import { useRegisterStudent } from "../hooks/useStudents";
 import type {
   RegisterStudentPayload,
@@ -101,15 +102,22 @@ export function StudentRegistrationPage() {
     setStudentPreview,
   ] = useState<string | null>(null);
 
+  const [
+    guardianPreview,
+    setGuardianPreview,
+  ] = useState<string | null>(null);
+
   useEffect(() => {
     return () => {
       if (studentPreview) {
-        URL.revokeObjectURL(
-          studentPreview,
-        );
+        URL.revokeObjectURL(studentPreview);
+      }
+
+      if (guardianPreview) {
+        URL.revokeObjectURL(guardianPreview);
       }
     };
-  }, [studentPreview]);
+  }, [studentPreview, guardianPreview]);
 
   const studentCompleted = useMemo(
     () =>
@@ -212,6 +220,25 @@ export function StudentRegistrationPage() {
     });
   }
 
+  function selectGuardianPhoto(
+    event: ChangeEvent<HTMLInputElement>,
+  ) {
+    const file =
+      event.target.files?.[0] ?? null;
+
+    updateGuardian("photo_url", file);
+
+    setGuardianPreview((current) => {
+      if (current) {
+        URL.revokeObjectURL(current);
+      }
+
+      return file
+        ? URL.createObjectURL(file)
+        : null;
+    });
+  }
+
   async function submit(
     event: FormEvent,
   ) {
@@ -259,11 +286,15 @@ export function StudentRegistrationPage() {
 
   return (
     <form onSubmit={submit} className="space-y-5 pb-8">
+        <UserPageBackButton
+          label="Back to students"
+          onClick={() => navigate("/users/students")}
+        />
+
         <StudentPageHeader
           title="Add student"
           description="Create a student profile, connect a guardian and choose the academic placement."
-          showBackButton
-          icon={
+            icon={
             <UserPlus
               size={23}
               strokeWidth={1.7}
@@ -306,95 +337,156 @@ export function StudentRegistrationPage() {
         />
 
         <div className="space-y-5">
-            <FormSection
-              eyebrow="Profile image"
-              title="Student photo"
-              description="Add a clear portrait for the student directory and profile."
-              icon={
-                <Camera
-                  size={18}
-                  strokeWidth={1.7}
-                />
-              }
-              completed={Boolean(
-                form.student.photo_url,
-              )}
-            >
-              <div className="flex flex-col items-center gap-5 sm:flex-row">
-                <div className="flex h-44 w-36 shrink-0 items-center justify-center overflow-hidden rounded-[20px] border border-border/60 bg-primary/[0.035]">
-                  {studentPreview ? (
-                    <img
-                      src={studentPreview}
-                      alt="Student preview"
-                      className="h-full w-full object-cover"
-                    />
-                  ) : (
-                    <Camera
-                      size={35}
-                      strokeWidth={1.4}
-                      className="text-primary"
-                    />
-                  )}
+            <div className="grid items-start gap-5 xl:grid-cols-[340px_minmax(0,1fr)]">
+              <FormSection
+                eyebrow="Profile image"
+                title="Student photo"
+                description="Add a clear portrait for the student directory and profile."
+                icon={
+                  <Camera
+                    size={18}
+                    strokeWidth={1.7}
+                  />
+                }
+                completed={Boolean(
+                  form.student.photo_url,
+                )}
+              >
+                <div className="flex flex-col items-center gap-5 sm:flex-row">
+                  <div className="flex h-36 w-28 shrink-0 items-center justify-center overflow-hidden rounded-[20px] border border-border/60 bg-primary/[0.035]">
+                    {studentPreview ? (
+                      <img
+                        src={studentPreview}
+                        alt="Student preview"
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <Camera
+                        size={35}
+                        strokeWidth={1.4}
+                        className="text-primary"
+                      />
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="inline-flex h-11 cursor-pointer items-center gap-2 rounded-xl border border-primary/20 bg-primary/[0.06] px-5 text-sm font-medium text-primary transition hover:bg-primary/[0.1]">
+                      <Camera
+                        size={16}
+                        strokeWidth={1.8}
+                      />
+
+                      Choose photo
+
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={
+                          selectStudentPhoto
+                        }
+                      />
+                    </label>
+
+                    <p className="mt-3 text-xs font-normal leading-5 text-muted-foreground">
+                      Use a portrait JPG or PNG
+                      image with a clear face.
+                    </p>
+                  </div>
                 </div>
+              </FormSection>
 
-                <div>
-                  <label className="inline-flex h-11 cursor-pointer items-center gap-2 rounded-xl border border-primary/20 bg-primary/[0.06] px-5 text-sm font-medium text-primary transition hover:bg-primary/[0.1]">
-                    <Camera
-                      size={16}
-                      strokeWidth={1.8}
-                    />
+              <PersonFormSection
+                eyebrow="Student details"
+                title="Personal information"
+                description="Identity, birth and contact details for the student."
+                icon={
+                  <UserPlus
+                    size={18}
+                    strokeWidth={1.7}
+                  />
+                }
+                value={form.student}
+                completed={studentCompleted}
+                onChange={updateStudent}
+              />
 
-                    Choose photo
+            </div>
 
-                    <input
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={
-                        selectStudentPhoto
-                      }
-                    />
-                  </label>
+            <div className="grid items-start gap-5 xl:grid-cols-[340px_minmax(0,1fr)]">
+              <FormSection
+                eyebrow="Guardian profile"
+                title="Guardian photo"
+                description="Add a clear photo for the guardian profile."
+                icon={
+                  <Camera
+                    size={18}
+                    strokeWidth={1.7}
+                  />
+                }
+                completed={Boolean(
+                  form.guardian.photo_url,
+                )}
+              >
+                <div className="flex flex-col items-center gap-5 sm:flex-row">
+                  <div className="flex h-36 w-28 shrink-0 items-center justify-center overflow-hidden rounded-[20px] border border-border/60 bg-primary/[0.035]">
+                    {guardianPreview ? (
+                      <img
+                        src={guardianPreview}
+                        alt="Guardian preview"
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <Camera
+                        size={35}
+                        strokeWidth={1.4}
+                        className="text-primary"
+                      />
+                    )}
+                  </div>
 
-                  <p className="mt-3 text-xs font-normal leading-5 text-muted-foreground">
-                    Use a portrait JPG or PNG
-                    image with a clear face.
-                  </p>
+                  <div>
+                    <label className="inline-flex h-11 cursor-pointer items-center gap-2 rounded-xl border border-primary/20 bg-primary/[0.06] px-5 text-sm font-medium text-primary transition hover:bg-primary/[0.1]">
+                      <Camera
+                        size={16}
+                        strokeWidth={1.8}
+                      />
+
+                      Choose guardian photo
+
+                      <input
+                        type="file"
+                        accept="image/png,image/jpeg,image/webp"
+                        className="hidden"
+                        onChange={selectGuardianPhoto}
+                      />
+                    </label>
+
+                    <p className="mt-3 text-xs font-normal leading-5 text-muted-foreground">
+                      PNG, JPG or WEBP. A square portrait works best.
+                    </p>
+                  </div>
                 </div>
-              </div>
-            </FormSection>
+              </FormSection>
 
-            <PersonFormSection
-              eyebrow="Student details"
-              title="Personal information"
-              description="Identity, birth and contact details for the student."
-              icon={
-                <UserPlus
-                  size={18}
-                  strokeWidth={1.7}
-                />
-              }
-              value={form.student}
-              completed={studentCompleted}
-              onChange={updateStudent}
-            />
+              <PersonFormSection
+                eyebrow="Family contact"
+                title="Guardian information"
+                description="Information for the guardian responsible for this student."
+                icon={
+                  <UsersRound
+                    size={18}
+                    strokeWidth={1.7}
+                  />
+                }
+                value={form.guardian}
+                completed={
+                  guardianCompleted
+                }
+                onChange={updateGuardian}
+              />
 
-            <PersonFormSection
-              eyebrow="Family contact"
-              title="Guardian information"
-              description="Information for the guardian responsible for this student."
-              icon={
-                <UsersRound
-                  size={18}
-                  strokeWidth={1.7}
-                />
-              }
-              value={form.guardian}
-              completed={
-                guardianCompleted
-              }
-              onChange={updateGuardian}
-            />
+            </div>
 
             <FormSection
               eyebrow="Academic placement"

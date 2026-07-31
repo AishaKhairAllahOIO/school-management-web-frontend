@@ -276,10 +276,10 @@ export function StaffRolePage({
 
         <div className="relative flex flex-col gap-6 xl:flex-row xl:items-center xl:justify-between">
           <div className="relative min-w-0">
-  <div className="flex min-w-0 items-start gap-3.5">
+  <div className="flex min-w-0 items-center gap-3.5">
     <span
       className={[
-        "flex h-10 w-12 shrink-0",
+        "flex h-10 w-10 shrink-0",
         "items-center justify-center",
         "rounded-[17px]",
         config.color.light,

@@ -15,6 +15,8 @@ import {
   Trash2,
 } from "lucide-react";
 
+import { AuthenticatedUserImage } from "../../../shared/components/AuthenticatedUserImage";
+
 import type {
   StaffProfile,
   StaffSectionColor,
@@ -240,10 +242,8 @@ export function StaffCard({
           >
             <div className="flex items-center gap-3.5">
               {staff.photoUrl ? (
-                <img
-                  src={
-                    staff.photoUrl
-                  }
+                <AuthenticatedUserImage
+                  src={staff.photoUrl}
                   alt={fullName}
                   className={[
                     "h-14 w-14 shrink-0 rounded-[18px] object-cover",
@@ -251,6 +251,20 @@ export function StaffCard({
                     color.border,
                     "shadow-[var(--shadow-soft)]",
                   ].join(" ")}
+                  fallback={
+                    <div
+                      aria-hidden="true"
+                      className={[
+                        "flex h-14 w-14 shrink-0 items-center justify-center",
+                        "rounded-[15px]",
+                        color.light,
+                        color.text,
+                        "text-base font-semibold",
+                      ].join(" ")}
+                    >
+                      {getInitials(fullName)}
+                    </div>
+                  }
                 />
               ) : (
                 <div

@@ -1,3 +1,4 @@
+@import url("https://fonts.googleapis.com/css2?family=Exo:wght@300;400;500;600;700;800&display=swap");
 @import "tailwindcss";
 @import "tw-animate-css";
 
@@ -5,6 +6,9 @@
 
 :root {
   color-scheme: light;
+
+  --font-family: "Exo", sans-serif;
+  --font-brand: "Nunito Sans", ui-sans-serif, system-ui, sans-serif;
 
   --background: 250 250 255;
   --foreground: 21 20 44;
@@ -35,10 +39,10 @@
 
   --radius: 0.75rem;
 
-  --sidebar: 18 15 59;
+  --sidebar: 20 18 58;
   --sidebar-foreground: 255 255 255;
-  --sidebar-muted: 171 166 214;
-  --sidebar-active: 103 58 244;
+  --sidebar-muted: 184 180 218;
+  --sidebar-active: 101 84 210;
   --sidebar-active-foreground: 255 255 255;
   --sidebar-divider: 255 255 255;
 
@@ -65,9 +69,9 @@
   --gradient-sidebar:
     linear-gradient(
       180deg,
-      #100d3b 0%,
-      #151044 48%,
-      #090721 100%
+      #17143f 0%,
+      #120f35 48%,
+      #0c0a27 100%
     );
 
   --gradient-card:
@@ -158,10 +162,10 @@
   --input: 50 45 92;
   --ring: 167 139 250;
 
-  --sidebar: 8 7 26;
+  --sidebar: 10 9 34;
   --sidebar-foreground: 255 255 255;
-  --sidebar-muted: 160 154 203;
-  --sidebar-active: 124 86 255;
+  --sidebar-muted: 174 169 208;
+  --sidebar-active: 122 103 231;
   --sidebar-active-foreground: 255 255 255;
   --sidebar-divider: 255 255 255;
 
@@ -184,9 +188,9 @@
   --gradient-sidebar:
     linear-gradient(
       180deg,
-      #090721 0%,
-      #120d3a 55%,
-      #060515 100%
+      #0f0d32 0%,
+      #0c0a29 52%,
+      #07061c 100%
     );
 
   --gradient-card:
@@ -365,6 +369,22 @@
     border-color: rgb(var(--border));
   }
 
+ html,
+  body,
+  #root {
+    font-family: var(--font-family);
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+  font-family: inherit;
+}
  html {
   scroll-behavior: smooth;
 
@@ -416,13 +436,6 @@
   background:
     transparent;
 }
-
-  button,
-  input,
-  textarea,
-  select {
-    font: inherit;
-  }
 }
 
 @layer utilities {
@@ -509,9 +522,8 @@
 
   .sidebar-shell {
     box-shadow:
-      0 26px 80px rgb(12 8 48 / 0.32),
-      inset -1px 0 0
-        rgb(var(--sidebar-foreground) / 0.1);
+      14px 0 46px rgb(28 22 78 / 0.16),
+      inset -1px 0 0 rgb(var(--sidebar-foreground) / 0.08);
   }
 
   .sidebar-divider {
@@ -529,10 +541,8 @@
 
   .sidebar-active-glow {
     box-shadow:
-      0 14px 30px
-        rgb(var(--sidebar-active) / 0.28),
-      inset 0 1px 0
-        rgb(var(--sidebar-active-foreground) / 0.14);
+      0 10px 24px rgb(var(--sidebar-active) / 0.18),
+      inset 0 1px 0 rgb(var(--sidebar-active-foreground) / 0.10);
   }
 
   .sidebar-shell a[aria-current="page"] {
@@ -759,6 +769,33 @@
   .topbar-menu-shadow {
     box-shadow:
       var(--shadow-topbar-menu);
+  }
+  .sidebar-brand-title {
+    display: block;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-family: var(--font-brand);
+    font-size: 0.94rem;
+    font-weight: 800;
+    line-height: 1.08;
+    letter-spacing: -0.03em;
+    white-space: nowrap;
+    color: rgb(var(--sidebar-foreground));
+  }
+
+  .sidebar-brand-subtitle {
+    display: block;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-family: var(--font-family);
+    font-size: 0.625rem;
+    font-weight: 400;
+    line-height: 1.2;
+    letter-spacing: 0.012em;
+    white-space: nowrap;
+    color: rgb(var(--sidebar-muted) / 0.74);
   }
 }
 

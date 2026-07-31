@@ -10,6 +10,12 @@ import {
   objectToFormData,
 } from "../../shared/api/form-data.utils";
 
+
+import {
+  normalizeApiDateOnly,
+  normalizeApiDateTime,
+} from "../../shared/utils/api-date";
+
 import type {
   ApiResponse,
 } from "../../shared/types/api.types";
@@ -324,11 +330,12 @@ function normalizeStaff(
       user?.email ??
       null,
 
-    birthDate:
+    birthDate: normalizeApiDateOnly(
       raw.birthDate ??
       raw.birth_date ??
       user?.birth_date ??
       null,
+    ),
 
     birthPlace:
       raw.birthPlace ??
@@ -382,10 +389,11 @@ function normalizeStaff(
         raw.graduation_year,
       ),
 
-    hireDate:
+    hireDate: normalizeApiDateOnly(
       raw.hireDate ??
       raw.hire_date ??
       null,
+    ),
 
     experienceYears:
       raw.experienceYears ??
@@ -409,17 +417,15 @@ function normalizeStaff(
       raw.is_deleted ??
       Boolean(deletedAt),
 
-    deletedAt,
+    deletedAt: normalizeApiDateTime(deletedAt),
 
-    createdAt:
-      raw.createdAt ??
-      raw.created_at ??
-      null,
+    createdAt: normalizeApiDateTime(
+      raw.createdAt ?? raw.created_at ?? null,
+    ),
 
-    updatedAt:
-      raw.updatedAt ??
-      raw.updated_at ??
-      null,
+    updatedAt: normalizeApiDateTime(
+      raw.updatedAt ?? raw.updated_at ?? null,
+    ),
   };
 }
 

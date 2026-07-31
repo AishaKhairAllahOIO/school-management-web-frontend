@@ -1,6 +1,5 @@
 import {
   BookOpen,
-  CalendarDays,
   Clock3,
   Download,
   Edit3,
@@ -28,7 +27,6 @@ import {
   useUpdateClassSchedule,
 } from "@/features/scheduling/class-schedules/hooks/useClassSchedules";
 import { useSchedulingCatalog } from "@/features/scheduling/catalog/hooks/useSchedulingCatalog";
-import { SchedulePageHeader } from "@/features/scheduling/components/SchedulePageHeader";
 import { SchedulingLoadingState } from "@/features/scheduling/shared/components/SchedulingLoadingState";
 import { exportScheduleWorkbook } from "@/features/scheduling/shared/utils/export-schedule-xlsx";
 import {
@@ -159,15 +157,6 @@ export function ClassSchedulesPage() {
 
   return (
     <div className="space-y-5">
-      <SchedulePageHeader
-        title="Class Schedules"
-        description="Build colorful weekly schedules from the current grades and classrooms."
-        icon={CalendarDays}
-        onExport={handleExport}
-        onAdd={openCreateDialog}
-        addLabel="Add Lesson"
-      />
-
       <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <MetricCard label="Assigned Lessons" value={totalAssigned} icon={BookOpen} className="border-violet-200/60 bg-violet-50/65 text-violet-700" />
         <MetricCard label="Active Teachers" value={uniqueTeachers} icon={Users} className="border-sky-200/60 bg-sky-50/65 text-sky-700" />
@@ -220,116 +209,50 @@ export function ClassSchedulesPage() {
       </section>
 
       <section className="rounded-[26px] border border-border/45 bg-card p-4 shadow-[0_10px_35px_rgba(30,20,70,0.035)] sm:p-5">
-        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+        <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h2 className="text-[15px] font-semibold text-foreground">
+            <h2 className="text-[15px] font-medium text-foreground">
               {gradeMap.get(activeGradeId)?.name} · {selectedClassroom?.name}
             </h2>
             <p className="mt-1 text-[11px] text-muted-foreground">
               Room {selectedClassroom?.roomNumber ?? "—"} · {selectedClassroom?.studentCount ?? 0} students
             </p>
           </div>
-
-          <button
-            type="button"
-            onClick={handleExport}
-            className="inline-flex h-9 items-center gap-2 rounded-full border border-border/65 bg-background px-4 text-[11px] font-medium text-foreground/75 transition hover:bg-muted/45 hover:text-foreground"
-          >
-            <Download size={14} />
-            Export classroom
-          </button>
+          <div className="flex flex-wrap gap-2">
+            <button type="button" onClick={handleExport} className="inline-flex h-9 items-center gap-2 rounded-full border border-border/65 bg-background px-4 text-[11px] font-medium text-foreground/75 transition hover:bg-muted/45">
+              <Download size={14}/>Export
+            </button>
+            <button type="button" onClick={openCreateDialog} className="inline-flex h-9 items-center gap-2 rounded-full bg-primary px-4 text-[11px] font-medium text-primary-foreground">
+              <Plus size={14}/>Add Lesson
+            </button>
+          </div>
         </div>
 
-        <div className="grid gap-3 lg:grid-cols-5">
-          {weekDays.map((day, dayIndex) => {
-            const daySchedules = visibleSchedules
-              .filter((item) => item.day === day)
-              .sort(
-                (a, b) =>
-                  timeSlots.findIndex((slot) => slot.id === a.timeSlotId) -
-                  timeSlots.findIndex((slot) => slot.id === b.timeSlotId),
-              );
+        <div className="hidden overflow-hidden rounded-[20px] border border-border/55 lg:block">
+          <div className="grid grid-cols-[110px_repeat(6,minmax(0,1fr))] bg-muted/[0.18]">
+            <div className="border-r border-border/45 px-3 py-3 text-[10px] font-medium uppercase tracking-[0.08em] text-muted-foreground">Period</div>
+            {weekDays.map((day, index) => <div key={day} className={`border-r border-border/45 px-3 py-3 text-center text-[11px] font-medium last:border-r-0 ${["bg-violet-50/55","bg-sky-50/55","bg-emerald-50/55","bg-amber-50/55","bg-rose-50/55","bg-fuchsia-50/45"][index]}`}>{day}</div>)}
+          </div>
+          {timeSlots.map((slot) => (
+            <div key={slot.id} className="grid grid-cols-[110px_repeat(6,minmax(0,1fr))] border-t border-border/45">
+              <div className="flex flex-col justify-center border-r border-border/45 bg-muted/[0.10] px-3 py-3"><span className="text-[11px] font-medium text-foreground">{slot.label}</span><span className="mt-1 text-[9px] text-muted-foreground">{slot.start} – {slot.end}</span></div>
+              {weekDays.map((day) => {
+                const schedule = visibleSchedules.find((item) => item.day === day && item.timeSlotId === slot.id);
+                const subject = schedule ? subjectMap.get(schedule.subjectId) : undefined;
+                const teacher = schedule ? teacherMap.get(schedule.teacherId) : undefined;
+                return <div key={day} className="min-h-[112px] border-r border-border/45 p-2 last:border-r-0">
+                  {schedule ? <article className={`group h-full rounded-[15px] border p-2.5 ${subject ? pastelByColor[subject.color] : "border-border/55 bg-muted/15"}`}>
+                    <div className="flex items-start justify-between gap-1"><p className="truncate text-[10px] font-medium text-foreground">{subject?.name ?? "Subject"}</p><div className="flex gap-1 opacity-100 xl:opacity-0 xl:group-hover:opacity-100"><button onClick={()=>openEditDialog(schedule)} className="flex h-6 w-6 items-center justify-center rounded-full bg-card/90 text-primary"><Edit3 size={11}/></button><button onClick={()=>setDeletingSchedule(schedule)} className="flex h-6 w-6 items-center justify-center rounded-full bg-card/90 text-destructive"><Trash2 size={11}/></button></div></div>
+                    <p className="mt-2 truncate text-[9px] text-foreground/75">{teacher?.name}</p><p className="mt-1 text-[9px] text-muted-foreground">Room {schedule.roomNumber ?? selectedClassroom?.roomNumber ?? "—"}</p>
+                  </article> : <button onClick={openCreateDialog} className="flex h-full w-full flex-col items-center justify-center rounded-[15px] border border-dashed border-border/55 text-muted-foreground hover:border-primary/30 hover:bg-primary/[0.025] hover:text-primary"><Plus size={14}/><span className="mt-1 text-[9px]">Add</span></button>}
+                </div>;
+              })}
+            </div>
+          ))}
+        </div>
 
-            const dayColors = [
-              "border-violet-200/60 bg-violet-50/45",
-              "border-sky-200/60 bg-sky-50/45",
-              "border-emerald-200/60 bg-emerald-50/45",
-              "border-amber-200/60 bg-amber-50/45",
-              "border-rose-200/60 bg-rose-50/45",
-            ];
-
-            return (
-              <div key={day} className="min-w-0">
-                <div className={`rounded-[16px] border px-3 py-3 ${dayColors[dayIndex]}`}>
-                  <p className="text-xs font-semibold text-foreground">{day}</p>
-                  <p className="mt-0.5 text-[10px] text-muted-foreground">
-                    {daySchedules.length} lessons
-                  </p>
-                </div>
-
-                <div className="mt-2 space-y-2">
-                  {daySchedules.length > 0 ? (
-                    daySchedules.map((schedule) => {
-                      const subject = subjectMap.get(schedule.subjectId);
-                      const teacher = teacherMap.get(schedule.teacherId);
-                      const slot = slotMap.get(schedule.timeSlotId);
-
-                      return (
-                        <article
-                          key={schedule.id}
-                          className={[
-                            "group rounded-[18px] border p-3 transition",
-                            "hover:-translate-y-0.5 hover:shadow-[0_8px_22px_rgba(30,20,70,0.055)]",
-                            subject ? pastelByColor[subject.color] : "border-border/55 bg-muted/15",
-                          ].join(" ")}
-                        >
-                          <div className="flex items-start justify-between gap-2">
-                            <div className="min-w-0">
-                              <p className="truncate text-[11px] font-semibold text-foreground">
-                                {subject?.name ?? "Subject"}
-                              </p>
-                              <p className="mt-1 text-[9px] text-muted-foreground">{slot?.label}</p>
-                            </div>
-
-                            <div className="flex shrink-0 gap-1 opacity-100 lg:opacity-0 lg:transition lg:group-hover:opacity-100">
-                              <button
-                                type="button"
-                                aria-label="Edit schedule"
-                                onClick={() => openEditDialog(schedule)}
-                                className="flex h-7 w-7 items-center justify-center rounded-full bg-card/90 text-primary shadow-sm"
-                              >
-                                <Edit3 size={12} />
-                              </button>
-                              <button
-                                type="button"
-                                aria-label="Delete schedule"
-                                onClick={() => setDeletingSchedule(schedule)}
-                                className="flex h-7 w-7 items-center justify-center rounded-full bg-card/90 text-destructive shadow-sm"
-                              >
-                                <Trash2 size={12} />
-                              </button>
-                            </div>
-                          </div>
-
-                          <p className="mt-2 truncate text-[10px] text-foreground/75">{teacher?.name}</p>
-                          <p className="mt-1 text-[9px] text-muted-foreground">Room {schedule.roomNumber ?? selectedClassroom?.roomNumber ?? "—"}</p>
-                        </article>
-                      );
-                    })
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={openCreateDialog}
-                      className="flex min-h-24 w-full flex-col items-center justify-center rounded-[18px] border border-dashed border-border/65 bg-muted/[0.10] text-muted-foreground transition hover:border-primary/25 hover:bg-primary/[0.025] hover:text-primary"
-                    >
-                      <Plus size={16} />
-                      <span className="mt-1 text-[10px] font-medium">Add lesson</span>
-                    </button>
-                  )}
-                </div>
-              </div>
-            );
-          })}
+        <div className="space-y-3 lg:hidden">
+          {weekDays.map((day, dayIndex) => <div key={day} className="rounded-[18px] border border-border/55 p-3"><div className={`rounded-[14px] px-3 py-2 text-[11px] font-medium ${["bg-violet-50 text-violet-700","bg-sky-50 text-sky-700","bg-emerald-50 text-emerald-700","bg-amber-50 text-amber-700","bg-rose-50 text-rose-700","bg-fuchsia-50 text-fuchsia-700"][dayIndex]}`}>{day}</div><div className="mt-2 grid gap-2 sm:grid-cols-2">{visibleSchedules.filter(i=>i.day===day).map(schedule=>{const subject=subjectMap.get(schedule.subjectId);const teacher=teacherMap.get(schedule.teacherId);return <article key={schedule.id} className={`rounded-[15px] border p-3 ${subject?pastelByColor[subject.color]:"border-border/55"}`}><div className="flex justify-between"><p className="text-[10px] font-medium">{subject?.name}</p><div className="flex gap-1"><button onClick={()=>openEditDialog(schedule)}><Edit3 size={12}/></button><button onClick={()=>setDeletingSchedule(schedule)} className="text-destructive"><Trash2 size={12}/></button></div></div><p className="mt-1 text-[9px] text-muted-foreground">{slotMap.get(schedule.timeSlotId)?.label}</p><p className="mt-2 text-[9px]">{teacher?.name}</p></article>})}</div></div>)}
         </div>
       </section>
 

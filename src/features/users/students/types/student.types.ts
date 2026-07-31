@@ -112,10 +112,7 @@ export type StudentListFilters = {
   per_page?: number;
 
   level?: number | ApiId;
-  grade_level_id?: ApiId;
-  class_room_id?: ApiId;
-
-  name_classroom?: string;
+  classroom_name?: string;
   status?: EnrollmentStatus;
 
   sort?: "asc" | "desc";
@@ -268,6 +265,7 @@ export type UpdateStudentPersonalPayload =
     guardian_photo_url?: File | null;
     guardian_token_fcm?: string | null;
 
+    academic_year_id?: ApiId;
     grade_level_id?: ApiId;
     class_room_id?: ApiId | null;
     enrollment_status?: EnrollmentStatus;

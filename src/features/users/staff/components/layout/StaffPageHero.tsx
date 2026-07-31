@@ -1,3 +1,5 @@
+import { AuthenticatedUserImage } from "../../../shared/components/AuthenticatedUserImage";
+
 import type {
   ReactNode,
 } from "react";
@@ -40,6 +42,7 @@ type StaffPageHeroProps = {
 
   backLabel: string;
   onBack: () => void;
+  showBackButton?: boolean;
 
   photoUrl?: string | null;
   photoAlt?: string;
@@ -105,6 +108,7 @@ export function StaffPageHero({
   description,
   backLabel,
   onBack,
+  showBackButton = true,
   photoUrl = null,
   photoAlt,
   staffId,
@@ -180,7 +184,8 @@ export function StaffPageHero({
         ].join(" ")}
       />
 
-      <div className="relative p-4 sm:p-5">
+      <div className="relative p-4 sm:px-5 sm:py-4">
+        {showBackButton ? (
         <button
           type="button"
           onClick={onBack}
@@ -203,10 +208,11 @@ export function StaffPageHero({
 
           {backLabel}
         </button>
+        ) : null}
 
         <div
           className={[
-            "mt-3",
+            showBackButton ? "mt-3" : "",
             "flex flex-col gap-4",
             "lg:flex-row",
             "lg:items-center",
@@ -239,7 +245,7 @@ export function StaffPageHero({
 
               <h1
                 className={[
-                  "mt-2 truncate",
+                  "mt-1 truncate",
                   "text-2xl font-semibold",
                   "tracking-[-0.035em]",
                   "text-foreground",
@@ -503,8 +509,8 @@ function HeroPhoto({
 
   const sizeClassName =
     mode === "view"
-      ? "h-20 w-20 rounded-[20px]"
-      : "h-14 w-14 rounded-[16px]";
+      ? "h-16 w-16 rounded-[18px]"
+      : "h-12 w-12 rounded-[14px]";
 
   if (photoUrl) {
     return (
@@ -518,7 +524,7 @@ function HeroPhoto({
           sizeClassName,
         ].join(" ")}
       >
-        <img
+        <AuthenticatedUserImage
           src={photoUrl}
           alt={photoAlt}
           className="h-full w-full object-cover"

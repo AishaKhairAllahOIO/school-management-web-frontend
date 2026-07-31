@@ -1,86 +1,21 @@
-import { BookOpen, CalendarDays, UserRound } from "lucide-react";
-import { useState } from "react";
-
+import { BookOpen, CalendarDays, Download, Edit3, Plus, Trash2, UserRound } from "lucide-react";
+import { useMemo, useState } from "react";
 import { GradeTabs } from "@/features/scheduling/components/GradeTabs";
-import { SchedulePageHeader } from "@/features/scheduling/components/SchedulePageHeader";
 import { ScheduleStatusBadge } from "@/features/scheduling/components/ScheduleStatusBadge";
-import { quizSchedules } from "@/features/scheduling/data/scheduling.mock";
+import { quizSchedules as initialItems } from "@/features/scheduling/data/scheduling.mock";
 import { exportScheduleWorkbook } from "@/features/scheduling/shared/utils/export-schedule-xlsx";
-import type { SchoolGrade } from "@/features/settings/school-config/types/school.enums";
+import type { QuizScheduleItem } from "@/features/scheduling/types/scheduling.types";
+import type { SchoolGrade, SchoolSubject } from "@/features/settings/school-config/types/school.enums";
+import { ConfirmDelete, Editor, Input, SelectField } from "./ExamSchedulesPage";
 
-function formatSubject(subject: string) {
-  return subject.charAt(0).toUpperCase() + subject.slice(1);
+const subjects: SchoolSubject[] = ["arabic","english","math","science","french","national","sports"];
+const fmt=(v:string)=>v.charAt(0).toUpperCase()+v.slice(1);
+export function QuizSchedulesPage(){
+ const [items,setItems]=useState<QuizScheduleItem[]>(initialItems); const [grade,setGrade]=useState<SchoolGrade>("seventh"); const [editing,setEditing]=useState<QuizScheduleItem|null>(null); const [form,setForm]=useState<Omit<QuizScheduleItem,"id">|null>(null); const [deleting,setDeleting]=useState<QuizScheduleItem|null>(null);
+ const visible=useMemo(()=>items.filter(i=>i.grade===grade),[items,grade]);
+ const openCreate=()=>{setEditing(null);setForm({grade,subject:"arabic",date:"",lesson:"",teacherName:"",status:"scheduled"})};
+ const save=()=>{if(!form?.date||!form.lesson.trim()||!form.teacherName.trim())return;if(editing)setItems(c=>c.map(i=>i.id===editing.id?{...editing,...form}:i));else setItems(c=>[...c,{...form,id:`quiz-${Date.now()}`}]);setForm(null);setEditing(null)};
+ const exportRows=()=>exportScheduleWorkbook({fileName:`${grade}-quiz-schedules`,sheetName:"Quiz Schedules",rows:visible.map(i=>({Grade:i.grade,Subject:fmt(i.subject),Date:i.date,Lesson:i.lesson,Teacher:i.teacherName,Status:i.status}))});
+ return <div className="space-y-4"><section className="flex flex-col gap-3 rounded-[22px] border border-border/45 bg-card p-4 sm:flex-row sm:items-center sm:justify-between"><GradeTabs value={grade} onChange={setGrade}/><div className="flex gap-2"><button onClick={exportRows} className="inline-flex h-9 items-center gap-2 rounded-full border border-border/65 px-4 text-[11px]"><Download size={14}/>Export</button><button onClick={openCreate} className="inline-flex h-9 items-center gap-2 rounded-full bg-primary px-4 text-[11px] text-primary-foreground"><Plus size={14}/>Add Quiz</button></div></section><section className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">{visible.map((q,index)=><article key={q.id} className={`rounded-[22px] border p-4 ${["border-rose-200/60 bg-rose-50/60","border-sky-200/60 bg-sky-50/60","border-amber-200/60 bg-amber-50/60"][index%3]}`}><div className="flex justify-between gap-3"><div><p className="text-[13px] font-medium">{fmt(q.subject)}</p><p className="mt-1 text-[10px] text-muted-foreground">{q.lesson}</p></div><ScheduleStatusBadge status={q.status}/></div><div className="mt-4 space-y-2"><Info icon={CalendarDays} text={q.date}/><Info icon={UserRound} text={q.teacherName}/></div><div className="mt-4 flex justify-end gap-2 border-t border-border/35 pt-3"><button onClick={()=>{setEditing(q);setForm({...q})}} className="inline-flex h-8 items-center gap-1.5 rounded-full border border-border/60 bg-card px-3 text-[10px]"><Edit3 size={12}/>Edit</button><button onClick={()=>setDeleting(q)} className="inline-flex h-8 items-center gap-1.5 rounded-full border border-rose-200 bg-rose-50 px-3 text-[10px] text-rose-600"><Trash2 size={12}/>Delete</button></div></article>)}</section>{form?<Editor title={editing?"Edit Quiz":"Add Quiz"} onClose={()=>setForm(null)} onSave={save}><SelectField label="Subject" value={form.subject} onChange={v=>setForm({...form,subject:v as SchoolSubject})} options={subjects.map(v=>({value:v,label:fmt(v)}))}/><Input label="Date" type="date" value={form.date} onChange={v=>setForm({...form,date:v})}/><Input label="Lesson" value={form.lesson} onChange={v=>setForm({...form,lesson:v})}/><Input label="Teacher" value={form.teacherName} onChange={v=>setForm({...form,teacherName:v})}/><SelectField label="Status" value={form.status} onChange={v=>setForm({...form,status:v as QuizScheduleItem["status"]})} options={["scheduled","completed","cancelled"].map(v=>({value:v,label:fmt(v)}))}/></Editor>:null}{deleting?<ConfirmDelete title="Delete quiz?" description={`${fmt(deleting.subject)} quiz will be removed.`} onClose={()=>setDeleting(null)} onConfirm={()=>{setItems(c=>c.filter(i=>i.id!==deleting.id));setDeleting(null)}}/>:null}</div>
 }
-
-export function QuizSchedulesPage() {
-  const [grade, setGrade] = useState<SchoolGrade>("seventh");
-  const quizzes = quizSchedules.filter((quiz) => quiz.grade === grade);
-
-  function handleExport() {
-    exportScheduleWorkbook({
-      fileName: `${grade}-quiz-schedules`,
-      sheetName: "Quiz Schedules",
-      rows: quizzes.map((quiz) => ({
-        Grade: grade,
-        Subject: formatSubject(quiz.subject),
-        Date: quiz.date,
-        Lesson: quiz.lesson,
-        Teacher: quiz.teacherName,
-        Status: quiz.status,
-      })),
-    });
-  }
-
-  return (
-    <div className="space-y-5">
-      <SchedulePageHeader
-        title="Quiz Schedules"
-        description="Plan quizzes and short tests with a clean grade-based view."
-        icon={BookOpen}
-        onExport={handleExport}
-      />
-
-      <section className="rounded-[24px] border border-border/45 bg-card p-4 shadow-[0_10px_35px_rgba(30,20,70,0.035)]">
-        <GradeTabs value={grade} onChange={setGrade} />
-      </section>
-
-      <section className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-        {quizzes.map((quiz, index) => {
-          const tones = [
-            "border-rose-200/60 bg-rose-50/60",
-            "border-sky-200/60 bg-sky-50/60",
-            "border-amber-200/60 bg-amber-50/60",
-          ];
-
-          return (
-            <article key={quiz.id} className={`rounded-[22px] border p-4 ${tones[index % tones.length]}`}>
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <p className="text-[13px] font-semibold text-foreground">
-                    {formatSubject(quiz.subject)}
-                  </p>
-                  <p className="mt-1 text-[10px] text-muted-foreground">{quiz.lesson}</p>
-                </div>
-                <ScheduleStatusBadge status={quiz.status} />
-              </div>
-
-              <div className="mt-4 space-y-2">
-                <Info icon={CalendarDays} text={quiz.date} />
-                <Info icon={UserRound} text={quiz.teacherName} />
-              </div>
-            </article>
-          );
-        })}
-      </section>
-    </div>
-  );
-}
-
-function Info({ icon: Icon, text }: { icon: typeof CalendarDays; text: string }) {
-  return (
-    <div className="flex items-center gap-2 rounded-[12px] bg-card/65 px-2.5 py-2 text-[10px] text-muted-foreground">
-      <Icon size={13} />
-      <span>{text}</span>
-    </div>
-  );
-}
+function Info({icon:Icon,text}:{icon:typeof CalendarDays;text:string}){return <div className="flex items-center gap-2 rounded-[12px] bg-card/65 px-2.5 py-2 text-[10px] text-muted-foreground"><Icon size={13}/><span>{text}</span></div>}

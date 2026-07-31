@@ -17,6 +17,8 @@ import {
 
 import { motion } from "framer-motion";
 
+import { AuthenticatedUserImage } from "../../../shared/components/AuthenticatedUserImage";
+
 import type { StudentListItem } from "../../types/student.types";
 import { StudentStatusBadge } from "../shared/StudentStatusBadge";
 
@@ -183,10 +185,8 @@ export function StudentCard({
           >
             <div className="flex items-center gap-3.5">
               {student.photoUrl ? (
-                <img
-                  src={
-                    student.photoUrl
-                  }
+                <AuthenticatedUserImage
+                  src={student.photoUrl}
                   alt={fullName}
                   className={[
                     "h-12 w-12 shrink-0",
@@ -195,6 +195,22 @@ export function StudentCard({
                     "object-cover",
                     "shadow-[var(--shadow-soft)]",
                   ].join(" ")}
+                  fallback={
+                    <div
+                      aria-hidden="true"
+                      className={[
+                        "flex h-12 w-12 shrink-0",
+                        "items-center justify-center",
+                        "rounded-[15px]",
+                        "bg-primary/[0.08]",
+                        "text-primary",
+                      ].join(" ")}
+                    >
+                      <span className="text-sm font-medium">
+                        {getInitials(fullName)}
+                      </span>
+                    </div>
+                  }
                 />
               ) : (
                 <div
