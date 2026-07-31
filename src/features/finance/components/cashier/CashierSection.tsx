@@ -125,7 +125,7 @@ export function CashierSection() {
       title="Student Payments"
       description="Record collections and manage student receipts."
       icon={ReceiptText}
-      action={<Button onClick={() => setCreateOpen(true)} className="h-10 rounded-xl px-4 text-[12.5px] font-medium shadow-[0_8px_20px_rgb(var(--primary)/0.16)]"><Plus className="mr-2 h-4 w-4" strokeWidth={1.8}/>Process Payment</Button>}
+      action={<Button variant="outline" onClick={() => setCreateOpen(true)} className="h-10 rounded-xl border-primary/35 bg-white px-4 text-[12.5px] font-medium text-primary shadow-none hover:border-primary/50 hover:bg-primary/[0.045] hover:text-primary"><Plus className="mr-2 h-4 w-4" strokeWidth={1.8}/>Process Payment</Button>}
     >
       <PaymentsTable 
         payments={payments} 

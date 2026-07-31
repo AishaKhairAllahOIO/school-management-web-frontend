@@ -6,25 +6,34 @@ import {
   DialogTitle,
 } from "@/shared/ui/dialog";
 
-import { ContractForm } from "./ContractForm";
+import {
+  ContractForm,
+  type ContractStudentOption,
+} from "./ContractForm";
 import type { ContractFormValues } from "../../schemas/contract.schema";
 import type { FinancialAccount } from "../../types/finance.types";
 
 type Option = { id: number | string; name: string };
-type FeePlanOption = Option & { 
-  extraServices?: { id: number | string; name: string; amount: number }[] 
+type FeePlanOption = Option & {
+  extraServices?: {
+    id: number | string;
+    name: string;
+    amount: number;
+  }[];
 };
 
 type Props = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   account: FinancialAccount | null;
-  students: Option[];
-  academicYears: Option[];
+  students: ContractStudentOption[];
   feePlans: FeePlanOption[];
   installmentPolicies: Option[];
   isLoading?: boolean;
-  onSubmit: (studentId: string | number, values: ContractFormValues) => void;
+  onSubmit: (
+    studentId: string | number,
+    values: ContractFormValues,
+  ) => void;
 };
 
 export function UpdateContractDialog({
@@ -32,49 +41,44 @@ export function UpdateContractDialog({
   onOpenChange,
   account,
   students,
-  academicYears,
   feePlans,
   installmentPolicies,
   onSubmit,
   isLoading,
 }: Props) {
-  
-  // تجهيز البيانات القديمة لتعبئة الفورم
-  const defaultValues: ContractFormValues | undefined = account ? {
-    studentId: Number(account.studentId),
-    academicYearId: Number(account.academicYearId),
-    feePlanId: Number(account.feePlan?.id),
-    installmentPolicyId: Number(account.installmentPolicy?.id),
-    selectedExtraServiceIds: [], // مصفوفة الخدمات
-  } : undefined;
-
-  function handleSubmit(values: ContractFormValues) {
-    if (account) {
-      onSubmit(account.studentId, values);
-    }
-  }
+  const defaultValues: ContractFormValues | undefined = account
+    ? {
+        studentId: Number(account.studentId),
+        academicYearId: Number(account.academicYearId),
+        feePlanId: Number(account.feePlan?.id),
+        installmentPolicyId: Number(account.installmentPolicy?.id),
+        selectedExtraServiceIds: [],
+      }
+    : undefined;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-h-[90vh] overflow-y-auto rounded-[22px] border-border/45 sm:max-w-2xl">
         <DialogHeader>
-          <DialogTitle>Update Financial Contract</DialogTitle>
-          <DialogDescription>
-            Modify the student's fee plan or installment policy. Note: This action will be rejected if the student has already made payments.
+          <DialogTitle className="font-medium text-foreground/88">
+            Update Financial Contract
+          </DialogTitle>
+          <DialogDescription className="font-normal">
+            Update the fee plan or installment policy. The academic year stays
+            synchronized with the selected student enrollment.
           </DialogDescription>
         </DialogHeader>
 
-        {account && (
+        {account ? (
           <ContractForm
             students={students}
-            academicYears={academicYears}
             feePlans={feePlans}
             installmentPolicies={installmentPolicies}
             defaultValues={defaultValues}
             isLoading={isLoading}
-            onSubmit={handleSubmit}
+            onSubmit={(values) => onSubmit(account.studentId, values)}
           />
-        )}
+        ) : null}
       </DialogContent>
     </Dialog>
   );
