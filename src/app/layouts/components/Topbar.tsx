@@ -69,14 +69,15 @@ export function Topbar() {
         sticky
         top-0
         z-40
-        pb-2
-        pt-3
+        pb-3
+        pt-5
+        lg:pt-6
       "
     >
       <div
         className="
           flex
-          h-[50px]
+          h-[56px]
           w-full
           items-center
           justify-between
@@ -119,7 +120,7 @@ export function Topbar() {
             flex
             shrink-0
             items-center
-            gap-2
+            gap-2.5
           "
         >
           <NotificationsMenu

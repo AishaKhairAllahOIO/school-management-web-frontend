@@ -13,8 +13,8 @@ function MoonFillIcon() {
 
     <svg
       aria-hidden="true"
-      width="16"
-      height="16"
+      width="18"
+      height="18"
       viewBox="0 0 24 24"
       fill="none"
     >
@@ -95,7 +95,7 @@ export function ThemeButton() {
 
           aria-hidden="true"
 
-          size={16}
+          size={18}
 
           strokeWidth={2.1}
 

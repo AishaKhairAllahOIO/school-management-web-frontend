@@ -54,6 +54,7 @@ export function TopbarBreadcrumb({
       min-w-0
       items-center
       lg:flex
+      translate-y-[2px]
       "
     >
 

@@ -15,6 +15,7 @@ import { useDismissibleLayer } from "@/shared/hooks/use-dismissible-layer";
 
 import { ProfileMenuItem } from "./ProfileMenuItem";
 import type { TopbarMenuProps } from "./topbar.types";
+import { useAuthenticatedImage } from "@/shared/hooks/useAuthenticatedImage";
 
 export function ProfileMenu({
   isOpen,
@@ -43,8 +44,7 @@ export function ProfileMenu({
     : "Loading...";
 
   const photoUrl =
-    user?.photoUrl ??
-    "/images/avatar-placeholder.png";
+  useAuthenticatedImage(user?.photoUrl);
 
   const roleLabel = user?.role?.[0]
     ? user.role[0]
@@ -87,41 +87,50 @@ export function ProfileMenu({
         aria-haspopup="menu"
         className="
           flex
-          h-[44px]
-          w-[44px]
+          h-[56px]
+          w-[56px]
           items-center
           justify-center
-          rounded-[15px]
+          rounded-[18px]
           border
-          border-topbar-border/80
-          bg-topbar-surface/85
-          p-[4px]
+          border-topbar-border/75
+          bg-topbar-surface/92
+          p-[5px]
+          shadow-[0_8px_24px_rgb(46_38_108_/_0.07)]
           backdrop-blur-xl
-          transition
+          transition-all
+          duration-200
+          ease-out
+          hover:-translate-y-0.5
+          hover:border-primary/15
           hover:bg-topbar-soft
+          hover:shadow-[0_12px_28px_rgb(46_38_108_/_0.11)]
           focus-visible:outline-none
-          focus-visible:ring-2
-          focus-visible:ring-ring
-          lg:w-[232px]
+          focus-visible:ring-4
+          focus-visible:ring-primary/10
+          lg:h-[56px]
+          lg:w-[278px]
           lg:justify-start
-          lg:gap-[10px]
+          lg:gap-[12px]
+          lg:rounded-[20px]
           lg:px-[7px]
         "
       >
-        <img
-          src={photoUrl}
-          alt={displayName}
-          className="
-            h-[34px]
-            w-[34px]
-            shrink-0
-            rounded-full
-            object-cover
-            ring-2
-            ring-topbar-surface
-          "
-        />
-
+     <img
+  src={photoUrl}
+  alt={displayName}
+  className="
+    h-[46px]
+    w-[46px]
+    shrink-0
+    rounded-full
+    object-cover
+    ring-2
+    ring-topbar-surface
+    lg:h-[46px]
+    lg:w-[46px]
+  "
+/>
         <span
           className="
             hidden
@@ -135,9 +144,9 @@ export function ProfileMenu({
           <span
             className="
               truncate
-              text-[13px]
-              font-medium
-              leading-[16px]
+              text-[14px]
+              font-semibold
+              leading-[17px]
               text-topbar-text
             "
           >
@@ -147,9 +156,9 @@ export function ProfileMenu({
           <span
             className="
               truncate
-              text-[10px]
+              text-[11px]
               font-normal
-              leading-[14px]
+              leading-[15px]
               tracking-[0.01em]
               text-topbar-muted
             "
@@ -161,8 +170,8 @@ export function ProfileMenu({
         <span
           className="
             hidden
-            h-[28px]
-            w-[28px]
+            h-[32px]
+            w-[32px]
             shrink-0
             items-center
             justify-center
