@@ -1,6 +1,8 @@
 import { useState } from "react";
-import { Loader2, RefreshCw } from "lucide-react";
+import { CalendarDays, RefreshCw } from "lucide-react";
 import { Button } from "@/shared/ui/button";
+import { FinancePageSkeleton } from "../shared/FinancePageSkeleton";
+import { FinanceSectionHeader } from "../shared/FinanceSectionHeader";
 
 import { InstallmentsTable } from "./InstallmentsTable";
 import { InstallmentDetailsDialog } from "./InstallmentDetailsDialog"; // 👈 استيراد النافذة
@@ -20,14 +22,14 @@ export function InstallmentsSection() {
   const [selectedInstallmentId, setSelectedInstallmentId] = useState<string | number | null>(null);
 
   if (isLoading) {
-    return <div className="py-10 text-center text-muted-foreground">Loading installments data...</div>;
+    return <FinancePageSkeleton rows={6} />;
   }
 
   if (isError) {
     return (
       <div className="flex flex-col items-center justify-center rounded-2xl border border-red-200 bg-red-50 py-12 text-center">
         <Button variant="outline" onClick={() => refetch()} disabled={isFetching}>
-          {isFetching ? <Loader2 size={16} className="mr-2 animate-spin" /> : <RefreshCw size={16} className="mr-2" />}
+          <RefreshCw size={16} className={isFetching ? "mr-2 animate-spin" : "mr-2"} />
           {isFetching ? "Retrying..." : "Retry Loading Installments"}
         </Button>
       </div>
@@ -35,17 +37,13 @@ export function InstallmentsSection() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold">Scheduled Installments</h2>
-          <p className="text-muted-foreground">
-            Track all upcoming and overdue payments across all student accounts.
-          </p>
-        </div>
-      </div>
-
-
+    <div className="overflow-hidden rounded-[22px] border border-border/70 bg-card shadow-[0_14px_42px_rgba(38,24,84,0.055)]">
+      <FinanceSectionHeader
+        icon={<CalendarDays size={19} strokeWidth={1.9} />}
+        title="Student Installments"
+        description="Track scheduled, paid, pending, and overdue installments for student financial contracts."
+      />
+      <div className="p-5 sm:p-6">
       <InstallmentsTable 
         installments={installments} 
         onView={(id) => {
@@ -53,7 +51,7 @@ export function InstallmentsSection() {
           setViewInstallmentOpen(true);
         }}
       />
-
+      </div>
 
       <InstallmentDetailsDialog
         open={viewInstallmentOpen}

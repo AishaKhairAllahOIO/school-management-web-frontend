@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 
-import { Loader2, Printer, Receipt } from "lucide-react";
+import { Printer, Receipt } from "lucide-react";
 
 import {
   Dialog,
@@ -37,7 +37,7 @@ export function PaymentReceiptDialog({ open, onOpenChange, paymentId }: Props) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md bg-[#fdfdfd]">
+      <DialogContent className="max-h-[88vh] overflow-y-auto rounded-[24px] border-border/70 bg-card p-0 sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-xl">
             <Receipt className="text-violet-600" />
@@ -47,9 +47,9 @@ export function PaymentReceiptDialog({ open, onOpenChange, paymentId }: Props) {
 
         <div className="min-h-[250px] p-2 mt-2">
           {isLoading ? (
-            <div className="flex h-full flex-col items-center justify-center space-y-4 py-12">
-              <Loader2 className="h-8 w-8 animate-spin text-violet-600" />
-              <p className="text-sm text-muted-foreground">Loading receipt details...</p>
+            <div className="space-y-4 py-4 animate-pulse">
+              <div className="mx-auto h-8 w-32 rounded bg-muted/60" />
+              {Array.from({ length: 5 }).map((_, index) => <div key={index} className="h-5 rounded bg-muted/55" />)}
             </div>
           ) : isError || !receipt ? (
             <div className="flex flex-col items-center justify-center py-12 text-red-500">

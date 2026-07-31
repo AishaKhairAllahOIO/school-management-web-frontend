@@ -10,14 +10,12 @@ const groupVisualStyles = {
     footerSurface: "bg-primary/[0.045]",
     divider: "border-primary/[0.10]",
   },
-
   curriculum: {
     topAccent: "bg-info",
     iconSurface: "bg-info/[0.10]",
     footerSurface: "bg-info/[0.05]",
     divider: "border-info/[0.11]",
   },
-
   teaching: {
     topAccent: "bg-success",
     iconSurface: "bg-success/[0.11]",
@@ -78,21 +76,21 @@ export function AcademicsOverviewPage() {
 
                 <header
                   className={[
-                    "flex min-h-[68px] items-center gap-3",
-                    "border-b bg-card px-5 py-3 sm:px-6",
+                    "flex min-h-[74px] items-center gap-4",
+                    "border-b bg-card px-5 py-4 sm:px-6",
                     visualStyle.divider,
                   ].join(" ")}
                 >
                   <span
                     className={[
-                      "flex h-10 w-10 shrink-0 items-center justify-center",
-                      "rounded-[13px]",
+                      "flex h-11 w-11 shrink-0 items-center justify-center",
+                      "rounded-2xl",
                       visualStyle.iconSurface,
                       group.color.icon,
                     ].join(" ")}
                   >
                     <GroupIcon
-                      size={20}
+                      size={21}
                       strokeWidth={1.9}
                     />
                   </span>
@@ -100,14 +98,14 @@ export function AcademicsOverviewPage() {
                   <div className="min-w-0">
                     <h2
                       className={[
-                        "text-[17px] font-semibold leading-5 tracking-[-0.01em]",
+                        "text-[19px] font-medium leading-6 tracking-[0.01em]",
                         group.color.accent,
                       ].join(" ")}
                     >
                       {group.label}
                     </h2>
 
-                    <p className="mt-1 text-[13px] leading-5 text-muted-foreground">
+                    <p className="mt-1.5 text-[13px] leading-5 text-muted-foreground">
                       {group.description}
                     </p>
                   </div>
@@ -121,9 +119,7 @@ export function AcademicsOverviewPage() {
                   ].join(" ")}
                 >
                   {group.items.map((item) => {
-                    const ItemIcon =
-                      item.icon;
-
+                    const ItemIcon = item.icon;
                     const showStatistics =
                       shouldShowStatistics(
                         item.label,
@@ -134,45 +130,43 @@ export function AcademicsOverviewPage() {
                         key={item.path}
                         className="flex min-w-0 flex-col bg-card"
                       >
-                        <div className="flex min-h-[88px] min-w-0 items-center gap-3 px-5 py-3">
+                        <div className="flex min-h-[96px] min-w-0 items-center gap-4 px-5 py-4 sm:px-6">
                           <span
                             className={[
-                              "flex h-10 w-10 shrink-0 items-center justify-center",
-                              "rounded-[13px]",
+                              "flex h-11 w-11 shrink-0 items-center justify-center",
+                              "rounded-2xl",
                               visualStyle.iconSurface,
                               group.color.icon,
                             ].join(" ")}
                           >
                             <ItemIcon
-                              size={19}
+                              size={20}
                               strokeWidth={1.9}
                             />
                           </span>
 
                           <div className="min-w-0 flex-1">
-                            <h3 className="truncate text-[15px] font-semibold leading-5 text-foreground">
+                            <h3 className="truncate text-[16px] font-medium leading-6 tracking-[0.005em] text-foreground">
                               {item.label}
                             </h3>
 
-                            <p className="mt-1 line-clamp-2 text-[12px] leading-[18px] text-muted-foreground">
-                              {
-                                item.description
-                              }
+                            <p className="mt-1.5 line-clamp-2 text-[12.5px] leading-5 text-muted-foreground">
+                              {item.description}
                             </p>
                           </div>
 
                           {showStatistics ? (
                             <div
                               className={[
-                                "min-w-[48px] shrink-0 border-s ps-3 text-right",
+                                "min-w-[56px] shrink-0 border-s ps-4 text-right",
                                 visualStyle.divider,
                               ].join(" ")}
                             >
-                              <div className="text-[17px] font-semibold leading-5 text-foreground">
+                              <div className="text-[18px] font-medium leading-none text-foreground">
                                 —
                               </div>
 
-                              <div className="mt-1 text-[9px] font-medium uppercase tracking-[0.07em] text-muted-foreground">
+                              <div className="mt-1.5 text-[9px] font-medium uppercase tracking-[0.07em] text-muted-foreground">
                                 Items
                               </div>
                             </div>
@@ -182,9 +176,9 @@ export function AcademicsOverviewPage() {
                         <Link
                           to={item.path}
                           className={[
-                            "group flex min-h-[38px] items-center justify-between",
-                            "border-t px-5",
-                            "text-[12px] font-semibold",
+                            "group flex min-h-[42px] items-center justify-between",
+                            "border-t px-5 sm:px-6",
+                            "text-[13px] font-medium",
                             "transition-colors duration-200",
                             "focus-visible:outline-none",
                             "focus-visible:ring-4",

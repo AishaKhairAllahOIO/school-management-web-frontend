@@ -1,5 +1,3 @@
-import { Loader2 } from "lucide-react";
-
 import {
   Dialog,
   DialogContent,
@@ -33,7 +31,7 @@ export function AccountDetailsDialog({ open, onOpenChange, studentId }: Props) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-xl">
+      <DialogContent className="max-h-[88vh] overflow-y-auto rounded-[24px] border-border/70 p-0 sm:max-w-xl">
         <DialogHeader>
           <DialogTitle>Financial Account Profile</DialogTitle>
           <DialogDescription>
@@ -43,9 +41,9 @@ export function AccountDetailsDialog({ open, onOpenChange, studentId }: Props) {
 
         <div className="mt-4 min-h-[200px]">
           {isLoading ? (
-            <div className="flex h-full flex-col items-center justify-center space-y-3 py-10">
-              <Loader2 className="h-8 w-8 animate-spin text-violet-600" />
-              <p className="text-sm text-muted-foreground">Loading account details...</p>
+            <div className="space-y-4 py-3 animate-pulse">
+              <div className="grid grid-cols-2 gap-4"><div className="h-24 rounded-2xl bg-muted/60" /><div className="h-24 rounded-2xl bg-muted/60" /></div>
+              <div className="space-y-3 rounded-2xl border border-border/60 p-5">{Array.from({ length: 4 }).map((_, index) => <div key={index} className="h-5 rounded bg-muted/55" />)}</div>
             </div>
           ) : isError || !account ? (
             <div className="flex flex-col items-center justify-center py-10 text-center text-red-500 bg-red-50 rounded-xl border border-red-100">

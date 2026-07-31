@@ -53,7 +53,7 @@ type RawUser = {
   birth_place?: string | null;
 
   gender?: StaffProfile["gender"];
-  nationality:
+  nationality?:
     StaffProfile["nationality"];
 
   address?: string | null;
@@ -249,7 +249,7 @@ function normalizeRole(
 function normalizeAccountStatus(
   value: unknown,
 ): StaffAccountStatus {
-  return value === "active"
+  return value === "active" || value === "enabled"
     ? "active"
     : "disabled";
 }
@@ -638,10 +638,15 @@ export const staffApi = {
         | ApiResponse<RawStaff>
         | RawStaff
       >(
-        API_ENDPOINTS.STAFF.EMPLOYMENT(
+        API_ENDPOINTS.STAFF.PERSONAL(
           staffId,
         ),
-        values,
+        objectToFormData(
+          values as Record<
+            string,
+            unknown
+          >,
+        ),
       );
 
     return normalizeStaff(
@@ -710,7 +715,7 @@ export const staffApi = {
     const response = await axiosClient.get<
       ApiResponse<StaffImportBatchStatus>
     >(
-      `/admin/staff/import-batches/${batchId}/status`,
+      API_ENDPOINTS.STAFF.IMPORT_STATUS(batchId),
     );
 
     return unwrap(response.data);
@@ -720,7 +725,7 @@ export const staffApi = {
     batchId: ApiId,
   ): Promise<Blob> {
     const response = await axiosClient.get<Blob>(
-      `/admin/staff/import-batches/${batchId}/errors/export`,
+      API_ENDPOINTS.STAFF.IMPORT_ERRORS(batchId),
       { responseType: "blob" },
     );
 

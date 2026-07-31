@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { CalendarDays, Loader2, CreditCard } from "lucide-react";
+import { CalendarDays, CreditCard } from "lucide-react";
 
 import {
   Dialog,
@@ -38,7 +38,7 @@ export function InstallmentDetailsDialog({ open, onOpenChange, installmentId }: 
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md bg-[#fdfdfd]">
+      <DialogContent className="max-h-[88vh] overflow-y-auto rounded-[24px] border-border/70 bg-card p-0 sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-xl">
             <CalendarDays className="text-violet-600" />

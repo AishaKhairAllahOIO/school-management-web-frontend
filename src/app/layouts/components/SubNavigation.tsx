@@ -1,283 +1,71 @@
 import {
-  Bell,
-  BookOpen,
-  Building2,
-  CalendarDays,
-  FileText,
-  LockKeyhole,
-  ShieldCheck,
-  UserCheck,
-  Users,
-  Wallet,
-  type LucideIcon,
+  Bell, BookOpen, Building2, CalendarDays, FileText, LockKeyhole,
+  ReceiptText, ShieldCheck, UserCheck, Users, Wallet, type LucideIcon,
 } from "lucide-react";
+import { NavLink, useLocation } from "react-router-dom";
 
-import {
-  NavLink,
-  useLocation,
-} from "react-router-dom";
+type SubNavigationItem = { title: string; path: string; icon: LucideIcon };
+type SubNavigationSection = { basePath: string; items: SubNavigationItem[] };
 
-type SubNavigationItem = {
-  title: string;
-  path: string;
-  icon: LucideIcon;
-};
+const subNavigationSections: SubNavigationSection[] = [
+  { basePath: "/attendance", items: [
+    { title: "Students", path: "/attendance/students", icon: Users },
+    { title: "Staff", path: "/attendance/staff", icon: UserCheck },
+    { title: "Vacations", path: "/attendance/vacations", icon: CalendarDays },
+  ]},
+  { basePath: "/scheduling", items: [
+    { title: "Classes", path: "/scheduling/classes", icon: CalendarDays },
+    { title: "Exams", path: "/scheduling/exams", icon: FileText },
+    { title: "Quizzes", path: "/scheduling/quizzes", icon: BookOpen },
+    { title: "Holidays", path: "/scheduling/holidays", icon: CalendarDays },
+  ]},
+  { basePath: "/finance", items: [
+    { title: "Student Contracts", path: "/finance/contracts", icon: FileText },
+    { title: "Student Installments", path: "/finance/installments", icon: CalendarDays },
+    { title: "Student Payments", path: "/finance/payments", icon: ReceiptText },
+  ]},
+  { basePath: "/communications", items: [
+    { title: "Announcements", path: "/communications/announcements", icon: Bell },
+    { title: "Activities", path: "/communications/activities", icon: FileText },
+  ]},
+  { basePath: "/settings", items: [
+    { title: "General", path: "/settings/general", icon: Building2 },
+    { title: "Academic", path: "/settings/academic", icon: BookOpen },
+    { title: "Financial", path: "/settings/financial", icon: Wallet },
+    { title: "Attendance", path: "/settings/attendance", icon: CalendarDays },
+    { title: "Roles", path: "/settings/roles", icon: ShieldCheck },
+    { title: "Permissions", path: "/settings/permissions", icon: LockKeyhole },
+  ]},
+];
 
-type SubNavigationSection = {
-  basePath: string;
-  items: SubNavigationItem[];
-};
-
-const subNavigationSections: SubNavigationSection[] =
-  [
-    {
-      basePath: "/attendance",
-      items: [
-        {
-          title: "Students",
-          path: "/attendance/students",
-          icon: Users,
-        },
-        {
-          title: "Staff",
-          path: "/attendance/staff",
-          icon: UserCheck,
-        },
-        {
-          title: "Vacations",
-          path: "/attendance/vacations",
-          icon: CalendarDays,
-        },
-      ],
-    },
-    {
-      basePath: "/scheduling",
-      items: [
-        {
-          title: "Classes",
-          path: "/scheduling/classes",
-          icon: CalendarDays,
-        },
-  
-        {
-          title: "Exams",
-          path: "/scheduling/exams",
-          icon: FileText,
-        },
-        {
-          title: "Quizzes",
-          path: "/scheduling/quizzes",
-          icon: BookOpen,
-        },
-        {
-          title: "Holidays",
-          path: "/scheduling/holidays",
-          icon: CalendarDays,
-        },
-      ],
-    },
-
-    {
-      basePath: "/communications",
-      items: [
-        {
-          title: "Announcements",
-          path: "/communications/announcements",
-          icon: Bell,
-        },
-         
-        {
-          title: "activities",
-          path: "/communications/activities",
-          icon: FileText,
-        },
-      ],
-    },
-    {
-      basePath: "/settings",
-      items: [
-        {
-          title: "General",
-          path: "/settings/general",
-          icon: Building2,
-        },
-        {
-          title: "Academic",
-          path: "/settings/academic",
-          icon: BookOpen,
-        },
-        {
-          title: "Financial",
-          path: "/settings/financial",
-          icon: Wallet,
-        },
-         {
-          title: "Attendance",
-          path: "/settings/attendance",
-          icon: Wallet,
-        },
-        {
-          title: "Roles",
-          path: "/settings/roles",
-          icon: ShieldCheck,
-        },
-        {
-          title: "Permissions",
-          path: "/settings/permissions",
-          icon: LockKeyhole,
-        },
-      ],
-    },
-  ];
-
-function TabItem({
-  title,
-  path,
-  icon: Icon,
-}: SubNavigationItem) {
-  return (
-    <NavLink
-      to={path}
-      className={({ isActive }) =>
-        [
-          "group relative",
-          "inline-flex h-11 min-w-max",
-          "items-center justify-center gap-2",
-          "rounded-[14px] px-4",
-          "text-[13px] font-medium",
-          "transition-all duration-200 ease-out",
-          "focus-visible:outline-none",
-          "focus-visible:ring-4",
-          "focus-visible:ring-primary/10",
-          isActive
-            ? [
-                "bg-primary/[0.07]",
-                "text-primary",
-              ].join(" ")
-            : [
-                "text-muted-foreground",
-                "hover:bg-muted/40",
-                "hover:text-foreground",
-              ].join(" "),
-        ].join(" ")
-      }
-    >
-      {({ isActive }) => (
-        <>
-          <Icon
-            aria-hidden="true"
-            size={17}
-            strokeWidth={1.8}
-            className={[
-              "shrink-0",
-              "transition-colors duration-200",
-              isActive
-                ? "text-primary"
-                : [
-                    "text-muted-foreground",
-                    "group-hover:text-foreground",
-                  ].join(" "),
-            ].join(" ")}
-          />
-
-          <span className="whitespace-nowrap">
-            {title}
-          </span>
-
-          <span
-            aria-hidden="true"
-            className={[
-              "absolute bottom-0",
-              "left-4 right-4",
-              "h-[2px]",
-              "origin-center rounded-full",
-              "bg-primary",
-              "transition-transform duration-200",
-              isActive
-                ? "scale-x-100"
-                : "scale-x-0",
-            ].join(" ")}
-          />
-        </>
-      )}
-    </NavLink>
-  );
+function TabItem({ title, path, icon: Icon }: SubNavigationItem) 
+{
+  return <NavLink to={path} className={({ isActive }) => [
+    "group relative inline-flex h-11 min-w-max items-center justify-center gap-2 rounded-[14px] px-4 text-[13px] font-medium transition-all duration-200 ease-out",
+    "focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/10",
+    isActive ? "bg-primary/[0.07] text-primary" : "text-muted-foreground hover:bg-muted/40 hover:text-foreground",
+  ].join(" ")}>
+    {({ isActive }) => <>
+      <Icon aria-hidden size={17} strokeWidth={1.8} className={isActive ? "shrink-0 text-primary" : "shrink-0 text-muted-foreground transition-colors group-hover:text-foreground"} />
+      <span className="whitespace-nowrap">{title}</span>
+      <span aria-hidden className={["absolute bottom-0 left-4 right-4 h-[2px] origin-center rounded-full bg-primary transition-transform duration-200", isActive ? "scale-x-100" : "scale-x-0"].join(" ")} />
+    </>}
+  </NavLink>;
 }
 
-function DefaultSubNavigation({
-  items,
-}: {
-  items: SubNavigationItem[];
-}) {
-  return (
-    <nav
-      aria-label="Section navigation"
-      className={[
-        "w-full min-w-0",
-        "overflow-hidden",
-        "rounded-[22px]",
-        "border border-border/60",
-        "bg-card/95",
-        "p-1.5",
-        "shadow-[0_8px_28px_rgba(38,24,84,0.045)]",
-        "backdrop-blur-sm",
-      ].join(" ")}
-    >
-      <div
-        className={[
-          "flex h-11 w-full min-w-0",
-          "items-center gap-1",
-          "overflow-x-auto",
-          "[scrollbar-width:none]",
-          "[&::-webkit-scrollbar]:hidden",
-        ].join(" ")}
-      >
-        {items.map((item) => (
-          <TabItem
-            key={item.path}
-            {...item}
-          />
-        ))}
-      </div>
-    </nav>
-  );
+function DefaultSubNavigation({ items }: { items: SubNavigationItem[] }) 
+{
+  return <nav aria-label="Section navigation" className="w-full min-w-0 overflow-hidden rounded-[22px] border border-border/60 bg-card/95 p-1.5 shadow-[0_8px_28px_rgba(38,24,84,0.045)] backdrop-blur-sm">
+    <div className="flex h-11 w-full min-w-0 items-center gap-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      {items.map(item => <TabItem key={item.path} {...item} />)}
+    </div>
+  </nav>;
 }
 
-export function SubNavigation() {
+export function SubNavigation()
+{
   const { pathname } = useLocation();
-
-  const isUsersRoute =
-    pathname === "/users" ||
-    pathname.startsWith("/users/");
-
-  if (isUsersRoute) {
-    return null;
-  }
-
-  const isAcademicsRoute =
-    pathname === "/academics" ||
-    pathname.startsWith("/academics/");
-
-  if (isAcademicsRoute) {
-    return null;
-  }
-
-  const currentSection =
-    subNavigationSections.find(
-      (section) =>
-        pathname === section.basePath ||
-        pathname.startsWith(
-          `${section.basePath}/`,
-        ),
-    );
-
-  if (!currentSection) {
-    return null;
-  }
-
-  return (
-    <DefaultSubNavigation
-      items={currentSection.items}
-    />
-  );
+  if (pathname === "/users" || pathname.startsWith("/users/") || pathname === "/academics" || pathname.startsWith("/academics/")) return null;
+  const currentSection = subNavigationSections.find(section => pathname === section.basePath || pathname.startsWith(`${section.basePath}/`));
+  return currentSection ? <DefaultSubNavigation items={currentSection.items} /> : null;
 }

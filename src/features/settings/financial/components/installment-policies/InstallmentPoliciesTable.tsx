@@ -1,131 +1,66 @@
- import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/shared/ui/table";
+import { CalendarRange } from "lucide-react";
 
-import { Button } from "@/shared/ui/button";
-
-import type {
-  InstallmentPolicy,
-} from "../../types/installmentPolicy.types";
+import type { InstallmentPolicy } from "../../types/installmentPolicy.types";
+import { FinancialActionMenu } from "../../shared/FinancialActionMenu";
+import {
+  FinancialEntityTable,
+  FinancialEntityTd,
+  FinancialEntityTh,
+} from "../../shared/FinancialEntityTable";
 
 type Props = {
   policies: InstallmentPolicy[];
-
-  onEdit: (
-    policy: InstallmentPolicy
-  ) => void;
-
-  onDelete: (
-    policy: InstallmentPolicy
-  ) => void;
+  onEdit: (policy: InstallmentPolicy) => void;
+  onDelete: (policy: InstallmentPolicy) => void;
 };
 
-export function InstallmentPoliciesTable({
-  policies,
-  onEdit,
-  onDelete,
-}: Props) {
+export function InstallmentPoliciesTable({ policies, onEdit, onDelete }: Props) {
+  if (!policies.length) {
+    return (
+      <div className="mt-4 rounded-[18px] border border-dashed border-border bg-muted/15 p-8 text-center">
+        <span className="mx-auto flex h-10 w-10 items-center justify-center rounded-[13px] bg-primary/[0.08] text-primary">
+          <CalendarRange size={18} strokeWidth={1.8} />
+        </span>
+        <p className="mt-3 text-sm font-medium text-foreground">No installment policies yet</p>
+        <p className="mt-1 text-xs font-normal text-muted-foreground">
+          Create a payment schedule to distribute tuition across multiple due dates.
+        </p>
+      </div>
+    );
+  }
+
   return (
-    <Table>
-
-      <TableHeader>
-
-        <TableRow>
-
-          <TableHead>Name</TableHead>
-
-          <TableHead>
-            Installments
-          </TableHead>
-
-          <TableHead>
-            Created
-          </TableHead>
-
-          <TableHead className="w-44">
-            Actions
-          </TableHead>
-
-        </TableRow>
-
-      </TableHeader>
-
-      <TableBody>
-
-        {policies.length === 0 && (
-
-          <TableRow>
-
-            <TableCell
-              colSpan={4}
-              className="text-center py-8"
-            >
-              No Policies Found
-            </TableCell>
-
-          </TableRow>
-
-        )}
-
+    <FinancialEntityTable>
+      <thead>
+        <tr>
+          <FinancialEntityTh>Name</FinancialEntityTh>
+          <FinancialEntityTh>Installments</FinancialEntityTh>
+          <FinancialEntityTh>Created</FinancialEntityTh>
+          <FinancialEntityTh align="right">Actions</FinancialEntityTh>
+        </tr>
+      </thead>
+      <tbody>
         {policies.map((policy) => (
-
-          <TableRow key={policy.id}>
-
-            <TableCell>
-
-              {policy.name}
-
-            </TableCell>
-
-            <TableCell>
-
-              {policy.items.length}
-
-            </TableCell>
-
-            <TableCell>
-
-              {new Date(
-                policy.createdAt
-              ).toLocaleDateString()}
-
-            </TableCell>
-
-            <TableCell className="flex gap-2">
-
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() =>
-                  onEdit(policy)
-                }
-              >
-                Edit
-              </Button>
-
-              <Button
-                size="sm"
-                variant="destructive"
-                onClick={() =>
-                  onDelete(policy)
-                }
-              >
-                Delete
-              </Button>
-
-            </TableCell>
-
-          </TableRow>
-
+          <tr key={policy.id}>
+            <FinancialEntityTd strong>{policy.name}</FinancialEntityTd>
+            <FinancialEntityTd>
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/[0.09] px-3 py-1.5 text-[11px] font-medium text-emerald-600">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                {policy.items.length} Installments
+              </span>
+            </FinancialEntityTd>
+            <FinancialEntityTd>{new Date(policy.createdAt).toLocaleDateString()}</FinancialEntityTd>
+            <FinancialEntityTd align="right">
+              <FinancialActionMenu
+                isOpen={false}
+                onOpenChange={() => undefined}
+                onEdit={() => onEdit(policy)}
+                onDelete={() => onDelete(policy)}
+              />
+            </FinancialEntityTd>
+          </tr>
         ))}
-
-      </TableBody>
-
-    </Table>
+      </tbody>
+    </FinancialEntityTable>
   );
 }

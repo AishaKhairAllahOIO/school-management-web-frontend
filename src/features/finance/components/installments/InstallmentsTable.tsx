@@ -1,92 +1,30 @@
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/shared/ui/table";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/shared/ui/table";
 import { Eye } from "lucide-react";
-import type { Installment } from "../../types/finance.types";
 import { Button } from "@/shared/ui/button";
+import type { Installment } from "../../types/finance.types";
 
-type Props = {
-  installments: Installment[];
-  onView?: (id: string | number) => void;
-};
+type Props = { installments: Installment[]; onView?: (id: string | number) => void };
 
+function StatusBadge({ status, dueDate }: { status: string; dueDate: string }) {
+  const overdue = (new Date() > new Date(dueDate) && status !== "paid") || status === "overdue";
+  const classes = status === "paid" ? "bg-emerald-50 text-emerald-700 ring-emerald-200/70" : overdue ? "bg-rose-50 text-rose-700 ring-rose-200/70" : "bg-sky-50 text-sky-700 ring-sky-200/70";
+  return <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-medium ring-1 ring-inset ${classes}`}>{status === "paid" ? "Paid" : overdue ? "Overdue" : "Pending"}</span>;
+}
 
 export function InstallmentsTable({ installments, onView }: Props) {
-  
-  const getStatusBadge = (status: string, dueDate: string) => {
-    const isOverdue = new Date() > new Date(dueDate) && status !== "paid";
-
-    if (status === "paid") {
-      return <span className="rounded-full bg-green-100 px-2.5 py-1 text-xs font-medium text-green-700">Paid</span>;
-    }
-    if (isOverdue || status === "overdue") {
-      return <span className="rounded-full bg-red-100 px-2.5 py-1 text-xs font-medium text-red-700 animate-pulse">Overdue</span>;
-    }
-    return <span className="rounded-full bg-blue-100 px-2.5 py-1 text-xs font-medium text-blue-700">Pending</span>;
-  };
-
-  if (!installments.length) {
-    return (
-      <div className="rounded-2xl border border-dashed border-border bg-muted/20 p-10 text-center">
-        <h3 className="text-lg font-semibold">No Installments Found</h3>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Installments will be generated once a financial contract is finalized.
-        </p>
-      </div>
-    );
-  }
-
-  return (
-    <div className="overflow-hidden rounded-2xl border shadow-sm bg-white">
-      <Table>
-        <TableHeader>
-          <TableRow className="hover:bg-muted/30">
-            <TableHead>Installment</TableHead>
-            <TableHead>Amount Due</TableHead>
-            <TableHead>Amount Paid</TableHead>
-            <TableHead>Due Date</TableHead>
-            <TableHead>Status</TableHead>
-
-            <TableHead className="w-16 text-right">Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {installments.map((installment) => (
-            <TableRow key={installment.id}>
-              <TableCell className="font-medium text-gray-800">
-                {installment.title} <span className="text-muted-foreground text-xs ml-1">(#{installment.installmentNumber})</span>
-              </TableCell>
-              <TableCell className="font-bold text-gray-700">
-                {installment.amountDue?.toLocaleString()} $
-              </TableCell>
-              <TableCell className="font-semibold text-green-600">
-                {installment.amountPaid?.toLocaleString()} $
-              </TableCell>
-              <TableCell className="text-sm">
-                {new Date(installment.dueDate).toLocaleDateString()}
-              </TableCell>
-              <TableCell>
-                {getStatusBadge(installment.status, installment.dueDate)}
-              </TableCell>
-              <TableCell className="text-right">
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  className="text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-                  onClick={() => onView && onView(installment.id)}
-                >
-                  <Eye className="h-4 w-4" />
-                </Button>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </div>
-  );
+  if (!installments.length) return <div className="rounded-[18px] border border-dashed border-border/80 bg-muted/[0.16] px-6 py-14 text-center"><h3 className="font-semibold">No student installments found</h3><p className="mt-1.5 text-sm text-muted-foreground">Installments appear after a student financial contract is finalized.</p></div>;
+  return <div className="overflow-hidden rounded-[20px] border border-border/70 bg-background"><Table>
+    <TableHeader><TableRow className="border-border/60 bg-muted/[0.18] hover:bg-muted/[0.18]">
+      {['STUDENT INSTALLMENT','AMOUNT DUE','AMOUNT PAID','DUE DATE','STATUS'].map(label => <TableHead key={label} className="h-12 px-4 text-[11px] font-semibold tracking-[0.06em] text-muted-foreground">{label}</TableHead>)}
+      <TableHead className="h-12 px-4 text-right text-[11px] font-semibold tracking-[0.06em] text-muted-foreground">ACTIONS</TableHead>
+    </TableRow></TableHeader>
+    <TableBody>{installments.map(item => <TableRow key={item.id} className="border-border/50 hover:bg-muted/[0.12]">
+      <TableCell className="px-4 py-4 font-medium">{item.title} <span className="ml-1 text-xs font-normal text-muted-foreground">#{item.installmentNumber}</span></TableCell>
+      <TableCell className="px-4 py-4 font-medium">{item.amountDue?.toLocaleString()} $</TableCell>
+      <TableCell className="px-4 py-4 font-medium text-emerald-700">{item.amountPaid?.toLocaleString()} $</TableCell>
+      <TableCell className="px-4 py-4 text-muted-foreground">{new Date(item.dueDate).toLocaleDateString()}</TableCell>
+      <TableCell className="px-4 py-4"><StatusBadge status={item.status} dueDate={item.dueDate} /></TableCell>
+      <TableCell className="px-4 py-4 text-right"><Button type="button" size="icon" variant="outline" aria-label="View installment" className="h-10 w-10 rounded-full border-border/70 bg-background text-muted-foreground shadow-none hover:border-primary/25 hover:bg-primary/[0.05] hover:text-primary" onClick={() => onView?.(item.id)}><Eye className="h-4 w-4" /></Button></TableCell>
+    </TableRow>)}</TableBody>
+  </Table></div>;
 }

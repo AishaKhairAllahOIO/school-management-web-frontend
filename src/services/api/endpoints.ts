@@ -102,8 +102,6 @@ export const API_ENDPOINTS = {
 
     // LIST: "/admin/staff/showAllStaff",
 
-    SEARCH: "/admin/staff/search",
-
     ALPHABETICAL: "/admin/staff/alphabetical",
 
     DETAILS: (staffId: ApiId) =>
@@ -111,9 +109,6 @@ export const API_ENDPOINTS = {
 
     PERSONAL: (staffId: ApiId) =>
       `/admin/staff/${staffId}/personal`,
-
-    EMPLOYMENT: (staffId: ApiId) =>
-      `/admin/staff/${staffId}/employment`,
 
     ROLE_COUNTS: "/admin/staff/counts/roles",
 

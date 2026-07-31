@@ -1,8 +1,10 @@
 import { useState } from "react";
-import { Plus, Loader2, RefreshCw } from "lucide-react";
+import { Plus, ReceiptText } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"; 
 
 import { Button } from "@/shared/ui/button";
+import { FinancePageSkeleton } from "../shared/FinancePageSkeleton";
+import { FinanceSectionHeader } from "../shared/FinanceSectionHeader";
 import { axiosClient } from "@/services/axios/axiosClient";
 import { API_ENDPOINTS } from "@/services/api/endpoints"; // 👈 استيراد المسارات الصحيحة
 import { financeOperationsService } from "../../services/finance-operations.service"; 
@@ -92,7 +94,7 @@ export function CashierSection() {
   }
 
   if (isLoadingPayments || isLoadingStudents) {
-    return <div className="py-10 text-center text-muted-foreground">Loading cashier data...</div>;
+    return <FinancePageSkeleton rows={6} />;
   }
 
   if (isError) {
@@ -106,19 +108,22 @@ export function CashierSection() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold">Cashier & Ledger</h2>
-          <p className="text-muted-foreground">
-            Process incoming payments and manage transaction receipts.
-          </p>
-        </div>
-        <Button onClick={() => setCreateOpen(true)} className="bg-green-600 hover:bg-green-700">
-          <Plus className="mr-2 h-4 w-4" /> Process Payment
-        </Button>
-      </div>
-
+    <div className="overflow-hidden rounded-[22px] border border-border/70 bg-card shadow-[0_14px_42px_rgba(38,24,84,0.055)]">
+      <FinanceSectionHeader
+        icon={<ReceiptText size={19} strokeWidth={1.9} />}
+        title="Student Payments"
+        description="Record student payments, review receipts, and manage the cashier ledger."
+        action={
+          <Button
+            variant="outline"
+            onClick={() => setCreateOpen(true)}
+            className="h-11 rounded-[14px] border-primary/25 bg-background px-4 text-primary shadow-none hover:border-primary/40 hover:bg-primary/[0.04] hover:text-primary"
+          >
+            <Plus className="mr-2 h-4 w-4" /> Process Payment
+          </Button>
+        }
+      />
+      <div className="p-5 sm:p-6">
       <PaymentsTable 
         payments={payments} 
         onView={(id) => {
@@ -131,6 +136,7 @@ export function CashierSection() {
           setEditOpen(true);
         }}
       />
+      </div>
     
       <ProcessPaymentDialog
         open={createOpen}

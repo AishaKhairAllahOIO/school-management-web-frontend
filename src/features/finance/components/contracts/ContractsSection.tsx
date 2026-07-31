@@ -1,11 +1,12 @@
 import { useState } from "react";
-import { Plus, Loader2, RefreshCw } from "lucide-react";
+import { FileText, Plus, RefreshCw } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { UpdateContractDialog } from "./UpdateContractDialog";
 import { Button } from "@/shared/ui/button";
+import { FinancePageSkeleton } from "../shared/FinancePageSkeleton";
+import { FinanceSectionHeader } from "../shared/FinanceSectionHeader";
 import { axiosClient } from "@/services/axios/axiosClient";
 import { API_ENDPOINTS } from "@/services/api/endpoints";
-import type { StudentListItem } from  "../../../users/students/types/student-api.types"; 
 import { ContractsTable } from "./ContractsTable";
 import { FinalizeContractDialog } from "./FinalizeContractDialog";
 import { useFinancialAccounts } from "../../hooks/useFinancialAccounts";
@@ -122,12 +123,7 @@ export function ContractsSection() {
   }
 
   if (isLoadingDependencies) {
-    return (
-      <div className="flex h-64 flex-col items-center justify-center space-y-4">
-        <Loader2 className="h-8 w-8 animate-spin text-violet-600" />
-        <span className="font-medium text-muted-foreground">Loading financial data...</span>
-      </div>
-    );
+    return <FinancePageSkeleton rows={5} />;
   }
 
   if (isAccountsError) {
@@ -143,7 +139,7 @@ export function ContractsSection() {
           onClick={() => refetchAccounts()}
           disabled={isFetchingAccounts}
         >
-          {isFetchingAccounts ? <Loader2 size={16} className="mr-2 animate-spin" /> : <RefreshCw size={16} className="mr-2" />}
+          <RefreshCw size={16} className={isFetchingAccounts ? "mr-2 animate-spin" : "mr-2"} />
           {isFetchingAccounts ? "Trying Again..." : "Try Again"}
         </Button>
       </div>
@@ -151,19 +147,22 @@ export function ContractsSection() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold">Financial Contracts</h2>
-          <p className="text-muted-foreground">
-            Manage student financial accounts and generate installment schedules.
-          </p>
-        </div>
-        <Button onClick={() => setCreateOpen(true)}>
-          <Plus className="mr-2 h-4 w-4" /> Finalize New Contract
-        </Button>
-      </div>
-
+    <div className="overflow-hidden rounded-[22px] border border-border/70 bg-card shadow-[0_14px_42px_rgba(38,24,84,0.055)]">
+      <FinanceSectionHeader
+        icon={<FileText size={19} strokeWidth={1.9} />}
+        title="Student Financial Contracts"
+        description="Create and manage each student's fee plan, selected services, and installment policy."
+        action={
+          <Button
+            variant="outline"
+            onClick={() => setCreateOpen(true)}
+            className="h-11 rounded-[14px] border-primary/25 bg-background px-4 text-primary shadow-none hover:border-primary/40 hover:bg-primary/[0.04] hover:text-primary"
+          >
+            <Plus className="mr-2 h-4 w-4" /> Finalize Contract
+          </Button>
+        }
+      />
+      <div className="p-5 sm:p-6">
       <ContractsTable 
         accounts={accounts} 
         onViewDetails={(account) => {
@@ -176,6 +175,7 @@ export function ContractsSection() {
           setEditOpen(true);
         }}
       />
+      </div>
 
       <FinalizeContractDialog
         open={createOpen}
