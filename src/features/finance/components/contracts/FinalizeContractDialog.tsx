@@ -43,7 +43,7 @@ export function FinalizeContractDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90vh] overflow-y-auto rounded-[24px] border-border/70 bg-card sm:max-w-2xl">
+      <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Finalize Financial Contract</DialogTitle>
           <DialogDescription>

@@ -105,7 +105,7 @@ export function ContractForm({
               </Select>
             )}
           />
-          {errors.studentId && <p className="text-sm text-destructive">{String(errors.studentId.message)}</p>}
+          {errors.studentId && <p className="text-sm text-red-500">{String(errors.studentId.message)}</p>}
         </div>
 
         {/* Academic Year Selection */}
@@ -129,7 +129,7 @@ export function ContractForm({
               </Select>
             )}
           />
-          {errors.academicYearId && <p className="text-sm text-destructive">{String(errors.academicYearId.message)}</p>}
+          {errors.academicYearId && <p className="text-sm text-red-500">{String(errors.academicYearId.message)}</p>}
         </div>
 
         {/* Fee Plan Selection */}
@@ -156,7 +156,7 @@ export function ContractForm({
               </Select>
             )}
           />
-          {errors.feePlanId && <p className="text-sm text-destructive">{String(errors.feePlanId.message)}</p>}
+          {errors.feePlanId && <p className="text-sm text-red-500">{String(errors.feePlanId.message)}</p>}
         </div>
 
         {/* Installment Policy Selection */}
@@ -180,7 +180,7 @@ export function ContractForm({
               </Select>
             )}
           />
-          {errors.installmentPolicyId && <p className="text-sm text-destructive">{String(errors.installmentPolicyId.message)}</p>}
+          {errors.installmentPolicyId && <p className="text-sm text-red-500">{String(errors.installmentPolicyId.message)}</p>}
         </div>
       </div>
 
@@ -194,14 +194,14 @@ export function ContractForm({
                 key={service.id}
                 className={`flex cursor-pointer items-center justify-between rounded-xl border p-3 transition-all hover:bg-muted/50 ${
                   selectedServices.includes(Number(service.id))
-                    ? "border-primary bg-primary/[0.05]"
+                    ? "border-violet-500 bg-violet-50/50"
                     : "border-border bg-card"
                 }`}
               >
                 <div className="flex items-center gap-3">
                   <input
                     type="checkbox"
-                    className="h-4 w-4 rounded border-input text-primary focus:ring-primary"
+                    className="h-4 w-4 rounded border-gray-300 text-violet-600 focus:ring-violet-600"
                     checked={selectedServices.includes(Number(service.id))}
                     onChange={() => toggleService(Number(service.id))}
                   />

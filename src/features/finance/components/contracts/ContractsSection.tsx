@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, Loader2, RefreshCw } from "lucide-react";
+import { FileText, Plus, Loader2, RefreshCw } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { UpdateContractDialog } from "./UpdateContractDialog";
 import { Button } from "@/shared/ui/button";
@@ -12,7 +12,8 @@ import { useFinancialAccounts } from "../../hooks/useFinancialAccounts";
 import { AccountDetailsDialog } from "./AccountDetailsDialog";
 import { useFeePlans } from "@/features/settings/financial/hooks/useFeePlans";
 import { useInstallmentPolicies } from "@/features/settings/financial/hooks/useInstallmentPolicies";
-import { FinancePageSkeleton, FinanceSectionHeader, financeActionButton } from "../shared/FinancePrimitives";
+import { FinanceSectionShell } from "../shared/FinanceSectionShell";
+import { FinanceTableSkeleton } from "../shared/FinanceTableSkeleton";
 
 export function ContractsSection() {
   const {
@@ -123,19 +124,27 @@ export function ContractsSection() {
   }
 
   if (isLoadingDependencies) {
-    return <FinancePageSkeleton columns={6} />;
+    return (
+      <FinanceSectionShell
+        title="Student Contracts"
+        description="Create and manage student financial agreements."
+        icon={FileText}
+      >
+        <FinanceTableSkeleton />
+      </FinanceSectionShell>
+    );
   }
 
   if (isAccountsError) {
     return (
-      <div className="flex flex-col items-center justify-center rounded-2xl border border-red-200 bg-red-50 py-12 text-center">
-        <div className="mb-4 rounded-full bg-red-100 p-3 text-red-600">
+      <div className="flex flex-col items-center justify-center rounded-[18px] border border-destructive/20 bg-destructive/[0.045] py-12 text-center">
+        <div className="mb-4 rounded-full bg-destructive/10 p-3 text-destructive">
           <RefreshCw size={24} className={isFetchingAccounts ? "animate-spin" : ""} />
         </div>
-        <h3 className="mb-2 text-lg font-semibold text-red-800">Failed to load contracts</h3>
+        <h3 className="mb-2 text-[15px] font-medium text-foreground/90">Failed to load contracts</h3>
         <Button
           variant="outline"
-          className="mt-4 border-red-200 bg-white text-red-600 hover:bg-red-50"
+          className="mt-4 rounded-xl border-destructive/20 bg-card text-destructive hover:bg-destructive/[0.06]"
           onClick={() => refetchAccounts()}
           disabled={isFetchingAccounts}
         >
@@ -147,9 +156,20 @@ export function ContractsSection() {
   }
 
   return (
-    <div className="space-y-6">
-      <FinanceSectionHeader title="Student Financial Contracts" description="Manage student financial accounts and generate installment schedules." action={<Button className={financeActionButton} onClick={() => setCreateOpen(true)}><Plus className="mr-2 h-4 w-4" />Finalize Contract</Button>} />
-
+    <FinanceSectionShell
+      title="Student Contracts"
+      description="Create and manage student financial agreements."
+      icon={FileText}
+      action={
+        <Button
+          onClick={() => setCreateOpen(true)}
+          className="h-10 rounded-xl px-4 text-[12.5px] font-medium shadow-[0_8px_20px_rgb(var(--primary)/0.16)]"
+        >
+          <Plus className="mr-2 h-4 w-4" strokeWidth={1.8} />
+          New Contract
+        </Button>
+      }
+    >
       <ContractsTable 
         accounts={accounts} 
         onViewDetails={(account) => {
@@ -198,6 +218,6 @@ export function ContractsSection() {
         isLoading={updateContract.isPending}
         onSubmit={handleUpdateContract}
       />
-    </div>
+    </FinanceSectionShell>
   );
 }

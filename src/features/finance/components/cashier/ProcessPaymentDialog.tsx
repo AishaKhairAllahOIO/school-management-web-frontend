@@ -33,7 +33,7 @@ export function ProcessPaymentDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="rounded-[24px] border-border/70 bg-card sm:max-w-xl">
+      <DialogContent className="sm:max-w-xl">
         <DialogHeader>
           <DialogTitle>Process New Payment</DialogTitle>
           <DialogDescription>
