@@ -1,18 +1,18 @@
 import { useState } from "react";
-import { FileText, Plus, RefreshCw } from "lucide-react";
+import { Plus, Loader2, RefreshCw } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { UpdateContractDialog } from "./UpdateContractDialog";
 import { Button } from "@/shared/ui/button";
-import { FinancePageSkeleton } from "../shared/FinancePageSkeleton";
-import { FinanceSectionHeader } from "../shared/FinanceSectionHeader";
 import { axiosClient } from "@/services/axios/axiosClient";
 import { API_ENDPOINTS } from "@/services/api/endpoints";
+import type { StudentListItem } from  "../../../users/students/types/student-api.types"; 
 import { ContractsTable } from "./ContractsTable";
 import { FinalizeContractDialog } from "./FinalizeContractDialog";
 import { useFinancialAccounts } from "../../hooks/useFinancialAccounts";
 import { AccountDetailsDialog } from "./AccountDetailsDialog";
 import { useFeePlans } from "@/features/settings/financial/hooks/useFeePlans";
 import { useInstallmentPolicies } from "@/features/settings/financial/hooks/useInstallmentPolicies";
+import { FinancePageSkeleton, FinanceSectionHeader, financeActionButton } from "../shared/FinancePrimitives";
 
 export function ContractsSection() {
   const {
@@ -123,7 +123,7 @@ export function ContractsSection() {
   }
 
   if (isLoadingDependencies) {
-    return <FinancePageSkeleton rows={5} />;
+    return <FinancePageSkeleton columns={6} />;
   }
 
   if (isAccountsError) {
@@ -139,7 +139,7 @@ export function ContractsSection() {
           onClick={() => refetchAccounts()}
           disabled={isFetchingAccounts}
         >
-          <RefreshCw size={16} className={isFetchingAccounts ? "mr-2 animate-spin" : "mr-2"} />
+          {isFetchingAccounts ? <Loader2 size={16} className="mr-2 animate-spin" /> : <RefreshCw size={16} className="mr-2" />}
           {isFetchingAccounts ? "Trying Again..." : "Try Again"}
         </Button>
       </div>
@@ -147,22 +147,9 @@ export function ContractsSection() {
   }
 
   return (
-    <div className="overflow-hidden rounded-[22px] border border-border/70 bg-card shadow-[0_14px_42px_rgba(38,24,84,0.055)]">
-      <FinanceSectionHeader
-        icon={<FileText size={19} strokeWidth={1.9} />}
-        title="Student Financial Contracts"
-        description="Create and manage each student's fee plan, selected services, and installment policy."
-        action={
-          <Button
-            variant="outline"
-            onClick={() => setCreateOpen(true)}
-            className="h-11 rounded-[14px] border-primary/25 bg-background px-4 text-primary shadow-none hover:border-primary/40 hover:bg-primary/[0.04] hover:text-primary"
-          >
-            <Plus className="mr-2 h-4 w-4" /> Finalize Contract
-          </Button>
-        }
-      />
-      <div className="p-5 sm:p-6">
+    <div className="space-y-6">
+      <FinanceSectionHeader title="Student Financial Contracts" description="Manage student financial accounts and generate installment schedules." action={<Button className={financeActionButton} onClick={() => setCreateOpen(true)}><Plus className="mr-2 h-4 w-4" />Finalize Contract</Button>} />
+
       <ContractsTable 
         accounts={accounts} 
         onViewDetails={(account) => {
@@ -175,7 +162,6 @@ export function ContractsSection() {
           setEditOpen(true);
         }}
       />
-      </div>
 
       <FinalizeContractDialog
         open={createOpen}

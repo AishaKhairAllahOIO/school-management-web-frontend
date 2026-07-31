@@ -31,7 +31,7 @@ export type Installment = {
   amountDue: number;
   amountPaid: number;
   dueDate: string;
-  status: "pending" | "paid" | "overdue"; 
+  status: "pending" | "partially_paid" | "paid" | "overdue"; 
   createdAt: string;
   updatedAt: string;
 };

@@ -1,3 +1,5 @@
+import { Loader2 } from "lucide-react";
+
 import {
   Dialog,
   DialogContent,
@@ -22,16 +24,16 @@ export function AccountDetailsDialog({ open, onOpenChange, studentId }: Props) {
   // دالة لتنسيق حالة الدفع
   const formatStatus = (status?: string) => {
     switch (status) {
-      case "paid": return <span className="text-green-600 font-bold">Paid</span>;
-      case "partially_paid": return <span className="text-orange-600 font-bold">Partially Paid</span>;
-      case "unpaid": return <span className="text-red-600 font-bold">Unpaid</span>;
+      case "paid": return <span className="text-success font-bold">Paid</span>;
+      case "partially_paid": return <span className="text-warning font-bold">Partially Paid</span>;
+      case "unpaid": return <span className="text-destructive font-bold">Unpaid</span>;
       default: return <span>{status || "Unknown"}</span>;
     }
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[88vh] overflow-y-auto rounded-[24px] border-border/70 p-0 sm:max-w-xl">
+      <DialogContent className="rounded-[24px] border-border/70 bg-card sm:max-w-xl">
         <DialogHeader>
           <DialogTitle>Financial Account Profile</DialogTitle>
           <DialogDescription>
@@ -41,12 +43,12 @@ export function AccountDetailsDialog({ open, onOpenChange, studentId }: Props) {
 
         <div className="mt-4 min-h-[200px]">
           {isLoading ? (
-            <div className="space-y-4 py-3 animate-pulse">
-              <div className="grid grid-cols-2 gap-4"><div className="h-24 rounded-2xl bg-muted/60" /><div className="h-24 rounded-2xl bg-muted/60" /></div>
-              <div className="space-y-3 rounded-2xl border border-border/60 p-5">{Array.from({ length: 4 }).map((_, index) => <div key={index} className="h-5 rounded bg-muted/55" />)}</div>
+            <div className="flex h-full flex-col items-center justify-center space-y-3 py-10">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              <p className="text-sm text-muted-foreground">Loading account details...</p>
             </div>
           ) : isError || !account ? (
-            <div className="flex flex-col items-center justify-center py-10 text-center text-red-500 bg-red-50 rounded-xl border border-red-100">
+            <div className="flex flex-col items-center justify-center py-10 text-center text-destructive bg-destructive/[0.055] rounded-xl border border-destructive/20">
               <p className="font-medium">Failed to load account details.</p>
               <p className="text-sm opacity-80">Please check the connection or try again.</p>
             </div>
@@ -56,13 +58,13 @@ export function AccountDetailsDialog({ open, onOpenChange, studentId }: Props) {
               <div className="grid grid-cols-2 gap-4">
                 <div className="rounded-xl border bg-muted/20 p-4">
                   <p className="text-sm text-muted-foreground">Total Required</p>
-                  <p className="mt-1 text-2xl font-bold text-gray-800">
+                  <p className="mt-1 text-2xl font-bold text-foreground">
                     {account.totalRequiredAmount?.toLocaleString()} $
                   </p>
                 </div>
-                <div className="rounded-xl border bg-violet-50/50 p-4 border-violet-100">
-                  <p className="text-sm text-violet-600/80">Remaining Balance</p>
-                  <p className="mt-1 text-2xl font-bold text-violet-700">
+                <div className="rounded-xl border bg-primary/[0.05] p-4 border-primary/20">
+                  <p className="text-sm text-primary/80">Remaining Balance</p>
+                  <p className="mt-1 text-2xl font-bold text-primary">
                     {account.remainingBalance?.toLocaleString()} $
                   </p>
                 </div>

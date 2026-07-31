@@ -1,30 +1,11 @@
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/shared/ui/table";
 import { Eye } from "lucide-react";
 import { Button } from "@/shared/ui/button";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/shared/ui/table";
 import type { Installment } from "../../types/finance.types";
-
-type Props = { installments: Installment[]; onView?: (id: string | number) => void };
-
-function StatusBadge({ status, dueDate }: { status: string; dueDate: string }) {
-  const overdue = (new Date() > new Date(dueDate) && status !== "paid") || status === "overdue";
-  const classes = status === "paid" ? "bg-emerald-50 text-emerald-700 ring-emerald-200/70" : overdue ? "bg-rose-50 text-rose-700 ring-rose-200/70" : "bg-sky-50 text-sky-700 ring-sky-200/70";
-  return <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-medium ring-1 ring-inset ${classes}`}>{status === "paid" ? "Paid" : overdue ? "Overdue" : "Pending"}</span>;
-}
-
-export function InstallmentsTable({ installments, onView }: Props) {
-  if (!installments.length) return <div className="rounded-[18px] border border-dashed border-border/80 bg-muted/[0.16] px-6 py-14 text-center"><h3 className="font-semibold">No student installments found</h3><p className="mt-1.5 text-sm text-muted-foreground">Installments appear after a student financial contract is finalized.</p></div>;
-  return <div className="overflow-hidden rounded-[20px] border border-border/70 bg-background"><Table>
-    <TableHeader><TableRow className="border-border/60 bg-muted/[0.18] hover:bg-muted/[0.18]">
-      {['STUDENT INSTALLMENT','AMOUNT DUE','AMOUNT PAID','DUE DATE','STATUS'].map(label => <TableHead key={label} className="h-12 px-4 text-[11px] font-semibold tracking-[0.06em] text-muted-foreground">{label}</TableHead>)}
-      <TableHead className="h-12 px-4 text-right text-[11px] font-semibold tracking-[0.06em] text-muted-foreground">ACTIONS</TableHead>
-    </TableRow></TableHeader>
-    <TableBody>{installments.map(item => <TableRow key={item.id} className="border-border/50 hover:bg-muted/[0.12]">
-      <TableCell className="px-4 py-4 font-medium">{item.title} <span className="ml-1 text-xs font-normal text-muted-foreground">#{item.installmentNumber}</span></TableCell>
-      <TableCell className="px-4 py-4 font-medium">{item.amountDue?.toLocaleString()} $</TableCell>
-      <TableCell className="px-4 py-4 font-medium text-emerald-700">{item.amountPaid?.toLocaleString()} $</TableCell>
-      <TableCell className="px-4 py-4 text-muted-foreground">{new Date(item.dueDate).toLocaleDateString()}</TableCell>
-      <TableCell className="px-4 py-4"><StatusBadge status={item.status} dueDate={item.dueDate} /></TableCell>
-      <TableCell className="px-4 py-4 text-right"><Button type="button" size="icon" variant="outline" aria-label="View installment" className="h-10 w-10 rounded-full border-border/70 bg-background text-muted-foreground shadow-none hover:border-primary/25 hover:bg-primary/[0.05] hover:text-primary" onClick={() => onView?.(item.id)}><Eye className="h-4 w-4" /></Button></TableCell>
-    </TableRow>)}</TableBody>
-  </Table></div>;
+import { financeIconButton } from "../shared/FinancePrimitives";
+const money=(n:number)=>new Intl.NumberFormat("en-US",{style:"currency",currency:"USD"}).format(n||0);
+const date=(v:string)=>v?new Intl.DateTimeFormat("en-US",{year:"numeric",month:"short",day:"2-digit"}).format(new Date(v)):"—";
+export function InstallmentsTable({installments,onView}:{installments:Installment[];onView?:(id:string|number)=>void}){
+ if(!installments.length)return <div className="rounded-[22px] border border-dashed border-border bg-card p-12 text-center"><h3 className="font-semibold">No student installments found</h3><p className="mt-2 text-sm text-muted-foreground">Installments appear after a student financial contract is finalized.</p></div>;
+ return <div className="overflow-hidden rounded-[22px] border border-border/70 bg-card shadow-[0_12px_30px_rgba(31,25,78,0.055)]"><Table><TableHeader><TableRow className="h-12 border-border/65 bg-muted/35 hover:bg-muted/35"><TableHead>STUDENT INSTALLMENT</TableHead><TableHead>AMOUNT DUE</TableHead><TableHead>AMOUNT PAID</TableHead><TableHead>DUE DATE</TableHead><TableHead>STATUS</TableHead><TableHead className="text-right">ACTIONS</TableHead></TableRow></TableHeader><TableBody>{installments.map(item=><TableRow key={item.id} className="min-h-16 border-border/55 hover:bg-primary/[0.025]"><TableCell className="font-semibold text-foreground">{item.title}<span className="ml-2 text-xs font-normal text-muted-foreground">#{item.installmentNumber||"—"}</span></TableCell><TableCell>{money(item.amountDue)}</TableCell><TableCell className="font-semibold text-success">{money(item.amountPaid)}</TableCell><TableCell>{date(item.dueDate)}</TableCell><TableCell><span className={`rounded-full px-3 py-1.5 text-xs font-semibold ${item.status==="paid"?"bg-success/12 text-success":item.status==="overdue"?"bg-destructive/10 text-destructive":"bg-info/10 text-info"}`}>{item.status.replaceAll("_"," ")}</span></TableCell><TableCell className="text-right"><Button variant="outline" size="icon" className={financeIconButton} onClick={()=>onView?.(item.id)} aria-label="View installment"><Eye className="h-4 w-4"/></Button></TableCell></TableRow>)}</TableBody></Table></div>;
 }

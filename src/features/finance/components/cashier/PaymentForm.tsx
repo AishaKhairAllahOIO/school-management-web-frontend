@@ -66,7 +66,7 @@ export function PaymentForm({ students, onSubmit, isLoading = false }: Props) {
               </Select>
             )}
           />
-          {errors.studentId && <p className="text-sm text-red-500">{String(errors.studentId.message)}</p>}
+          {errors.studentId && <p className="text-sm text-destructive">{String(errors.studentId.message)}</p>}
         </div>
 
         {/* Paid Amount */}
@@ -74,10 +74,10 @@ export function PaymentForm({ students, onSubmit, isLoading = false }: Props) {
           <label className="text-sm font-medium">Amount to Pay ($)</label>
           <Input 
             type="number" 
-            className="h-11 rounded-xl text-lg font-bold text-violet-700" 
+            className="h-11 rounded-xl text-lg font-bold text-primary" 
             {...register("paidAmount")} 
           />
-          {errors.paidAmount && <p className="text-sm text-red-500">{String(errors.paidAmount.message)}</p>}
+          {errors.paidAmount && <p className="text-sm text-destructive">{String(errors.paidAmount.message)}</p>}
         </div>
 
         {/* Payment Method */}
@@ -100,7 +100,7 @@ export function PaymentForm({ students, onSubmit, isLoading = false }: Props) {
               </Select>
             )}
           />
-          {errors.paymentMethod && <p className="text-sm text-red-500">{String(errors.paymentMethod.message)}</p>}
+          {errors.paymentMethod && <p className="text-sm text-destructive">{String(errors.paymentMethod.message)}</p>}
         </div>
 
         {/* Paper Receipt (Optional) */}
@@ -128,7 +128,7 @@ export function PaymentForm({ students, onSubmit, isLoading = false }: Props) {
         )}
       </div>
 
-      <Button type="submit" className="w-full h-12 text-lg bg-green-600 hover:bg-green-700" disabled={isLoading}>
+      <Button type="submit" className="h-12 w-full rounded-[14px] bg-primary text-base font-semibold text-primary-foreground hover:bg-primary/90" disabled={isLoading}>
         {isLoading ? "Processing..." : "Process Payment"}
       </Button>
     </form>

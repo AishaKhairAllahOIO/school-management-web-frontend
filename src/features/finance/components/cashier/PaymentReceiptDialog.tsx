@@ -1,127 +1,16 @@
 import { useQuery } from "@tanstack/react-query";
-
 import { Printer, Receipt } from "lucide-react";
-
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/shared/ui/dialog";
 import { Button } from "@/shared/ui/button";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/shared/ui/dialog";
 import { financeOperationsService } from "../../services/finance-operations.service";
-
-type Props = {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  paymentId: string | number | null;
-};
-
-export function PaymentReceiptDialog({ open, onOpenChange, paymentId }: Props) {
-
-    const { data: receipt, isLoading, isError } = useQuery({
-    queryKey: ["payment-details", paymentId],
-    queryFn: () => financeOperationsService.getPaymentDetails(paymentId!),
-    enabled: !!paymentId && open,
-  });
-
-  const formatMethod = (method: string) => {
-    switch (method) {
-      case "cash": return "Cash";
-      case "bank_transfer": return "Bank Transfer";
-      case "cheque": return "Cheque";
-      case "electronic_wallet": return "E-Wallet";
-      default: return method;
-    }
-  };
-
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[88vh] overflow-y-auto rounded-[24px] border-border/70 bg-card p-0 sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-xl">
-            <Receipt className="text-violet-600" />
-            Payment Receipt Details
-          </DialogTitle>
-        </DialogHeader>
-
-        <div className="min-h-[250px] p-2 mt-2">
-          {isLoading ? (
-            <div className="space-y-4 py-4 animate-pulse">
-              <div className="mx-auto h-8 w-32 rounded bg-muted/60" />
-              {Array.from({ length: 5 }).map((_, index) => <div key={index} className="h-5 rounded bg-muted/55" />)}
-            </div>
-          ) : isError || !receipt ? (
-            <div className="flex flex-col items-center justify-center py-12 text-red-500">
-              <p>Failed to load receipt details.</p>
-            </div>
-          ) : (
-            <div className="space-y-6">
-
-              <div className="border-b border-dashed border-gray-300 pb-4 text-center">
-                <h3 className="text-2xl font-bold text-gray-800">
-                  {receipt.paidAmount?.toLocaleString()} $
-                </h3>
-                <p className="text-sm text-green-600 font-medium mt-1">Payment Successful</p>
-              </div>
-
-
-              <div className="space-y-4 text-sm">
-                <div className="flex justify-between items-center">
-                  <span className="text-muted-foreground">Receipt ID</span>
-                  <span className="font-semibold text-gray-800">#{receipt.id}</span>
-                </div>
-                
-                <div className="flex justify-between items-center">
-                  <span className="text-muted-foreground">Payment Date</span>
-                  <span className="font-medium text-gray-800">
-
-                    {receipt.paymentDate || "N/A"}
-                  </span>
-                </div>
-
-                <div className="flex justify-between items-center">
-                  <span className="text-muted-foreground">Payment Method</span>
-                  <span className="font-medium text-gray-800">
-                    {formatMethod(receipt.paymentMethod)}
-                  </span>
-                </div>
-
-                {receipt.paperReceiptNo && (
-                  <div className="flex justify-between items-center">
-                    <span className="text-muted-foreground">Paper Ref. No.</span>
-                    <span className="font-medium text-gray-800">{receipt.paperReceiptNo}</span>
-                  </div>
-                )}
-
-                {receipt.digitalReference && (
-                  <div className="flex justify-between items-center">
-                    <span className="text-muted-foreground">Digital Ref. No.</span>
-                    <span className="font-medium text-gray-800">{receipt.digitalReference}</span>
-                  </div>
-                )}
-
-                <div className="flex justify-between items-center">
-                  <span className="text-muted-foreground">Processed By</span>
-                  <span className="font-medium text-violet-700 bg-violet-50 px-2 py-0.5 rounded-md">
-                    {receipt.cashierName || "System Admin"}
-                  </span>
-                </div>
-              </div>
-
-
-              <div className="pt-4">
-                <Button 
-                  className="w-full bg-gray-900 hover:bg-gray-800" 
-                  onClick={() => window.print()}
-                >
-                  <Printer className="mr-2 h-4 w-4" /> Print Receipt
-                </Button>
-              </div>
-            </div>
-          )}
-        </div>
-      </DialogContent>
-    </Dialog>
-  );
+import { financeActionButton } from "../shared/FinancePrimitives";
+const money=(n:number)=>new Intl.NumberFormat("en-US",{style:"currency",currency:"USD"}).format(n||0);
+const date=(v?:string)=>v?new Intl.DateTimeFormat("en-US",{year:"numeric",month:"long",day:"2-digit",hour:"2-digit",minute:"2-digit"}).format(new Date(v)):"—";
+const method=(v:string)=>({cash:"Cash",bank_transfer:"Bank Transfer",cheque:"Cheque",electronic_wallet:"Electronic Wallet"}[v]??v);
+function escapeHtml(value:unknown){const entities:Record<string,string>={"&":"&amp;","<":"&lt;",">":"&gt;","\'":"&#039;",'"':"&quot;"};return String(value??"").replace(/[&<>\'"]/g,c=>entities[c]??c);}
+export function PaymentReceiptDialog({open,onOpenChange,paymentId}:{open:boolean;onOpenChange:(v:boolean)=>void;paymentId:string|number|null}){
+ const query=useQuery({queryKey:["payment-details",paymentId],queryFn:()=>financeOperationsService.getPaymentDetails(paymentId!),enabled:Boolean(open&&paymentId),retry:1}); const receipt=query.data;
+ const printReceipt=()=>{if(!receipt)return;const win=window.open("","_blank","width=900,height=720");if(!win)return;win.document.write(`<!doctype html><html><head><title>Student Payment Receipt ${escapeHtml(receipt.id)}</title><style>@page{size:A4;margin:14mm}*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;color:#15142c;background:#fff}.sheet{border:1px solid #e2e0f0;border-radius:20px;overflow:hidden}.header{padding:30px 34px;background:linear-gradient(135deg,#17143f,#6740e8);color:white;display:flex;justify-content:space-between;align-items:flex-start}.brand{font-size:22px;font-weight:800}.subtitle{margin-top:6px;opacity:.78;font-size:12px}.receipt-title{text-align:right;font-size:12px;letter-spacing:.16em;text-transform:uppercase;opacity:.78}.receipt-no{margin-top:8px;font-size:18px;font-weight:700}.body{padding:32px 34px}.paid{padding:22px;border:1px solid #d8d1fa;border-radius:16px;background:#f7f4ff;text-align:center}.paid-label{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:#67667d}.amount{margin-top:8px;font-size:34px;font-weight:800;color:#6740e8}.success{margin-top:7px;font-size:12px;color:#3f966f;font-weight:700}.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:24px}.item{padding:16px;border:1px solid #eceaf5;border-radius:14px}.label{font-size:11px;color:#77758a;text-transform:uppercase;letter-spacing:.08em}.value{margin-top:7px;font-size:14px;font-weight:700}.footer{margin-top:30px;padding-top:18px;border-top:1px dashed #cbc7dd;display:flex;justify-content:space-between;color:#77758a;font-size:11px}.stamp{margin-top:28px;text-align:right}.line{display:inline-block;width:180px;border-top:1px solid #77758a;padding-top:8px;text-align:center;font-size:11px}@media print{body{print-color-adjust:exact;-webkit-print-color-adjust:exact}}</style></head><body><div class="sheet"><div class="header"><div><div class="brand">School Management</div><div class="subtitle">Administration Platform · Student Finance</div></div><div><div class="receipt-title">Official Payment Receipt</div><div class="receipt-no">#${escapeHtml(receipt.id)}</div></div></div><div class="body"><div class="paid"><div class="paid-label">Amount received</div><div class="amount">${escapeHtml(money(receipt.paidAmount))}</div><div class="success">Payment recorded successfully</div></div><div class="grid"><div class="item"><div class="label">Payment method</div><div class="value">${escapeHtml(method(receipt.paymentMethod))}</div></div><div class="item"><div class="label">Payment date</div><div class="value">${escapeHtml(date(receipt.paymentDate))}</div></div><div class="item"><div class="label">Paper receipt number</div><div class="value">${escapeHtml(receipt.paperReceiptNo||"—")}</div></div><div class="item"><div class="label">Digital reference</div><div class="value">${escapeHtml(receipt.digitalReference||"—")}</div></div><div class="item"><div class="label">Received by</div><div class="value">${escapeHtml(receipt.cashierName||"System Administrator")}</div></div><div class="item"><div class="label">Transaction status</div><div class="value">Completed</div></div></div><div class="stamp"><span class="line">Authorized signature</span></div><div class="footer"><span>This receipt was generated electronically by the school system.</span><span>Printed ${escapeHtml(new Date().toLocaleString())}</span></div></div></div><script>window.onload=()=>{window.print();window.onafterprint=()=>window.close();}<\/script></body></html>`);win.document.close();};
+ return <Dialog open={open} onOpenChange={onOpenChange}><DialogContent className="overflow-hidden rounded-[24px] border-border/70 p-0 sm:max-w-[540px]"><DialogHeader className="border-b border-border/60 px-6 py-5 text-left"><div className="flex items-center gap-3"><div className="rounded-2xl bg-primary/[0.08] p-2.5 text-primary"><Receipt className="h-5 w-5"/></div><div><DialogTitle>Student Payment Receipt</DialogTitle><DialogDescription>Review and print the official student payment receipt.</DialogDescription></div></div></DialogHeader><div className="p-6">{query.isLoading?<div className="space-y-4"><div className="h-28 animate-pulse rounded-[20px] bg-muted/70"/>{[1,2,3].map(i=><div key={i} className="h-14 animate-pulse rounded-2xl bg-muted/70"/>)}</div>:query.isError||!receipt?<div className="rounded-2xl border border-destructive/20 bg-destructive/[0.06] p-5 text-sm text-destructive">The payment receipt could not be loaded.</div>:<div className="space-y-5"><div className="rounded-[20px] border border-primary/15 bg-primary/[0.045] p-5 text-center"><p className="text-xs font-semibold uppercase tracking-[0.13em] text-muted-foreground">Amount received</p><p className="mt-2 text-3xl font-bold text-primary">{money(receipt.paidAmount)}</p><p className="mt-1 text-xs font-semibold text-success">Payment recorded successfully</p></div><div className="grid gap-3 sm:grid-cols-2"><Item label="Receipt ID" value={`#${receipt.id}`}/><Item label="Payment method" value={method(receipt.paymentMethod)}/><Item label="Paper receipt" value={receipt.paperReceiptNo||"—"}/><Item label="Digital reference" value={receipt.digitalReference||"—"}/><Item label="Payment date" value={date(receipt.paymentDate)}/><Item label="Received by" value={receipt.cashierName||"System Administrator"}/></div><Button className={`w-full ${financeActionButton}`} onClick={printReceipt}><Printer className="mr-2 h-4 w-4"/>Print professional receipt</Button></div>}</div></DialogContent></Dialog>;
 }
+function Item({label,value}:{label:string;value:string}){return <div className="rounded-2xl border border-border/65 bg-muted/25 p-4"><p className="text-xs text-muted-foreground">{label}</p><p className="mt-2 break-words text-sm font-semibold text-foreground">{value}</p></div>}

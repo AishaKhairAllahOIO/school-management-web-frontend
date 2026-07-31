@@ -1,171 +1,29 @@
 import { useState } from "react";
-import { Plus, ReceiptText } from "lucide-react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"; 
-
+import { Plus, RefreshCw } from "lucide-react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/shared/ui/button";
-import { FinancePageSkeleton } from "../shared/FinancePageSkeleton";
-import { FinanceSectionHeader } from "../shared/FinanceSectionHeader";
 import { axiosClient } from "@/services/axios/axiosClient";
-import { API_ENDPOINTS } from "@/services/api/endpoints"; // 👈 استيراد المسارات الصحيحة
-import { financeOperationsService } from "../../services/finance-operations.service"; 
-
+import { API_ENDPOINTS } from "@/services/api/endpoints";
+import { financeOperationsService } from "../../services/finance-operations.service";
 import { PaymentsTable } from "./PaymentsTable";
 import { ProcessPaymentDialog } from "./ProcessPaymentDialog";
 import { UpdatePaymentDialog } from "./UpdatePaymentDialog";
-import { PaymentReceiptDialog } from "./PaymentReceiptDialog"; // 👈 استيراد نافذة الإيصال
+import { PaymentReceiptDialog } from "./PaymentReceiptDialog";
 import { usePayments } from "../../hooks/usePayments";
-
 import type { PaymentReceipt } from "../../types/finance.types";
 import type { PaymentFormValues } from "../../schemas/payment.schema";
+import { FinanceConfirmDialog, FinancePageSkeleton, FinanceSectionHeader, financeActionButton } from "../shared/FinancePrimitives";
 
 export function CashierSection() {
-  const {
-    data: payments = [],
-    isLoading: isLoadingPayments,
-    isError,
-    isFetching,
-    refetch,
-    processPayment,
-    deletePayment,
-  } = usePayments();
-
-  const queryClient = useQueryClient();
-
-
-  const [createOpen, setCreateOpen] = useState(false);
-  const [editOpen, setEditOpen] = useState(false);
-  const [selectedPayment, setSelectedPayment] = useState<PaymentReceipt | null>(null);
-
-
-  const [viewOpen, setViewOpen] = useState(false);
-  const [selectedPaymentIdToView, setSelectedPaymentIdToView] = useState<string | number | null>(null);
-
-
-  const { data: students = [], isLoading: isLoadingStudents } = useQuery({
-    queryKey: ["students-list"],
-    queryFn: async () => {
-      try {
-        const response = await axiosClient.get(API_ENDPOINTS.STUDENTS.FILTER, {
-          params: { status: 'enrolled', per_page: 100 }
-        }); 
-        const rawData = response.data?.data?.data ?? response.data?.data ?? response.data?.items ?? [];
-        return rawData.map((student: any) => ({
-          id: student.studentId || student.id,
-          name: student.fullName, 
-        }));
-      } catch (error) {
-        return [];
-      }
-    },
-  });
-
-  function handleProcessPayment(values: PaymentFormValues) {
-    const payload = {
-      ...values,
-      paperReceiptNo: values.paperReceiptNo || null,
-      digitalReference: values.digitalReference || null,
-    };
-
-    processPayment.mutate(payload, {
-      onSuccess: () => {
-        setCreateOpen(false);
-      },
-    });
-  }
-
-  const updatePayment = useMutation({
-    mutationFn: ({ id, payload }: { id: string; payload: any }) => 
-      financeOperationsService.updatePayment(id, payload),
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["payments-ledger"] });
-      setEditOpen(false);
-      setSelectedPayment(null);
-    },
-    onError: (error: any) => {
-      alert("Update failed: " + (error.response?.data?.message || "Unknown error"));
-    }
-  });
-
-
-  function handleDelete(id: string | number) {
-    if (confirm("Are you sure you want to delete this payment? This will reverse the amount in the student's balance.")) {
-      deletePayment.mutate(id);  
-    }
-  }
-
-  if (isLoadingPayments || isLoadingStudents) {
-    return <FinancePageSkeleton rows={6} />;
-  }
-
-  if (isError) {
-    return (
-      <div className="flex flex-col items-center justify-center rounded-2xl border border-red-200 bg-red-50 py-12 text-center">
-        <Button variant="outline" onClick={() => refetch()} disabled={isFetching}>
-          {isFetching ? "Retrying..." : "Retry Loading Cashier"}
-        </Button>
-      </div>
-    );
-  }
-
-  return (
-    <div className="overflow-hidden rounded-[22px] border border-border/70 bg-card shadow-[0_14px_42px_rgba(38,24,84,0.055)]">
-      <FinanceSectionHeader
-        icon={<ReceiptText size={19} strokeWidth={1.9} />}
-        title="Student Payments"
-        description="Record student payments, review receipts, and manage the cashier ledger."
-        action={
-          <Button
-            variant="outline"
-            onClick={() => setCreateOpen(true)}
-            className="h-11 rounded-[14px] border-primary/25 bg-background px-4 text-primary shadow-none hover:border-primary/40 hover:bg-primary/[0.04] hover:text-primary"
-          >
-            <Plus className="mr-2 h-4 w-4" /> Process Payment
-          </Button>
-        }
-      />
-      <div className="p-5 sm:p-6">
-      <PaymentsTable 
-        payments={payments} 
-        onView={(id) => {
-          setSelectedPaymentIdToView(id);
-          setViewOpen(true);
-        }}
-        onDelete={handleDelete} 
-        onEdit={(payment) => {
-          setSelectedPayment(payment);
-          setEditOpen(true);
-        }}
-      />
-      </div>
-    
-      <ProcessPaymentDialog
-        open={createOpen}
-        onOpenChange={setCreateOpen}
-        students={students}
-        isLoading={processPayment.isPending}
-        onSubmit={handleProcessPayment}
-      />
-
-      <UpdatePaymentDialog
-        open={editOpen}
-        onOpenChange={(open) => {
-          setEditOpen(open);
-          if (!open) setSelectedPayment(null);
-        }}
-        payment={selectedPayment}
-        isLoading={updatePayment.isPending}
-        onSubmit={(id, payload) => updatePayment.mutate({ id, payload })}
-      />
-
-
-      <PaymentReceiptDialog
-        open={viewOpen}
-        onOpenChange={(open) => {
-          setViewOpen(open);
-          if (!open) setSelectedPaymentIdToView(null);
-        }}
-        paymentId={selectedPaymentIdToView}
-      />
-    </div>
-  );
+  const { data: payments = [], isLoading: paymentsLoading, isError, isFetching, refetch, processPayment, deletePayment } = usePayments();
+  const queryClient=useQueryClient();
+  const [createOpen,setCreateOpen]=useState(false); const [editOpen,setEditOpen]=useState(false); const [selectedPayment,setSelectedPayment]=useState<PaymentReceipt|null>(null);
+  const [viewOpen,setViewOpen]=useState(false); const [viewId,setViewId]=useState<string|number|null>(null);
+  const [deleteOpen,setDeleteOpen]=useState(false); const [deleteId,setDeleteId]=useState<string|number|null>(null);
+  const {data:students=[],isLoading:studentsLoading}=useQuery({queryKey:["students-list"],queryFn:async()=>{const response=await axiosClient.get(API_ENDPOINTS.STUDENTS.FILTER,{params:{status:"enrolled",per_page:100}});const raw=response.data?.data?.data??response.data?.data??response.data?.items??[];return raw.map((student:any)=>({id:student.studentId||student.id,name:student.fullName||student.name||`Student #${student.studentId||student.id}`}));}});
+  const updatePayment=useMutation({mutationFn:({id,payload}:{id:string;payload:any})=>financeOperationsService.updatePayment(id,payload),onSuccess:async()=>{await queryClient.invalidateQueries({queryKey:["payments-ledger"]});setEditOpen(false);setSelectedPayment(null);}});
+  if(paymentsLoading||studentsLoading)return <FinancePageSkeleton columns={6}/>;
+  if(isError)return <div className="rounded-[22px] border border-destructive/20 bg-destructive/[0.055] p-10 text-center"><h2 className="font-semibold text-destructive">Student payments could not be loaded</h2><Button className={`mt-4 ${financeActionButton}`} onClick={()=>refetch()} disabled={isFetching}><RefreshCw className={`mr-2 h-4 w-4 ${isFetching?"animate-spin":""}`}/>Try again</Button></div>;
+  const process=(values:PaymentFormValues)=>processPayment.mutate({...values,paperReceiptNo:values.paperReceiptNo||null,digitalReference:values.digitalReference||null},{onSuccess:()=>setCreateOpen(false)});
+  return <div className="space-y-6"><FinanceSectionHeader title="Student Payments" description="Record student payments, maintain transaction references, and issue professional receipts." action={<Button className={financeActionButton} onClick={()=>setCreateOpen(true)}><Plus className="mr-2 h-4 w-4"/>Process Payment</Button>}/><PaymentsTable payments={payments} onView={(id)=>{setViewId(id);setViewOpen(true)}} onEdit={(payment)=>{setSelectedPayment(payment);setEditOpen(true)}} onDelete={(id)=>{setDeleteId(id);setDeleteOpen(true)}}/><ProcessPaymentDialog open={createOpen} onOpenChange={setCreateOpen} students={students} isLoading={processPayment.isPending} onSubmit={process}/><UpdatePaymentDialog open={editOpen} onOpenChange={(v)=>{setEditOpen(v);if(!v)setSelectedPayment(null)}} payment={selectedPayment} isLoading={updatePayment.isPending} onSubmit={(id,payload)=>updatePayment.mutate({id,payload})}/><PaymentReceiptDialog open={viewOpen} onOpenChange={(v)=>{setViewOpen(v);if(!v)setViewId(null)}} paymentId={viewId}/><FinanceConfirmDialog open={deleteOpen} onOpenChange={(v)=>{setDeleteOpen(v);if(!v)setDeleteId(null)}} title="Delete student payment?" description="This permanently deletes the selected receipt and may reverse the amount in the student account. This action cannot be undone." confirmLabel="Delete Payment" pending={deletePayment.isPending} onConfirm={()=>{if(deleteId==null)return;deletePayment.mutate(deleteId,{onSuccess:()=>{setDeleteOpen(false);setDeleteId(null)}})}}/></div>;
 }

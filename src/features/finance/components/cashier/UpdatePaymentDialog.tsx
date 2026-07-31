@@ -76,7 +76,7 @@ export function UpdatePaymentDialog({ open, onOpenChange, payment, isLoading, on
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="rounded-[24px] border-border/70 bg-card sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Update Payment Details</DialogTitle>
           <DialogDescription>
@@ -87,9 +87,9 @@ export function UpdatePaymentDialog({ open, onOpenChange, payment, isLoading, on
         <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4 mt-4">
           
           {/* حقل للعرض فقط لتذكير المحاسب بالمبلغ */}
-          <div className="rounded-xl bg-gray-50 p-3 border border-gray-100 flex justify-between items-center text-sm">
+          <div className="rounded-xl bg-muted/35 p-3 border border-border/60 flex justify-between items-center text-sm">
             <span className="text-muted-foreground">Receipt Amount:</span>
-            <span className="font-bold text-gray-700">{payment?.paidAmount?.toLocaleString()} $</span>
+            <span className="font-bold text-foreground">{payment?.paidAmount?.toLocaleString()} $</span>
           </div>
 
           <div className="space-y-2">
