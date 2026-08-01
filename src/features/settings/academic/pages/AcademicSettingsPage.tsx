@@ -239,7 +239,7 @@ function AcademicSettingsErrorState({
             Academic data is unavailable
           </h1>
 
-          <p className="mt-2 text-sm font-normal leading-6 text-muted-foreground">
+          <p className="mt-2 text-[15px] font-normal leading-6 text-muted-foreground">
             The academic configuration could not
             be retrieved. Check the server
             connection and try again.
@@ -253,7 +253,7 @@ function AcademicSettingsErrorState({
               "mt-5 inline-flex h-11",
               "items-center justify-center gap-2",
               "rounded-xl bg-primary px-6",
-              "text-sm font-medium",
+              "text-[15px] font-medium",
               "text-primary-foreground",
               "shadow-soft transition",
               "hover:bg-primary/90",

@@ -314,11 +314,11 @@ export function SchoolGallery({
           </span>
 
           <div className="min-w-0 pt-0.5">
-            <h2 className="text-[15px] font-semibold text-foreground">
+            <h2 className="text-[16px] font-semibold text-foreground">
               School Gallery
             </h2>
 
-            <p className="mt-1 text-[11px] leading-4 text-muted-foreground">
+            <p className="mt-1 text-[12px] leading-4 text-muted-foreground">
               Upload school photos.
             </p>
           </div>
@@ -438,7 +438,7 @@ export function SchoolGallery({
                         "rounded-full",
                         "bg-foreground/65",
                         "px-1.5 py-0.5",
-                        "text-[8px] font-medium",
+                        "text-[9px] font-medium",
                         "text-background",
                         "backdrop-blur",
                       ].join(" ")}
@@ -511,7 +511,7 @@ export function SchoolGallery({
 
         {selectionError ? (
           <div className="mt-3 rounded-[14px] bg-destructive/[0.045] px-4 py-3">
-            <p className="text-[11px] font-medium text-destructive">
+            <p className="text-[12px] font-medium text-destructive">
               {selectionError}
             </p>
           </div>
@@ -535,7 +535,7 @@ export function SchoolGallery({
                 "border border-border/70",
                 "bg-background",
                 "px-4",
-                "text-[11px] font-semibold",
+                "text-[12px] font-semibold",
                 "text-foreground/70",
                 "transition duration-200",
                 "hover:bg-muted/55",
@@ -555,7 +555,7 @@ export function SchoolGallery({
                 "justify-center gap-2",
                 "rounded-full bg-primary",
                 "px-4",
-                "text-[11px] font-semibold",
+                "text-[12px] font-semibold",
                 "text-primary-foreground",
                 "shadow-[0_8px_20px_rgba(98,74,180,0.16)]",
                 "transition duration-200",
@@ -583,7 +583,7 @@ export function SchoolGallery({
 
         {isImagesError ? (
           <div className="mt-4 rounded-[16px] bg-destructive/[0.035] p-5 text-center">
-            <p className="text-xs font-semibold text-destructive">
+            <p className="text-[13px] font-semibold text-destructive">
               Failed to load gallery images.
             </p>
 
@@ -597,7 +597,7 @@ export function SchoolGallery({
                 "items-center gap-2",
                 "rounded-full bg-card",
                 "px-4",
-                "text-xs font-semibold",
+                "text-[13px] font-semibold",
                 "text-foreground",
                 "shadow-sm",
                 "transition hover:bg-muted",
@@ -731,7 +731,7 @@ function DeleteSchoolImageDialog({
 
               <p
                 id="delete-image-description"
-                className="mt-1.5 text-sm leading-6 text-muted-foreground"
+                className="mt-1.5 text-[15px] leading-6 text-muted-foreground"
               >
                 The image will be permanently removed.
               </p>
@@ -762,7 +762,7 @@ function DeleteSchoolImageDialog({
             className={[
               "h-10 rounded-full",
               "bg-card px-5",
-              "text-xs font-semibold",
+              "text-[13px] font-semibold",
               "text-foreground/75",
               "shadow-sm",
               "transition hover:bg-muted",
@@ -781,7 +781,7 @@ function DeleteSchoolImageDialog({
               "justify-center gap-2",
               "rounded-full",
               "bg-destructive px-5",
-              "text-xs font-semibold",
+              "text-[13px] font-semibold",
               "text-destructive-foreground",
               "shadow-[0_8px_20px_rgba(180,35,35,0.15)]",
               "transition",

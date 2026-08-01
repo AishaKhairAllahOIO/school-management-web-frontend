@@ -62,11 +62,11 @@ export function GeneralSettingsDangerZone({
             </span>
 
             <div className="pt-0.5">
-              <h2 className="text-[15px] font-semibold text-foreground">
+              <h2 className="text-[16px] font-semibold text-foreground">
                 Danger Zone
               </h2>
 
-              <p className="mt-1 max-w-2xl text-xs leading-5 text-muted-foreground">
+              <p className="mt-1 max-w-2xl text-[13px] leading-5 text-muted-foreground">
                 Permanently reset the school
                 profile, logo and all gallery
                 images. This action cannot be
@@ -86,7 +86,7 @@ export function GeneralSettingsDangerZone({
               "items-center justify-center gap-2",
               "rounded-full",
               "bg-card px-5",
-              "text-xs font-semibold",
+              "text-[13px] font-semibold",
               "text-destructive",
               "shadow-[0_6px_20px_rgba(100,20,20,0.06)]",
               "transition duration-200",

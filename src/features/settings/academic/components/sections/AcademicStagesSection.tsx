@@ -165,11 +165,11 @@ export function AcademicStagesSection({
             <GraduationCap size={20} />
           </span>
 
-          <p className="mt-4 text-sm font-medium text-foreground">
+          <p className="mt-4 text-[15px] font-medium text-foreground">
             No academic stages yet
           </p>
 
-          <p className="mt-1 text-xs font-normal text-muted-foreground">
+          <p className="mt-1 text-[13px] font-normal text-muted-foreground">
             Add the first stage to begin organizing
             grade levels.
           </p>
@@ -268,11 +268,11 @@ function StageStat({
         {value}
       </p>
 
-      <p className="mt-1 text-xs font-medium text-foreground">
+      <p className="mt-1 text-[13px] font-medium text-foreground">
         {label}
       </p>
 
-      <p className="mt-1 text-[10px] font-normal text-muted-foreground">
+      <p className="mt-1 text-[11px] font-normal text-muted-foreground">
         {description}
       </p>
     </div>

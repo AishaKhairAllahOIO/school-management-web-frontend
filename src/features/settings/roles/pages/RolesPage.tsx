@@ -192,16 +192,16 @@ export function RolesPage() {
 
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2">
-                          <h3 className="truncate text-[13px] font-semibold text-foreground">
+                          <h3 className="truncate text-[14px] font-semibold text-foreground">
                             {role.name}
                           </h3>
 
-                          <span className="rounded-full bg-success/[0.09] px-2 py-0.5 text-[9px] font-medium text-success">
+                          <span className="rounded-full bg-success/[0.09] px-2 py-0.5 text-[10px] font-medium text-success">
                             {role.status}
                           </span>
                         </div>
 
-                        <p className="mt-1 text-[10px] text-muted-foreground">
+                        <p className="mt-1 text-[11px] text-muted-foreground">
                           {role.users} users
                         </p>
                       </div>
@@ -231,11 +231,11 @@ export function RolesPage() {
               </span>
 
               <div>
-                <p className="text-[12px] font-semibold text-foreground">
+                <p className="text-[13px] font-semibold text-foreground">
                   Role management
                 </p>
 
-                <p className="mt-1 text-[10px] leading-4 text-muted-foreground">
+                <p className="mt-1 text-[11px] leading-4 text-muted-foreground">
                   Dashboard is selected by role and is not counted as a separate module.
                 </p>
               </div>
@@ -263,12 +263,12 @@ export function RolesPage() {
                     {selectedRole.name}
                   </h2>
 
-                  <span className="rounded-full bg-success/[0.09] px-2.5 py-1 text-[10px] font-medium text-success">
+                  <span className="rounded-full bg-success/[0.09] px-2.5 py-1 text-[11px] font-medium text-success">
                     {selectedRole.status}
                   </span>
                 </div>
 
-                <p className="mt-1.5 text-xs text-muted-foreground">
+                <p className="mt-1.5 text-[13px] text-muted-foreground">
                   {selectedRole.description}
                 </p>
               </div>
@@ -277,7 +277,7 @@ export function RolesPage() {
             <div className="flex items-center gap-2 self-start">
               <button
                 type="button"
-                className="flex h-9 items-center gap-2 rounded-full border border-border/65 bg-background px-4 text-[11px] font-medium text-foreground/80 transition hover:bg-muted/45 hover:text-foreground"
+                className="flex h-9 items-center gap-2 rounded-full border border-border/65 bg-background px-4 text-[12px] font-medium text-foreground/80 transition hover:bg-muted/45 hover:text-foreground"
               >
                 <Edit3 size={14} />
                 Edit Role
@@ -295,52 +295,52 @@ export function RolesPage() {
 
           <div className="mt-5 grid gap-4 xl:grid-cols-[minmax(0,1.2fr)_minmax(260px,0.8fr)]">
             <article className="rounded-[20px] border border-border/50 bg-muted/[0.12] p-4.5">
-              <h3 className="text-[13px] font-semibold text-foreground">
+              <h3 className="text-[14px] font-semibold text-foreground">
                 Role Information
               </h3>
 
               <dl className="mt-4 grid gap-4 sm:grid-cols-2">
                 <div>
-                  <dt className="text-[10px] font-medium text-muted-foreground">
+                  <dt className="text-[11px] font-medium text-muted-foreground">
                     Role Name
                   </dt>
-                  <dd className="mt-1 text-[12px] font-medium text-foreground">
+                  <dd className="mt-1 text-[13px] font-medium text-foreground">
                     {selectedRole.name}
                   </dd>
                 </div>
 
                 <div>
-                  <dt className="text-[10px] font-medium text-muted-foreground">
+                  <dt className="text-[11px] font-medium text-muted-foreground">
                     Assigned Users
                   </dt>
-                  <dd className="mt-1 text-[12px] font-medium text-foreground">
+                  <dd className="mt-1 text-[13px] font-medium text-foreground">
                     {selectedRole.users}
                   </dd>
                 </div>
 
                 <div className="sm:col-span-2">
-                  <dt className="text-[10px] font-medium text-muted-foreground">
+                  <dt className="text-[11px] font-medium text-muted-foreground">
                     Description
                   </dt>
-                  <dd className="mt-1 max-w-2xl text-[12px] leading-5 text-foreground/85">
+                  <dd className="mt-1 max-w-2xl text-[13px] leading-5 text-foreground/85">
                     {selectedInformation.description}
                   </dd>
                 </div>
 
                 <div>
-                  <dt className="text-[10px] font-medium text-muted-foreground">
+                  <dt className="text-[11px] font-medium text-muted-foreground">
                     Created At
                   </dt>
-                  <dd className="mt-1 text-[12px] font-medium text-foreground">
+                  <dd className="mt-1 text-[13px] font-medium text-foreground">
                     {selectedInformation.createdAt}
                   </dd>
                 </div>
 
                 <div>
-                  <dt className="text-[10px] font-medium text-muted-foreground">
+                  <dt className="text-[11px] font-medium text-muted-foreground">
                     Last Updated
                   </dt>
-                  <dd className="mt-1 text-[12px] font-medium text-foreground">
+                  <dd className="mt-1 text-[13px] font-medium text-foreground">
                     {selectedInformation.updatedAt}
                   </dd>
                 </div>
@@ -348,7 +348,7 @@ export function RolesPage() {
             </article>
 
             <article className="rounded-[20px] border border-border/50 bg-muted/[0.12] p-4.5">
-              <h3 className="text-[13px] font-semibold text-foreground">
+              <h3 className="text-[14px] font-semibold text-foreground">
                 Permissions Summary
               </h3>
 
@@ -373,12 +373,12 @@ export function RolesPage() {
                           <Icon size={15} strokeWidth={1.8} />
                         </span>
 
-                        <span className="truncate text-[11px] text-muted-foreground">
+                        <span className="truncate text-[12px] text-muted-foreground">
                           {item.label}
                         </span>
                       </div>
 
-                      <span className="text-[12px] font-semibold text-foreground">
+                      <span className="text-[13px] font-semibold text-foreground">
                         {item.value}
                       </span>
                     </div>
@@ -390,11 +390,11 @@ export function RolesPage() {
 
           <article className="mt-4 rounded-[20px] border border-border/50 bg-muted/[0.12] p-4.5">
             <div className="flex items-center justify-between gap-3">
-              <h3 className="text-[13px] font-semibold text-foreground">
+              <h3 className="text-[14px] font-semibold text-foreground">
                 Module Access
               </h3>
 
-              <span className="text-[10px] text-muted-foreground">
+              <span className="text-[11px] text-muted-foreground">
                 8 modules
               </span>
             </div>
@@ -420,11 +420,11 @@ export function RolesPage() {
                     </span>
 
                     <div className="min-w-0">
-                      <p className="truncate text-[11px] font-semibold text-foreground">
+                      <p className="truncate text-[12px] font-semibold text-foreground">
                         {item.title}
                       </p>
 
-                      <p className="mt-0.5 text-[9px] font-medium text-success">
+                      <p className="mt-0.5 text-[10px] font-medium text-success">
                         Full Access
                       </p>
                     </div>

@@ -132,7 +132,7 @@ function AccessBadge({
       className={[
         "inline-flex justify-center",
         "rounded-full px-2.5 py-1",
-        "text-[9px] font-medium",
+        "text-[10px] font-medium",
         "whitespace-nowrap",
         className,
       ].join(" ")}
@@ -171,12 +171,12 @@ export function PermissionsPage() {
                   <Icon size={18} strokeWidth={1.8} />
                 </span>
 
-                <span className="rounded-full bg-muted/[0.35] px-2.5 py-1 text-[9px] font-medium text-muted-foreground">
+                <span className="rounded-full bg-muted/[0.35] px-2.5 py-1 text-[10px] font-medium text-muted-foreground">
                   Overview
                 </span>
               </div>
 
-              <p className="mt-4 text-[11px] font-medium text-muted-foreground">
+              <p className="mt-4 text-[12px] font-medium text-muted-foreground">
                 {item.label}
               </p>
 
@@ -184,7 +184,7 @@ export function PermissionsPage() {
                 {item.value}
               </p>
 
-              <p className="mt-1 text-[10px] text-muted-foreground">
+              <p className="mt-1 text-[11px] text-muted-foreground">
                 {item.description}
               </p>
             </article>
@@ -195,11 +195,11 @@ export function PermissionsPage() {
       <section className="grid items-start gap-5 2xl:grid-cols-[minmax(0,1.12fr)_minmax(430px,0.88fr)]">
         <article className="overflow-hidden rounded-[24px] border border-border/45 bg-card shadow-[0_10px_35px_rgba(30,20,70,0.035)]">
           <header className="border-b border-border/45 px-5 py-4">
-            <h2 className="text-[14px] font-semibold text-foreground">
+            <h2 className="text-[15px] font-semibold text-foreground">
               System Modules
             </h2>
 
-            <p className="mt-1 text-[10px] text-muted-foreground">
+            <p className="mt-1 text-[11px] text-muted-foreground">
               Modules match the main sidebar. Dashboard is role-specific and is not treated as a permission module.
             </p>
           </header>
@@ -215,7 +215,7 @@ export function PermissionsPage() {
               </colgroup>
 
               <thead>
-                <tr className="border-b border-border/45 bg-muted/[0.12] text-[10px] font-medium text-muted-foreground">
+                <tr className="border-b border-border/45 bg-muted/[0.12] text-[11px] font-medium text-muted-foreground">
                   <th className="px-4 py-3">Module</th>
                   <th className="px-4 py-3">Description</th>
                   <th className="px-3 py-3 text-center">Permissions</th>
@@ -246,24 +246,24 @@ export function PermissionsPage() {
                             <Icon size={16} strokeWidth={1.8} />
                           </span>
 
-                          <span className="truncate text-[11px] font-semibold text-foreground">
+                          <span className="truncate text-[12px] font-semibold text-foreground">
                             {item.name}
                           </span>
                         </div>
                       </td>
 
                       <td className="px-4 py-3.5">
-                        <p className="line-clamp-2 text-[10px] leading-4 text-muted-foreground">
+                        <p className="line-clamp-2 text-[11px] leading-4 text-muted-foreground">
                           {item.description}
                         </p>
                       </td>
 
-                      <td className="px-3 py-3.5 text-center text-[11px] font-semibold text-foreground">
+                      <td className="px-3 py-3.5 text-center text-[12px] font-semibold text-foreground">
                         {item.permissions}
                       </td>
 
                       <td className="px-3 py-3.5 text-center">
-                        <span className="rounded-full bg-success/[0.09] px-2.5 py-1 text-[9px] font-medium text-success">
+                        <span className="rounded-full bg-success/[0.09] px-2.5 py-1 text-[10px] font-medium text-success">
                           Active
                         </span>
                       </td>
@@ -307,25 +307,25 @@ export function PermissionsPage() {
 
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-center justify-between gap-2">
-                        <h3 className="text-[11px] font-semibold text-foreground">
+                        <h3 className="text-[12px] font-semibold text-foreground">
                           {item.name}
                         </h3>
 
-                        <span className="rounded-full bg-success/[0.09] px-2.5 py-1 text-[9px] font-medium text-success">
+                        <span className="rounded-full bg-success/[0.09] px-2.5 py-1 text-[10px] font-medium text-success">
                           Active
                         </span>
                       </div>
 
-                      <p className="mt-1 text-[10px] leading-4 text-muted-foreground">
+                      <p className="mt-1 text-[11px] leading-4 text-muted-foreground">
                         {item.description}
                       </p>
 
                       <div className="mt-2 flex items-center justify-between">
-                        <span className="text-[10px] text-muted-foreground">
+                        <span className="text-[11px] text-muted-foreground">
                           Permissions
                         </span>
 
-                        <span className="text-[11px] font-semibold text-foreground">
+                        <span className="text-[12px] font-semibold text-foreground">
                           {item.permissions}
                         </span>
                       </div>
@@ -337,11 +337,11 @@ export function PermissionsPage() {
           </div>
 
           <footer className="flex flex-wrap items-center justify-between gap-3 border-t border-border/45 px-5 py-3.5">
-            <p className="text-[10px] text-muted-foreground">
+            <p className="text-[11px] text-muted-foreground">
               Showing 8 of 8 modules
             </p>
 
-            <span className="rounded-full border border-border/60 bg-background px-3 py-1.5 text-[10px] font-medium text-foreground/75">
+            <span className="rounded-full border border-border/60 bg-background px-3 py-1.5 text-[11px] font-medium text-foreground/75">
               8 modules
             </span>
           </footer>
@@ -349,11 +349,11 @@ export function PermissionsPage() {
 
         <article className="overflow-hidden rounded-[24px] border border-border/45 bg-card shadow-[0_10px_35px_rgba(30,20,70,0.035)]">
           <header className="border-b border-border/45 px-5 py-4">
-            <h2 className="text-[14px] font-semibold text-foreground">
+            <h2 className="text-[15px] font-semibold text-foreground">
               Role Permissions Matrix
             </h2>
 
-            <p className="mt-1 text-[10px] text-muted-foreground">
+            <p className="mt-1 text-[11px] text-muted-foreground">
               Access comparison by role.
             </p>
           </header>
@@ -368,7 +368,7 @@ export function PermissionsPage() {
               </colgroup>
 
               <thead>
-                <tr className="border-b border-border/45 bg-muted/[0.12] text-[10px] font-medium text-muted-foreground">
+                <tr className="border-b border-border/45 bg-muted/[0.12] text-[11px] font-medium text-muted-foreground">
                   <th className="px-3 py-3">Module</th>
                   <th className="px-2 py-3 text-center">Super Admin</th>
                   <th className="px-2 py-3 text-center">Secretary</th>
@@ -382,7 +382,7 @@ export function PermissionsPage() {
                     key={row[0]}
                     className="border-b border-border/40 last:border-0"
                   >
-                    <td className="px-3 py-3.5 text-[11px] font-semibold text-foreground">
+                    <td className="px-3 py-3.5 text-[12px] font-semibold text-foreground">
                       {row[0]}
                     </td>
 
@@ -409,7 +409,7 @@ export function PermissionsPage() {
                 key={row[0]}
                 className="rounded-[17px] border border-border/45 bg-muted/[0.08] p-3"
               >
-                <h3 className="text-[11px] font-semibold text-foreground">
+                <h3 className="text-[12px] font-semibold text-foreground">
                   {row[0]}
                 </h3>
 
@@ -423,7 +423,7 @@ export function PermissionsPage() {
                       key={role}
                       className="flex items-center justify-between gap-3"
                     >
-                      <span className="text-[10px] text-muted-foreground">
+                      <span className="text-[11px] text-muted-foreground">
                         {role}
                       </span>
 
@@ -452,7 +452,7 @@ export function PermissionsPage() {
             ].map((item) => (
               <div
                 key={item.label}
-                className="flex items-center gap-2 text-[10px] text-muted-foreground"
+                className="flex items-center gap-2 text-[11px] text-muted-foreground"
               >
                 <span
                   className={[

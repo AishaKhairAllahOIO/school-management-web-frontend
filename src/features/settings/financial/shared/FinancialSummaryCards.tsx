@@ -80,7 +80,7 @@ export function FinancialSummaryCards() {
 
             <div className="flex items-start justify-between gap-4 pl-1">
               <div className="min-w-0">
-                <p className="text-[11px] font-medium text-muted-foreground">
+                <p className="text-[12px] font-medium text-muted-foreground">
                   {card.title}
                 </p>
 
@@ -88,7 +88,7 @@ export function FinancialSummaryCards() {
                   {card.value}
                 </p>
 
-                <p className="mt-2 text-[11px] leading-5 text-muted-foreground">
+                <p className="mt-2 text-[12px] leading-5 text-muted-foreground">
                   {card.description}
                 </p>
               </div>

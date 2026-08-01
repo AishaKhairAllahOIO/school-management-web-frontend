@@ -10,11 +10,6 @@ type Props = {
   children: ReactNode;
 };
 
-/**
- * Deliberately keeps the finance workspace visually quiet.
- * The page title already exists in the application breadcrumb, so this shell
- * only provides an optional action row and the content surface.
- */
 export function FinanceSectionShell({
   action,
   children,
@@ -22,8 +17,8 @@ export function FinanceSectionShell({
   return (
     <section className="w-full min-w-0">
       {action ? (
-        <div className="mb-3 flex items-center justify-end px-0.5">
-          {action}
+        <div className="mb-4 flex w-full items-center justify-end">
+          <div className="shrink-0">{action}</div>
         </div>
       ) : null}
 

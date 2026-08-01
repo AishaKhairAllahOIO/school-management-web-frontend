@@ -20,11 +20,11 @@ export function SchedulePreview({
   if (items.length === 0) {
     return (
       <div className="rounded-[14px] border border-dashed border-border/70 bg-muted/[0.12] p-5 text-center">
-        <p className="text-[13px] font-medium text-foreground">
+        <p className="text-[14px] font-medium text-foreground">
           No working days selected
         </p>
 
-        <p className="mt-1 text-[11px] leading-5 text-muted-foreground">
+        <p className="mt-1 text-[12px] leading-5 text-muted-foreground">
           Select at least one working day to build the preview.
         </p>
       </div>
@@ -66,12 +66,12 @@ export function SchedulePreview({
                 )}
               </span>
 
-              <span className="truncate text-[12px] font-medium text-foreground">
+              <span className="truncate text-[13px] font-medium text-foreground">
                 {item.label}
               </span>
             </div>
 
-            <span className="shrink-0 text-[12px] font-medium text-muted-foreground">
+            <span className="shrink-0 text-[13px] font-medium text-muted-foreground">
               {item.time}
             </span>
           </div>
@@ -81,10 +81,10 @@ export function SchedulePreview({
       <div className="flex items-center justify-between rounded-[13px] bg-primary px-3 py-2.5 text-primary-foreground shadow-sm">
         <div className="flex items-center gap-2.5">
           <Flag size={14} strokeWidth={1.8} />
-          <span className="text-[12px] font-medium">End of Day</span>
+          <span className="text-[13px] font-medium">End of Day</span>
         </div>
 
-        <span className="text-[12px] font-medium">{endTime}</span>
+        <span className="text-[13px] font-medium">{endTime}</span>
       </div>
     </div>
   );

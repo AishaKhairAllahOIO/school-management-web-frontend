@@ -15,7 +15,8 @@ export type StaffRole =
   | "adviser"
   | "secretary"
   | "counselor"
-  | "service_staff";
+  | "service_staff"
+  | "super_admin";
 
 export type StaffGender =
   | "male"

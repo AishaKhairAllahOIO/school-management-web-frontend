@@ -21,8 +21,8 @@ export function InstallmentPoliciesTable({ policies, onEdit, onDelete }: Props) 
         <span className="mx-auto flex h-10 w-10 items-center justify-center rounded-[13px] bg-primary/[0.08] text-primary">
           <CalendarRange size={18} strokeWidth={1.8} />
         </span>
-        <p className="mt-3 text-sm font-medium text-foreground">No installment policies yet</p>
-        <p className="mt-1 text-xs font-normal text-muted-foreground">
+        <p className="mt-3 text-[15px] font-medium text-foreground">No installment policies yet</p>
+        <p className="mt-1 text-[13px] font-normal text-muted-foreground">
           Create a payment schedule to distribute tuition across multiple due dates.
         </p>
       </div>
@@ -44,7 +44,7 @@ export function InstallmentPoliciesTable({ policies, onEdit, onDelete }: Props) 
           <tr key={policy.id}>
             <FinancialEntityTd strong>{policy.name}</FinancialEntityTd>
             <FinancialEntityTd>
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/[0.09] px-3 py-1.5 text-[11px] font-medium text-emerald-600">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/[0.09] px-3 py-1.5 text-[12px] font-medium text-emerald-600">
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
                 {policy.items.length} Installments
               </span>

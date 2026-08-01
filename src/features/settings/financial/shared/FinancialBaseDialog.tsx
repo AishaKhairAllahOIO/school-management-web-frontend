@@ -90,13 +90,13 @@ export function FinancialBaseDialog({
           <div className="min-w-0">
             <h2
               id="settings-dialog-title"
-              className="text-[16px] font-semibold tracking-[-0.015em] text-foreground"
+              className="text-[17px] font-semibold tracking-[-0.015em] text-foreground"
             >
               {title}
             </h2>
 
             {description ? (
-              <p className="mt-1 text-[11px] leading-5 text-muted-foreground">
+              <p className="mt-1 text-[12px] leading-5 text-muted-foreground">
                 {description}
               </p>
             ) : null}
@@ -150,7 +150,7 @@ export function FinancialDialogField({
 }) {
   return (
     <div className="mb-4 min-w-0 last:mb-0">
-      <span className="mb-1.5 block text-[11px] font-medium text-foreground/85">
+      <span className="mb-1.5 block text-[12px] font-medium text-foreground/85">
         {label}
       </span>
 
@@ -163,7 +163,7 @@ export const financialDialogInputClass = [
   "h-11 w-full rounded-[13px]",
   "border border-border/70",
   "bg-background px-3.5",
-  "text-sm font-normal text-foreground",
+  "text-[15px] font-normal text-foreground",
   "outline-none transition-all",
   "placeholder:text-muted-foreground/80",
   "hover:border-border",
@@ -195,7 +195,7 @@ export function FinancialDialogCheckbox({
         "hover:bg-muted/[0.2]",
       ].join(" ")}
     >
-      <span className="text-[12px] font-medium text-foreground/85">
+      <span className="text-[13px] font-medium text-foreground/85">
         {label}
       </span>
 
@@ -238,7 +238,7 @@ export function FinancialDialogActions({
           "h-9 rounded-full",
           "border border-border/65",
           "bg-background px-4",
-          "text-[12px] font-medium",
+          "text-[13px] font-medium",
           "text-foreground/75",
           "transition-colors",
           "hover:bg-muted/45",
@@ -257,7 +257,7 @@ export function FinancialDialogActions({
           "items-center gap-2",
           "rounded-full",
           "bg-primary px-4",
-          "text-[12px] font-medium",
+          "text-[13px] font-medium",
           "text-primary-foreground",
           "shadow-[0_8px_20px_rgba(98,74,180,0.16)]",
           "transition",

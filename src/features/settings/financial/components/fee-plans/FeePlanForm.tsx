@@ -39,7 +39,7 @@ type Props = {
 };
 
 const fieldClassName =
-  "h-11 rounded-[14px] border-border/65 bg-background text-sm shadow-none focus-visible:ring-4 focus-visible:ring-primary/[0.08]";
+  "h-11 rounded-[14px] border-border/65 bg-background text-[15px] shadow-none focus-visible:ring-4 focus-visible:ring-primary/[0.08]";
 
 export function FeePlanForm({
   defaultValues,
@@ -88,7 +88,7 @@ export function FeePlanForm({
     >
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-2">
-          <label className="text-xs font-semibold text-foreground/80">
+          <label className="text-[13px] font-semibold text-foreground/80">
             Academic Year
           </label>
           <Controller
@@ -124,7 +124,7 @@ export function FeePlanForm({
             )}
           />
           {errors.academicYearId ? (
-            <p className="text-[11px] font-medium text-destructive">
+            <p className="text-[12px] font-medium text-destructive">
               {String(
                 errors.academicYearId.message,
               )}
@@ -133,7 +133,7 @@ export function FeePlanForm({
         </div>
 
         <div className="space-y-2">
-          <label className="text-xs font-semibold text-foreground/80">
+          <label className="text-[13px] font-semibold text-foreground/80">
             Grade Level
           </label>
           <Controller
@@ -169,14 +169,14 @@ export function FeePlanForm({
             )}
           />
           {errors.gradeLevelId ? (
-            <p className="text-[11px] font-medium text-destructive">
+            <p className="text-[12px] font-medium text-destructive">
               {String(errors.gradeLevelId.message)}
             </p>
           ) : null}
         </div>
 
         <div className="space-y-2">
-          <label className="text-xs font-semibold text-foreground/80">
+          <label className="text-[13px] font-semibold text-foreground/80">
             Fee Plan Name
           </label>
           <Input
@@ -185,14 +185,14 @@ export function FeePlanForm({
             {...register("name")}
           />
           {errors.name ? (
-            <p className="text-[11px] font-medium text-destructive">
+            <p className="text-[12px] font-medium text-destructive">
               {String(errors.name.message)}
             </p>
           ) : null}
         </div>
 
         <div className="space-y-2">
-          <label className="text-xs font-semibold text-foreground/80">
+          <label className="text-[13px] font-semibold text-foreground/80">
             Base Amount
           </label>
           <Input
@@ -203,7 +203,7 @@ export function FeePlanForm({
             {...register("baseAmount")}
           />
           {errors.baseAmount ? (
-            <p className="text-[11px] font-medium text-destructive">
+            <p className="text-[12px] font-medium text-destructive">
               {String(errors.baseAmount.message)}
             </p>
           ) : null}
@@ -213,10 +213,10 @@ export function FeePlanForm({
       <section className="overflow-hidden rounded-[18px] border border-border/55 bg-muted/[0.10]">
         <div className="flex flex-col gap-3 border-b border-border/45 px-4 py-3.5 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h3 className="text-sm font-semibold text-foreground">
+            <h3 className="text-[15px] font-semibold text-foreground">
               Extra Services
             </h3>
-            <p className="mt-0.5 text-[11px] leading-5 text-muted-foreground">
+            <p className="mt-0.5 text-[12px] leading-5 text-muted-foreground">
               Add optional charges included with this fee plan.
             </p>
           </div>
@@ -232,7 +232,7 @@ export function FeePlanForm({
                 amount: 0,
               })
             }
-            className="h-9 rounded-[12px] border-border/60 bg-card px-3 text-[11px] shadow-none"
+            className="h-9 rounded-[12px] border-border/60 bg-card px-3 text-[12px] shadow-none"
           >
             <Plus className="mr-1.5 h-3.5 w-3.5" />
             Add Service
@@ -241,7 +241,7 @@ export function FeePlanForm({
 
         <div className="space-y-3 p-4">
           {fields.length === 0 ? (
-            <div className="rounded-[15px] border border-dashed border-border/65 bg-card/60 px-4 py-7 text-center text-xs text-muted-foreground">
+            <div className="rounded-[15px] border border-dashed border-border/65 bg-card/60 px-4 py-7 text-center text-[13px] text-muted-foreground">
               No extra services have been added.
             </div>
           ) : null}
@@ -252,7 +252,7 @@ export function FeePlanForm({
               className="grid gap-3 rounded-[16px] border border-border/50 bg-card p-4 md:grid-cols-[150px_minmax(0,1fr)_150px_auto] md:items-end"
             >
               <div className="space-y-2">
-                <label className="text-[11px] font-medium text-muted-foreground">
+                <label className="text-[12px] font-medium text-muted-foreground">
                   Type
                 </label>
                 <Controller
@@ -279,7 +279,7 @@ export function FeePlanForm({
               </div>
 
               <div className="space-y-2">
-                <label className="text-[11px] font-medium text-muted-foreground">
+                <label className="text-[12px] font-medium text-muted-foreground">
                   Service Name
                 </label>
                 <Input
@@ -290,7 +290,7 @@ export function FeePlanForm({
               </div>
 
               <div className="space-y-2">
-                <label className="text-[11px] font-medium text-muted-foreground">
+                <label className="text-[12px] font-medium text-muted-foreground">
                   Amount
                 </label>
                 <Input
@@ -321,14 +321,14 @@ export function FeePlanForm({
         <button
           type="button"
           onClick={onCancel}
-          className="h-9 rounded-full border border-border/65 bg-background px-4 text-[12px] font-medium text-foreground/75 transition-colors hover:bg-muted/45 hover:text-foreground"
+          className="h-9 rounded-full border border-border/65 bg-background px-4 text-[13px] font-medium text-foreground/75 transition-colors hover:bg-muted/45 hover:text-foreground"
         >
           Cancel
         </button>
         <button
           type="submit"
           disabled={isLoading}
-          className="inline-flex h-9 items-center gap-2 rounded-full bg-primary px-4 text-[12px] font-medium text-primary-foreground shadow-[0_8px_20px_rgba(98,74,180,0.16)] transition hover:-translate-y-0.5 hover:bg-primary/90 disabled:cursor-not-allowed disabled:translate-y-0 disabled:opacity-50"
+          className="inline-flex h-9 items-center gap-2 rounded-full bg-primary px-4 text-[13px] font-medium text-primary-foreground shadow-[0_8px_20px_rgba(98,74,180,0.16)] transition hover:-translate-y-0.5 hover:bg-primary/90 disabled:cursor-not-allowed disabled:translate-y-0 disabled:opacity-50"
         >
           {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
           {isLoading ? "Saving..." : "Save"}

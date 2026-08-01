@@ -189,7 +189,7 @@ export function SchoolLogoUpload({
         <div className="min-w-0 pt-0.5">
           <h2
             className={[
-              "text-[15px]",
+              "text-[16px]",
               "font-semibold",
               "text-foreground",
             ].join(" ")}
@@ -199,7 +199,7 @@ export function SchoolLogoUpload({
 
           <p
             className={[
-              "mt-1 text-[11px]",
+              "mt-1 text-[12px]",
               "leading-4",
               "text-muted-foreground",
             ].join(" ")}
@@ -272,7 +272,7 @@ export function SchoolLogoUpload({
                     "border border-border/60",
                     "bg-card/95",
                     "px-3 py-1.5",
-                    "text-[10px]",
+                    "text-[11px]",
                     "font-medium",
                     "text-foreground",
                     "shadow-sm",
@@ -321,7 +321,7 @@ export function SchoolLogoUpload({
               <p
                 className={[
                   "mt-2.5",
-                  "text-[11px]",
+                  "text-[12px]",
                   "font-medium",
                   "text-foreground",
                 ].join(" ")}
@@ -331,7 +331,7 @@ export function SchoolLogoUpload({
 
               <p
                 className={[
-                  "mt-1 text-[9px]",
+                  "mt-1 text-[10px]",
                   "leading-4",
                   "text-muted-foreground",
                 ].join(" ")}
@@ -362,7 +362,7 @@ export function SchoolLogoUpload({
         >
           <p
             className={[
-              "text-[10px]",
+              "text-[11px]",
               "font-medium leading-4",
               "text-destructive",
             ].join(" ")}
@@ -397,7 +397,7 @@ export function SchoolLogoUpload({
               "border-border/70",
               "bg-background",
               "px-3",
-              "text-[11px]",
+              "text-[12px]",
               "font-semibold",
               "text-foreground/70",
               "transition duration-200",
@@ -427,7 +427,7 @@ export function SchoolLogoUpload({
               "rounded-full",
               "bg-primary",
               "px-3",
-              "text-[11px]",
+              "text-[12px]",
               "font-semibold",
               "text-primary-foreground",
               "shadow-[0_8px_20px_rgba(98,74,180,0.16)]",

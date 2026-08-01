@@ -1,4 +1,4 @@
-import { CalendarDays, Search } from "lucide-react";
+import { Search } from "lucide-react";
 
 import { Input } from "@/shared/ui/input";
 import {
@@ -19,14 +19,12 @@ type Props = {
   setGradeFilter: (value: string) => void;
   classroomFilter: string;
   setClassroomFilter: (value: string) => void;
-  advisorFilter: string;
-  setAdvisorFilter: (value: string) => void;
+  supervisorFilter: string;
+  setSupervisorFilter: (value: string) => void;
   status: string;
   setStatus: (value: string) => void;
   absenceType: string;
   setAbsenceType: (value: string) => void;
-  date: string;
-  setDate: (value: string) => void;
 };
 
 function unique(values: string[]) {
@@ -41,29 +39,29 @@ export function AttendanceFilters({
   setGradeFilter,
   classroomFilter,
   setClassroomFilter,
-  advisorFilter,
-  setAdvisorFilter,
+  supervisorFilter,
+  setSupervisorFilter,
   status,
   setStatus,
   absenceType,
   setAbsenceType,
-  date,
-  setDate,
 }: Props) {
   const grades = unique(data.map((item) => item.className));
   const classrooms = unique(data.map((item) => item.section));
-  const advisors = unique(data.map((item) => item.advisorName));
+  const supervisors = unique(data.map((item) => item.supervisorName));
   const triggerClass =
-    "h-10 rounded-[13px] border-border/60 bg-background/80 text-[11px] shadow-none";
+    "h-11 rounded-[13px] border-border/60 bg-background/80 text-[12px] shadow-none";
+
+  const absenceTypeEnabled = status === "Absent";
 
   return (
-    <div className="grid gap-2.5 lg:grid-cols-2 2xl:grid-cols-[minmax(220px,1fr)_120px_130px_145px_130px_145px_150px]">
-      <div className="relative min-w-0 lg:col-span-2 2xl:col-span-1">
+    <div className="grid gap-2.5 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-[minmax(220px,1.25fr)_130px_140px_155px_145px_160px]">
+      <div className="relative min-w-0 md:col-span-2 xl:col-span-3 2xl:col-span-1">
         <Search className="absolute start-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
         <Input
           value={search}
           onChange={(event) => setSearch(event.target.value)}
-          placeholder="Search student..."
+          placeholder="Student name"
           className={[triggerClass, "ps-9"].join(" ")}
         />
       </div>
@@ -92,19 +90,25 @@ export function AttendanceFilters({
         </SelectContent>
       </Select>
 
-      <Select value={advisorFilter} onValueChange={setAdvisorFilter}>
+      <Select value={supervisorFilter} onValueChange={setSupervisorFilter}>
         <SelectTrigger className={triggerClass}>
-          <SelectValue placeholder="Advisor" />
+          <SelectValue placeholder="Supervisor" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="all">All advisors</SelectItem>
-          {advisors.map((advisor) => (
-            <SelectItem key={advisor} value={advisor}>{advisor}</SelectItem>
+          <SelectItem value="all">All supervisors</SelectItem>
+          {supervisors.map((supervisor) => (
+            <SelectItem key={supervisor} value={supervisor}>{supervisor}</SelectItem>
           ))}
         </SelectContent>
       </Select>
 
-      <Select value={status} onValueChange={setStatus}>
+      <Select
+        value={status}
+        onValueChange={(value) => {
+          setStatus(value);
+          if (value !== "Absent") setAbsenceType("all");
+        }}
+      >
         <SelectTrigger className={triggerClass}>
           <SelectValue placeholder="Attendance" />
         </SelectTrigger>
@@ -115,8 +119,17 @@ export function AttendanceFilters({
         </SelectContent>
       </Select>
 
-      <Select value={absenceType} onValueChange={setAbsenceType}>
-        <SelectTrigger className={triggerClass}>
+      <Select
+        value={absenceTypeEnabled ? absenceType : "all"}
+        onValueChange={setAbsenceType}
+        disabled={!absenceTypeEnabled}
+      >
+        <SelectTrigger
+          className={[
+            triggerClass,
+            !absenceTypeEnabled ? "cursor-not-allowed opacity-50" : "",
+          ].join(" ")}
+        >
           <SelectValue placeholder="Absence type" />
         </SelectTrigger>
         <SelectContent>
@@ -125,17 +138,6 @@ export function AttendanceFilters({
           <SelectItem value="Unexcused">Unexcused</SelectItem>
         </SelectContent>
       </Select>
-
-      <div className="relative min-w-0">
-        <CalendarDays className="pointer-events-none absolute start-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-        <Input
-          type="date"
-          value={date}
-          onChange={(event) => setDate(event.target.value)}
-          className={[triggerClass, "ps-9"].join(" ")}
-          aria-label="Attendance date"
-        />
-      </div>
     </div>
   );
 }

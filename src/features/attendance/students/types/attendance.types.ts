@@ -8,7 +8,15 @@ export interface StudentAttendance {
   studentName: string;
   className: string;
   section: string;
-  advisorName: string;
+  supervisorName: string;
+  date: string;
+  status: AttendanceStatus;
+  absenceType?: AbsenceType;
+}
+
+export interface StudentAttendanceHistoryRecord {
+  id: string;
+  studentId: string;
   date: string;
   status: AttendanceStatus;
   absenceType?: AbsenceType;

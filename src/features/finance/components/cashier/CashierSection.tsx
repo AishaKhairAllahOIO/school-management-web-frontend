@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, ReceiptText } from "lucide-react";
+import { Banknote, CircleDollarSign, CreditCard, Plus, ReceiptText } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"; 
 
 import { Button } from "@/shared/ui/button";
@@ -17,7 +17,8 @@ import { usePayments } from "../../hooks/usePayments";
 import type { PaymentReceipt } from "../../types/finance.types";
 import type { PaymentFormValues } from "../../schemas/payment.schema";
 import { FinanceSectionShell } from "../shared/FinanceSectionShell";
-import { FinanceTableSkeleton } from "../shared/FinanceTableSkeleton";
+import { FinanceSummarySkeleton, FinanceTableSkeleton } from "../shared/FinanceTableSkeleton";
+import { FinanceSummaryGrid } from "../shared/FinanceSummaryGrid";
 
 export function CashierSection() {
   const {
@@ -107,7 +108,16 @@ export function CashierSection() {
 
 
   if (isLoadingPayments || isLoadingStudents) {
-    return <FinanceSectionShell title="Student Payments" description="Record collections and manage student receipts." icon={ReceiptText}><FinanceTableSkeleton /></FinanceSectionShell>;
+    return (
+      <FinanceSectionShell
+        title="Student Payments"
+        description="Record collections and manage student receipts."
+        icon={ReceiptText}
+      >
+        <FinanceSummarySkeleton />
+        <FinanceTableSkeleton />
+      </FinanceSectionShell>
+    );
   }
 
   if (isError) {
@@ -125,10 +135,55 @@ export function CashierSection() {
       title="Student Payments"
       description="Record collections and manage student receipts."
       icon={ReceiptText}
-      action={<Button variant="outline" onClick={() => setCreateOpen(true)} className="h-10 rounded-xl border-primary/35 bg-white px-4 text-[12.5px] font-medium text-primary shadow-none hover:border-primary/50 hover:bg-primary/[0.045] hover:text-primary"><Plus className="mr-2 h-4 w-4" strokeWidth={1.8}/>Process Payment</Button>}
     >
-      <PaymentsTable 
-        payments={payments} 
+      <FinanceSummaryGrid
+        items={[
+          {
+            label: "Recorded payments",
+            value: new Intl.NumberFormat().format(payments.length),
+            hint: "Official receipts",
+            icon: ReceiptText,
+            tone: "primary",
+          },
+          {
+            label: "Total collected",
+            value: `${payments.reduce((sum, item) => sum + Number(item.paidAmount ?? 0), 0).toLocaleString()} $`,
+            hint: "Across all methods",
+            icon: CircleDollarSign,
+            tone: "success",
+          },
+          {
+            label: "Cash receipts",
+            value: new Intl.NumberFormat().format(payments.filter((item) => item.paymentMethod === "cash").length),
+            hint: "Processed in cash",
+            icon: Banknote,
+            tone: "warning",
+          },
+          {
+            label: "Digital payments",
+            value: new Intl.NumberFormat().format(payments.filter((item) => item.paymentMethod !== "cash").length),
+            hint: "Transfer, cheque or wallet",
+            icon: CreditCard,
+            tone: "info",
+          },
+        ]}
+      />
+
+      <PaymentsTable
+        payments={payments}
+        headerAction={
+          <Button
+            type="button"
+            variant="outline"
+            size="icon"
+            onClick={() => setCreateOpen(true)}
+            aria-label="Process payment"
+            title="Process payment"
+            className="h-8 w-8 rounded-[11px] border-primary/25 bg-transparent text-primary shadow-none hover:border-primary/45 hover:bg-primary/[0.045] hover:text-primary"
+          >
+            <Plus className="h-4 w-4" strokeWidth={1.9} />
+          </Button>
+        } 
         onView={(id) => {
           setSelectedPaymentIdToView(id);
           setViewOpen(true);

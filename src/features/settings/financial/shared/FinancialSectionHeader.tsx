@@ -27,7 +27,7 @@ export function FinancialSectionHeader({
           <h2 className="text-[17px] font-semibold leading-6 tracking-[-0.01em] text-foreground">
             {title}
           </h2>
-          <p className="mt-0.5 text-[12px] leading-5 text-muted-foreground">
+          <p className="mt-0.5 text-[13px] leading-5 text-muted-foreground">
             {description}
           </p>
         </div>

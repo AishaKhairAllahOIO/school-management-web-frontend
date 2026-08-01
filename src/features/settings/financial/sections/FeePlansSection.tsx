@@ -117,18 +117,18 @@ export function FeePlansSection({
           />
         </span>
 
-        <h3 className="mt-3 text-sm font-semibold text-foreground">
+        <h3 className="mt-3 text-[15px] font-semibold text-foreground">
           Failed to load fee plans
         </h3>
 
-        <p className="mt-1 max-w-sm text-xs leading-5 text-muted-foreground">
+        <p className="mt-1 max-w-sm text-[13px] leading-5 text-muted-foreground">
           There was a problem connecting to the server. Please try again.
         </p>
 
         <Button
           type="button"
           variant="outline"
-          className="mt-5 h-10 rounded-[14px] border-destructive/15 bg-card px-4 text-xs text-destructive hover:bg-destructive/[0.04] hover:text-destructive"
+          className="mt-5 h-10 rounded-[14px] border-destructive/15 bg-card px-4 text-[13px] text-destructive hover:bg-destructive/[0.04] hover:text-destructive"
           onClick={() => refetch()}
           disabled={isFetching}
         >
@@ -161,7 +161,7 @@ export function FeePlansSection({
         <Button
           type="button"
           onClick={() => setCreateOpen(true)}
-          className="h-10 rounded-[14px] px-4 text-xs font-medium shadow-none"
+          className="h-10 rounded-[14px] px-4 text-[13px] font-medium shadow-none"
         >
           <Plus className="mr-2 h-4 w-4" />
           Create Fee Plan

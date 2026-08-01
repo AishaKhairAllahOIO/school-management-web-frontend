@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { CalendarClock, Loader2, RefreshCw } from "lucide-react";
+import { AlertCircle, CalendarClock, CircleDollarSign, Loader2, RefreshCw, WalletCards } from "lucide-react";
 import { Button } from "@/shared/ui/button";
 
 import { InstallmentsTable } from "./InstallmentsTable";
@@ -7,6 +7,7 @@ import { InstallmentDetailsDialog } from "./InstallmentDetailsDialog"; // ğŸ‘ˆ Ø
 import { useInstallments } from "../../hooks/useInstallments";
 import { FinanceSectionShell } from "../shared/FinanceSectionShell";
 import { FinanceTableSkeleton } from "../shared/FinanceTableSkeleton";
+import { FinanceSummaryGrid } from "../shared/FinanceSummaryGrid";
 
 export function InstallmentsSection() {
   const {
@@ -42,6 +43,39 @@ export function InstallmentsSection() {
       description="Track upcoming, paid, and overdue student installments."
       icon={CalendarClock}
     >
+      <FinanceSummaryGrid
+        items={[
+          {
+            label: "Installments",
+            value: new Intl.NumberFormat().format(installments.length),
+            hint: "Across active contracts",
+            icon: CalendarClock,
+            tone: "primary",
+          },
+          {
+            label: "Amount due",
+            value: `${installments.reduce((sum, item) => sum + Number(item.amountDue ?? 0), 0).toLocaleString()} $`,
+            hint: "Scheduled total",
+            icon: CircleDollarSign,
+            tone: "info",
+          },
+          {
+            label: "Amount paid",
+            value: `${installments.reduce((sum, item) => sum + Number(item.amountPaid ?? 0), 0).toLocaleString()} $`,
+            hint: "Collected against installments",
+            icon: WalletCards,
+            tone: "success",
+          },
+          {
+            label: "Overdue",
+            value: new Intl.NumberFormat().format(installments.filter((item) => item.status === "overdue" || (item.status !== "paid" && new Date(item.dueDate) < new Date())).length),
+            hint: "Requires follow-up",
+            icon: AlertCircle,
+            tone: "destructive",
+          },
+        ]}
+      />
+
       <InstallmentsTable 
         installments={installments} 
         onView={(id) => {

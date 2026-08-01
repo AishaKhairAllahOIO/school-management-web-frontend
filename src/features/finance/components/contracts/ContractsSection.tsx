@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { useQueries } from "@tanstack/react-query";
-import { FileText, Loader2, Plus, RefreshCw } from "lucide-react";
+import { CircleDollarSign, FileText, Loader2, Plus, ReceiptText, RefreshCw, WalletCards } from "lucide-react";
 
 import { Button } from "@/shared/ui/button";
 import { useStudents } from "../../../users/students/hooks/useStudents";
@@ -15,7 +15,8 @@ import { AccountDetailsDialog } from "./AccountDetailsDialog";
 import { useFeePlans } from "@/features/settings/financial/hooks/useFeePlans";
 import { useInstallmentPolicies } from "@/features/settings/financial/hooks/useInstallmentPolicies";
 import { FinanceSectionShell } from "../shared/FinanceSectionShell";
-import { FinanceTableSkeleton } from "../shared/FinanceTableSkeleton";
+import { FinanceSummarySkeleton, FinanceTableSkeleton } from "../shared/FinanceTableSkeleton";
+import { FinanceSummaryGrid } from "../shared/FinanceSummaryGrid";
 
 export function ContractsSection() {
   const {
@@ -160,6 +161,7 @@ export function ContractsSection() {
         description="Create and manage student financial agreements."
         icon={FileText}
       >
+        <FinanceSummarySkeleton />
         <FinanceTableSkeleton />
       </FinanceSectionShell>
     );
@@ -202,19 +204,55 @@ export function ContractsSection() {
       title="Student Contracts"
       description="Create and manage student financial agreements."
       icon={FileText}
-      action={
-        <Button
-          variant="outline"
-          onClick={() => setCreateOpen(true)}
-          className="h-10 rounded-xl border-primary/35 bg-white px-4 text-[12.5px] font-medium text-primary shadow-none hover:border-primary/50 hover:bg-primary/[0.045] hover:text-primary"
-        >
-          <Plus className="mr-2 h-4 w-4" strokeWidth={1.8} />
-          New Contract
-        </Button>
-      }
     >
+      <FinanceSummaryGrid
+        items={[
+          {
+            label: "Active contracts",
+            value: new Intl.NumberFormat().format(accounts.length),
+            hint: "Current student agreements",
+            icon: WalletCards,
+            tone: "primary",
+          },
+          {
+            label: "Total contracted",
+            value: `${accounts.reduce((sum, item) => sum + Number(item.totalRequiredAmount ?? 0), 0).toLocaleString()} $`,
+            hint: "Required amount",
+            icon: CircleDollarSign,
+            tone: "info",
+          },
+          {
+            label: "Collected",
+            value: `${accounts.reduce((sum, item) => sum + Math.max(0, Number(item.totalRequiredAmount ?? 0) - Number(item.remainingBalance ?? 0)), 0).toLocaleString()} $`,
+            hint: "Recorded through payments",
+            icon: ReceiptText,
+            tone: "success",
+          },
+          {
+            label: "Outstanding",
+            value: `${accounts.reduce((sum, item) => sum + Number(item.remainingBalance ?? 0), 0).toLocaleString()} $`,
+            hint: "Remaining student balance",
+            icon: FileText,
+            tone: "warning",
+          },
+        ]}
+      />
+
       <ContractsTable
         accounts={accounts}
+        headerAction={
+          <Button
+            type="button"
+            variant="outline"
+            size="icon"
+            onClick={() => setCreateOpen(true)}
+            aria-label="Create new contract"
+            title="New contract"
+            className="h-8 w-8 rounded-[11px] border-primary/25 bg-transparent text-primary shadow-none hover:border-primary/45 hover:bg-primary/[0.045] hover:text-primary"
+          >
+            <Plus className="h-4 w-4" strokeWidth={1.9} />
+          </Button>
+        }
         studentsById={studentsById}
         onViewDetails={(account) => {
           setSelectedStudentId(account.studentId);

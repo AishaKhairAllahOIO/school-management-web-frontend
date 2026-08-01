@@ -9,7 +9,7 @@ export function ScheduleStatusBadge({ status }: ScheduleStatusBadgeProps) {
   return (
     <span
       className={[
-        "inline-flex items-center rounded-full px-2.5 py-1 text-[9px] font-medium capitalize",
+        "inline-flex items-center rounded-full px-2.5 py-1 text-[10px] font-medium capitalize",
         isScheduled
           ? "bg-sky-50 text-sky-700"
           : isCompleted

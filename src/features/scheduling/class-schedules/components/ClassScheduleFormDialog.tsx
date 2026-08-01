@@ -134,7 +134,7 @@ export function ClassScheduleFormDialog({
               <h2 className="text-[16px] font-semibold tracking-[-0.015em] text-foreground">
                 {mode === "create" ? "Add Class Schedule" : "Edit Class Schedule"}
               </h2>
-              <p className="mt-1 text-[11px] leading-5 text-muted-foreground">
+              <p className="mt-1 text-[12px] leading-5 text-muted-foreground">
                 Assign a subject, teacher, classroom and time without changing the current API payload.
               </p>
             </div>
@@ -222,7 +222,7 @@ export function ClassScheduleFormDialog({
               type="button"
               onClick={onClose}
               disabled={isSubmitting}
-              className="h-9 rounded-full border border-border/65 bg-background px-4 text-[12px] font-medium text-foreground/75 transition hover:bg-muted/45 hover:text-foreground disabled:opacity-50"
+              className="h-9 rounded-full border border-border/65 bg-background px-4 text-[13px] font-medium text-foreground/75 transition hover:bg-muted/45 hover:text-foreground disabled:opacity-50"
             >
               Cancel
             </button>
@@ -230,7 +230,7 @@ export function ClassScheduleFormDialog({
             <button
               type="submit"
               disabled={!canSubmit || isSubmitting}
-              className="inline-flex h-9 items-center gap-2 rounded-full bg-primary px-4 text-[12px] font-medium text-primary-foreground shadow-[0_8px_20px_rgba(98,74,180,0.16)] transition hover:-translate-y-0.5 hover:bg-primary/90 disabled:cursor-not-allowed disabled:translate-y-0 disabled:opacity-50"
+              className="inline-flex h-9 items-center gap-2 rounded-full bg-primary px-4 text-[13px] font-medium text-primary-foreground shadow-[0_8px_20px_rgba(98,74,180,0.16)] transition hover:-translate-y-0.5 hover:bg-primary/90 disabled:cursor-not-allowed disabled:translate-y-0 disabled:opacity-50"
             >
               {isSubmitting ? (
                 <Loader2 size={14} className="animate-spin" />
@@ -253,7 +253,7 @@ export function ClassScheduleFormDialog({
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <label className="block">
-      <span className="mb-1.5 block text-[11px] font-medium text-foreground/85">
+      <span className="mb-1.5 block text-[12px] font-medium text-foreground/85">
         {label}
       </span>
       {children}

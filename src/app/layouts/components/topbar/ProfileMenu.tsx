@@ -3,6 +3,7 @@ import {
   Eye,
   LogOut,
   Settings,
+  UserPlus,
 } from "lucide-react";
 
 import { useRef } from "react";
@@ -281,15 +282,25 @@ export function ProfileMenu({
             />
 
             {isSuperAdmin && (
-              <ProfileMenuItem
-                title={
-                  t.layout.topbar.manageUsers
-                }
-                icon={Settings}
-                onClick={() =>
-                  navigateAndClose("/users")
-                }
-              />
+              <>
+                <ProfileMenuItem
+                  title="Add Administrator"
+                  icon={UserPlus}
+                  onClick={() =>
+                    navigateAndClose("/users/administrators/new")
+                  }
+                />
+
+                <ProfileMenuItem
+                  title={
+                    t.layout.topbar.manageUsers
+                  }
+                  icon={Settings}
+                  onClick={() =>
+                    navigateAndClose("/users")
+                  }
+                />
+              </>
             )}
           </div>
 

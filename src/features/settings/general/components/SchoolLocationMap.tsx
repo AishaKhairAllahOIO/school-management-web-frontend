@@ -127,14 +127,14 @@ export function SchoolLocationMap({
               />
             </span>
 
-            <p className="mt-4 text-sm font-semibold text-foreground">
+            <p className="mt-4 text-[15px] font-semibold text-foreground">
               Map preview unavailable
             </p>
 
             <p
               className={[
                 "mx-auto mt-1.5 max-w-sm",
-                "text-xs leading-5",
+                "text-[13px] leading-5",
                 "text-muted-foreground",
               ].join(" ")}
             >

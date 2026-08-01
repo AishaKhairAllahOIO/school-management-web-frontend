@@ -227,6 +227,7 @@ function normalizeRole(
     "secretary",
     "counselor",
     "service_staff",
+    "super_admin",
   ];
 
   const roleValue = Array.isArray(value)

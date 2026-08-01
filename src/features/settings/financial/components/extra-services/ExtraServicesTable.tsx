@@ -23,7 +23,7 @@ export function ExtraServicesTable({ services, onEdit, onDelete }: Props) {
     return (
       <div className="rounded-2xl border border-dashed border-border/80 bg-muted/20 p-10 text-center shadow-sm">
         <h3 className="text-lg font-semibold text-foreground">No Extra Services Yet</h3>
-        <p className="mt-2 text-sm text-muted-foreground">
+        <p className="mt-2 text-[15px] text-muted-foreground">
           Add optional school services like uniforms, books, or activities.
         </p>
       </div>

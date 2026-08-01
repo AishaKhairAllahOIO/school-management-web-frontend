@@ -20,3 +20,14 @@ export interface StaffAttendance {
   attendedPeriods?: number;
   notes?: string;
 }
+
+export interface StaffAttendanceHistoryRecord {
+  id: string;
+  employeeId: string;
+  date: string;
+  status: StaffAttendanceStatus;
+  absenceType?: StaffAbsenceType;
+  requiredPeriods?: number;
+  attendedPeriods?: number;
+  notes?: string;
+}

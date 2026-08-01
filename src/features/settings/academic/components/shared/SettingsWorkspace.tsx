@@ -65,10 +65,10 @@ export function SettingsWorkspace({
                 </span>
 
                 <span className="min-w-0">
-                  <span className="block truncate text-[12px] font-medium text-foreground">
+                  <span className="block truncate text-[13px] font-medium text-foreground">
                     {item.title}
                   </span>
-                  <span className="mt-0.5 block truncate text-[10px] leading-4 text-muted-foreground">
+                  <span className="mt-0.5 block truncate text-[11px] leading-4 text-muted-foreground">
                     {item.description}
                   </span>
                 </span>
@@ -80,7 +80,7 @@ export function SettingsWorkspace({
         {hint ? (
           <div className="border-t border-border/40 p-2.5">
             <div className="rounded-[13px] bg-primary/[0.04] px-3 py-2.5">
-              <p className="text-[10px] leading-4 text-muted-foreground">
+              <p className="text-[11px] leading-4 text-muted-foreground">
                 {hint}
               </p>
             </div>

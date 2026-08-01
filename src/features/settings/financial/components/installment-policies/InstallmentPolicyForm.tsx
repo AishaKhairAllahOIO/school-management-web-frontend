@@ -24,7 +24,7 @@ type Props = {
 };
 
 const fieldClassName =
-  "h-11 rounded-[14px] border-border/65 bg-background text-sm shadow-none focus-visible:ring-4 focus-visible:ring-primary/[0.08]";
+  "h-11 rounded-[14px] border-border/65 bg-background text-[15px] shadow-none focus-visible:ring-4 focus-visible:ring-primary/[0.08]";
 
 export function InstallmentPolicyForm({
   defaultValues,
@@ -63,7 +63,7 @@ export function InstallmentPolicyForm({
       className="space-y-5"
     >
       <div className="space-y-2">
-        <label className="text-xs font-semibold text-foreground/80">
+        <label className="text-[13px] font-semibold text-foreground/80">
           Policy Name
         </label>
         <Input
@@ -72,7 +72,7 @@ export function InstallmentPolicyForm({
           {...register("name")}
         />
         {errors.name ? (
-          <p className="text-[11px] font-medium text-destructive">
+          <p className="text-[12px] font-medium text-destructive">
             {errors.name.message}
           </p>
         ) : null}
@@ -81,10 +81,10 @@ export function InstallmentPolicyForm({
       <section className="overflow-hidden rounded-[18px] border border-border/55 bg-muted/[0.10]">
         <div className="flex flex-col gap-3 border-b border-border/45 px-4 py-3.5 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h3 className="text-sm font-semibold text-foreground">
+            <h3 className="text-[15px] font-semibold text-foreground">
               Installments
             </h3>
-            <p className="mt-0.5 text-[11px] leading-5 text-muted-foreground">
+            <p className="mt-0.5 text-[12px] leading-5 text-muted-foreground">
               Define the percentage and due date of every payment.
             </p>
           </div>
@@ -100,7 +100,7 @@ export function InstallmentPolicyForm({
                 dueDay: 1,
               })
             }
-            className="h-9 rounded-[12px] border-border/60 bg-card px-3 text-[11px] shadow-none"
+            className="h-9 rounded-[12px] border-border/60 bg-card px-3 text-[12px] shadow-none"
           >
             <Plus className="mr-1.5 h-3.5 w-3.5" />
             Add Installment
@@ -109,7 +109,7 @@ export function InstallmentPolicyForm({
 
         {(errors.items?.message ||
           errors.items?.root?.message) ? (
-          <div className="mx-4 mt-4 rounded-[14px] border border-destructive/15 bg-destructive/[0.035] px-4 py-3 text-[11px] font-medium text-destructive">
+          <div className="mx-4 mt-4 rounded-[14px] border border-destructive/15 bg-destructive/[0.035] px-4 py-3 text-[12px] font-medium text-destructive">
             {errors.items?.message ||
               errors.items?.root?.message}
           </div>
@@ -123,10 +123,10 @@ export function InstallmentPolicyForm({
             >
               <div className="mb-4 flex items-center justify-between gap-3">
                 <div>
-                  <p className="text-xs font-semibold text-foreground">
+                  <p className="text-[13px] font-semibold text-foreground">
                     Installment #{index + 1}
                   </p>
-                  <p className="mt-0.5 text-[10px] text-muted-foreground">
+                  <p className="mt-0.5 text-[11px] text-muted-foreground">
                     Payment details and due date
                   </p>
                 </div>
@@ -137,7 +137,7 @@ export function InstallmentPolicyForm({
                     size="sm"
                     variant="outline"
                     onClick={() => remove(index)}
-                    className="h-8 rounded-[11px] border-destructive/15 bg-destructive/[0.025] px-3 text-[11px] text-destructive shadow-none hover:bg-destructive/[0.06] hover:text-destructive"
+                    className="h-8 rounded-[11px] border-destructive/15 bg-destructive/[0.025] px-3 text-[12px] text-destructive shadow-none hover:bg-destructive/[0.06] hover:text-destructive"
                   >
                     <Trash2 className="mr-1.5 h-3.5 w-3.5" />
                     Remove
@@ -147,7 +147,7 @@ export function InstallmentPolicyForm({
 
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
                 <div className="space-y-2 sm:col-span-2 lg:col-span-1">
-                  <label className="text-[11px] font-medium text-muted-foreground">
+                  <label className="text-[12px] font-medium text-muted-foreground">
                     Title
                   </label>
                   <Input
@@ -156,14 +156,14 @@ export function InstallmentPolicyForm({
                     {...register(`items.${index}.title`)}
                   />
                   {errors.items?.[index]?.title ? (
-                    <p className="text-[11px] font-medium text-destructive">
+                    <p className="text-[12px] font-medium text-destructive">
                       {errors.items[index]?.title?.message}
                     </p>
                   ) : null}
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-[11px] font-medium text-muted-foreground">
+                  <label className="text-[12px] font-medium text-muted-foreground">
                     Percentage
                   </label>
                   <Input
@@ -177,14 +177,14 @@ export function InstallmentPolicyForm({
                     })}
                   />
                   {errors.items?.[index]?.percentage ? (
-                    <p className="text-[11px] font-medium text-destructive">
+                    <p className="text-[12px] font-medium text-destructive">
                       {errors.items[index]?.percentage?.message}
                     </p>
                   ) : null}
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-[11px] font-medium text-muted-foreground">
+                  <label className="text-[12px] font-medium text-muted-foreground">
                     Due Month
                   </label>
                   <Input
@@ -198,14 +198,14 @@ export function InstallmentPolicyForm({
                     })}
                   />
                   {errors.items?.[index]?.dueMonth ? (
-                    <p className="text-[11px] font-medium text-destructive">
+                    <p className="text-[12px] font-medium text-destructive">
                       {errors.items[index]?.dueMonth?.message}
                     </p>
                   ) : null}
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-[11px] font-medium text-muted-foreground">
+                  <label className="text-[12px] font-medium text-muted-foreground">
                     Due Day
                   </label>
                   <Input
@@ -219,7 +219,7 @@ export function InstallmentPolicyForm({
                     })}
                   />
                   {errors.items?.[index]?.dueDay ? (
-                    <p className="text-[11px] font-medium text-destructive">
+                    <p className="text-[12px] font-medium text-destructive">
                       {errors.items[index]?.dueDay?.message}
                     </p>
                   ) : null}
@@ -234,14 +234,14 @@ export function InstallmentPolicyForm({
         <button
           type="button"
           onClick={onCancel}
-          className="h-9 rounded-full border border-border/65 bg-background px-4 text-[12px] font-medium text-foreground/75 transition-colors hover:bg-muted/45 hover:text-foreground"
+          className="h-9 rounded-full border border-border/65 bg-background px-4 text-[13px] font-medium text-foreground/75 transition-colors hover:bg-muted/45 hover:text-foreground"
         >
           Cancel
         </button>
         <button
           type="submit"
           disabled={isLoading}
-          className="inline-flex h-9 items-center gap-2 rounded-full bg-primary px-4 text-[12px] font-medium text-primary-foreground shadow-[0_8px_20px_rgba(98,74,180,0.16)] transition hover:-translate-y-0.5 hover:bg-primary/90 disabled:cursor-not-allowed disabled:translate-y-0 disabled:opacity-50"
+          className="inline-flex h-9 items-center gap-2 rounded-full bg-primary px-4 text-[13px] font-medium text-primary-foreground shadow-[0_8px_20px_rgba(98,74,180,0.16)] transition hover:-translate-y-0.5 hover:bg-primary/90 disabled:cursor-not-allowed disabled:translate-y-0 disabled:opacity-50"
         >
           {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
           {isLoading ? "Saving..." : "Save"}

@@ -117,13 +117,13 @@ export function AcademicYearsSection({
 
               <EntityTd>
                 {year.isCurrent ? (
-                  <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/[0.09] px-3 py-1.5 text-[11px] font-medium text-emerald-600">
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/[0.09] px-3 py-1.5 text-[12px] font-medium text-emerald-600">
                     <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
 
                     Current Year
                   </span>
                 ) : (
-                  <span className="inline-flex items-center gap-1.5 rounded-full bg-muted/70 px-3 py-1.5 text-[11px] font-medium text-muted-foreground">
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-muted/70 px-3 py-1.5 text-[12px] font-medium text-muted-foreground">
                     <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground/50" />
 
                     Previous
@@ -171,11 +171,11 @@ export function AcademicYearsSection({
 
       {academicYears.length === 0 ? (
         <div className="mt-4 rounded-[18px] border border-dashed border-border bg-muted/15 p-8 text-center">
-          <p className="text-sm font-medium text-foreground">
+          <p className="text-[15px] font-medium text-foreground">
             No academic years yet
           </p>
 
-          <p className="mt-1 text-xs font-normal text-muted-foreground">
+          <p className="mt-1 text-[13px] font-normal text-muted-foreground">
             Add the first academic year to begin
             configuring the school calendar.
           </p>
@@ -296,11 +296,11 @@ function YearStat({
         {value}
       </p>
 
-      <p className="mt-1 text-xs font-medium text-foreground">
+      <p className="mt-1 text-[13px] font-medium text-foreground">
         {label}
       </p>
 
-      <p className="mt-1 text-[10px] font-normal text-muted-foreground">
+      <p className="mt-1 text-[11px] font-normal text-muted-foreground">
         {description}
       </p>
     </div>

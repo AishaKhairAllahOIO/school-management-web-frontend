@@ -20,7 +20,7 @@ export function GradeTabs({ value, onChange }: GradeTabsProps) {
           type="button"
           onClick={() => onChange(grade.value)}
           className={[
-            "rounded-full border px-4 py-2 text-xs font-medium transition",
+            "rounded-full border px-4 py-2 text-[13px] font-medium transition",
             value === grade.value
               ? grade.className
               : "border-border/60 bg-background text-muted-foreground hover:bg-muted/35 hover:text-foreground",

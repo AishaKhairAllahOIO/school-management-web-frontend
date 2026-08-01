@@ -26,6 +26,8 @@ type StaffContactFormSectionProps = {
 
   disabled?: boolean;
 
+  emailRequired?: boolean;
+
   color?: StaffSectionColor;
 
   updateValue: <
@@ -40,6 +42,7 @@ type StaffContactFormSectionProps = {
 export function StaffContactFormSection({
   values,
   disabled = false,
+  emailRequired = false,
   color = defaultStaffSectionColor,
   updateValue,
 }: StaffContactFormSectionProps) {
@@ -78,8 +81,12 @@ export function StaffContactFormSection({
           />
         </StaffFormField>
 
-        <StaffFormField label="Email">
+        <StaffFormField
+          label="Email"
+          required={emailRequired}
+        >
           <input
+            required={emailRequired}
             disabled={disabled}
             dir="ltr"
             type="email"

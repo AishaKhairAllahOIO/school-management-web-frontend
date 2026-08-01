@@ -224,7 +224,7 @@ export function SchoolScheduleSection({
 
                       <span
                         className={[
-                          "truncate text-[12px] font-medium",
+                          "truncate text-[13px] font-medium",
                           checked
                             ? "text-foreground"
                             : "text-muted-foreground",
@@ -275,7 +275,7 @@ export function SchoolScheduleSection({
                         </SelectContent>
                       </Select>
 
-                      <span className="hidden text-[10px] text-muted-foreground 2xl:inline">
+                      <span className="hidden text-[11px] text-muted-foreground 2xl:inline">
                         periods
                       </span>
                     </div>
@@ -327,7 +327,7 @@ export function SchoolScheduleSection({
                     className={`${inputClassName} pr-16`}
                   />
 
-                  <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground">
+                  <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[11px] text-muted-foreground">
                     minutes
                   </span>
                 </div>
@@ -341,7 +341,7 @@ export function SchoolScheduleSection({
                 className="mt-0.5 shrink-0"
               />
 
-              <p className="text-[11px] leading-5">
+              <p className="text-[12px] leading-5">
                 End time is calculated automatically from periods and breaks.
               </p>
             </div>
@@ -405,7 +405,7 @@ export function SchoolScheduleSection({
                           className={`${inputClassName} pr-16`}
                         />
 
-                        <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground">
+                        <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[11px] text-muted-foreground">
                           minutes
                         </span>
                       </div>
@@ -437,10 +437,10 @@ export function SchoolScheduleSection({
 
               {schedule.breaks.length === 0 ? (
                 <div className="rounded-[14px] border border-dashed border-border/70 bg-muted/[0.1] p-5 text-center">
-                  <p className="text-[12px] font-medium text-foreground">
+                  <p className="text-[13px] font-medium text-foreground">
                     No breaks added
                   </p>
-                  <p className="mt-1 text-[10px] text-muted-foreground">
+                  <p className="mt-1 text-[11px] text-muted-foreground">
                     Add a break when needed.
                   </p>
                 </div>
@@ -454,7 +454,7 @@ export function SchoolScheduleSection({
                 "mt-3 inline-flex h-9 items-center gap-2",
                 "rounded-full border border-primary/18",
                 "bg-background px-4",
-                "text-[12px] font-medium text-primary",
+                "text-[13px] font-medium text-primary",
                 "transition-colors hover:bg-primary/[0.05]",
               ].join(" ")}
             >
@@ -471,7 +471,7 @@ export function SchoolScheduleSection({
               className={[
                 "inline-flex h-10 items-center gap-2 rounded-full",
                 "bg-primary px-5",
-                "text-[12px] font-medium text-primary-foreground",
+                "text-[13px] font-medium text-primary-foreground",
                 "shadow-[0_8px_20px_rgba(98,74,180,0.16)]",
                 "transition hover:-translate-y-0.5 hover:bg-primary/90",
                 "disabled:cursor-not-allowed disabled:translate-y-0 disabled:opacity-60",
@@ -527,7 +527,7 @@ const inputClassName = [
   "h-10 w-full rounded-[12px]",
   "border border-border/65",
   "bg-background px-3.5",
-  "text-[12px] font-normal text-foreground",
+  "text-[13px] font-normal text-foreground",
   "outline-none transition-all",
   "hover:border-border",
   "focus:border-primary/40 focus:ring-4 focus:ring-primary/10",
@@ -542,7 +542,7 @@ function ScheduleField({
 }) {
   return (
     <label className="block">
-      <span className="mb-1.5 block text-[11px] font-medium text-foreground/85">
+      <span className="mb-1.5 block text-[12px] font-medium text-foreground/85">
         {label}
       </span>
       {children}
@@ -569,12 +569,12 @@ function SchedulePanel({
         </span>
 
         <div className="min-w-0 pt-0.5">
-          <h3 className="text-[14px] font-medium text-foreground">
+          <h3 className="text-[15px] font-medium text-foreground">
             {title}
           </h3>
 
           {description ? (
-            <p className="mt-0.5 text-[11px] leading-5 text-muted-foreground">
+            <p className="mt-0.5 text-[12px] leading-5 text-muted-foreground">
               {description}
             </p>
           ) : null}

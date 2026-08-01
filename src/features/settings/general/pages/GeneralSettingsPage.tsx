@@ -51,7 +51,7 @@ export function GeneralSettingsPage() {
           School information could not be loaded
         </h2>
 
-        <p className="mt-2 max-w-lg text-sm leading-6 text-muted-foreground">
+        <p className="mt-2 max-w-lg text-[15px] leading-6 text-muted-foreground">
           The general school settings are currently
           unavailable. Check the connection and try
           again.
@@ -69,7 +69,7 @@ export function GeneralSettingsPage() {
             "rounded-xl",
             "border border-border/70",
             "bg-card px-4",
-            "text-sm font-medium",
+            "text-[15px] font-medium",
             "text-foreground",
             "transition-colors",
             "hover:bg-muted/55",

@@ -81,7 +81,7 @@ export function InstallmentPoliciesSection() {
         <Button
           type="button"
           onClick={() => setCreateOpen(true)}
-          className="h-10 rounded-[14px] px-4 text-xs font-medium shadow-none"
+          className="h-10 rounded-[14px] px-4 text-[13px] font-medium shadow-none"
         >
           <Plus className="mr-2 h-4 w-4" />
           Create Policy

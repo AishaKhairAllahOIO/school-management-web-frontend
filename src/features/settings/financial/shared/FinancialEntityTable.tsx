@@ -18,7 +18,7 @@ export function FinancialEntityTable({
       <table
         className={[
           "w-full table-fixed border-collapse text-left",
-          "text-[12px]",
+          "text-[13px]",
           "[&_tbody_tr]:transition-colors",
           "[&_tbody_tr]:duration-150",
           "[&_tbody_tr:hover]:bg-primary/[0.025]",
@@ -44,7 +44,7 @@ export function FinancialEntityTh({
       className={[
         "border-b border-border/55",
         "bg-muted/25 px-3 py-3",
-        "text-[9px] font-semibold",
+        "text-[10px] font-semibold",
         "uppercase tracking-[0.07em]",
         "text-muted-foreground",
         "whitespace-normal break-words leading-4",
@@ -71,7 +71,7 @@ export function FinancialEntityTd({
       className={[
         "min-w-0 border-b border-border/40",
         "px-3 py-3 align-middle",
-        "text-[12px] leading-5",
+        "text-[13px] leading-5",
         "whitespace-normal break-words",
         strong
           ? "font-medium text-foreground"

@@ -135,7 +135,7 @@ export function AcademicTermsSection({
       >
         <div className="mt-5 max-w-md">
           <label className="block">
-            <span className="mb-2 block text-xs font-medium text-foreground">
+            <span className="mb-2 block text-[13px] font-medium text-foreground">
               Academic Year
             </span>
             <Select
@@ -200,7 +200,7 @@ export function AcademicTermsSection({
               </EntityTd>
 
               <EntityTd>
-                <span className="inline-flex h-8 min-w-8 items-center justify-center rounded-full bg-primary/[0.07] px-2 text-xs font-medium text-primary">
+                <span className="inline-flex h-8 min-w-8 items-center justify-center rounded-full bg-primary/[0.07] px-2 text-[13px] font-medium text-primary">
                   {term.order}
                 </span>
               </EntityTd>
@@ -279,11 +279,11 @@ export function AcademicTermsSection({
             <Layers3 size={19} />
           </span>
 
-          <p className="mt-4 text-sm font-medium text-foreground">
+          <p className="mt-4 text-[15px] font-medium text-foreground">
             No terms found
           </p>
 
-          <p className="mt-1 text-xs font-normal text-muted-foreground">
+          <p className="mt-1 text-[13px] font-normal text-muted-foreground">
             Add the first term for{" "}
             {selectedYear?.name ??
               "the selected academic year"}.
@@ -376,7 +376,7 @@ function StatusBadge({
       className={[
         "inline-flex items-center gap-1.5",
         "rounded-full px-3 py-1.5",
-        "text-[11px] font-medium",
+        "text-[12px] font-medium",
         tone === "success"
           ? "bg-emerald-500/[0.09] text-emerald-600"
           : "bg-primary/[0.08] text-primary",
@@ -435,11 +435,11 @@ function TermStat({
         {value}
       </p>
 
-      <p className="mt-1 text-xs font-medium text-foreground">
+      <p className="mt-1 text-[13px] font-medium text-foreground">
         {label}
       </p>
 
-      <p className="mt-1 text-[10px] font-normal text-muted-foreground">
+      <p className="mt-1 text-[11px] font-normal text-muted-foreground">
         {description}
       </p>
     </div>

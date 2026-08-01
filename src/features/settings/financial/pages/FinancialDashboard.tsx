@@ -1,9 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
-import { Loader2, RefreshCw } from "lucide-react";
+import { RefreshCw } from "lucide-react";
 
 import { axiosClient } from "@/services/axios/axiosClient";
 import { API_ENDPOINTS } from "@/services/api/endpoints";
 
+import { FeePlansSkeleton } from "../components/fee-plans/FeePlansSkeleton";
 import { FeePlansSection } from "../sections/FeePlansSection";
 import { InstallmentPoliciesSection } from "../sections/InstallmentPoliciesSection";
 import type { FinancialSection } from "./FinancialSettingsPage";
@@ -59,17 +60,7 @@ export const FinancialDashboard = ({ activeSection }: Props) => {
   const hasErrors = isYearsError || isGradesError;
 
   if (isLoadingDependencies) {
-    return (
-      <div className="flex min-h-[420px] flex-col items-center justify-center gap-3 px-5 text-center">
-        <span className="flex h-11 w-11 items-center justify-center rounded-[15px] bg-primary/[0.08] text-primary">
-          <Loader2 size={20} className="animate-spin" />
-        </span>
-        <div>
-          <p className="text-sm font-medium text-foreground">Loading academic data</p>
-          <p className="mt-1 text-xs text-muted-foreground">Preparing years and grade levels.</p>
-        </div>
-      </div>
-    );
+    return <FeePlansSkeleton />;
   }
 
   if (hasErrors) {
@@ -78,8 +69,8 @@ export const FinancialDashboard = ({ activeSection }: Props) => {
         <span className="flex h-11 w-11 items-center justify-center rounded-[15px] bg-destructive/[0.08] text-destructive">
           <RefreshCw size={19} />
         </span>
-        <h3 className="mt-3 text-sm font-semibold text-foreground">Academic data is unavailable</h3>
-        <p className="mt-1 max-w-md text-xs leading-5 text-muted-foreground">
+        <h3 className="mt-3 text-[15px] font-semibold text-foreground">Academic data is unavailable</h3>
+        <p className="mt-1 max-w-md text-[13px] leading-5 text-muted-foreground">
           Fee plans require academic years and grade levels. Please verify the related API endpoints.
         </p>
       </div>

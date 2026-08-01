@@ -127,7 +127,7 @@ export function ResetAcademicSettingsDialog({
 
               <p
                 id="reset-academic-description"
-                className="mt-1 text-sm leading-6 text-muted-foreground"
+                className="mt-1 text-[15px] leading-6 text-muted-foreground"
               >
                 This removes the current academic
                 configuration and school schedule.
@@ -148,11 +148,11 @@ export function ResetAcademicSettingsDialog({
 
         <div className="space-y-5 p-6">
           <div className="rounded-2xl border border-destructive/15 bg-destructive/5 p-4">
-            <p className="text-xs font-bold uppercase tracking-wide text-destructive">
+            <p className="text-[13px] font-bold uppercase tracking-wide text-destructive">
               This operation removes
             </p>
 
-            <ul className="mt-3 space-y-2 text-sm text-foreground">
+            <ul className="mt-3 space-y-2 text-[15px] text-foreground">
               <li>
                 • Current academic year
                 selection
@@ -172,7 +172,7 @@ export function ResetAcademicSettingsDialog({
               </li>
             </ul>
 
-            <p className="mt-4 text-xs leading-5 text-muted-foreground">
+            <p className="mt-4 text-[13px] leading-5 text-muted-foreground">
               Academic years, terms and stages are
               managed separately and should not be
               removed by this operation.
@@ -180,7 +180,7 @@ export function ResetAcademicSettingsDialog({
           </div>
 
           <label className="block">
-            <span className="mb-2 block text-xs font-bold text-foreground">
+            <span className="mb-2 block text-[13px] font-bold text-foreground">
               Type{" "}
               <span className="rounded-md bg-muted px-2 py-1 font-mono text-destructive">
                 {CONFIRMATION_VALUE}
@@ -201,7 +201,7 @@ export function ResetAcademicSettingsDialog({
               }
               className={[
                 "h-11 w-full rounded-xl border bg-background px-4",
-                "font-mono text-sm font-semibold text-foreground",
+                "font-mono text-[15px] font-semibold text-foreground",
                 "outline-none transition",
                 "focus:border-destructive/50 focus:ring-4 focus:ring-destructive/10",
                 isConfirmed
@@ -212,7 +212,7 @@ export function ResetAcademicSettingsDialog({
 
             {confirmation.length > 0 &&
             !isConfirmed ? (
-              <p className="mt-2 text-[11px] font-semibold text-destructive">
+              <p className="mt-2 text-[12px] font-semibold text-destructive">
                 The confirmation value does not
                 match.
               </p>
@@ -225,7 +225,7 @@ export function ResetAcademicSettingsDialog({
             type="button"
             disabled={isPending}
             onClick={onClose}
-            className="h-10 rounded-xl border border-border bg-card px-5 text-xs font-bold text-foreground transition hover:bg-muted disabled:opacity-50"
+            className="h-10 rounded-xl border border-border bg-card px-5 text-[13px] font-bold text-foreground transition hover:bg-muted disabled:opacity-50"
           >
             Keep Settings
           </button>
@@ -237,7 +237,7 @@ export function ResetAcademicSettingsDialog({
               isPending
             }
             onClick={onConfirm}
-            className="flex h-10 items-center gap-2 rounded-xl bg-destructive px-5 text-xs font-bold text-destructive-foreground transition hover:bg-destructive/90 disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex h-10 items-center gap-2 rounded-xl bg-destructive px-5 text-[13px] font-bold text-destructive-foreground transition hover:bg-destructive/90 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {isPending ? (
               <Loader2

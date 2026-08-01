@@ -96,7 +96,7 @@ export function ClassSchedulesPage() {
             void catalogQuery.refetch();
             void schedulesQuery.refetch();
           }}
-          className="mt-4 rounded-full bg-primary px-4 py-2 text-xs font-medium text-primary-foreground"
+          className="mt-4 rounded-full bg-primary px-4 py-2 text-[13px] font-medium text-primary-foreground"
         >
           Try again
         </button>
@@ -167,7 +167,7 @@ export function ClassSchedulesPage() {
       <section className="rounded-[26px] border border-border/45 bg-card p-4 shadow-[0_10px_35px_rgba(30,20,70,0.035)] sm:p-5">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div className="min-w-0 flex-1">
-            <p className="text-[11px] font-medium text-muted-foreground">Grade</p>
+            <p className="text-[12px] font-medium text-muted-foreground">Grade</p>
             <div className="mt-2 flex flex-wrap gap-2">
               {catalog.grades.map((grade) => (
                 <button
@@ -178,7 +178,7 @@ export function ClassSchedulesPage() {
                     setSelectedClassroomId("");
                   }}
                   className={[
-                    "rounded-full border px-4 py-2 text-xs font-medium transition",
+                    "rounded-full border px-4 py-2 text-[13px] font-medium transition",
                     activeGradeId === grade.id
                       ? pastelByColor[grade.color]
                       : "border-border/60 bg-background text-muted-foreground hover:bg-muted/35 hover:text-foreground",
@@ -191,7 +191,7 @@ export function ClassSchedulesPage() {
           </div>
 
           <div className="w-full lg:w-[260px]">
-            <p className="mb-2 text-[11px] font-medium text-muted-foreground">Classroom</p>
+            <p className="mb-2 text-[12px] font-medium text-muted-foreground">Classroom</p>
             <Select value={activeClassroomId} onValueChange={setSelectedClassroomId}>
               <SelectTrigger className="h-11 rounded-[13px] border-border/70 bg-background px-3.5 text-sm font-normal">
                 <SelectValue placeholder="Select classroom" />
@@ -214,15 +214,15 @@ export function ClassSchedulesPage() {
             <h2 className="text-[15px] font-medium text-foreground">
               {gradeMap.get(activeGradeId)?.name} · {selectedClassroom?.name}
             </h2>
-            <p className="mt-1 text-[11px] text-muted-foreground">
+            <p className="mt-1 text-[12px] text-muted-foreground">
               Room {selectedClassroom?.roomNumber ?? "—"} · {selectedClassroom?.studentCount ?? 0} students
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
-            <button type="button" onClick={handleExport} className="inline-flex h-9 items-center gap-2 rounded-full border border-border/65 bg-background px-4 text-[11px] font-medium text-foreground/75 transition hover:bg-muted/45">
+            <button type="button" onClick={handleExport} className="inline-flex h-9 items-center gap-2 rounded-full border border-border/65 bg-background px-4 text-[12px] font-medium text-foreground/75 transition hover:bg-muted/45">
               <Download size={14}/>Export
             </button>
-            <button type="button" onClick={openCreateDialog} className="inline-flex h-9 items-center gap-2 rounded-full bg-primary px-4 text-[11px] font-medium text-primary-foreground">
+            <button type="button" onClick={openCreateDialog} className="inline-flex h-9 items-center gap-2 rounded-full bg-primary px-4 text-[12px] font-medium text-primary-foreground">
               <Plus size={14}/>Add Lesson
             </button>
           </div>
@@ -230,21 +230,21 @@ export function ClassSchedulesPage() {
 
         <div className="hidden overflow-hidden rounded-[20px] border border-border/55 lg:block">
           <div className="grid grid-cols-[110px_repeat(6,minmax(0,1fr))] bg-muted/[0.18]">
-            <div className="border-r border-border/45 px-3 py-3 text-[10px] font-medium uppercase tracking-[0.08em] text-muted-foreground">Period</div>
-            {weekDays.map((day, index) => <div key={day} className={`border-r border-border/45 px-3 py-3 text-center text-[11px] font-medium last:border-r-0 ${["bg-violet-50/55","bg-sky-50/55","bg-emerald-50/55","bg-amber-50/55","bg-rose-50/55","bg-fuchsia-50/45"][index]}`}>{day}</div>)}
+            <div className="border-r border-border/45 px-3 py-3 text-[11px] font-medium uppercase tracking-[0.08em] text-muted-foreground">Period</div>
+            {weekDays.map((day, index) => <div key={day} className={`border-r border-border/45 px-3 py-3 text-center text-[12px] font-medium last:border-r-0 ${["bg-violet-50/55","bg-sky-50/55","bg-emerald-50/55","bg-amber-50/55","bg-rose-50/55","bg-fuchsia-50/45"][index]}`}>{day}</div>)}
           </div>
           {timeSlots.map((slot) => (
             <div key={slot.id} className="grid grid-cols-[110px_repeat(6,minmax(0,1fr))] border-t border-border/45">
-              <div className="flex flex-col justify-center border-r border-border/45 bg-muted/[0.10] px-3 py-3"><span className="text-[11px] font-medium text-foreground">{slot.label}</span><span className="mt-1 text-[9px] text-muted-foreground">{slot.start} – {slot.end}</span></div>
+              <div className="flex flex-col justify-center border-r border-border/45 bg-muted/[0.10] px-3 py-3"><span className="text-[12px] font-medium text-foreground">{slot.label}</span><span className="mt-1 text-[10px] text-muted-foreground">{slot.start} – {slot.end}</span></div>
               {weekDays.map((day) => {
                 const schedule = visibleSchedules.find((item) => item.day === day && item.timeSlotId === slot.id);
                 const subject = schedule ? subjectMap.get(schedule.subjectId) : undefined;
                 const teacher = schedule ? teacherMap.get(schedule.teacherId) : undefined;
                 return <div key={day} className="min-h-[112px] border-r border-border/45 p-2 last:border-r-0">
                   {schedule ? <article className={`group h-full rounded-[15px] border p-2.5 ${subject ? pastelByColor[subject.color] : "border-border/55 bg-muted/15"}`}>
-                    <div className="flex items-start justify-between gap-1"><p className="truncate text-[10px] font-medium text-foreground">{subject?.name ?? "Subject"}</p><div className="flex gap-1 opacity-100 xl:opacity-0 xl:group-hover:opacity-100"><button onClick={()=>openEditDialog(schedule)} className="flex h-6 w-6 items-center justify-center rounded-full bg-card/90 text-primary"><Edit3 size={11}/></button><button onClick={()=>setDeletingSchedule(schedule)} className="flex h-6 w-6 items-center justify-center rounded-full bg-card/90 text-destructive"><Trash2 size={11}/></button></div></div>
-                    <p className="mt-2 truncate text-[9px] text-foreground/75">{teacher?.name}</p><p className="mt-1 text-[9px] text-muted-foreground">Room {schedule.roomNumber ?? selectedClassroom?.roomNumber ?? "—"}</p>
-                  </article> : <button onClick={openCreateDialog} className="flex h-full w-full flex-col items-center justify-center rounded-[15px] border border-dashed border-border/55 text-muted-foreground hover:border-primary/30 hover:bg-primary/[0.025] hover:text-primary"><Plus size={14}/><span className="mt-1 text-[9px]">Add</span></button>}
+                    <div className="flex items-start justify-between gap-1"><p className="truncate text-[11px] font-medium text-foreground">{subject?.name ?? "Subject"}</p><div className="flex gap-1 opacity-100 xl:opacity-0 xl:group-hover:opacity-100"><button onClick={()=>openEditDialog(schedule)} className="flex h-6 w-6 items-center justify-center rounded-full bg-card/90 text-primary"><Edit3 size={11}/></button><button onClick={()=>setDeletingSchedule(schedule)} className="flex h-6 w-6 items-center justify-center rounded-full bg-card/90 text-destructive"><Trash2 size={11}/></button></div></div>
+                    <p className="mt-2 truncate text-[10px] text-foreground/75">{teacher?.name}</p><p className="mt-1 text-[10px] text-muted-foreground">Room {schedule.roomNumber ?? selectedClassroom?.roomNumber ?? "—"}</p>
+                  </article> : <button onClick={openCreateDialog} className="flex h-full w-full flex-col items-center justify-center rounded-[15px] border border-dashed border-border/55 text-muted-foreground hover:border-primary/30 hover:bg-primary/[0.025] hover:text-primary"><Plus size={14}/><span className="mt-1 text-[10px]">Add</span></button>}
                 </div>;
               })}
             </div>
@@ -252,7 +252,7 @@ export function ClassSchedulesPage() {
         </div>
 
         <div className="space-y-3 lg:hidden">
-          {weekDays.map((day, dayIndex) => <div key={day} className="rounded-[18px] border border-border/55 p-3"><div className={`rounded-[14px] px-3 py-2 text-[11px] font-medium ${["bg-violet-50 text-violet-700","bg-sky-50 text-sky-700","bg-emerald-50 text-emerald-700","bg-amber-50 text-amber-700","bg-rose-50 text-rose-700","bg-fuchsia-50 text-fuchsia-700"][dayIndex]}`}>{day}</div><div className="mt-2 grid gap-2 sm:grid-cols-2">{visibleSchedules.filter(i=>i.day===day).map(schedule=>{const subject=subjectMap.get(schedule.subjectId);const teacher=teacherMap.get(schedule.teacherId);return <article key={schedule.id} className={`rounded-[15px] border p-3 ${subject?pastelByColor[subject.color]:"border-border/55"}`}><div className="flex justify-between"><p className="text-[10px] font-medium">{subject?.name}</p><div className="flex gap-1"><button onClick={()=>openEditDialog(schedule)}><Edit3 size={12}/></button><button onClick={()=>setDeletingSchedule(schedule)} className="text-destructive"><Trash2 size={12}/></button></div></div><p className="mt-1 text-[9px] text-muted-foreground">{slotMap.get(schedule.timeSlotId)?.label}</p><p className="mt-2 text-[9px]">{teacher?.name}</p></article>})}</div></div>)}
+          {weekDays.map((day, dayIndex) => <div key={day} className="rounded-[18px] border border-border/55 p-3"><div className={`rounded-[14px] px-3 py-2 text-[12px] font-medium ${["bg-violet-50 text-violet-700","bg-sky-50 text-sky-700","bg-emerald-50 text-emerald-700","bg-amber-50 text-amber-700","bg-rose-50 text-rose-700","bg-fuchsia-50 text-fuchsia-700"][dayIndex]}`}>{day}</div><div className="mt-2 grid gap-2 sm:grid-cols-2">{visibleSchedules.filter(i=>i.day===day).map(schedule=>{const subject=subjectMap.get(schedule.subjectId);const teacher=teacherMap.get(schedule.teacherId);return <article key={schedule.id} className={`rounded-[15px] border p-3 ${subject?pastelByColor[subject.color]:"border-border/55"}`}><div className="flex justify-between"><p className="text-[11px] font-medium">{subject?.name}</p><div className="flex gap-1"><button onClick={()=>openEditDialog(schedule)}><Edit3 size={12}/></button><button onClick={()=>setDeletingSchedule(schedule)} className="text-destructive"><Trash2 size={12}/></button></div></div><p className="mt-1 text-[10px] text-muted-foreground">{slotMap.get(schedule.timeSlotId)?.label}</p><p className="mt-2 text-[10px]">{teacher?.name}</p></article>})}</div></div>)}
         </div>
       </section>
 
@@ -303,7 +303,7 @@ function MetricCard({
     <article className={`rounded-[22px] border p-4 ${className}`}>
       <div className="flex items-start justify-between gap-3">
         <div>
-          <p className="text-[10px] font-medium opacity-75">{label}</p>
+          <p className="text-[11px] font-medium opacity-75">{label}</p>
           <p className="mt-2 text-[23px] font-semibold tracking-[-0.03em]">{value}</p>
         </div>
         <span className="flex h-10 w-10 items-center justify-center rounded-[14px] bg-card/75">
@@ -341,7 +341,7 @@ function DeleteScheduleDialog({
           <Trash2 size={19} />
         </span>
         <h2 className="mt-4 text-[16px] font-semibold text-foreground">Delete this lesson?</h2>
-        <p className="mt-1.5 text-[11px] leading-5 text-muted-foreground">
+        <p className="mt-1.5 text-[12px] leading-5 text-muted-foreground">
           {subjectName ?? "This lesson"} on {schedule.day} will be removed from the classroom schedule.
         </p>
 
@@ -350,7 +350,7 @@ function DeleteScheduleDialog({
             type="button"
             disabled={isPending}
             onClick={onClose}
-            className="h-9 rounded-full border border-border/65 bg-background px-4 text-[11px] font-medium text-foreground/75 disabled:opacity-50"
+            className="h-9 rounded-full border border-border/65 bg-background px-4 text-[12px] font-medium text-foreground/75 disabled:opacity-50"
           >
             Keep lesson
           </button>
@@ -358,7 +358,7 @@ function DeleteScheduleDialog({
             type="button"
             disabled={isPending}
             onClick={onConfirm}
-            className="inline-flex h-9 items-center gap-2 rounded-full bg-destructive px-4 text-[11px] font-medium text-destructive-foreground disabled:opacity-50"
+            className="inline-flex h-9 items-center gap-2 rounded-full bg-destructive px-4 text-[12px] font-medium text-destructive-foreground disabled:opacity-50"
           >
             {isPending ? <Loader2 size={14} className="animate-spin" /> : <Trash2 size={14} />}
             {isPending ? "Deleting..." : "Delete"}

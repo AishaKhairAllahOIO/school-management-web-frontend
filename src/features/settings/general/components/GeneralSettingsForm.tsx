@@ -46,7 +46,7 @@ function TextInput({
 }: TextInputProps) {
   return (
     <label className={["block min-w-0", className ?? ""].join(" ")}>
-      <span className="mb-2 block text-xs font-semibold text-foreground/80">
+      <span className="mb-2 block text-[13px] font-semibold text-foreground/80">
         {label}
         {required ? <span className="text-destructive"> *</span> : null}
       </span>
@@ -65,7 +65,7 @@ function TextInput({
           className={[
             "h-11 w-full rounded-[14px] border border-border/80 bg-background",
             "shadow-[0_1px_2px_rgba(15,23,42,0.04)]",
-            "text-sm font-normal text-foreground outline-none transition duration-200",
+            "text-[15px] font-normal text-foreground outline-none transition duration-200",
             "placeholder:font-normal placeholder:text-muted-foreground/80",
             "hover:border-border focus:border-primary/55 focus:ring-4 focus:ring-primary/[0.10]",
             "disabled:cursor-not-allowed disabled:opacity-60",
@@ -78,7 +78,7 @@ function TextInput({
       </div>
 
       {error ? (
-        <p className="mt-1.5 px-1 text-[11px] font-medium text-destructive">{error}</p>
+        <p className="mt-1.5 px-1 text-[12px] font-medium text-destructive">{error}</p>
       ) : null}
     </label>
   );
@@ -99,8 +99,8 @@ function SectionHeader({
         <Icon size={17} strokeWidth={1.75} />
       </span>
       <div className="min-w-0 pt-0.5">
-        <h2 className="text-[15px] font-semibold text-foreground">{title}</h2>
-        <p className="mt-1 max-w-xl text-xs leading-5 text-muted-foreground">{description}</p>
+        <h2 className="text-[16px] font-semibold text-foreground">{title}</h2>
+        <p className="mt-1 max-w-xl text-[13px] leading-5 text-muted-foreground">{description}</p>
       </div>
     </div>
   );
@@ -310,8 +310,8 @@ function GeneralSettingsFormContent({ initialData }: GeneralSettingsFormProps) {
               <Building2 size={18} strokeWidth={1.75} />
             </span>
             <div className="pt-0.5">
-              <p className="text-sm font-semibold text-foreground">Complete the school profile</p>
-              <p className="mt-1 text-xs leading-5 text-muted-foreground">
+              <p className="text-[15px] font-semibold text-foreground">Complete the school profile</p>
+              <p className="mt-1 text-[13px] leading-5 text-muted-foreground">
                 Fill in the required information and save the form to initialize the school settings.
               </p>
             </div>
@@ -343,7 +343,7 @@ function GeneralSettingsFormContent({ initialData }: GeneralSettingsFormProps) {
               />
 
               <label className="md:col-span-2">
-                <span className="mb-2 block text-xs font-semibold text-foreground/80">
+                <span className="mb-2 block text-[13px] font-semibold text-foreground/80">
                   Description <span className="text-destructive">*</span>
                 </span>
                 <textarea
@@ -353,7 +353,7 @@ function GeneralSettingsFormContent({ initialData }: GeneralSettingsFormProps) {
                     "min-h-[140px] max-h-[380px] w-full resize-y rounded-[14px]",
                     "border border-border/80 bg-background px-4 py-3.5",
                     "shadow-[0_1px_2px_rgba(15,23,42,0.04)]",
-                    "text-sm font-normal leading-6 text-foreground outline-none transition duration-200",
+                    "text-[15px] font-normal leading-6 text-foreground outline-none transition duration-200",
                     "placeholder:font-normal placeholder:text-muted-foreground/80",
                     "hover:border-border focus:border-primary/55 focus:ring-4 focus:ring-primary/[0.10]",
                     "disabled:cursor-not-allowed disabled:opacity-60",
@@ -363,7 +363,7 @@ function GeneralSettingsFormContent({ initialData }: GeneralSettingsFormProps) {
                   ].join(" ")}
                 />
                 {errors.description?.message ? (
-                  <p className="mt-1.5 px-1 text-[11px] font-medium text-destructive">
+                  <p className="mt-1.5 px-1 text-[12px] font-medium text-destructive">
                     {errors.description.message}
                   </p>
                 ) : null}
@@ -497,7 +497,7 @@ function GeneralSettingsFormContent({ initialData }: GeneralSettingsFormProps) {
           type="button"
           onClick={handleCancel}
           disabled={!hasUnsavedChanges || updateMutation.isPending}
-          className="h-11 rounded-full bg-muted/55 px-6 text-sm font-semibold text-foreground/75 transition hover:bg-muted hover:text-foreground disabled:cursor-not-allowed disabled:opacity-45"
+          className="h-11 rounded-full bg-muted/55 px-6 text-[15px] font-semibold text-foreground/75 transition hover:bg-muted hover:text-foreground disabled:cursor-not-allowed disabled:opacity-45"
         >
           Cancel
         </button>
@@ -505,7 +505,7 @@ function GeneralSettingsFormContent({ initialData }: GeneralSettingsFormProps) {
         <button
           type="submit"
           disabled={!hasUnsavedChanges || updateMutation.isPending}
-          className="flex h-11 items-center justify-center gap-2 rounded-full bg-primary px-6 text-sm font-semibold text-primary-foreground shadow-[0_10px_24px_rgba(98,74,180,0.2)] transition duration-200 hover:-translate-y-0.5 hover:bg-primary/90 hover:shadow-[0_14px_30px_rgba(98,74,180,0.25)] disabled:cursor-not-allowed disabled:translate-y-0 disabled:opacity-55"
+          className="flex h-11 items-center justify-center gap-2 rounded-full bg-primary px-6 text-[15px] font-semibold text-primary-foreground shadow-[0_10px_24px_rgba(98,74,180,0.2)] transition duration-200 hover:-translate-y-0.5 hover:bg-primary/90 hover:shadow-[0_14px_30px_rgba(98,74,180,0.25)] disabled:cursor-not-allowed disabled:translate-y-0 disabled:opacity-55"
         >
           {updateMutation.isPending ? (
             <Loader2 size={16} className="animate-spin" />

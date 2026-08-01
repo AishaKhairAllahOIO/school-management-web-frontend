@@ -57,16 +57,16 @@ export function FinancialWorkspace({
 
                 <span className="min-w-0 flex-1">
                   <span className="flex items-center justify-between gap-2">
-                    <span className="block truncate text-[12px] font-semibold">
+                    <span className="block truncate text-[13px] font-semibold">
                       {item.title}
                     </span>
                     {item.badge ? (
-                      <span className="rounded-full bg-background/80 px-2 py-0.5 text-[9px] font-semibold text-muted-foreground">
+                      <span className="rounded-full bg-background/80 px-2 py-0.5 text-[10px] font-semibold text-muted-foreground">
                         {item.badge}
                       </span>
                     ) : null}
                   </span>
-                  <span className="mt-0.5 block truncate text-[10px] leading-4 text-muted-foreground">
+                  <span className="mt-0.5 block truncate text-[11px] leading-4 text-muted-foreground">
                     {item.description}
                   </span>
                 </span>
@@ -77,7 +77,7 @@ export function FinancialWorkspace({
 
         {hint ? (
           <div className="border-t border-border/45 p-3">
-            <div className="rounded-[14px] bg-muted/25 px-3 py-2.5 text-[10px] leading-4 text-muted-foreground">
+            <div className="rounded-[14px] bg-muted/25 px-3 py-2.5 text-[11px] leading-4 text-muted-foreground">
               {hint}
             </div>
           </div>
