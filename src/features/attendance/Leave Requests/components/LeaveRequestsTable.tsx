@@ -1,205 +1,72 @@
-import type {
-  LeaveRequest,
-} from "../types/staffLeave.types";
+import { CalendarDays } from "lucide-react";
 
-import { LeaveStatusBadge }
-from "./LeaveStatusBadge";
+import type { LeaveRequest } from "../types/staffLeave.types";
 
-interface Props {
+type Props = {
   data: LeaveRequest[];
+  compact?: boolean;
+  isLoading?: boolean;
+};
 
-  onSelect: (
-    leave: LeaveRequest
-  ) => void;
+function calculateDays(startDate: string, endDate: string) {
+  const diff = new Date(endDate).getTime() - new Date(startDate).getTime();
+  return Math.floor(diff / 86400000) + 1;
 }
 
-export const LeaveRequestsTable = ({
+export function LeaveRequestsTable({
   data,
-  onSelect,
-}: Props) => {
-  const calculateDays = (
-    startDate: string,
-    endDate: string
-  ) => {
-    const start =
-      new Date(startDate);
-
-    const end =
-      new Date(endDate);
-
-    const diff =
-      end.getTime() -
-      start.getTime();
-
+  compact = false,
+  isLoading = false,
+}: Props) {
+  if (compact) {
     return (
-      Math.floor(
-        diff /
-          (1000 *
-            60 *
-            60 *
-            24)
-      ) + 1
-    );
-  };
-
-  return (
-    <div
-      className="
-        soft-card
-        overflow-hidden
-        rounded-3xl
-      "
-    >
-      <div className="overflow-x-auto">
-        <table className="w-full">
-
-          <thead
-            className="
-              bg-muted/40
-            "
-          >
-            <tr>
-              <th className="p-4 text-left">
-                Employee
-              </th>
-
-              <th className="p-4 text-left">
-                Type
-              </th>
-
-              <th className="p-4 text-left">
-                Start Date
-              </th>
-
-              <th className="p-4 text-left">
-                End Date
-              </th>
-
-              <th className="p-4 text-left">
-                Duration
-              </th>
-
-              <th className="p-4 text-left">
-                Status
-              </th>
-
-              <th className="p-4 text-left">
-                Approved By
-              </th>
-            </tr>
-          </thead>
-
-          <tbody>
-
-            {data.map((item) => (
-              <tr
+      <div className="space-y-1.5 p-2.5">
+        {isLoading
+          ? Array.from({ length: 4 }).map((_, index) => (
+              <div
+                key={index}
+                className="h-[74px] animate-pulse rounded-[14px] bg-muted/45"
+              />
+            ))
+          : data.map((item) => (
+              <div
                 key={item.id}
-                onClick={() =>
-                  onSelect(item)
-                }
-                className="
-                  border-t
-                  cursor-pointer
-                  transition-colors
-                  hover:bg-muted/20
-                "
+                className="flex w-full items-start gap-2.5 rounded-[14px] border border-transparent px-2.5 py-2.5 transition-colors hover:border-border/55 hover:bg-muted/[0.28]"
               >
-                <td className="p-4">
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[11px] bg-warning/[0.10] text-[11px] font-semibold text-warning">
+                  {item.employeeName.charAt(0)}
+                </span>
 
-                  <div className="flex items-center gap-3">
+                <span className="min-w-0 flex-1">
+                  <span className="flex items-start justify-between gap-2">
+                    <strong className="truncate text-[12px] font-medium text-foreground">
+                      {item.employeeName}
+                    </strong>
+                    <span className="shrink-0 rounded-full bg-warning/[0.10] px-2 py-0.5 text-[9px] font-medium text-warning">
+                      {calculateDays(item.startDate, item.endDate)} days
+                    </span>
+                  </span>
 
-                    <div
-                      className="
-                        flex
-                        h-10
-                        w-10
-                        items-center
-                        justify-center
-                        rounded-full
-                        bg-primary/10
-                        text-primary
-                        font-semibold
-                      "
-                    >
-                      {item.employeeName.charAt(
-                        0
-                      )}
-                    </div>
+                  <span className="mt-1 block truncate text-[10px] text-muted-foreground">
+                    {item.leaveType.replace(" Leave", " vacation")}
+                  </span>
 
-                    <div>
-
-                      <p className="font-medium">
-                        {item.employeeName}
-                      </p>
-
-                      <p
-                        className="
-                          text-xs
-                          text-muted-foreground
-                        "
-                      >
-                        {item.role}
-                      </p>
-
-                    </div>
-
-                  </div>
-
-                </td>
-
-                <td className="p-4">
-                  {item.leaveType}
-                </td>
-
-                <td className="p-4">
-                  {item.startDate}
-                </td>
-
-                <td className="p-4">
-                  {item.endDate}
-                </td>
-
-                <td className="p-4">
-                  {calculateDays(
-                    item.startDate,
-                    item.endDate
-                  )}{" "}
-                  Days
-                </td>
-
-                <td className="p-4">
-                  <LeaveStatusBadge
-                    status={item.status}
-                  />
-                </td>
-
-                <td className="p-4">
-                  {item.approvedBy ??
-                    "-"}
-                </td>
-
-              </tr>
+                  <span className="mt-1 flex items-center gap-1 text-[10px] text-muted-foreground/85">
+                    <CalendarDays className="h-3 w-3" strokeWidth={1.7} />
+                    {item.startDate} — {item.endDate}
+                  </span>
+                </span>
+              </div>
             ))}
 
-            {data.length === 0 && (
-              <tr>
-                <td
-                  colSpan={7}
-                  className="
-                    py-10
-                    text-center
-                    text-muted-foreground
-                  "
-                >
-                  No leave requests found.
-                </td>
-              </tr>
-            )}
-
-          </tbody>
-
-        </table>
+        {!isLoading && data.length === 0 && (
+          <p className="px-3 py-10 text-center text-[11px] text-muted-foreground">
+            No vacations found.
+          </p>
+        )}
       </div>
-    </div>
-  );
-};
+    );
+  }
+
+  return null;
+}

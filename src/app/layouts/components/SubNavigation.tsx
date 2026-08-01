@@ -33,7 +33,6 @@ const subNavigationSections: SubNavigationSection[] = [
     items: [
       { title: "Students", path: "/attendance/students", icon: Users },
       { title: "Staff", path: "/attendance/staff", icon: UserCheck },
-      { title: "Vacations", path: "/attendance/vacations", icon: CalendarDays },
     ],
   },
   {
@@ -156,7 +155,7 @@ function DefaultSubNavigation({ items }: { items: SubNavigationItem[] }) {
   return (
     <nav
       aria-label="Section navigation"
-      className="w-full min-w-0 overflow-hidden rounded-[22px] border border-border/60 bg-card/95 p-1.5 shadow-[0_8px_28px_rgba(38,24,84,0.045)] backdrop-blur-sm"
+      className="w-full min-w-0 overflow-hidden rounded-[22px] border border-border/60 bg-card/95 p-2 shadow-[0_8px_28px_rgba(38,24,84,0.045)] backdrop-blur-sm"
     >
       <div className="flex h-11 w-full min-w-0 items-center overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         <div className="flex min-w-max items-center gap-1">

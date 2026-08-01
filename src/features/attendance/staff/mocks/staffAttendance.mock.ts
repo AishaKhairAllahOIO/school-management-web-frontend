@@ -1,9 +1,6 @@
-import type {
-  StaffAttendance,
-} from "../types/staffAttendance.types";
+import type { StaffAttendance } from "../types/staffAttendance.types";
 
-export const staffAttendanceMock: StaffAttendance[] =
-[
+export const staffAttendanceMock: StaffAttendance[] = [
   {
     id: "1",
     employeeId: "EMP001",
@@ -11,30 +8,41 @@ export const staffAttendanceMock: StaffAttendance[] =
     role: "Teacher",
     date: "2026-06-15",
     status: "Present",
-    checkIn: "07:55",
-    checkOut: "14:00",
+    requiredPeriods: 6,
+    attendedPeriods: 5,
   },
-
   {
     id: "2",
     employeeId: "EMP002",
     employeeName: "Sara Omar",
     role: "Secretary",
     date: "2026-06-15",
-    status: "Late",
-    checkIn: "08:25",
-    checkOut: "14:00",
+    status: "Present",
   },
-
   {
     id: "3",
     employeeId: "EMP003",
-    employeeName:
-      "Mohammad Hasan",
+    employeeName: "Mohammad Hasan",
     role: "Supervisor",
     date: "2026-06-15",
     status: "Absent",
-    absenceType:
-      "Unexcused",
+    absenceType: "Unexcused",
+  },
+  {
+    id: "4",
+    employeeId: "EMP004",
+    employeeName: "Lina Khalil",
+    role: "Counselor",
+    date: "2026-06-15",
+    status: "Present",
+  },
+  {
+    id: "5",
+    employeeId: "EMP005",
+    employeeName: "Omar Saleh",
+    role: "Service Staff",
+    date: "2026-06-15",
+    status: "Absent",
+    absenceType: "Excused",
   },
 ];

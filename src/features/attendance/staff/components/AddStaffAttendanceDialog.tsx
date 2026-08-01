@@ -205,10 +205,6 @@ export const AddStaffAttendanceDialog = () => {
                   Present
                 </SelectItem>
 
-                <SelectItem value="Late">
-                  Late
-                </SelectItem>
-
                 <SelectItem value="Absent">
                   Absent
                 </SelectItem>
