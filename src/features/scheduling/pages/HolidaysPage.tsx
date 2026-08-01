@@ -1,4 +1,4 @@
-import { CalendarDays, Download, Edit3, Palmtree, Plus, Sparkles, Trash2 } from "lucide-react";
+import { Download, Edit3, Palmtree, Plus, Sparkles, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { exportScheduleWorkbook } from "@/features/scheduling/shared/utils/export-schedule-xlsx";
 import { ConfirmDelete, Editor, Input, SelectField } from "./ExamSchedulesPage";

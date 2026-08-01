@@ -1,7 +1,6 @@
 import { useMemo, useState } from "react";
 
-import { useLeaveRequests }
-from "../hooks/useLeaveRequests";
+import { useLeaveRequests } from "../hooks/useLeaveRequests";
 
 import { LeaveStats }
 from "../components/LeaveStats";
@@ -16,19 +15,10 @@ import { AddLeaveDialog }
 from "../components/AddLeaveDialog";
 import type { LeaveRequest } from "../types/staffLeave.types";
 import { LeaveDetailsDrawer } from "../components/LeaveDetailsDrawer";
-export const LeaveRequestsPage =
-() => {
- const [
-  selectedLeave,
-  setSelectedLeave,
-] = useState<
-  LeaveRequest | undefined
->();
+export const LeaveRequestsPage = () => {
+  const [selectedLeave] = useState<LeaveRequest | undefined>();
 
-const [
-  drawerOpen,
-  setDrawerOpen,
-] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const {
     data = [],
     isLoading,
@@ -176,15 +166,10 @@ const [
 
     
     <LeaveRequestsTable
-     data={filteredData}
-     onSelect={(leave) => {
-     setSelectedLeave(
-      leave
-      );
-
-    setDrawerOpen(true);
-  }}
-/>
+      data={filteredData}
+      compact={false}
+      isLoading={isLoading}
+    />
 <LeaveDetailsDrawer
   open={drawerOpen}
   onOpenChange={

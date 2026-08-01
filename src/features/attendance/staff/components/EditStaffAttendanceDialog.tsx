@@ -141,16 +141,12 @@ export const EditStaffAttendanceDialog = ({
             <>
               <Input
                 type="time"
-                {...register(
-                  "checkIn"
-                )}
+                {...register("checkIn" as "employeeName" | "date" | "status" | "id" | "role" | "employeeId" | "absenceType" | "requiredPeriods" | "attendedPeriods" | "notes")}
               />
 
               <Input
                 type="time"
-                {...register(
-                  "checkOut"
-                )}
+                {...register("checkOut" as "employeeName" | "date" | "status" | "id" | "role" | "employeeId" | "absenceType" | "requiredPeriods" | "attendedPeriods" | "notes")}
               />
             </>
           )}

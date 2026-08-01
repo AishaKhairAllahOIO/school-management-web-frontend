@@ -689,11 +689,10 @@ export function StudentEditPage() {
       ["guardian"],
     );
 
-  const enrollmentData =
-    getProfileSection(
-      profileQuery.data,
-      ["enrollment"],
-    );
+  const _enrollmentData = getProfileSection(
+    profileQuery.data,
+    ["enrollment"],
+  );
 
   const isSaving =
     studentMutation.isPending;

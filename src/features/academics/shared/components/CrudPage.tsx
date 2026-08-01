@@ -1391,11 +1391,12 @@ function EditorDialog<
 
           <div className="grid gap-4 md:grid-cols-2">
             {fields.map((field) => {
-              const disabled =
+              const disabled = Boolean(
                 isSubmitting ||
                 isLoading ||
                 (isEdit &&
-                  field.disabledOnEdit);
+                  field.disabledOnEdit)
+              );
 
               return (
                 <label

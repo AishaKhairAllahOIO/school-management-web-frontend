@@ -769,7 +769,7 @@ function PersonFormSection({
   );
 }
 
-function ReviewRow({
+function _ReviewRow({
   label,
   completed,
 }: {
@@ -793,10 +793,7 @@ function ReviewRow({
         ].join(" ")}
       >
         {completed ? (
-          <Check
-            size={11}
-            strokeWidth={2}
-          />
+          <span className="text-emerald-600">✓</span>
         ) : null}
 
         {completed
