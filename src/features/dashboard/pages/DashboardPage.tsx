@@ -1,4 +1,4 @@
-import { useCurrentUser } from "@/app/layouts/hooks/useCurrentUser";
+import { useCurrentUser } from "@/app/layout/hooks/useCurrentUser";
 import { AdviserDashboard } from "@/features/dashboard/adviser/AdviserDashboard";
 import {
   DashboardLoadingState,

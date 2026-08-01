@@ -8,8 +8,10 @@ export type TopbarMenuProps = {
 
 export type ProfileMenuItemProps = {
   title: string;
+  description?: string;
   icon: LucideIcon;
   onClick?: () => void;
+  tone?: "default" | "primary";
 };
 
 export type UserRoleSource = {

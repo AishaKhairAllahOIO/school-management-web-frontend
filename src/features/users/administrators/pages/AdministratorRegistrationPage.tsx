@@ -4,7 +4,7 @@ import {
 
 import {
   useCurrentUser,
-} from "@/app/layouts/hooks/useCurrentUser";
+} from "@/app/layout/hooks/useCurrentUser";
 
 import {
   StaffRegistrationPage,

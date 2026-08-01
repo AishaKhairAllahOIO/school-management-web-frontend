@@ -4,8 +4,8 @@ import {
   X,
 } from "lucide-react";
 
-import { SidebarMenu } from "@/app/layouts/components/SidebarMenu";
-import { useLayoutStore } from "@/app/layouts/store/layoutStore";
+import { SidebarMenu } from "@/app/layout/components/sidebar/SidebarMenu";
+import { useLayoutStore } from "@/app/layout/store/layoutStore";
 import { useLocale } from "@/app/providers/locale";
 
 function formatMobileSidebarDate(locale: string) {

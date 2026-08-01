@@ -4,8 +4,8 @@ import {
   useLocation,
 } from "react-router-dom";
 
-import { sidebarItems } from "@/app/layouts/config/sidebarItems";
-import type { SidebarItem } from "@/app/layouts/types/sidebar.types";
+import { sidebarItems } from "@/app/layout/config/sidebarItems";
+import type { SidebarItem } from "@/app/layout/types/sidebar.types";
 import { useLocale } from "@/app/providers/locale";
 
 type SidebarMenuProps = {

@@ -1,12 +1,12 @@
 import { Bell } from "lucide-react";
 import { useRef } from "react";
 
-import { useNotifications } from "@/app/layouts/hooks/useNotifications";
+import { useNotifications } from "@/app/layout/hooks/useNotifications";
 import { useLocale } from "@/app/providers/locale";
 import { useDismissibleLayer } from "@/shared/hooks/use-dismissible-layer";
 
 import { TOPBAR_ICON_BUTTON_CLASS_NAME } from "./topbar.constants";
-import type { TopbarMenuProps } from "./topbar.types";
+import type { TopbarMenuProps } from "../topbar/topbar.types";
 
 export function NotificationsMenu({
   isOpen,

@@ -7,19 +7,19 @@ import {
 
 import { useLocation } from "react-router-dom";
 
-import { useLayoutStore } from "@/app/layouts/store/layoutStore";
+import { useLayoutStore } from "@/app/layout/store/layoutStore";
 import { useLocale } from "@/app/providers/locale";
 
 import { LanguageToggle } from "@/shared/components/locale";
 
-import { NotificationsMenu } from "./topbar/NotificationsMenu";
-import { ProfileMenu } from "./topbar/ProfileMenu";
-import { ThemeButton } from "./topbar/ThemeButton";
-import { TopbarBreadcrumb } from "./topbar/TopbarBreadcrumb";
+import { NotificationsMenu } from "./NotificationsMenu";
+import { ProfileMenu } from "./profile/ProfileMenu";
+import { ThemeButton } from "./ThemeButton";
+import { TopbarBreadcrumb } from "./TopbarBreadcrumb";
 
 import {
   TOPBAR_ICON_BUTTON_CLASS_NAME,
-} from "./topbar/topbar.constants";
+} from "./topbar.constants";
 
 export function Topbar() {
   const location = useLocation();

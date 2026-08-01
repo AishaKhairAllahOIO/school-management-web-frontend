@@ -1,10 +1,10 @@
 import { Outlet } from "react-router-dom";
 
-import { MobileSidebar } from "@/app/layouts/components/MobileSidebar";
-import { Sidebar } from "@/app/layouts/components/Sidebar";
-import { SubNavigation } from "@/app/layouts/components/SubNavigation";
-import { Topbar } from "@/app/layouts/components/Topbar";
-import { useLayoutStore } from "@/app/layouts/store/layoutStore";
+import { MobileSidebar } from "@/app/layout/components/sidebar/MobileSidebar";
+import { Sidebar } from "@/app/layout/components/sidebar/Sidebar";
+import { SubNavigation } from "@/app/layout/components/navigation/SubNavigation";
+import { Topbar } from "@/app/layout/components/topbar/Topbar";
+import { useLayoutStore } from "@/app/layout/store/layoutStore";
 import { useLocale } from "@/app/providers/locale";
 
 export function AppLayout() {
