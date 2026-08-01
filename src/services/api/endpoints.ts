@@ -244,7 +244,7 @@ export const API_ENDPOINTS = {
     ACTIVITIES: "/auth/activities/all",
     ACTIVITY: (id: ApiId) =>
       `/auth/activity/${id}`,
-    CREATE_ACTIVITY: "/api/auth/activity",
+    CREATE_ACTIVITY: "/auth/activity",
     UPDATE_ACTIVITY: (id: ApiId) =>
       `/auth/activity/update/${id}`,
 

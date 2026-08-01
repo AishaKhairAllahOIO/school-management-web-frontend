@@ -218,6 +218,19 @@ export function Sidebar() {
               "
             />
 
+           <div
+  aria-hidden="true"
+  className="
+    pointer-events-none
+    absolute
+    inset-x-3.5
+    inset-y-[11px]
+    rounded-[18px]
+    bg-sidebar-foreground/[0.105]
+    shadow-[0_10px_26px_rgb(0_0_0_/_0.14)]
+  "
+/>
+
             {/* Workspace information */}
             <div
               className={[
@@ -388,14 +401,10 @@ export function Sidebar() {
           {/* Push View Website to the bottom */}
           <div className="min-h-4 flex-1" />
 
-          {/* Premium website card */}
+          {/* School website */}
           <div
             className={[
               "shrink-0",
-              /*
-               * رفع البطاقة عن أسفل السايد بار:
-               * زِد القيمة إلى pb-10 إذا أردتها أعلى أكثر.
-               */
               "pb-8",
               isCollapsed ? "px-0" : "px-0.5",
             ].join(" ")}
@@ -407,37 +416,12 @@ export function Sidebar() {
               aria-label="View website"
               title="View website"
               className={[
-                "group relative flex overflow-hidden",
-                "items-center",
-                "border border-sidebar-foreground/[0.11]",
-                "bg-gradient-to-br",
-                "from-sidebar-foreground/[0.085]",
-                "via-sidebar-foreground/[0.045]",
-                "to-sidebar-active/[0.085]",
-                "text-sidebar-muted",
-                "shadow-[0_14px_36px_rgb(0_0_0_/_0.16)]",
-                "backdrop-blur-2xl",
-                "transition-all duration-300 ease-out",
-                "before:pointer-events-none",
-                "before:absolute before:inset-x-3",
-                "before:top-0 before:h-px",
-                "before:bg-gradient-to-r",
-                "before:from-transparent",
-                "before:via-sidebar-foreground/30",
-                "before:to-transparent",
-                "after:pointer-events-none",
-                "after:absolute after:-end-6 after:-top-8",
-                "after:h-20 after:w-20",
-                "after:rounded-full",
-                "after:bg-sidebar-active/15",
-                "after:blur-2xl",
-                "hover:-translate-y-1",
-                "hover:border-sidebar-foreground/[0.20]",
-                "hover:from-sidebar-foreground/[0.12]",
-                "hover:via-sidebar-foreground/[0.07]",
-                "hover:to-sidebar-active/[0.13]",
-                "hover:text-sidebar-foreground",
-                "hover:shadow-[0_18px_42px_rgb(0_0_0_/_0.22)]",
+                "group flex items-center",
+                "bg-sidebar-foreground/[0.105]",
+                "text-sidebar-foreground",
+                "shadow-[0_10px_26px_rgb(0_0_0_/_0.14)]",
+                "transition-all duration-200",
+                "hover:bg-sidebar-foreground/[0.13]",
                 "focus-visible:outline-none",
                 "focus-visible:ring-2",
                 "focus-visible:ring-sidebar-foreground/25",
@@ -455,20 +439,10 @@ export function Sidebar() {
                     ].join(" "),
               ].join(" ")}
             >
-              {/* Single website icon */}
               <span
                 className={[
-                  "relative z-10",
                   "flex shrink-0 items-center justify-center",
-                  "rounded-[12px]",
-                  "border border-sidebar-foreground/[0.08]",
-                  "bg-sidebar-foreground/[0.09]",
                   "text-sidebar-foreground/90",
-                  "shadow-[inset_0_1px_0_rgb(255_255_255_/_0.08)]",
-                  "transition-all duration-300",
-                  "group-hover:scale-[1.04]",
-                  "group-hover:bg-sidebar-foreground/[0.14]",
-                  "group-hover:text-sidebar-foreground",
                   isCollapsed
                     ? "h-8 w-8"
                     : "h-[34px] w-[34px]",
@@ -484,8 +458,6 @@ export function Sidebar() {
               {!isCollapsed && (
                 <span
                   className="
-                    relative
-                    z-10
                     ms-3
                     min-w-0
                     flex-1
