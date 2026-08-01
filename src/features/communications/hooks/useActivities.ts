@@ -55,7 +55,7 @@ export function useActivities() {
   const updateActivityMutation = useMutation({
     mutationFn: ({ id, payload }: { id: string | number; payload: Partial<ActivityPayload> }) =>
       communicationService.updateActivity(id, payload),
-    onSuccess: (response, variables) => {
+    onSuccess: (_, variables) => {
 
       queryClient.setQueryData(["activities"], (oldData: any[] = []) =>
         oldData.map((item) =>

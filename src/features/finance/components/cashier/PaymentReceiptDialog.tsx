@@ -6,46 +6,30 @@ import {
   DialogTitle,
 } from "@/shared/ui/dialog";
 
-import { PaymentForm } from "./PaymentForm";
-import type { PaymentFormValues } from "../../schemas/payment.schema";
-
-type Option = { id: number | string; name: string };
-
 type Props = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  students: Option[];
-  isLoading?: boolean;
-  onSubmit: (values: PaymentFormValues) => void;
+  paymentId?: string | number | null;
 };
 
-export function ProcessPaymentDialog({
+export function PaymentReceiptDialog({
   open,
   onOpenChange,
-  students,
-  isLoading,
-  onSubmit,
+  paymentId,
 }: Props) {
-  
-  function handleSubmit(values: PaymentFormValues) {
-    onSubmit(values);
-  }
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-xl">
         <DialogHeader>
-          <DialogTitle>Process New Payment</DialogTitle>
+          <DialogTitle>Payment Receipt</DialogTitle>
           <DialogDescription>
-            Record a new payment receipt for a student and update their remaining balance.
+            View the details of payment receipt {paymentId ?? ""}.
           </DialogDescription>
         </DialogHeader>
 
-        <PaymentForm
-          students={students}
-          isLoading={isLoading}
-          onSubmit={handleSubmit}
-        />
+        <div className="rounded-[16px] border border-border/60 bg-muted/20 p-4 text-sm text-muted-foreground">
+          Receipt details will be shown here once the backend endpoint is wired.
+        </div>
       </DialogContent>
     </Dialog>
   );

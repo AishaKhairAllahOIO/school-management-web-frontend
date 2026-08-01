@@ -1,5 +1,5 @@
 import { axiosClient } from "@/services/axios/axiosClient";
-import { API_ENDPOINTS } from "@/services/api/endpoints"; // 👈 استيراد مساراتك المركزية
+import { API_ENDPOINTS } from "@/services/api/endpoints";
 import type {
   Activity,
   ActivityPayload,
@@ -9,6 +9,27 @@ import type {
   AdvisorAlertPayload,
   StaffAlertPayload,
 } from "../types/communication.types";
+
+const normalizeIds = (ids?: Array<string | number>) =>
+  (ids ?? []).map((id) => Number(id)).filter((id) => Number.isFinite(id));
+
+const normalizePayload = (payload: unknown) => {
+  const normalized = { ...(payload as Record<string, unknown>) };
+
+  if (Array.isArray((normalized as any).class_room_ids)) {
+    (normalized as any).class_room_ids = normalizeIds((normalized as any).class_room_ids);
+  }
+
+  if (Array.isArray((normalized as any).staff_ids)) {
+    (normalized as any).staff_ids = normalizeIds((normalized as any).staff_ids);
+  }
+
+  if (Array.isArray((normalized as any).enrollement_ids)) {
+    (normalized as any).enrollement_ids = normalizeIds((normalized as any).enrollement_ids);
+  }
+
+  return normalized;
+};
 
 export const communicationService = {
   // ==========================================
@@ -24,13 +45,13 @@ export const communicationService = {
     return response.data?.data ?? response.data;
   },
 
-  createActivity: async (payload: any) => {
-    const response = await axiosClient.post(API_ENDPOINTS.COMMUNICATIONS.CREATE_ACTIVITY, payload);
+  createActivity: async (payload: ActivityPayload) => {
+    const response = await axiosClient.post(API_ENDPOINTS.COMMUNICATIONS.CREATE_ACTIVITY, normalizePayload(payload));
     return response.data;
   },
 
   updateActivity: async (id: string | number, payload: Partial<ActivityPayload>) => {
-    const response = await axiosClient.post(API_ENDPOINTS.COMMUNICATIONS.UPDATE_ACTIVITY(id), payload);
+    const response = await axiosClient.post(API_ENDPOINTS.COMMUNICATIONS.UPDATE_ACTIVITY(id), normalizePayload(payload));
     return response.data;
   },
 
@@ -54,16 +75,15 @@ deleteActivity: async (id: string | number) => {
   },
 
 
-  createAnnouncement: async (payload: any) => {
-    // استخدمنا CREATE_ANNOUNCEMENT أو ANNOUNCEMENTS حسب ما عرفناه في ملف endpoints
-    const response = await axiosClient.post(API_ENDPOINTS.COMMUNICATIONS.CREATE_ANNOUNCEMENT, payload);
+  createAnnouncement: async (payload: AnnouncementPayload) => {
+    const response = await axiosClient.post(API_ENDPOINTS.COMMUNICATIONS.CREATE_ANNOUNCEMENT, normalizePayload(payload));
     return response.data;
   },
   
  
 
   updateAnnouncement: async (id: string | number, payload: Partial<AnnouncementPayload>) => {
-    const response = await axiosClient.post(API_ENDPOINTS.COMMUNICATIONS.UPDATE_ANNOUNCEMENT(id), payload);
+    const response = await axiosClient.post(API_ENDPOINTS.COMMUNICATIONS.UPDATE_ANNOUNCEMENT(id), normalizePayload(payload));
     return response.data;
   },
 
@@ -76,17 +96,17 @@ deleteActivity: async (id: string | number) => {
   // 3. خدمات التنبيهات الجماعية (Bulk Alerts Services)
   // ==========================================
   sendPaymentAlert: async (payload: PaymentAlertPayload) => {
-    const response = await axiosClient.post(API_ENDPOINTS.COMMUNICATIONS.PAYMENT_ALERTS, payload);
+    const response = await axiosClient.post(API_ENDPOINTS.COMMUNICATIONS.PAYMENT_ALERTS, normalizePayload(payload));
     return response.data;
   },
 
   sendAdvisorAlert: async (payload: AdvisorAlertPayload) => {
-    const response = await axiosClient.post(API_ENDPOINTS.COMMUNICATIONS.ADVISOR_ALERTS, payload);
+    const response = await axiosClient.post(API_ENDPOINTS.COMMUNICATIONS.ADVISOR_ALERTS, normalizePayload(payload));
     return response.data;
   },
 
   sendStaffAlert: async (payload: StaffAlertPayload) => {
-    const response = await axiosClient.post(API_ENDPOINTS.COMMUNICATIONS.STAFF_ALERTS, payload);
+    const response = await axiosClient.post(API_ENDPOINTS.COMMUNICATIONS.STAFF_ALERTS, normalizePayload(payload));
     return response.data;
   },
 
