@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Calendar, Clock, Loader2, Sparkles, MapPin } from "lucide-react";
+import { Calendar, Clock, Loader2, Sparkles} from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -65,33 +65,49 @@ export function CreateActivityDialog({
     }
   }, [activityToEdit, open]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+ const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!gradeLevelId) {
       alert("الرجاء تحديد المرحلة الدراسية.");
       return;
     }
 
-    const payload = {
-      activity_name: activityName,
-      type,
+     const payload: any = {
+      activity_name: activityName.trim(),
+      type: type.trim(),
       activity_date: activityDate,
       start_time: startTime,
       end_time: endTime,
-      grade_level_id: gradeLevelId,
-      class_room_ids: selectedClassRoomIds,
-      description,
+      grade_level_id: Number(gradeLevelId),  
     };
 
-    if (isEditing && activityToEdit) {
+     if (selectedClassRoomIds.length > 0) {
+      payload.class_room_ids = selectedClassRoomIds.map((id) => Number(id));
+    }
 
+    // if (description.trim()) {
+    //   payload.description = description.trim();
+    // }
+
+    if (isEditing && activityToEdit) {
       updateActivity.mutate(
         { id: activityToEdit.id, payload },
-        { onSuccess: handleSuccess }
+        { 
+          onSuccess: handleSuccess,
+          onError: (err: any) => {
+            console.error("Update Activity Error:", err?.response?.data || err);
+            alert(err?.response?.data?.message || "فشل في تعديل النشاط.");
+          }
+        }
       );
     } else {
-
-      createActivity.mutate(payload, { onSuccess: handleSuccess });
+      createActivity.mutate(payload, { 
+        onSuccess: handleSuccess,
+        onError: (err: any) => {
+          console.error("Create Activity Error:", err?.response?.data || err);
+          alert(err?.response?.data?.message || "فشل في إنشاء النشاط.");
+        }
+      });
     }
   };
 

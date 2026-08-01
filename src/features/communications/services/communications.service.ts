@@ -24,7 +24,7 @@ export const communicationService = {
     return response.data?.data ?? response.data;
   },
 
-  createActivity: async (payload: ActivityPayload) => {
+  createActivity: async (payload: any) => {
     const response = await axiosClient.post(API_ENDPOINTS.COMMUNICATIONS.CREATE_ACTIVITY, payload);
     return response.data;
   },
@@ -34,8 +34,9 @@ export const communicationService = {
     return response.data;
   },
 
-  deleteActivity: async (id: string | number) => {
-    const response = await axiosClient.delete(API_ENDPOINTS.COMMUNICATIONS.ACTIVITY(id));
+deleteActivity: async (id: string | number) => {
+
+  const response = await axiosClient.delete(API_ENDPOINTS.COMMUNICATIONS.DELETE_ACTIVITY(id));
     return response.data;
   },
 
@@ -52,10 +53,14 @@ export const communicationService = {
     return response.data?.data ?? response.data ?? [];
   },
 
-  createAnnouncement: async (payload: AnnouncementPayload) => {
-    const response = await axiosClient.post(API_ENDPOINTS.COMMUNICATIONS.ANNOUNCEMENTS, payload);
+
+  createAnnouncement: async (payload: any) => {
+    // استخدمنا CREATE_ANNOUNCEMENT أو ANNOUNCEMENTS حسب ما عرفناه في ملف endpoints
+    const response = await axiosClient.post(API_ENDPOINTS.COMMUNICATIONS.CREATE_ANNOUNCEMENT, payload);
     return response.data;
   },
+  
+ 
 
   updateAnnouncement: async (id: string | number, payload: Partial<AnnouncementPayload>) => {
     const response = await axiosClient.post(API_ENDPOINTS.COMMUNICATIONS.UPDATE_ANNOUNCEMENT(id), payload);

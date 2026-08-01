@@ -54,7 +54,7 @@ export function CreateAnnouncementDialog({
     }
   }, [announcementToEdit, open]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+ const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
     if (audience === "student" && !gradeLevelId) {
@@ -62,23 +62,46 @@ export function CreateAnnouncementDialog({
       return;
     }
 
-     const payload = {
+
+    const payload: any = {
       audience,
-      title,
-      description,
-      ...(audience === "student" && {
-        grade_level_id: gradeLevelId,
-        class_room_ids: selectedClassRoomIds,
-      }),
+      title: title.trim(),
+      description: description.trim(),
     };
 
+
+    if (audience === "student") {
+      payload.grade_level_id = Number(gradeLevelId);  
+      
+
+      if (selectedClassRoomIds.length > 0) {
+        payload.class_room_ids = selectedClassRoomIds.map((id) => Number(id));
+      }
+    }
+
     if (isEditing && announcementToEdit) {
-       updateAnnouncement.mutate(
+      updateAnnouncement.mutate(
         { id: announcementToEdit.id, payload },
-        { onSuccess: handleSuccess }
+        { 
+          onSuccess: handleSuccess,
+          onError: (err: any) => {
+            console.error("Update Announcement Error:", err?.response?.data || err);
+            alert(err?.response?.data?.message || "فشل في تعديل الإعلان.");
+          }
+        }
       );
     } else {
-      createAnnouncement.mutate(payload, { onSuccess: handleSuccess });
+      createAnnouncement.mutate(payload, { 
+        onSuccess: handleSuccess,
+        onError: (err: any) => {
+
+          console.error("Create Announcement Error:", err?.response?.data || err);
+          const backendMessage = err?.response?.data?.message;
+          const backendErrors = err?.response?.data?.errors;
+          const firstError = backendErrors ? Object.values(backendErrors)[0] : null;
+          alert(firstError || backendMessage || "فشل في نشر الإعلان. افتح الـ Console لمعرفة السبب الدقيق.");
+        }
+      });
     }
   };
 

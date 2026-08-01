@@ -42,12 +42,36 @@ export function SendBulkAlertDialog({
   const [minutesLate, setMinutesLate] = useState<string>("15");
   const [monthName, setMonthName] = useState<string>("June 2026");
 
-  const handleSubmit = (e: React.FormEvent) => {
+
+  const handleSuccess = () => {
+    alert("✅ تم إرسال التنبيهات الجماعية بنجاح!");
+    setSelectedIds([]);
+    onOpenChange(false);
+  };
+
+
+
+   const handleError = (err: any) => {
+    console.error("❌ Alert Error Details:", err?.response?.data || err);
+    const backendMessage = err?.response?.data?.message;
+    const backendErrors = err?.response?.data?.errors;
+    
+    const exactValidationError = backendErrors ? Object.values(backendErrors).flat()[0] : null;
+    
+    alert(`❌ رفض الباك إند الإرسال والسبب:\n\n[ ${exactValidationError || backendMessage || "خطأ غير معروف"} ]`);
+  };
+
+const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (selectedIds.length === 0) {
-      alert("الرجاء اختيار شخص واحد على الأقل لإرسال التنبيه.");
+      alert("الرجاء اختيار شخص واحد على الأقل.");
       return;
     }
+
+
+    const numericIds = selectedIds.map((id) => Number(id));
+    const targetId = numericIds.length === 1 ? numericIds[0] : numericIds;
+
 
     if (targetAudience === "staff") {
       if (alertType === "salary" || alertType === "absence" || alertType === "late") {
@@ -55,58 +79,59 @@ export function SendBulkAlertDialog({
           {
             audience: "staff",
             type: alertType as "salary" | "absence" | "late",
-            staff_ids: selectedIds,
+            staff_id: targetId,   
             meta:
               alertType === "salary"
-                ? { amount: Number(amount) || 0, mounth: monthName }
+                ? { amount: Number(amount) || 0, mounth: monthName || "غير محدد" }
                 : alertType === "late"
-                ? { session: sessionName, minutes_late: Number(minutesLate) || 0 }
+                ? { session: sessionName || "غير محدد", minutes_late: Number(minutesLate) || 0 }
                 : undefined,
-          },
-          { onSuccess: handleSuccess }
+          } as any,
+          { onSuccess: handleSuccess, onError: handleError }
         );
       }
       return;
     }
+
 
     if (alertType === "payed" || alertType === "payment") {
       sendPaymentAlert.mutate(
         {
           audience: "student",
           type: alertType,
-          enrollement_ids: selectedIds,
+
+          enrollement_id: targetId, 
           meta:
             alertType === "payed"
               ? { amount: Number(amount) || 0 }
-              : { amount_due: Number(amount) || 0, due_date: dueDate },
-        },
-        { onSuccess: handleSuccess }
+              : { amount_due: Number(amount) || 0, due_date: dueDate || new Date().toISOString().split('T')[0] },
+        } as any,
+        { onSuccess: handleSuccess, onError: handleError }
       );
       return;
     }
+
+     
+    const advisorKey = (alertType === "escape") 
+                        ? "enrollement_id"  
+                        : "enrollment_id";  
 
     sendAdvisorAlert.mutate(
       {
         audience: "student",
         type: alertType as "behavior" | "escape" | "late" | "absence",
-        enrollement_ids: selectedIds,
+        [advisorKey]: targetId,  
         meta:
           alertType === "behavior"
             ? { severity }
             : alertType === "escape"
-            ? { session: sessionName }
+            ? { session: sessionName || "غير محدد" }
             : alertType === "late"
-            ? { session: sessionName, minutes_late: Number(minutesLate) || 0 }
+            ? { session: sessionName || "غير محدد", minutes_late: Number(minutesLate) || 0 }
             : undefined,
-      },
-      { onSuccess: handleSuccess }
+      } as any,
+      { onSuccess: handleSuccess, onError: handleError }
     );
-  };
-
-  const handleSuccess = () => {
-    alert("تم إرسال التنبيهات بنجاح!");
-    setSelectedIds([]);
-    onOpenChange(false);
   };
 
   return (
@@ -155,7 +180,6 @@ export function SendBulkAlertDialog({
             </select>
           </div>
 
-          {/* Dynamic Meta Form Container */}
           <div className="p-3.5 bg-muted/50 rounded-xl border border-border space-y-3 animate-in fade-in duration-200">
             {(alertType === "salary" || alertType === "payment" || alertType === "payed") && (
               <div>
@@ -220,7 +244,7 @@ export function SendBulkAlertDialog({
                   type="text"
                   value={sessionName}
                   onChange={(e) => setSessionName(e.target.value)}
-                  placeholder="مثال: Math Session"
+                  placeholder="مثال: رياضيات"
                   required
                   className="w-full rounded-lg border border-input p-2 text-sm bg-card text-foreground focus:ring-1 focus:ring-ring outline-none"
                 />
