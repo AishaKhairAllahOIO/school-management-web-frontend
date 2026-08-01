@@ -1,32 +1,30 @@
-import { ArrowRight, Sparkles } from "lucide-react";
+import { ArrowRight, FileBarChart2 } from "lucide-react";
 
 export function ReportAnalyticsCard({ onCreate }: { onCreate: () => void }) {
   return (
-    <section className="relative overflow-hidden rounded-[24px] border border-primary/15 bg-gradient-to-br from-primary/[0.10] via-card to-info/[0.08] p-5 shadow-[0_16px_42px_rgba(75,55,170,0.09)]">
-      <div aria-hidden className="absolute -end-12 -top-12 h-40 w-40 rounded-full bg-primary/15 blur-3xl" />
-      <div aria-hidden className="absolute -bottom-16 start-1/4 h-32 w-32 rounded-full bg-info/10 blur-3xl" />
+    <section className="rounded-[22px] border border-border/60 bg-card px-5 py-4 shadow-[0_8px_28px_rgba(30,20,70,0.035)]">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex min-w-0 items-start gap-3.5">
+          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[14px] border border-primary/10 bg-primary/[0.07] text-primary">
+            <FileBarChart2 aria-hidden="true" size={20} strokeWidth={1.8} />
+          </span>
 
-      <div className="relative flex h-full flex-col">
-        <span className="flex h-10 w-10 items-center justify-center rounded-[13px] bg-card/80 text-primary shadow-sm backdrop-blur-xl">
-          <Sparkles aria-hidden="true" size={18} strokeWidth={1.8} />
-        </span>
-
-        <p className="mt-5 text-[11px] font-semibold uppercase tracking-[0.12em] text-primary/80">
-          Reports workspace
-        </p>
-        <h2 className="mt-2 max-w-[360px] text-[22px] font-semibold leading-[28px] tracking-[-0.035em] text-foreground">
-          Turn school operations into decisions.
-        </h2>
-        <p className="mt-2 max-w-md text-[12px] leading-5 text-muted-foreground">
-          Build focused exports across students, academics, attendance, staff, finance and communications.
-        </p>
+          <div className="min-w-0">
+            <h1 className="text-[18px] font-semibold tracking-[-0.025em] text-foreground">
+              Reports workspace
+            </h1>
+            <p className="mt-1 max-w-[720px] text-[12px] leading-5 text-muted-foreground">
+              Find, configure and export focused school reports from one clear workspace.
+            </p>
+          </div>
+        </div>
 
         <button
           type="button"
           onClick={onCreate}
-          className="mt-6 inline-flex h-10 w-fit items-center gap-2 rounded-[13px] border border-primary/20 bg-card/85 px-4 text-[12px] font-semibold text-primary shadow-sm transition-all hover:-translate-y-0.5 hover:bg-card focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/10"
+          className="inline-flex h-10 shrink-0 items-center justify-center gap-2 rounded-[13px] border border-primary/25 bg-transparent px-4 text-[12px] font-semibold text-primary transition-colors hover:bg-primary/[0.055] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/10"
         >
-          Create a report
+          Create report
           <ArrowRight aria-hidden="true" size={15} strokeWidth={1.8} />
         </button>
       </div>

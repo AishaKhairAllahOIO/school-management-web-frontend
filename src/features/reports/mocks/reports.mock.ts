@@ -76,6 +76,7 @@ export const reportsMock: ReportsResponse = {
   templates: [
     {
       id: "student-enrollment",
+      permission: "reports.students.view",
       category: "Students",
       title: "Enrollment & Student Directory",
       description: "Enrollment distribution by academic year, grade, classroom and account status.",
@@ -87,6 +88,7 @@ export const reportsMock: ReportsResponse = {
     },
     {
       id: "student-guardians",
+      permission: "reports.students.view",
       category: "Students",
       title: "Guardian & Contact Directory",
       description: "Guardian contacts, linked students and household information for administration.",
@@ -97,6 +99,7 @@ export const reportsMock: ReportsResponse = {
     },
     {
       id: "student-progress",
+      permission: "reports.students.view",
       category: "Students",
       title: "Student Progress Overview",
       description: "A consolidated view of student academic movement and current enrollment context.",
@@ -107,6 +110,7 @@ export const reportsMock: ReportsResponse = {
     },
     {
       id: "academic-performance",
+      permission: "reports.academics.view",
       category: "Academics",
       title: "Academic Performance",
       description: "Grade, subject and assessment results with classroom-level comparisons.",
@@ -118,6 +122,7 @@ export const reportsMock: ReportsResponse = {
     },
     {
       id: "curriculum-coverage",
+      permission: "reports.academics.view",
       category: "Academics",
       title: "Curriculum Coverage",
       description: "Subject assignment coverage across grades and academic stages.",
@@ -128,6 +133,7 @@ export const reportsMock: ReportsResponse = {
     },
     {
       id: "teacher-workload",
+      permission: "reports.academics.view",
       category: "Academics",
       title: "Teacher Workload & Assignments",
       description: "Assigned periods, remaining capacity, subjects and classroom responsibilities.",
@@ -138,6 +144,7 @@ export const reportsMock: ReportsResponse = {
     },
     {
       id: "student-attendance",
+      permission: "reports.attendance.view",
       category: "Attendance",
       title: "Student Attendance Analysis",
       description: "Present, absent, excused and unexcused trends by grade, classroom and advisor.",
@@ -149,6 +156,7 @@ export const reportsMock: ReportsResponse = {
     },
     {
       id: "staff-attendance",
+      permission: "reports.attendance.view",
       category: "Attendance",
       title: "Staff Attendance & Vacations",
       description: "Attendance records, absence types and vacation periods across staff roles.",
@@ -159,6 +167,7 @@ export const reportsMock: ReportsResponse = {
     },
     {
       id: "absence-risk",
+      permission: "reports.attendance.view",
       category: "Attendance",
       title: "Absence Risk Watchlist",
       description: "Students and employees approaching configured absence thresholds.",
@@ -169,6 +178,7 @@ export const reportsMock: ReportsResponse = {
     },
     {
       id: "staff-directory",
+      permission: "reports.staff.view",
       category: "Staff",
       title: "Staff Directory",
       description: "Teachers, supervisors, secretaries, counselors and service staff profiles.",
@@ -179,6 +189,7 @@ export const reportsMock: ReportsResponse = {
     },
     {
       id: "payroll-summary",
+      permission: "reports.payroll.view",
       category: "Staff",
       title: "Payroll Summary",
       description: "Salary cycles, processed payroll and staff payment breakdowns.",
@@ -190,6 +201,7 @@ export const reportsMock: ReportsResponse = {
     },
     {
       id: "fee-collection",
+      permission: "reports.finance.view",
       category: "Finance",
       title: "Fee Collection & Outstanding Balances",
       description: "Collected tuition, remaining balances, overdue installments and collection rate.",
@@ -201,6 +213,7 @@ export const reportsMock: ReportsResponse = {
     },
     {
       id: "student-contracts",
+      permission: "reports.finance.view",
       category: "Finance",
       title: "Student Contracts",
       description: "Financial agreements, fee plans, extra services and contract totals.",
@@ -211,6 +224,7 @@ export const reportsMock: ReportsResponse = {
     },
     {
       id: "installment-aging",
+      permission: "reports.finance.view",
       category: "Finance",
       title: "Installment Aging",
       description: "Upcoming, paid and overdue installments grouped by due period.",
@@ -221,6 +235,7 @@ export const reportsMock: ReportsResponse = {
     },
     {
       id: "communication-activity",
+      permission: "reports.communications.view",
       category: "Communications",
       title: "Announcements & Activities",
       description: "Published announcements, school activities and audience reach summaries.",
@@ -232,6 +247,7 @@ export const reportsMock: ReportsResponse = {
     },
     {
       id: "notification-delivery",
+      permission: "reports.communications.view",
       category: "Communications",
       title: "Notification Delivery",
       description: "Payment, advisor and staff alert volume with delivery and engagement indicators.",
@@ -242,6 +258,7 @@ export const reportsMock: ReportsResponse = {
     },
     {
       id: "school-calendar",
+      permission: "reports.communications.view",
       category: "Communications",
       title: "School Calendar Summary",
       description: "Activities, holidays, examinations and scheduled school events.",

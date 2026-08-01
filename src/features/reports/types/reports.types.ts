@@ -31,6 +31,11 @@ export type ReportTemplate = {
   formats: ReportFormat[];
   filters: string[];
   featured?: boolean;
+  /**
+   * Optional permission key used by the UI before rendering this report.
+   * Connect it later to the application's existing permission checker.
+   */
+  permission?: string;
 };
 
 export type RecentReport = {
