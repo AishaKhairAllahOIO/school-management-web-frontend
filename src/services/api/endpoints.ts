@@ -239,29 +239,36 @@ export const API_ENDPOINTS = {
     PAYMENT: (id: ApiId) =>
       `/admin/finance/contracts/payments/${id}`,
   },
+COMMUNICATIONS: {
 
-  COMMUNICATIONS: {
-    ACTIVITIES: "/auth/activities/all",
-    ACTIVITY: (id: ApiId) =>
-      `/auth/activity/${id}`,
-    CREATE_ACTIVITY: "/auth/activity",
-    UPDATE_ACTIVITY: (id: ApiId) =>
-      `/auth/activity/update/${id}`,
+ CREATE_ACTIVITY: "/activity",
+    UPDATE_ACTIVITY: (id: string | number) => `/activity/update/${id}`,
+    DELETE_ACTIVITY: (id: string | number) => `/activity/${id}`,
+    ACTIVITY: (id: string | number) => `/activity/${id}`, 
+    ACTIVITIES: "/user/my-activities",
+    
+    ANNOUNCEMENTS: "/announcements",
+    CREATE_ANNOUNCEMENT: "/announcements",  
+    UPDATE_ANNOUNCEMENT: (id: string | number) => `/announcement/update/${id}`,
+    DELETE_ANNOUNCEMENT: (id: string | number) => `/announcements/${id}`,
+    MY_ANNOUNCEMENTS: "/staff-announcements",
+    STAFF_ANNOUNCEMENTS: "/staff-announcements",
+    CREATER_ANNOUNCEMENTS: "/creater/show/announcements",
 
-    ANNOUNCEMENTS: "/auth/announcements",
-    MY_ANNOUNCEMENTS:
-      "/auth/creater/show/announcements",
-    STAFF_ANNOUNCEMENTS:
-      "/auth/staff-announcements",
-    UPDATE_ANNOUNCEMENT: (id: ApiId) =>
-      `/auth/announcement/update/${id}`,
-    DELETE_ANNOUNCEMENT: (id: ApiId) =>
-      `/auth/announcements/${id}`,
 
-    PAYMENT_ALERTS: "/auth/payment-alerts",
-    ADVISOR_ALERTS: "/auth/advisor-alerts",
-    STAFF_ALERTS: "/auth/staff-alerts",
-    DELETE_ALERT: (id: ApiId) =>
-      `/auth/alerts/${id}`,
+    PAYMENT_ALERTS: "/payment-alerts",
+    ADVISOR_ALERTS: "/advisor-alerts",
+    STAFF_ALERTS: "/staff-alerts",
+    DELETE_ALERT: (id: string | number) => `/alerts/${id}`,
   },
+
+
+  SCHOOL_LAWS: {
+    GET_ALL: "/auth/school/laws/all/show",
+    GET_ONE: (id: string | number) => `/auth/school/law/one/show/${id}`,
+    CREATE: "/auth/school/law/create",
+    UPDATE: (id: string | number) => `/auth/school/law/update/${id}`,
+    DELETE: (id: string | number) => `/auth/school/law/delete/${id}`,
+  },
+   
 } as const;
