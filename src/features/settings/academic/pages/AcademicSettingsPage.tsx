@@ -8,7 +8,6 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 
-import { AcademicSettingsDangerZone } from "../components/AcademicSettingsDangerZone";
 import { AcademicStagesSection } from "../components/sections/AcademicStagesSection";
 import { AcademicTermsSection } from "../components/sections/AcademicTermsSection";
 import { AcademicYearsSection } from "../components/sections/AcademicYearsSection";
@@ -157,51 +156,65 @@ export function AcademicSettingsPage() {
         ) : null}
       </SettingsWorkspace>
 
-      {activeSection === "schedule" ? (
-        <AcademicSettingsDangerZone />
-      ) : null}
     </div>
   );
 }
 
 function AcademicSettingsLoadingState() {
   return (
-    <div className="mx-auto w-full max-w-[1500px] space-y-6">
-      <div className="rounded-[26px] border border-border/60 bg-card p-6 shadow-soft">
-        <div className="flex items-center gap-4">
-          <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
-            <Loader2
-              size={20}
-              className="animate-spin"
-            />
-          </span>
-
-          <div>
-            <h1 className="text-lg font-semibold text-foreground">
-              Preparing academic workspace
-            </h1>
-
-            <p className="mt-1 text-sm font-normal text-muted-foreground">
-              Loading years, terms, stages and
-              calendar information.
-            </p>
-          </div>
-        </div>
-
-        <div className="mt-6 grid gap-5 lg:grid-cols-[270px_minmax(0,1fr)]">
-          <div className="space-y-3 rounded-[22px] bg-muted/20 p-4">
-            {Array.from({
-              length: 4,
-            }).map((_, index) => (
+    <div className="mx-auto w-full max-w-[1500px]">
+      <div className="grid min-w-0 items-start gap-5 lg:grid-cols-[230px_minmax(0,1fr)]">
+        <aside className="overflow-hidden rounded-[22px] border border-border/60 bg-card p-2.5 shadow-[0_10px_32px_rgba(30,20,70,0.045)]">
+          <div className="space-y-2">
+            {Array.from({ length: 4 }).map((_, index) => (
               <div
                 key={index}
-                className="h-16 animate-pulse rounded-2xl bg-muted"
-              />
+                className="flex items-center gap-3 rounded-[15px] px-3 py-3"
+              >
+                <div className="h-8 w-8 animate-pulse rounded-[11px] bg-muted/70" />
+                <div className="min-w-0 flex-1 space-y-2">
+                  <div className="h-3 w-3/5 animate-pulse rounded bg-muted/75" />
+                  <div className="h-2.5 w-4/5 animate-pulse rounded bg-muted/50" />
+                </div>
+              </div>
             ))}
           </div>
 
-          <div className="min-h-[420px] animate-pulse rounded-[24px] bg-muted/30" />
-        </div>
+          <div className="mt-2 border-t border-border/45 p-3">
+            <div className="h-16 animate-pulse rounded-[14px] bg-muted/45" />
+          </div>
+        </aside>
+
+        <main className="min-w-0 overflow-hidden rounded-[22px] border border-border/60 bg-card p-5 shadow-[0_10px_32px_rgba(30,20,70,0.045)]">
+          <div className="flex items-start justify-between gap-4">
+            <div className="space-y-2">
+              <div className="h-5 w-40 animate-pulse rounded bg-muted/75" />
+              <div className="h-3 w-72 max-w-full animate-pulse rounded bg-muted/50" />
+            </div>
+            <div className="h-10 w-28 animate-pulse rounded-xl bg-muted/65" />
+          </div>
+
+          <div className="mt-5 overflow-hidden rounded-[18px] border border-border/60">
+            <div className="grid grid-cols-6 gap-3 bg-muted/25 px-3 py-3">
+              {Array.from({ length: 6 }).map((_, index) => (
+                <div key={index} className="h-2.5 animate-pulse rounded bg-muted/70" />
+              ))}
+            </div>
+            {Array.from({ length: 5 }).map((_, row) => (
+              <div key={row} className="grid grid-cols-6 gap-3 border-t border-border/40 px-3 py-4">
+                {Array.from({ length: 6 }).map((_, cell) => (
+                  <div key={cell} className="h-3 animate-pulse rounded bg-muted/50" />
+                ))}
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-5 grid gap-3 sm:grid-cols-3">
+            {Array.from({ length: 3 }).map((_, index) => (
+              <div key={index} className="h-28 animate-pulse rounded-[18px] bg-muted/40" />
+            ))}
+          </div>
+        </main>
       </div>
     </div>
   );
@@ -226,7 +239,7 @@ function AcademicSettingsErrorState({
             Academic data is unavailable
           </h1>
 
-          <p className="mt-2 text-sm font-normal leading-6 text-muted-foreground">
+          <p className="mt-2 text-[15px] font-normal leading-6 text-muted-foreground">
             The academic configuration could not
             be retrieved. Check the server
             connection and try again.
@@ -240,7 +253,7 @@ function AcademicSettingsErrorState({
               "mt-5 inline-flex h-11",
               "items-center justify-center gap-2",
               "rounded-xl bg-primary px-6",
-              "text-sm font-medium",
+              "text-[15px] font-medium",
               "text-primary-foreground",
               "shadow-soft transition",
               "hover:bg-primary/90",

@@ -1,16 +1,19 @@
 import { reportsMock } from "../mocks/reports.mock";
-import type { ReportsResponse, ReportType } from "../types/reports.types";
+import type {
+  ReportBuilderSelection,
+  ReportsResponse,
+} from "../types/reports.types";
 
-export const fetchReports = async (): Promise<ReportsResponse> => {
-  await new Promise((resolve) => setTimeout(resolve, 120));
+export async function fetchReports(): Promise<ReportsResponse> {
+  await new Promise((resolve) => setTimeout(resolve, 420));
   return reportsMock;
-};
+}
 
-export const generateReport = async (type: ReportType) => {
-  await new Promise((resolve) => setTimeout(resolve, 120));
+export async function generateReport(selection: ReportBuilderSelection) {
+  await new Promise((resolve) => setTimeout(resolve, 700));
 
   return {
     success: true,
-    message: `${type} report has been queued for generation.`,
+    message: `${selection.template.title} has been queued as ${selection.format}.`,
   };
-};
+}

@@ -1,4 +1,6 @@
 import { ArrowLeft, GraduationCap } from "lucide-react";
+
+import { AuthenticatedUserImage } from "../../../shared/components/AuthenticatedUserImage";
 import type { ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -33,7 +35,7 @@ export function StudentPageHeader({
       <div className="pointer-events-none absolute -right-16 -top-24 h-52 w-52 rounded-full bg-primary opacity-[0.12] blur-3xl" />
       <div className="pointer-events-none absolute -bottom-24 left-1/3 h-44 w-44 rounded-full bg-primary opacity-[0.06] blur-3xl" />
 
-      <div className="relative p-4 sm:p-5">
+      <div className="relative p-4 sm:px-5 sm:py-4">
         {showBackButton ? (
           <button
             type="button"
@@ -48,11 +50,15 @@ export function StudentPageHeader({
         <div className={["flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between", showBackButton ? "mt-3" : ""].join(" ")}>
           <div className="flex min-w-0 items-center gap-3.5">
             {photoUrl ? (
-              <div className="h-14 w-14 shrink-0 overflow-hidden rounded-[16px] border border-primary/20 bg-card shadow-[var(--shadow-card)]">
-                <img src={photoUrl} alt={photoAlt ?? title} className="h-full w-full object-cover" />
+              <div className="h-12 w-12 shrink-0 overflow-hidden rounded-[14px] border border-primary/20 bg-card shadow-[var(--shadow-card)]">
+                <AuthenticatedUserImage
+                  src={photoUrl}
+                  alt={photoAlt ?? title}
+                  className="h-full w-full object-cover"
+                />
               </div>
             ) : (
-              <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[16px] bg-primary text-primary-foreground shadow-[var(--shadow-card)]">
+              <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[14px] bg-primary text-primary-foreground shadow-[var(--shadow-card)]">
                 {icon ?? <GraduationCap className="h-5 w-5" strokeWidth={1.8} />}
               </span>
             )}
@@ -62,7 +68,7 @@ export function StudentPageHeader({
                 <GraduationCap className="h-3 w-3" strokeWidth={1.9} />
                 Student profile
               </span>
-              <h1 className="mt-2 truncate text-2xl font-semibold tracking-[-0.035em] text-foreground">
+              <h1 className="mt-1 truncate text-2xl font-semibold tracking-[-0.035em] text-foreground">
                 {title}
               </h1>
               {description ? (

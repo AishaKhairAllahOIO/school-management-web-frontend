@@ -2,6 +2,16 @@ import {
   BriefcaseBusiness,
 } from "lucide-react";
 
+import { DatePicker } from "@/shared/ui/date-picker";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/shared/ui/select";
+
+
 import {
   StaffFormField,
 } from "../fields/StaffFormField";
@@ -62,45 +72,26 @@ export function StaffEmploymentFormSection({
       <div className="grid gap-x-5 gap-y-5 md:grid-cols-2">
 
         <StaffFormField label="Degree">
-          <select
-            disabled={disabled}
+          <Select
             value={values.degree ?? "none"}
-            onChange={(e) =>
-              updateValue(
-                "degree",
-                e.target.value as StaffDegree,
-              )
+            disabled={disabled}
+            onValueChange={(value) =>
+              updateValue("degree", value as StaffDegree)
             }
-            className={fieldClassName}
           >
-            <option value="none">
-              None
-            </option>
-
-            <option value="student">
-              Student
-            </option>
-
-            <option value="diploma">
-              Diploma
-            </option>
-
-            <option value="bachelor">
-              Bachelor
-            </option>
-
-            <option value="master">
-              Master
-            </option>
-
-            <option value="phd">
-              PhD
-            </option>
-
-            <option value="other">
-              Other
-            </option>
-          </select>
+            <SelectTrigger className="h-12 rounded-[15px]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="none">None</SelectItem>
+              <SelectItem value="student">Student</SelectItem>
+              <SelectItem value="diploma">Diploma</SelectItem>
+              <SelectItem value="bachelor">Bachelor</SelectItem>
+              <SelectItem value="master">Master</SelectItem>
+              <SelectItem value="phd">PhD</SelectItem>
+              <SelectItem value="other">Other</SelectItem>
+            </SelectContent>
+          </Select>
         </StaffFormField>
 
         <StaffFormField
@@ -173,18 +164,13 @@ export function StaffEmploymentFormSection({
           label="Hire date"
           required
         >
-          <input
-            required
-            disabled={disabled}
-            type="date"
+          <DatePicker
             value={values.hire_date}
-            onChange={(e) =>
-              updateValue(
-                "hire_date",
-                e.target.value,
-              )
+            onChange={(value) =>
+              updateValue("hire_date", value)
             }
-            className={fieldClassName}
+            placeholder="Select hire date"
+            disabled={disabled}
           />
         </StaffFormField>
 
@@ -219,46 +205,28 @@ export function StaffEmploymentFormSection({
             label="Service type"
             required
           >
-            <select
-              required
+            <Select
+              value={values.service_type ?? "none"}
               disabled={disabled}
-              value={
-                values.service_type ??
-                ""
-              }
-              onChange={(e) =>
+              onValueChange={(value) =>
                 updateValue(
                   "service_type",
-                  e.target
-                    .value as StaffServiceType,
+                  value === "none" ? null : (value as StaffServiceType),
                 )
               }
-              className={fieldClassName}
             >
-              <option value="">
-                Select service
-              </option>
-
-              <option value="cleaner">
-                Cleaner
-              </option>
-
-              <option value="guard">
-                Guard
-              </option>
-
-              <option value="driver">
-                Driver
-              </option>
-
-              <option value="maintenance">
-                Maintenance
-              </option>
-
-              <option value="kitchen_staff">
-                Kitchen staff
-              </option>
-            </select>
+              <SelectTrigger className="h-12 rounded-[15px]">
+                <SelectValue placeholder="Select service" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">Select service</SelectItem>
+                <SelectItem value="cleaner">Cleaner</SelectItem>
+                <SelectItem value="guard">Guard</SelectItem>
+                <SelectItem value="driver">Driver</SelectItem>
+                <SelectItem value="maintenance">Maintenance</SelectItem>
+                <SelectItem value="kitchen_staff">Kitchen staff</SelectItem>
+              </SelectContent>
+            </Select>
           </StaffFormField>
         )}
 

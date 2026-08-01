@@ -70,6 +70,9 @@ export type PersonProfile = {
   gender: UserGender | null;
   nationality: UserNationality | null;
 
+  nationalId?: string | null;
+  email?: string | null;
+
   address: string | null;
   phoneNumber: string | null;
   photoUrl: string | null;
@@ -100,6 +103,8 @@ export type StudentListItem = {
   photoUrl?: string | null;
   phoneNumber?: string | null;
   accountStatus?: AccountStatus;
+  isDeleted?: boolean;
+  deletedAt?: string | null;
 };
 
 export type StudentListFilters = {
@@ -107,10 +112,7 @@ export type StudentListFilters = {
   per_page?: number;
 
   level?: number | ApiId;
-  grade_level_id?: ApiId;
-  class_room_id?: ApiId;
-
-  name_classroom?: string;
+  classroom_name?: string;
   status?: EnrollmentStatus;
 
   sort?: "asc" | "desc";
@@ -182,7 +184,7 @@ export type StudentPersonalPayload = {
   address: string;
   phone_number: string;
 
-  url_photo?: File | null;
+  photo_url?: File | null;
 };
 
 export type GuardianPersonalPayload = {
@@ -198,10 +200,13 @@ export type GuardianPersonalPayload = {
   gender: UserGender;
   nationality: UserNationality;
 
+  national_id?: string;
+  email?: string;
+
   address: string;
   phone_number: string;
 
-  url_photo?: File | null;
+  photo_url?: File | null;
   token_fcm?: string | null;
 };
 
@@ -223,9 +228,6 @@ export type RegisterStudentPayload = {
 |--------------------------------------------------------------------------
 */
 
-export type UpdateStudentPersonalPayload =
-  Partial<StudentPersonalPayload>;
-
 export type UpdateGuardianPersonalPayload =
   Partial<GuardianPersonalPayload>;
 
@@ -235,6 +237,39 @@ export type UpdateStudentEnrollmentPayload = {
   class_room_id?: ApiId | null;
   enrollment_status?: EnrollmentStatus;
 };
+
+/**
+ * The current backend updates the student, guardian, and enrollment through
+ * one flat multipart request using the student personal-data endpoint.
+ */
+export type UpdateStudentPersonalPayload =
+  Partial<StudentPersonalPayload> & {
+    guardian_first_name?: string;
+    guardian_last_name?: string;
+
+    guardian_father_name?: string;
+    guardian_mother_name?: string;
+
+    guardian_birth_date?: string;
+    guardian_birth_place?: string;
+
+    guardian_gender?: UserGender;
+    guardian_nationality?: UserNationality;
+
+    guardian_national_id?: string;
+    guardian_email?: string;
+
+    guardian_address?: string;
+    guardian_phone_number?: string;
+
+    guardian_photo_url?: File | null;
+    guardian_token_fcm?: string | null;
+
+    academic_year_id?: ApiId;
+    grade_level_id?: ApiId;
+    class_room_id?: ApiId | null;
+    enrollment_status?: EnrollmentStatus;
+  };
 
 /*
 |--------------------------------------------------------------------------

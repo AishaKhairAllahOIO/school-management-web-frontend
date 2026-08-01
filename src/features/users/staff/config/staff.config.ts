@@ -4,6 +4,7 @@ import {
   HeartHandshake,
   ShieldCheck,
   UserCog,
+  UserRoundCog,
 } from "lucide-react";
 
 import type {
@@ -219,4 +220,43 @@ export const staffSectionConfigs: Record<
       itemHover: "hover:border-secondary-foreground/20 hover:bg-secondary/70",
     },
   },
+
+  super_admin: {
+    role: "super_admin",
+
+    title: "Administrators",
+    singularLabel: "Administrator",
+    pluralLabel: "Administrators",
+
+    listPath: "/profile",
+    createPath: "/users/administrators/new",
+
+    icon: UserRoundCog,
+
+    color: {
+      background: "bg-primary",
+      light: "bg-primary/[0.08]",
+      text: "text-primary",
+
+      border: "border-primary/20",
+
+      hover:
+        "hover:border-primary/30 hover:bg-primary/[0.07] hover:text-primary",
+
+      ring:
+        "focus-visible:ring-primary/15",
+
+      button:
+        "bg-primary text-primary-foreground hover:bg-primary/90",
+
+      footer:
+        "bg-primary/[0.035] hover:bg-primary/[0.07]",
+
+      fieldHover: "hover:border-primary/25 hover:bg-card",
+      fieldFocus: "focus:border-primary/40 focus:bg-card",
+      fieldRing: "focus:ring-primary/[0.10]",
+      itemHover: "hover:border-primary/20 hover:bg-primary/[0.035]",
+    },
+  },
+
 };

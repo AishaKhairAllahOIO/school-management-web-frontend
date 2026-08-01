@@ -47,6 +47,30 @@ export const staffKeys = {
       },
     ] as const,
 
+  roleSearch: (
+    role: StaffRole,
+    name: string,
+    page: number,
+    perPage: number,
+  ) => [
+    ...staffKeys.role(role),
+    "search",
+    { name, page, perPage },
+  ] as const,
+
+  imports: () =>
+    [
+      ...staffKeys.all,
+      "imports",
+    ] as const,
+
+  importStatus: (batchId: ApiId) =>
+    [
+      ...staffKeys.imports(),
+      "status",
+      batchId,
+    ] as const,
+
   details: () =>
     [
       ...staffKeys.all,

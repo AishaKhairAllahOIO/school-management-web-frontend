@@ -1,154 +1,77 @@
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/shared/ui/table";
-
-import { Button } from "@/shared/ui/button";
-
-import {
-  PencilLine,
-  Trash2,
-} from "lucide-react";
+import { ReceiptText } from "lucide-react";
 
 import type { FeePlan } from "../../types/feePlan.types";
+import { FinancialActionMenu } from "../../shared/FinancialActionMenu";
+import {
+  FinancialEntityTable,
+  FinancialEntityTd,
+  FinancialEntityTh,
+} from "../../shared/FinancialEntityTable";
 
 type Props = {
   feePlans: FeePlan[];
-
   onEdit: (plan: FeePlan) => void;
-
   onDelete: (plan: FeePlan) => void;
 };
 
-export function FeePlansTable({
-  feePlans,
-  onEdit,
-  onDelete,
-}: Props) {
-  if (!feePlans.length)
+export function FeePlansTable({ feePlans, onEdit, onDelete }: Props) {
+  if (!feePlans.length) {
+    return (
+      <div className="mt-4 rounded-[18px] border border-dashed border-border bg-muted/15 p-8 text-center">
+        <span className="mx-auto flex h-10 w-10 items-center justify-center rounded-[13px] bg-primary/[0.08] text-primary">
+          <ReceiptText size={18} strokeWidth={1.8} />
+        </span>
+        <p className="mt-3 text-[15px] font-medium text-foreground">No fee plans yet</p>
+        <p className="mt-1 text-[13px] font-normal text-muted-foreground">
+          Create the first tuition plan to begin configuring school finances.
+        </p>
+      </div>
+    );
+  }
+
   return (
-  <div className="rounded-2xl border border-dashed border-border bg-muted/20 p-10 text-center">
-
-    <h3 className="text-lg font-semibold">
-      No Fee Plans Yet
-    </h3>
-
-    <p className="mt-2 text-sm text-muted-foreground">
-      Create your first fee plan to start configuring school finances.
-    </p>
-
-  </div>
-);
-  return (
-    <div className="overflow-hidden rounded-2xl border shadow-sm">
-      <Table>
-
-        <TableHeader>
-
-         <TableRow className="hover:bg-muted/30">
-         
-            <TableHead>Name</TableHead>
-
-            <TableHead>
-              Academic Year
-            </TableHead>
-
-            <TableHead>
-              Grade
-            </TableHead>
-
-            <TableHead>
-              Base Amount
-            </TableHead>
-
-            <TableHead>
-              Extra Services
-            </TableHead>
-
-            <TableHead className="w-60">
-              Actions
-            </TableHead>
-
-          </TableRow>
-
-        </TableHeader>
-
-        <TableBody>
-
-          {feePlans.map((plan) => (
-
-            <TableRow key={plan.id}>
-
-              <TableCell>
-                {plan.name}
-              </TableCell>
-
-             <TableCell>
-                {plan.academicYear?.name ?? "-"}
-             </TableCell>
-
-             <TableCell>
-                {plan.gradeLevel?.name ?? "-"}
-             </TableCell>
-
-              <TableCell>
-                {plan.baseAmount.toLocaleString()} $
-              </TableCell>
-
-              <TableCell>
-               {plan.extraServices.length > 0 ? (
-                 <span className="rounded-full bg-violet-100 px-3 py-1 text-xs font-medium text-violet-700">
-                   {plan.extraServices.length} Services
-                 </span>
-                  ) : (
-                 <span className="rounded-full bg-muted px-3 py-1 text-xs text-muted-foreground">
-                   No Services
-                 </span>
-                  )}
-             </TableCell>             
-
-              <TableCell>
-
-                <div className="flex gap-2">
-
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() =>
-                      onEdit(plan)
-                    }
-                  >
-                    <PencilLine className="mr-2 h-4 w-4" />
-                    Edit
-                  </Button>
-
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="border-red-300 text-red-700 hover:bg-red-50"
-                    onClick={() =>
-                      onDelete(plan)
-                    }
-                  >
-                    <Trash2 className="mr-2 h-4 w-4" />
-                    Delete
-                  </Button>
-
-                </div>
-
-              </TableCell>
-
-            </TableRow>
-
-          ))}
-
-        </TableBody>
-
-      </Table>
-    </div>
+    <FinancialEntityTable>
+      <thead>
+        <tr>
+          <FinancialEntityTh>Name</FinancialEntityTh>
+          <FinancialEntityTh>Academic Year</FinancialEntityTh>
+          <FinancialEntityTh>Grade</FinancialEntityTh>
+          <FinancialEntityTh>Base Amount</FinancialEntityTh>
+          <FinancialEntityTh>Extra Services</FinancialEntityTh>
+          <FinancialEntityTh align="right">Actions</FinancialEntityTh>
+        </tr>
+      </thead>
+      <tbody>
+        {feePlans.map((plan) => (
+          <tr key={plan.id}>
+            <FinancialEntityTd strong>{plan.name}</FinancialEntityTd>
+            <FinancialEntityTd>{plan.academicYear?.name ?? "—"}</FinancialEntityTd>
+            <FinancialEntityTd>{plan.gradeLevel?.name ?? "—"}</FinancialEntityTd>
+            <FinancialEntityTd strong>{plan.baseAmount.toLocaleString()} $</FinancialEntityTd>
+            <FinancialEntityTd>
+              {plan.extraServices.length > 0 ? (
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/[0.08] px-3 py-1.5 text-[12px] font-medium text-primary">
+                  <span className="h-1.5 w-1.5 rounded-full bg-primary" />
+                  {plan.extraServices.length} Services
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-muted/70 px-3 py-1.5 text-[12px] font-medium text-muted-foreground">
+                  <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground/50" />
+                  No Services
+                </span>
+              )}
+            </FinancialEntityTd>
+            <FinancialEntityTd align="right">
+              <FinancialActionMenu
+                isOpen={false}
+                onOpenChange={() => undefined}
+                onEdit={() => onEdit(plan)}
+                onDelete={() => onDelete(plan)}
+              />
+            </FinancialEntityTd>
+          </tr>
+        ))}
+      </tbody>
+    </FinancialEntityTable>
   );
 }

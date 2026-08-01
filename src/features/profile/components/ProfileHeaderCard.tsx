@@ -12,6 +12,7 @@ import type {
   ProfileIdentity,
 } from "@/features/profile/types/profile.types";
 
+import { useAuthenticatedImage } from "@/shared/hooks/useAuthenticatedImage";
 import {
   formatDate,
   formatFullName,
@@ -34,9 +35,8 @@ export function ProfileHeaderCard({
       user.lastName,
     );
 
-  const photo =
-    user.photoUrl ||
-    "/images/avatar-placeholder.png";
+const photoUrl =
+  useAuthenticatedImage(user?.photoUrl);
 
   const isEnabled =
     String(
@@ -89,7 +89,7 @@ export function ProfileHeaderCard({
               ].join(" ")}
             >
               <img
-                src={photo}
+                src={photoUrl}
                 alt={fullName}
                 className={[
                   "h-[74px] w-[74px]",

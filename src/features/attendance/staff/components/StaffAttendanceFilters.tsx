@@ -1,6 +1,6 @@
+import { Search } from "lucide-react";
 
 import { Input } from "@/shared/ui/input";
-
 import {
   Select,
   SelectContent,
@@ -8,134 +8,100 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/shared/ui/select";
-import { Search } from "lucide-react";
 
-interface Props {
+import type { StaffAttendance } from "../types/staffAttendance.types";
+
+type Props = {
+  data: StaffAttendance[];
   search: string;
   setSearch: (value: string) => void;
-
   role: string;
   setRole: (value: string) => void;
-
   status: string;
   setStatus: (value: string) => void;
-}
+  absenceType: string;
+  setAbsenceType: (value: string) => void;
+};
 
-export const AttendanceFilters = ({
+export function AttendanceFilters({
+  data,
   search,
   setSearch,
   role,
   setRole,
   status,
   setStatus,
-}: Props) => {
+  absenceType,
+  setAbsenceType,
+}: Props) {
+  const controlClass =
+    "h-11 rounded-[13px] border-border/60 bg-background/80 text-[12px] shadow-none";
+  const roles = [...new Set(data.map((item) => item.role))];
+  const absenceTypeEnabled = status === "Absent";
+
   return (
-    <div
-  className="
-    flex
-    flex-wrap
-    items-center
-    gap-4
-  "
->
-  <div className="
-     w-[320px]
-     rounded-2xl
-     border-border/60
-     shadow-sm
-  ">
-    <Search
-          size={18}
-          className="
-            absolute
-            left-4
-            top-1/2
-            -translate-y-1/2
-            text-muted-foreground
-            z-10
-          "
+    <div className="grid gap-2.5 md:grid-cols-2 xl:grid-cols-[minmax(210px,1fr)_150px_145px_160px]">
+      <div className="relative min-w-0 md:col-span-2 xl:col-span-1">
+        <Search
+          className="absolute start-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-muted-foreground"
+          strokeWidth={1.8}
         />
-    <Input
-      placeholder="Search employee..."
-      value={search}
-      onChange={(e) =>
-        setSearch(e.target.value)
-      }
-    className="
-            h-12
-            rounded-2xl
-            border-border/60
-            bg-background
-            pl-11
-            shadow-sm
-          " />
-  </div>
+        <Input
+          placeholder="Staff name"
+          value={search}
+          onChange={(event) => setSearch(event.target.value)}
+          className={[controlClass, "ps-9"].join(" ")}
+        />
+      </div>
 
-  <Select
-    value={role}
-    onValueChange={setRole}
-  >
-    <SelectTrigger className="
-    w-[180px]
-     py-5.5 
-     rounded-2xl
-     border-border/60
-     shadow-sm
-    ">
-      <SelectValue />
-    </SelectTrigger>
+      <Select value={role} onValueChange={setRole}>
+        <SelectTrigger className={controlClass}>
+          <SelectValue placeholder="Staff type" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">All staff types</SelectItem>
+          {roles.map((item) => (
+            <SelectItem key={item} value={item}>{item}</SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
 
-    <SelectContent>
-      <SelectItem value="all">
-        All Roles
-      </SelectItem>
+      <Select
+        value={status}
+        onValueChange={(value) => {
+          setStatus(value);
+          if (value !== "Absent") setAbsenceType("all");
+        }}
+      >
+        <SelectTrigger className={controlClass}>
+          <SelectValue placeholder="Attendance" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">All attendance</SelectItem>
+          <SelectItem value="Present">Present</SelectItem>
+          <SelectItem value="Absent">Absent</SelectItem>
+        </SelectContent>
+      </Select>
 
-      <SelectItem value="Teacher">
-        Teacher
-      </SelectItem>
-
-      <SelectItem value="Secretary">
-        Secretary
-      </SelectItem>
-
-      <SelectItem value="Supervisor">
-        Supervisor
-      </SelectItem>
-    </SelectContent>
-  </Select>
-
-  <Select
-    value={status}
-    onValueChange={setStatus}
-  >
-    <SelectTrigger className="
-      w-[180px]
-      py-5.5 
-      rounded-2xl
-      border-border/60
-      shadow-sm
-    ">
-      <SelectValue />
-    </SelectTrigger>
-
-    <SelectContent>
-      <SelectItem value="all">
-        All Statuses
-      </SelectItem>
-
-      <SelectItem value="Present">
-        Present
-      </SelectItem>
-
-      <SelectItem value="Late">
-        Late
-      </SelectItem>
-
-      <SelectItem value="Absent">
-        Absent
-      </SelectItem>
-    </SelectContent>
-  </Select>
-</div>
+      <Select
+        value={absenceTypeEnabled ? absenceType : "all"}
+        onValueChange={setAbsenceType}
+        disabled={!absenceTypeEnabled}
+      >
+        <SelectTrigger
+          className={[
+            controlClass,
+            !absenceTypeEnabled ? "cursor-not-allowed opacity-50" : "",
+          ].join(" ")}
+        >
+          <SelectValue placeholder="Absence type" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">All absence types</SelectItem>
+          <SelectItem value="Excused">Excused</SelectItem>
+          <SelectItem value="Unexcused">Unexcused</SelectItem>
+        </SelectContent>
+      </Select>
+    </div>
   );
-};
+}

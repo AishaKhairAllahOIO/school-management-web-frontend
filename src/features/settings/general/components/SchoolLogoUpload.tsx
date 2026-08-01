@@ -1,4 +1,6 @@
 import {
+  Building2,
+  Check,
   ImagePlus,
   Loader2,
   RotateCcw,
@@ -14,11 +16,11 @@ import {
 type SchoolLogoUploadProps = {
   currentLogoUrl: string | null;
   selectedFile: File | null;
-
   error?: string;
   disabled?: boolean;
-
-  onFileChange: (file: File | null) => void;
+  onFileChange: (
+    file: File | null,
+  ) => void;
 };
 
 const ACCEPTED_IMAGE_TYPES = [
@@ -31,6 +33,8 @@ const ACCEPTED_IMAGE_TYPES = [
 const MAX_LOGO_SIZE =
   5 * 1024 * 1024;
 
+const FEATURED_MEDIA_SIZE = 208;
+
 export function SchoolLogoUpload({
   currentLogoUrl,
   selectedFile,
@@ -39,7 +43,9 @@ export function SchoolLogoUpload({
   onFileChange,
 }: SchoolLogoUploadProps) {
   const inputRef =
-    useRef<HTMLInputElement | null>(null);
+    useRef<HTMLInputElement | null>(
+      null,
+    );
 
   const [localError, setLocalError] =
     useState<string | null>(null);
@@ -52,25 +58,36 @@ export function SchoolLogoUpload({
   useEffect(() => {
     if (!selectedFile) {
       setPreviewUrl(currentLogoUrl);
-
       return;
     }
 
     const objectUrl =
-      URL.createObjectURL(selectedFile);
+      URL.createObjectURL(
+        selectedFile,
+      );
 
     setPreviewUrl(objectUrl);
 
     return () => {
-      URL.revokeObjectURL(objectUrl);
+      URL.revokeObjectURL(
+        objectUrl,
+      );
     };
-  }, [selectedFile, currentLogoUrl]);
+  }, [
+    selectedFile,
+    currentLogoUrl,
+  ]);
+
+  function openFilePicker() {
+    inputRef.current?.click();
+  }
 
   function handleFileChange(
     event: ChangeEvent<HTMLInputElement>,
   ) {
     const file =
-      event.target.files?.[0] ?? null;
+      event.target.files?.[0] ??
+      null;
 
     event.target.value = "";
 
@@ -90,7 +107,9 @@ export function SchoolLogoUpload({
       return;
     }
 
-    if (file.size > MAX_LOGO_SIZE) {
+    if (
+      file.size > MAX_LOGO_SIZE
+    ) {
       setLocalError(
         "The logo must be smaller than 5 MB.",
       );
@@ -110,109 +129,219 @@ export function SchoolLogoUpload({
   const displayedError =
     localError ?? error;
 
+  const isComplete =
+    Boolean(previewUrl);
+
   return (
-    <div
+    <section
       className={[
+        "relative h-fit w-full",
+        "self-start",
         "rounded-[22px]",
-        "bg-muted/[0.28]",
-        "p-3.5",
-        "transition duration-300",
-        "hover:bg-muted/[0.38]",
+        "border border-border/45",
+        "bg-card",
+        "p-4",
+        "shadow-[0_10px_35px_rgba(30,20,70,0.035)]",
       ].join(" ")}
     >
-      <div className="px-1">
-        <h3 className="text-sm font-semibold text-foreground">
-          School Logo
-        </h3>
+      {isComplete ? (
+        <span
+          className={[
+            "absolute right-4 top-4 z-10",
+            "flex h-7 w-7",
+            "items-center justify-center",
+            "rounded-full",
+            "border border-emerald-500/20",
+            "bg-emerald-500/10",
+            "text-emerald-600",
+          ].join(" ")}
+          title="School logo completed"
+          aria-label="School logo completed"
+        >
+          <Check
+            size={15}
+            strokeWidth={2.5}
+          />
+        </span>
+      ) : null}
 
-        <p className="mt-1 text-[11px] leading-5 text-muted-foreground">
-          Upload the visual identity used across
-          the school system.
-        </p>
-      </div>
-
-      <button
-        type="button"
-        disabled={disabled}
-        onClick={() =>
-          inputRef.current?.click()
-        }
+      <div
         className={[
-          "group relative mt-3",
-          "flex min-h-[210px] w-full",
-          "items-center justify-center",
-          "overflow-hidden rounded-[20px]",
-          "border border-dashed",
-          "bg-card",
-          "transition duration-300",
-          "hover:-translate-y-0.5",
-          "hover:border-primary/30",
-          "hover:shadow-[0_12px_30px_rgba(30,20,70,0.08)]",
-          "disabled:cursor-not-allowed",
-          "disabled:translate-y-0",
-          "disabled:opacity-60",
-          displayedError
-            ? "border-destructive/45"
-            : "border-border/65",
+          "flex min-h-[56px]",
+          "items-start gap-3 pr-9",
         ].join(" ")}
       >
-        {previewUrl ? (
-          <div className="relative flex h-[210px] w-full items-center justify-center">
-            <img
-              src={previewUrl}
-              alt="School logo preview"
-              className="h-full w-full object-contain p-7"
-            />
+        <span
+          className={[
+            "flex h-9 w-9 shrink-0",
+            "items-center justify-center",
+            "rounded-[13px]",
+            "bg-primary/[0.08]",
+            "text-primary",
+          ].join(" ")}
+        >
+          <Building2
+            size={17}
+            strokeWidth={1.75}
+          />
+        </span>
 
+        <div className="min-w-0 pt-0.5">
+          <h2
+            className={[
+              "text-[16px]",
+              "font-semibold",
+              "text-foreground",
+            ].join(" ")}
+          >
+            School Logo
+          </h2>
+
+          <p
+            className={[
+              "mt-1 text-[12px]",
+              "leading-4",
+              "text-muted-foreground",
+            ].join(" ")}
+          >
+            School visual identity.
+          </p>
+        </div>
+      </div>
+
+      <div className="mt-4">
+        <button
+          type="button"
+          disabled={disabled}
+          onClick={openFilePicker}
+          style={{
+            width:
+              FEATURED_MEDIA_SIZE,
+            height:
+              FEATURED_MEDIA_SIZE,
+          }}
+          className={[
+            "group relative max-w-full",
+            "overflow-hidden",
+            "rounded-[14px]",
+            "border border-dashed",
+            "bg-muted/[0.16]",
+            "outline-none",
+            "transition duration-200",
+            "hover:border-primary/40",
+            "hover:bg-primary/[0.03]",
+            "focus-visible:ring-4",
+            "focus-visible:ring-primary/[0.10]",
+            "disabled:cursor-not-allowed",
+            "disabled:opacity-60",
+            displayedError
+              ? "border-destructive/45"
+              : "border-border/80",
+          ].join(" ")}
+        >
+          {previewUrl ? (
+            <>
+              <img
+                src={previewUrl}
+                alt="School logo preview"
+                className={[
+                  "h-full w-full",
+                  "object-contain p-4",
+                ].join(" ")}
+              />
+
+              <div
+                className={[
+                  "absolute inset-0",
+                  "flex items-end",
+                  "justify-center",
+                  "bg-gradient-to-t",
+                  "from-foreground/35",
+                  "via-transparent",
+                  "to-transparent",
+                  "p-3",
+                  "opacity-0",
+                  "transition duration-200",
+                  "group-hover:opacity-100",
+                  "group-focus-visible:opacity-100",
+                ].join(" ")}
+              >
+                <span
+                  className={[
+                    "rounded-full",
+                    "border border-border/60",
+                    "bg-card/95",
+                    "px-3 py-1.5",
+                    "text-[11px]",
+                    "font-medium",
+                    "text-foreground",
+                    "shadow-sm",
+                    "backdrop-blur",
+                  ].join(" ")}
+                >
+                  Replace logo
+                </span>
+              </div>
+            </>
+          ) : (
             <div
               className={[
-                "absolute inset-0",
-                "flex items-end justify-center",
-                "bg-gradient-to-t",
-                "from-foreground/40",
-                "via-transparent",
-                "to-transparent",
-                "p-3",
-                "opacity-0",
-                "transition duration-300",
-                "group-hover:opacity-100",
+                "flex h-full w-full",
+                "flex-col",
+                "items-center",
+                "justify-center",
+                "px-4 text-center",
               ].join(" ")}
             >
-              <span className="rounded-full bg-card/95 px-4 py-2 text-[11px] font-semibold text-foreground shadow-lg backdrop-blur">
-                Choose another logo
+              <span
+                className={[
+                  "flex h-11 w-11",
+                  "items-center",
+                  "justify-center",
+                  "rounded-[14px]",
+                  "bg-primary/[0.08]",
+                  "text-primary",
+                  "transition duration-200",
+                  "group-hover:scale-105",
+                ].join(" ")}
+              >
+                {disabled ? (
+                  <Loader2
+                    size={21}
+                    className="animate-spin"
+                  />
+                ) : (
+                  <ImagePlus
+                    size={21}
+                    strokeWidth={1.8}
+                  />
+                )}
               </span>
+
+              <p
+                className={[
+                  "mt-2.5",
+                  "text-[12px]",
+                  "font-medium",
+                  "text-foreground",
+                ].join(" ")}
+              >
+                Add logo
+              </p>
+
+              <p
+                className={[
+                  "mt-1 text-[10px]",
+                  "leading-4",
+                  "text-muted-foreground",
+                ].join(" ")}
+              >
+                JPG, PNG, SVG or WebP
+              </p>
             </div>
-          </div>
-        ) : (
-          <div className="px-6 text-center">
-            <span
-              className={[
-                "mx-auto flex h-14 w-14",
-                "items-center justify-center",
-                "rounded-[18px]",
-                "bg-primary/[0.08]",
-                "text-primary",
-                "transition duration-300",
-                "group-hover:scale-105",
-                "group-hover:bg-primary/[0.12]",
-              ].join(" ")}
-            >
-              <ImagePlus
-                size={25}
-                strokeWidth={1.75}
-              />
-            </span>
-
-            <p className="mt-4 text-xs font-semibold text-foreground">
-              Upload school logo
-            </p>
-
-            <p className="mt-1.5 text-[10px] leading-4 text-muted-foreground">
-              JPG, PNG, SVG or WebP · Max 5 MB
-            </p>
-          </div>
-        )}
-      </button>
+          )}
+        </button>
+      </div>
 
       <input
         ref={inputRef}
@@ -224,95 +353,111 @@ export function SchoolLogoUpload({
       />
 
       {displayedError ? (
-        <p className="mt-2 px-1 text-[11px] font-medium text-destructive">
-          {displayedError}
-        </p>
-      ) : null}
-
-      <div className="mt-3 flex gap-2">
-        <button
-          type="button"
-          disabled={disabled}
-          onClick={() =>
-            inputRef.current?.click()
-          }
+        <div
           className={[
-            "flex h-10 flex-1",
-            "items-center justify-center gap-2",
-            "rounded-full bg-primary",
-            "px-4",
-            "text-xs font-semibold",
-            "text-primary-foreground",
-            "shadow-[0_8px_20px_rgba(98,74,180,0.16)]",
-            "transition duration-200",
-            "hover:-translate-y-0.5",
-            "hover:bg-primary/90",
-            "disabled:cursor-not-allowed",
-            "disabled:translate-y-0",
-            "disabled:opacity-60",
+            "mt-3 rounded-[14px]",
+            "bg-destructive/[0.045]",
+            "px-3 py-2.5",
           ].join(" ")}
         >
-          {disabled ? (
-            <Loader2
-              size={15}
-              className="animate-spin"
-            />
-          ) : (
-            <Upload size={15} />
-          )}
+          <p
+            className={[
+              "text-[11px]",
+              "font-medium leading-4",
+              "text-destructive",
+            ].join(" ")}
+          >
+            {displayedError}
+          </p>
+        </div>
+      ) : null}
 
-          {previewUrl
-            ? "Replace Logo"
-            : "Choose Logo"}
-        </button>
-
-        {selectedFile ? (
+      {selectedFile ? (
+        <div
+          className={[
+            "mt-4 flex",
+            "items-center",
+            "justify-end gap-2",
+            "border-t",
+            "border-border/45",
+            "pt-4",
+          ].join(" ")}
+        >
           <button
             type="button"
             disabled={disabled}
             onClick={undoSelection}
             className={[
-              "flex h-10 items-center",
-              "justify-center gap-2",
+              "flex h-9 min-w-0",
+              "items-center",
+              "justify-center",
+              "gap-1.5",
               "rounded-full",
-              "bg-card px-4",
-              "text-xs font-semibold",
-              "text-muted-foreground",
-              "shadow-[0_5px_16px_rgba(30,20,70,0.05)]",
+              "border",
+              "border-border/70",
+              "bg-background",
+              "px-3",
+              "text-[12px]",
+              "font-semibold",
+              "text-foreground/70",
               "transition duration-200",
-              "hover:bg-muted",
+              "hover:bg-muted/55",
               "hover:text-foreground",
-              "disabled:opacity-60",
+              "disabled:cursor-not-allowed",
+              "disabled:opacity-50",
             ].join(" ")}
           >
-            <RotateCcw size={14} />
-            Undo
+            <RotateCcw
+              size={13}
+              className="shrink-0"
+            />
+
+            <span>Undo</span>
           </button>
-        ) : null}
-      </div>
 
-      {selectedFile ? (
-        <div
-          className={[
-            "mt-3 rounded-[16px]",
-            "bg-card px-3.5 py-2.5",
-            "shadow-[0_5px_16px_rgba(30,20,70,0.035)]",
-          ].join(" ")}
-        >
-          <p className="truncate text-[11px] font-semibold text-foreground">
-            {selectedFile.name}
-          </p>
+          <button
+            type="button"
+            disabled={disabled}
+            onClick={openFilePicker}
+            className={[
+              "flex h-9 min-w-0",
+              "items-center",
+              "justify-center",
+              "gap-1.5",
+              "rounded-full",
+              "bg-primary",
+              "px-3",
+              "text-[12px]",
+              "font-semibold",
+              "text-primary-foreground",
+              "shadow-[0_8px_20px_rgba(98,74,180,0.16)]",
+              "transition duration-200",
+              "hover:-translate-y-0.5",
+              "hover:bg-primary/90",
+              "disabled:cursor-not-allowed",
+              "disabled:translate-y-0",
+              "disabled:opacity-50",
+            ].join(" ")}
+          >
+            {disabled ? (
+              <Loader2
+                size={14}
+                className={[
+                  "shrink-0",
+                  "animate-spin",
+                ].join(" ")}
+              />
+            ) : (
+              <Upload
+                size={14}
+                className="shrink-0"
+              />
+            )}
 
-          <p className="mt-0.5 text-[10px] text-muted-foreground">
-            {(
-              selectedFile.size /
-              1024 /
-              1024
-            ).toFixed(2)}{" "}
-            MB
-          </p>
+            <span>Replace</span>
+          </button>
         </div>
       ) : null}
-    </div>
+    </section>
   );
 }

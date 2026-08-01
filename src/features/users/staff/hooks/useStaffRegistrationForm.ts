@@ -23,41 +23,44 @@ import type {
   StaffRole,
 } from "../types/staff.types";
 
-const initialStaffRegistrationValues: RegisterStaffValues = {
-  first_name: "",
-  last_name: "",
-  father_name: "",
-  mother_name: "",
+function createInitialValues(): RegisterStaffValues {
+  return {
+    first_name: "",
+    last_name: "",
+    father_name: "",
+    mother_name: "",
 
-  phone_number: "",
-  email: "",
+    phone_number: "",
+    email: "",
 
-  birth_date: "",
-  birth_place: "",
+    birth_date: "",
+    birth_place: "",
 
-  gender: "male",
-  nationality: "syrian",
+    gender: "male",
+    nationality: "syrian",
 
-  address: "",
-  photo_url: null,
+    address: "",
+    photo_url: null,
 
-  degree: "none",
-  specialization: "",
-  university: "",
-  graduation_year: null,
+    degree: "none",
+    specialization: "",
+    university: "",
+    graduation_year: null,
 
-  hire_date: "",
-  experience_years: null,
+    hire_date: "",
+    experience_years: null,
 
-  password: "",
-  service_type: null,
-};
+    password: "",
+    service_type: null,
+  };
+}
 
 type UseStaffRegistrationFormResult = {
   values: RegisterStaffValues;
 
   photoPreview: string | null;
   formError: string | null;
+  successMessage: string | null;
 
   isSubmitting: boolean;
   requiresPassword: boolean;
@@ -83,6 +86,7 @@ type UseStaffRegistrationFormResult = {
   handleCancel: () => void;
 
   clearFormError: () => void;
+  clearSuccessMessage: () => void;
 };
 
 export function useStaffRegistrationForm(
@@ -98,13 +102,16 @@ export function useStaffRegistrationForm(
 
   const [values, setValues] =
     useState<RegisterStaffValues>(
-      initialStaffRegistrationValues,
+      createInitialValues,
     );
 
   const [photoPreview, setPhotoPreview] =
     useState<string | null>(null);
 
   const [formError, setFormError] =
+    useState<string | null>(null);
+
+  const [successMessage, setSuccessMessage] =
     useState<string | null>(null);
 
   useEffect(() => {
@@ -117,6 +124,16 @@ export function useStaffRegistrationForm(
     };
   }, [photoPreview]);
 
+  const clearPhotoPreview = useCallback(() => {
+    if (photoPreview) {
+      URL.revokeObjectURL(
+        photoPreview,
+      );
+    }
+
+    setPhotoPreview(null);
+  }, [photoPreview]);
+
   const updateValue = useCallback(
     <
       K extends keyof RegisterStaffValues,
@@ -124,6 +141,9 @@ export function useStaffRegistrationForm(
       key: K,
       value: RegisterStaffValues[K],
     ) => {
+      setFormError(null);
+      setSuccessMessage(null);
+
       setValues((current) => ({
         ...current,
         [key]: value,
@@ -146,10 +166,13 @@ export function useStaffRegistrationForm(
         );
       }
 
-      updateValue(
-        "photo_url",
-        file,
-      );
+      setFormError(null);
+      setSuccessMessage(null);
+
+      setValues((current) => ({
+        ...current,
+        photo_url: file,
+      }));
 
       setPhotoPreview(
         file
@@ -159,29 +182,20 @@ export function useStaffRegistrationForm(
 
       event.target.value = "";
     },
-    [
-      photoPreview,
-      updateValue,
-    ],
+    [photoPreview],
   );
 
   const removePhoto = useCallback(() => {
-    if (photoPreview) {
-      URL.revokeObjectURL(
-        photoPreview,
-      );
-    }
+    clearPhotoPreview();
 
-    updateValue(
-      "photo_url",
-      null,
-    );
+    setValues((current) => ({
+      ...current,
+      photo_url: null,
+    }));
 
-    setPhotoPreview(null);
-  }, [
-    photoPreview,
-    updateValue,
-  ]);
+    setFormError(null);
+    setSuccessMessage(null);
+  }, [clearPhotoPreview]);
 
   const handleSubmit = useCallback(
     async (
@@ -190,12 +204,31 @@ export function useStaffRegistrationForm(
       event.preventDefault();
 
       setFormError(null);
+      setSuccessMessage(null);
 
       try {
         const createdStaff =
           await registerMutation.mutateAsync(
             values,
           );
+
+        if (role === "super_admin") {
+          clearPhotoPreview();
+          setValues(createInitialValues());
+          setSuccessMessage(
+            `${createdStaff.fullName || "The administrator"} was registered successfully. The form is ready for another administrator.`,
+          );
+
+          window.requestAnimationFrame(() => {
+            const firstField = document.querySelector<HTMLInputElement>(
+              'input[name="first_name"]',
+            );
+
+            firstField?.focus();
+          });
+
+          return;
+        }
 
         navigate(
           `${config.listPath}/${createdStaff.id}`,
@@ -207,10 +240,12 @@ export function useStaffRegistrationForm(
       }
     },
     [
+      clearPhotoPreview,
       config.listPath,
       config.singularLabel,
       navigate,
       registerMutation,
+      role,
       values,
     ],
   );
@@ -228,9 +263,15 @@ export function useStaffRegistrationForm(
       setFormError(null);
     }, []);
 
+  const clearSuccessMessage =
+    useCallback(() => {
+      setSuccessMessage(null);
+    }, []);
+
   const requiresPassword =
     role === "adviser" ||
-    role === "secretary";
+    role === "secretary" ||
+    role === "super_admin";
 
   const isServiceStaff =
     role === "service_staff";
@@ -240,6 +281,7 @@ export function useStaffRegistrationForm(
 
     photoPreview,
     formError,
+    successMessage,
 
     isSubmitting:
       registerMutation.isPending,
@@ -256,5 +298,6 @@ export function useStaffRegistrationForm(
     handleCancel,
 
     clearFormError,
+    clearSuccessMessage,
   };
 }

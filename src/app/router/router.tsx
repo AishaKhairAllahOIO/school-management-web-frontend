@@ -1,6 +1,6 @@
 import { createBrowserRouter } from "react-router-dom";
 
-import { AppLayout } from "@/app/layouts/AppLayout";
+import { AppLayout } from "@/app/layout/AppLayout";
 import { ErrorPage, NotFoundPage } from "@/app/pages";
 import { AuthGuard } from "@/features/auth/guards/AuthGuard";
 import { GuestGuard } from "@/features/auth/guards/GuestGuard";

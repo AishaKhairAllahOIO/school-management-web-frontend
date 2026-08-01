@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, type ReactNode } from "react";
 
 import { useAcademicYears } from "@/features/settings/academic/hooks/useAcademicSettings";
 import { useStaffByRole } from "@/features/users/staff/hooks/useStaff";
@@ -21,6 +21,68 @@ import type {
 } from "../types/grade-configuration.types";
 
 const ADVISERS_PER_PAGE = 500;
+
+type TextCellProps = {
+  value: ReactNode;
+  caption: string;
+  emphasis?: "primary" | "secondary";
+};
+
+function TextCell({
+  value,
+  caption,
+  emphasis = "primary",
+}: TextCellProps) {
+  return (
+    <div className="min-w-[150px] py-1.5">
+      <p
+        className={[
+          "truncate tracking-[-0.015em]",
+          emphasis === "primary"
+            ? "text-[14px] font-semibold text-foreground"
+            : "text-[14px] font-medium text-foreground/85",
+        ].join(" ")}
+      >
+        {value}
+      </p>
+
+      <p className="mt-1 truncate text-[11px] font-medium leading-4 text-muted-foreground/75">
+        {caption}
+      </p>
+    </div>
+  );
+}
+
+type MetricCellProps = {
+  value: number;
+  caption: string;
+  tone?: "accent" | "neutral";
+};
+
+function MetricCell({
+  value,
+  caption,
+  tone = "neutral",
+}: MetricCellProps) {
+  return (
+    <div className="min-w-[120px] py-1.5">
+      <p
+        className={[
+          "text-[18px] font-semibold leading-none tracking-[-0.035em]",
+          tone === "accent"
+            ? "text-[var(--academic-accent)]"
+            : "text-foreground",
+        ].join(" ")}
+      >
+        {value}
+      </p>
+
+      <p className="mt-2 truncate text-[11px] font-medium leading-4 text-muted-foreground/75">
+        {caption}
+      </p>
+    </div>
+  );
+}
 
 export function GradeConfigurationsPage() {
   const configurationsQuery =
@@ -203,10 +265,19 @@ export function GradeConfigurationsPage() {
         {
           key: "year",
           header: "Academic Year",
-          render: (row) =>
-            yearNameById.get(
-              String(row.academicYearId),
-            ) ?? "Unknown academic year",
+          render: (row) => {
+            const yearName =
+              yearNameById.get(
+                String(row.academicYearId),
+              ) ?? "Unknown academic year";
+
+            return (
+              <TextCell
+                value={yearName}
+                caption="Academic cycle"
+              />
+            );
+          },
           searchableText: (row) =>
             yearNameById.get(
               String(row.academicYearId),
@@ -215,10 +286,19 @@ export function GradeConfigurationsPage() {
         {
           key: "grade",
           header: "Grade",
-          render: (row) =>
-            gradeNameById.get(
-              String(row.gradeId),
-            ) ?? "Unknown grade",
+          render: (row) => {
+            const gradeName =
+              gradeNameById.get(
+                String(row.gradeId),
+              ) ?? "Unknown grade";
+
+            return (
+              <TextCell
+                value={gradeName}
+                caption="Configured grade"
+              />
+            );
+          },
           searchableText: (row) =>
             gradeNameById.get(
               String(row.gradeId),
@@ -227,10 +307,20 @@ export function GradeConfigurationsPage() {
         {
           key: "supervisor",
           header: "Supervisor",
-          render: (row) =>
-            adviserNameById.get(
-              String(row.supervisorId),
-            ) ?? "Unavailable supervisor",
+          render: (row) => {
+            const supervisorName =
+              adviserNameById.get(
+                String(row.supervisorId),
+              ) ?? "Unavailable supervisor";
+
+            return (
+              <TextCell
+                value={supervisorName}
+                caption="Grade supervisor"
+                emphasis="secondary"
+              />
+            );
+          },
           searchableText: (row) =>
             adviserNameById.get(
               String(row.supervisorId),
@@ -239,26 +329,50 @@ export function GradeConfigurationsPage() {
         {
           key: "plannedClassrooms",
           header: "Planned Classrooms",
-          render: (row) =>
-            row.plannedClassroomsCount,
+          render: (row) => (
+            <MetricCell
+              value={
+                row.plannedClassroomsCount
+              }
+              caption="Classrooms planned"
+              tone="accent"
+            />
+          ),
         },
         {
           key: "plannedCapacity",
           header: "Planned Capacity",
-          render: (row) =>
-            row.plannedStudentsCapacity,
+          render: (row) => (
+            <MetricCell
+              value={
+                row.plannedStudentsCapacity
+              }
+              caption="Student capacity"
+            />
+          ),
         },
         {
           key: "actualClassrooms",
           header: "Actual Classrooms",
-          render: (row) =>
-            row.actualClassroomsCount,
+          render: (row) => (
+            <MetricCell
+              value={
+                row.actualClassroomsCount
+              }
+              caption="Current classrooms"
+              tone="accent"
+            />
+          ),
         },
         {
           key: "actualStudents",
           header: "Actual Students",
-          render: (row) =>
-            row.actualStudentsCount,
+          render: (row) => (
+            <MetricCell
+              value={row.actualStudentsCount}
+              caption="Enrolled students"
+            />
+          ),
         },
       ]}
       toFormValues={(row) => ({

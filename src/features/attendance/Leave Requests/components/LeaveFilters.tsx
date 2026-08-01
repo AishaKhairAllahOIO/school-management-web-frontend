@@ -1,155 +1,49 @@
 import { Search } from "lucide-react";
 
 import { Input } from "@/shared/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/ui/select";
 
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/shared/ui/select";
-
-interface Props {
+type Props = {
   search: string;
   setSearch: (value: string) => void;
-
   leaveType: string;
   setLeaveType: (value: string) => void;
-
   status: string;
   setStatus: (value: string) => void;
-}
+  compact?: boolean;
+};
 
-export const LeaveFilters = ({
-  search,
-  setSearch,
-  leaveType,
-  setLeaveType,
-  status,
-  setStatus,
-}: Props) => {
+export function LeaveFilters({ search, setSearch, leaveType, setLeaveType, status, setStatus, compact = false }: Props) {
+  const triggerClass = "h-9 rounded-[12px] border-border/60 bg-background/80 text-[11px] shadow-none";
+
   return (
-    <div
-      className="
-        grid
-        gap-4
-        lg:grid-cols-3
-      "
-    >
-      {/* Search */}
-
-      <div className="relative">
-        <Search
-          size={18}
-          className="
-            absolute
-            left-4
-            top-1/2
-            -translate-y-1/2
-            text-muted-foreground
-            z-10
-          "
-        />
-
-        <Input
-          placeholder="Search employee..."
-          value={search}
-          onChange={(e) =>
-            setSearch(e.target.value)
-          }
-          className="
-            h-12
-            rounded-2xl
-            border-border/60
-            bg-background
-            pl-11
-            shadow-sm
-          "
-        />
+    <div className={compact ? "grid gap-2" : "grid gap-2.5 md:grid-cols-[minmax(220px,1fr)_170px_150px]"}>
+      <div className="relative min-w-0">
+        <Search className="absolute start-3 top-1/2 z-10 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" strokeWidth={1.8} />
+        <Input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search leave requests..." className={[triggerClass, "ps-8"].join(" ")} />
       </div>
-
-      {/* Leave Type */}
-
-      <Select
-        value={leaveType}
-        onValueChange={setLeaveType}
-      >
-        <SelectTrigger
-          className="
-            h-12
-            py-5.5
-            rounded-2xl
-            border-border/60
-            shadow-sm
-          "
-        >
-          <SelectValue placeholder="Leave Type" />
-        </SelectTrigger>
-
-        <SelectContent>
-          <SelectItem value="all">
-            All Types
-          </SelectItem>
-
-          <SelectItem value="Annual Leave">
-            Annual Leave
-          </SelectItem>
-
-          <SelectItem value="Sick Leave">
-            Sick Leave
-          </SelectItem>
-
-          <SelectItem value="Emergency Leave">
-            Emergency Leave
-          </SelectItem>
-
-          <SelectItem value="Maternity Leave">
-            Maternity Leave
-          </SelectItem>
-
-          <SelectItem value="Unpaid Leave">
-            Unpaid Leave
-          </SelectItem>
-        </SelectContent>
-      </Select>
-
-      {/* Status */}
-
-      <Select
-        value={status}
-        onValueChange={setStatus}
-      >
-        <SelectTrigger
-          className="
-            h-12
-            py-5.5
-            rounded-2xl
-            border-border/60
-            shadow-sm
-          "
-        >
-          <SelectValue placeholder="Status" />
-        </SelectTrigger>
-
-        <SelectContent>
-          <SelectItem value="all">
-            All Statuses
-          </SelectItem>
-
-          <SelectItem value="Pending">
-            Pending
-          </SelectItem>
-
-          <SelectItem value="Approved">
-            Approved
-          </SelectItem>
-
-          <SelectItem value="Rejected">
-            Rejected
-          </SelectItem>
-        </SelectContent>
-      </Select>
+      <div className={compact ? "grid grid-cols-2 gap-2" : "contents"}>
+        <Select value={leaveType} onValueChange={setLeaveType}>
+          <SelectTrigger className={triggerClass}><SelectValue placeholder="Leave type" /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All types</SelectItem>
+            <SelectItem value="Annual Leave">Annual</SelectItem>
+            <SelectItem value="Sick Leave">Sick</SelectItem>
+            <SelectItem value="Emergency Leave">Emergency</SelectItem>
+            <SelectItem value="Maternity Leave">Maternity</SelectItem>
+            <SelectItem value="Unpaid Leave">Unpaid</SelectItem>
+          </SelectContent>
+        </Select>
+        <Select value={status} onValueChange={setStatus}>
+          <SelectTrigger className={triggerClass}><SelectValue placeholder="Status" /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All status</SelectItem>
+            <SelectItem value="Pending">Pending</SelectItem>
+            <SelectItem value="Approved">Approved</SelectItem>
+            <SelectItem value="Rejected">Rejected</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
     </div>
   );
-};
+}

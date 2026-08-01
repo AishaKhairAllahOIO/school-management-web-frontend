@@ -11,10 +11,13 @@ import {
   Phone,
   Power,
   Trash2,
+  RotateCcw,
   UserRound,
 } from "lucide-react";
 
 import { motion } from "framer-motion";
+
+import { AuthenticatedUserImage } from "../../../shared/components/AuthenticatedUserImage";
 
 import type { StudentListItem } from "../../types/student.types";
 import { StudentStatusBadge } from "../shared/StudentStatusBadge";
@@ -24,6 +27,7 @@ type StudentCardProps = {
   index: number;
   isDeleting?: boolean;
   isToggling?: boolean;
+  isRestoring?: boolean;
 
   onView: (
     student: StudentListItem,
@@ -38,6 +42,10 @@ type StudentCardProps = {
   ) => void;
 
   onToggleStatus: (
+    student: StudentListItem,
+  ) => void;
+
+  onRestore: (
     student: StudentListItem,
   ) => void;
 };
@@ -89,10 +97,12 @@ export function StudentCard({
   index,
   isDeleting = false,
   isToggling = false,
+  isRestoring = false,
   onView,
   onEdit,
   onDelete,
   onToggleStatus,
+  onRestore,
 }: StudentCardProps) {
   const fullName =
     student.fullName?.trim() ||
@@ -110,9 +120,15 @@ export function StudentCard({
     normalizedAccountStatus ===
       "active";
 
+  const isDeleted = Boolean(
+    student.isDeleted ||
+      student.deletedAt,
+  );
+
   const isBusy =
     isDeleting ||
-    isToggling;
+    isToggling ||
+    isRestoring;
 
   return (
     <motion.article
@@ -133,9 +149,9 @@ export function StudentCard({
       }}
       aria-busy={isBusy}
       className={[
-        "group relative flex min-h-[365px]",
+        "group relative flex min-h-[315px]",
         "h-full flex-col overflow-hidden",
-        "rounded-[24px] border",
+        "rounded-[20px] border",
         "border-primary/20 bg-card",
         "shadow-[var(--shadow-card)]",
         "transition-[transform,border-color,box-shadow]",
@@ -152,7 +168,7 @@ export function StudentCard({
         className="absolute inset-x-0 top-0 h-[3px] bg-primary"
       />
 
-      <div className="flex flex-1 flex-col p-5">
+      <div className="flex flex-1 flex-col p-4">
         <div className="flex items-start justify-between gap-4">
           <button
             type="button"
@@ -169,32 +185,46 @@ export function StudentCard({
           >
             <div className="flex items-center gap-3.5">
               {student.photoUrl ? (
-                <img
-                  src={
-                    student.photoUrl
-                  }
+                <AuthenticatedUserImage
+                  src={student.photoUrl}
                   alt={fullName}
                   className={[
-                    "h-14 w-14 shrink-0",
-                    "rounded-[18px]",
+                    "h-12 w-12 shrink-0",
+                    "rounded-[15px]",
                     "border border-primary/20",
                     "object-cover",
                     "shadow-[var(--shadow-soft)]",
                   ].join(" ")}
+                  fallback={
+                    <div
+                      aria-hidden="true"
+                      className={[
+                        "flex h-12 w-12 shrink-0",
+                        "items-center justify-center",
+                        "rounded-[15px]",
+                        "bg-primary/[0.08]",
+                        "text-primary",
+                      ].join(" ")}
+                    >
+                      <span className="text-sm font-medium">
+                        {getInitials(fullName)}
+                      </span>
+                    </div>
+                  }
                 />
               ) : (
                 <div
                   aria-hidden="true"
                   className={[
-                    "flex h-14 w-14 shrink-0",
+                    "flex h-12 w-12 shrink-0",
                     "items-center justify-center",
-                    "rounded-[18px]",
+                    "rounded-[15px]",
                     "bg-primary/[0.08]",
                     "text-primary",
                   ].join(" ")}
                 >
                   {fullName ? (
-                    <span className="text-base font-semibold">
+                    <span className="text-sm font-medium">
                       {getInitials(
                         fullName,
                       )}
@@ -206,11 +236,11 @@ export function StudentCard({
               )}
 
               <div className="min-w-0">
-                <h2 className="truncate text-[17px] font-semibold tracking-[-0.025em] text-foreground">
+                <h2 className="truncate text-[15px] font-medium tracking-[-0.015em] text-foreground">
                   {fullName}
                 </h2>
 
-                <p className="mt-1 truncate text-[13px] font-normal text-muted-foreground">
+                <p className="mt-0.5 truncate text-[11px] font-normal text-muted-foreground">
                   {student.grade
                     ?.name
                     ? `${student.grade.name} student`
@@ -243,7 +273,7 @@ export function StudentCard({
           </button>
         </div>
 
-        <div className="mt-4 flex items-center justify-between gap-3">
+        <div className="mt-3 flex items-center justify-between gap-3">
           <StudentStatusBadge
             status={
               student.status
@@ -350,61 +380,99 @@ export function StudentCard({
           <ArrowUpRight className="h-4 w-4 shrink-0" />
         </button>
 
-        <ActionButton
-          label={`Edit ${fullName}`}
-          onClick={() =>
-            onEdit(student)
-          }
-          disabled={isBusy}
-        >
-          <Pencil className="h-4 w-4" />
-        </ActionButton>
+        {isDeleted ? (
+          <button
+            type="button"
+            onClick={() =>
+              onRestore(student)
+            }
+            disabled={isBusy}
+            className={[
+              "col-span-3 inline-flex h-10",
+              "items-center justify-center gap-2",
+              "rounded-xl border px-4",
+              "border-success/20 bg-success/10",
+              "text-xs font-semibold text-success",
+              "transition-colors",
+              "hover:bg-success/15",
+              "focus-visible:outline-none",
+              "focus-visible:ring-4",
+              "focus-visible:ring-success/10",
+              "disabled:cursor-not-allowed",
+              "disabled:opacity-50",
+            ].join(" ")}
+          >
+            {isRestoring ? (
+              <Spinner />
+            ) : (
+              <RotateCcw className="h-4 w-4" />
+            )}
 
-        <ActionButton
-          label={
-            isEnabled
-              ? "Disable account"
-              : "Enable account"
-          }
-          onClick={() =>
-            onToggleStatus(
-              student,
-            )
-          }
-          disabled={isBusy}
-          className={[
-            "text-warning",
-            "hover:border-warning/20",
-            "hover:bg-warning/10",
-            "hover:text-warning",
-          ].join(" ")}
-        >
-          {isToggling ? (
-            <Spinner />
-          ) : (
-            <Power className="h-4 w-4" />
-          )}
-        </ActionButton>
+            <span>
+              {isRestoring
+                ? "Restoring..."
+                : "Restore student"}
+            </span>
+          </button>
+        ) : (
+          <>
+            <ActionButton
+              label={`Edit ${fullName}`}
+              onClick={() =>
+                onEdit(student)
+              }
+              disabled={isBusy}
+            >
+              <Pencil className="h-4 w-4" />
+            </ActionButton>
 
-        <ActionButton
-          label={`Delete ${fullName}`}
-          onClick={() =>
-            onDelete(student)
-          }
-          disabled={isBusy}
-          className={[
-            "text-destructive",
-            "hover:border-destructive/20",
-            "hover:bg-destructive/10",
-            "hover:text-destructive",
-          ].join(" ")}
-        >
-          {isDeleting ? (
-            <Spinner />
-          ) : (
-            <Trash2 className="h-4 w-4" />
-          )}
-        </ActionButton>
+            <ActionButton
+              label={
+                isEnabled
+                  ? "Disable account"
+                  : "Enable account"
+              }
+              onClick={() =>
+                onToggleStatus(
+                  student,
+                )
+              }
+              disabled={isBusy}
+              className={[
+                "text-warning",
+                "hover:border-warning/20",
+                "hover:bg-warning/10",
+                "hover:text-warning",
+              ].join(" ")}
+            >
+              {isToggling ? (
+                <Spinner />
+              ) : (
+                <Power className="h-4 w-4" />
+              )}
+            </ActionButton>
+
+            <ActionButton
+              label={`Delete ${fullName}`}
+              onClick={() =>
+                onDelete(student)
+              }
+              disabled={isBusy}
+              className={[
+                "text-destructive",
+                "hover:border-destructive/20",
+                "hover:bg-destructive/10",
+                "hover:text-destructive",
+              ].join(" ")}
+            >
+              {isDeleting ? (
+                <Spinner />
+              ) : (
+                <Trash2 className="h-4 w-4" />
+              )}
+            </ActionButton>
+          </>
+        )}
       </div>
     </motion.article>
   );

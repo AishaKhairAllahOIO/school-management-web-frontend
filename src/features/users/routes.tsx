@@ -58,6 +58,14 @@ import {
   StaffEditPage,
 } from "@/features/users/staff/pages/StaffEditPage";
 
+import {
+  StaffImportPage,
+} from "@/features/users/staff/pages/StaffImportPage";
+
+import {
+  AdministratorRegistrationPage,
+} from "@/features/users/administrators/pages/AdministratorRegistrationPage";
+
 export const usersRoutes = [
   {
     path: "users",
@@ -66,6 +74,12 @@ export const usersRoutes = [
       {
         index: true,
         element: <UsersOverviewPage />,
+      },
+
+
+      {
+        path: "administrators/new",
+        element: <AdministratorRegistrationPage />,
       },
 
       {
@@ -93,9 +107,15 @@ export const usersRoutes = [
         element: <StudentProfilePage />,
       },
 
+
       {
         path: "teachers",
         element: <TeachersPage />,
+      },
+
+      {
+        path: "teachers/import",
+        element: <StaffImportPage role="teacher" />,
       },
 
       {
@@ -125,6 +145,11 @@ export const usersRoutes = [
       },
 
       {
+        path: "supervisors/import",
+        element: <StaffImportPage role="adviser" />,
+      },
+
+      {
         path: "supervisors/new",
         element: (
           <StaffRegistrationPage role="adviser" />
@@ -148,6 +173,11 @@ export const usersRoutes = [
       {
         path: "secretaries",
         element: <SecretariesPage />,
+      },
+
+      {
+        path: "secretaries/import",
+        element: <StaffImportPage role="secretary" />,
       },
 
       {
@@ -177,6 +207,11 @@ export const usersRoutes = [
       },
 
       {
+        path: "counselors/import",
+        element: <StaffImportPage role="counselor" />,
+      },
+
+      {
         path: "counselors/new",
         element: (
           <StaffRegistrationPage role="counselor" />
@@ -200,6 +235,11 @@ export const usersRoutes = [
       {
         path: "service-staff",
         element: <ServiceStaffPage />,
+      },
+
+      {
+        path: "service-staff/import",
+        element: <StaffImportPage role="service_staff" />,
       },
 
       {

@@ -30,8 +30,8 @@ export function EditExtraServiceDialog({
 }: Props) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-3xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
+      <DialogContent className="max-h-[90vh] overflow-y-auto rounded-[22px] border-border/60 p-0 sm:max-w-3xl">
+        <DialogHeader className="border-b border-border/45 px-6 py-5 text-left">
           <DialogTitle>Edit extra service</DialogTitle>
           <DialogDescription>
             Update the selected extra service.

@@ -1,64 +1,29 @@
-  import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/shared/ui/dialog";
-
 import { InstallmentPolicyForm } from "./InstallmentPolicyForm";
-
+import { FinancialBaseDialog } from "../../shared/FinancialBaseDialog";
 import type { InstallmentPolicyFormValues } from "../../schemas/installmentPolicy.schema";
 
 type Props = {
   open: boolean;
-
   onOpenChange: (open: boolean) => void;
-
   defaultValues: InstallmentPolicyFormValues;
-
   isLoading?: boolean;
-
-  onSubmit: (
-    values: InstallmentPolicyFormValues
-  ) => void;
+  onSubmit: (values: InstallmentPolicyFormValues) => void;
 };
 
-export function EditInstallmentPolicyDialog({
-  open,
-  onOpenChange,
-  defaultValues,
-  onSubmit,
-  isLoading,
-}: Props) {
-  function handleSubmit(
-    values: InstallmentPolicyFormValues
-  ) {
-    onSubmit(values);
-  }
-
+export function EditInstallmentPolicyDialog({ open, onOpenChange, defaultValues, onSubmit, isLoading }: Props) {
+  if (!open) return null;
   return (
-    <Dialog
-      open={open}
-      onOpenChange={onOpenChange}
+    <FinancialBaseDialog
+      title="Edit Installment Policy"
+      description="Update payment percentages and due dates for this policy."
+      onClose={() => onOpenChange(false)}
     >
-      <DialogContent className="sm:max-w-3xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>
-            Edit Installment Policy
-          </DialogTitle>
-
-          <DialogDescription>
-            Update installment policy information.
-          </DialogDescription>
-        </DialogHeader>
-
-        <InstallmentPolicyForm
-          defaultValues={defaultValues}
-          isLoading={isLoading}
-          onSubmit={handleSubmit}
-        />
-      </DialogContent>
-    </Dialog>
+      <InstallmentPolicyForm
+        defaultValues={defaultValues}
+        isLoading={isLoading}
+        onCancel={() => onOpenChange(false)}
+        onSubmit={onSubmit}
+      />
+    </FinancialBaseDialog>
   );
 }

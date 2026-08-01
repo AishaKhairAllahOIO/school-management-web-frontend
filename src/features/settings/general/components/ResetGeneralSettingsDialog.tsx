@@ -149,7 +149,7 @@ export function ResetGeneralSettingsDialog({
 
               <p
                 id="reset-settings-description"
-                className="mt-1.5 text-sm leading-6 text-muted-foreground"
+                className="mt-1.5 text-[15px] leading-6 text-muted-foreground"
               >
                 This permanently removes the school
                 profile, logo and gallery content.
@@ -186,12 +186,12 @@ export function ResetGeneralSettingsDialog({
               "p-4",
             ].join(" ")}
           >
-            <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-destructive">
+            <p className="text-[12px] font-semibold uppercase tracking-[0.12em] text-destructive">
               This action will remove
             </p>
 
             <ul className="mt-3 space-y-2.5">
-              <li className="flex items-center gap-2.5 text-sm text-foreground/80">
+              <li className="flex items-center gap-2.5 text-[15px] text-foreground/80">
                 <span className="flex h-5 w-5 items-center justify-center rounded-full bg-destructive/[0.08] text-destructive">
                   <Check size={12} />
                 </span>
@@ -199,7 +199,7 @@ export function ResetGeneralSettingsDialog({
                 School profile information
               </li>
 
-              <li className="flex items-center gap-2.5 text-sm text-foreground/80">
+              <li className="flex items-center gap-2.5 text-[15px] text-foreground/80">
                 <span className="flex h-5 w-5 items-center justify-center rounded-full bg-destructive/[0.08] text-destructive">
                   <Check size={12} />
                 </span>
@@ -207,7 +207,7 @@ export function ResetGeneralSettingsDialog({
                 The currently uploaded logo
               </li>
 
-              <li className="flex items-center gap-2.5 text-sm text-foreground/80">
+              <li className="flex items-center gap-2.5 text-[15px] text-foreground/80">
                 <span className="flex h-5 w-5 items-center justify-center rounded-full bg-destructive/[0.08] text-destructive">
                   <Check size={12} />
                 </span>
@@ -218,9 +218,9 @@ export function ResetGeneralSettingsDialog({
           </div>
 
           <label className="block">
-            <span className="mb-2.5 block text-xs font-semibold text-foreground/80">
+            <span className="mb-2.5 block text-[13px] font-semibold text-foreground/80">
               Type{" "}
-              <span className="rounded-full bg-muted/65 px-2.5 py-1 font-mono text-[11px] text-destructive">
+              <span className="rounded-full bg-muted/65 px-2.5 py-1 font-mono text-[12px] text-destructive">
                 {confirmationValue}
               </span>{" "}
               to confirm
@@ -243,7 +243,7 @@ export function ResetGeneralSettingsDialog({
                 "border border-transparent",
                 "bg-muted/[0.4]",
                 "px-4",
-                "font-mono text-sm font-semibold",
+                "font-mono text-[15px] font-semibold",
                 "text-foreground",
                 "outline-none transition duration-200",
                 "hover:bg-muted/55",
@@ -261,7 +261,7 @@ export function ResetGeneralSettingsDialog({
 
             {confirmation.length > 0 &&
             !isConfirmed ? (
-              <p className="mt-2 px-1 text-[11px] font-medium text-destructive">
+              <p className="mt-2 px-1 text-[12px] font-medium text-destructive">
                 The confirmation value does not
                 match.
               </p>
@@ -284,7 +284,7 @@ export function ResetGeneralSettingsDialog({
             className={[
               "h-10 rounded-full",
               "bg-card px-5",
-              "text-xs font-semibold",
+              "text-[13px] font-semibold",
               "text-foreground/75",
               "shadow-[0_5px_16px_rgba(30,20,70,0.04)]",
               "transition duration-200",
@@ -307,7 +307,7 @@ export function ResetGeneralSettingsDialog({
               "justify-center gap-2",
               "rounded-full",
               "bg-destructive px-5",
-              "text-xs font-semibold",
+              "text-[13px] font-semibold",
               "text-destructive-foreground",
               "shadow-[0_8px_20px_rgba(180,35,35,0.15)]",
               "transition duration-200",

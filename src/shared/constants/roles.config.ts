@@ -1,7 +1,7 @@
 export const WEB_ALLOWED_ROLES = [
   "super_admin",
   "secretary",
-  "supervisor",
+  "adviser",
 ] as const;
 
 

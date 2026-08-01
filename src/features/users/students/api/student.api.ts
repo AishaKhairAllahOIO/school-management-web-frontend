@@ -1,6 +1,11 @@
 import { API_ENDPOINTS } from "@/services/api/endpoints";
 import { axiosClient } from "@/services/axios/axiosClient";
 
+import {
+  normalizeApiDateOnly,
+  normalizeApiDateTime,
+} from "../../shared/utils/api-date";
+
 import type {
   ApiId,
   ApiMessageResponse,
@@ -30,7 +35,6 @@ import type {
   UpdateStudentPersonalPayload,
 } from "../types/student.types";
 
-
 function unwrapResponse<T>(
   response: ApiResponse<T> | T,
 ): T {
@@ -45,11 +49,9 @@ function unwrapResponse<T>(
   return response as T;
 }
 
-
 function normalizeToggleAccountResponse(
   response: ToggleStudentAccountResponse & {
     enrollment_id?: ApiId;
-
     account_status?:
       ToggleStudentAccountResponse["accountStatus"];
   },
@@ -68,10 +70,56 @@ function normalizeToggleAccountResponse(
   };
 }
 
+
+function normalizePersonProfile<T extends {
+  birthDate?: string | null;
+}>(person: T): T {
+  return {
+    ...person,
+    birthDate: normalizeApiDateOnly(person.birthDate),
+  };
+}
+
+function normalizeStudentFullProfile(
+  profile: StudentFullProfile,
+): StudentFullProfile {
+  return {
+    ...profile,
+    student: normalizePersonProfile(profile.student),
+    guardian: profile.guardian
+      ? normalizePersonProfile(profile.guardian)
+      : null,
+    enrollment: {
+      ...profile.enrollment,
+      enrollmentDate: normalizeApiDateOnly(profile.enrollment.enrollmentDate),
+      completedAt: normalizeApiDateTime(profile.enrollment.completedAt),
+      deletedAt: normalizeApiDateTime(profile.enrollment.deletedAt),
+      createdAt: normalizeApiDateTime(profile.enrollment.createdAt),
+      updatedAt: normalizeApiDateTime(profile.enrollment.updatedAt),
+      academicYear: profile.enrollment.academicYear
+        ? {
+            ...profile.enrollment.academicYear,
+            startDate: normalizeApiDateOnly(profile.enrollment.academicYear.startDate),
+            endDate: normalizeApiDateOnly(profile.enrollment.academicYear.endDate),
+          }
+        : profile.enrollment.academicYear,
+    },
+  };
+}
+
+function normalizeStudentListResponse(
+  response: StudentListResponse,
+): StudentListResponse {
+  return {
+    ...response,
+    data: response.data.map((student) => ({
+      ...student,
+      deletedAt: normalizeApiDateTime(student.deletedAt),
+    })),
+  };
+}
+
 export const studentApi = {
-  /**
-   * عرض قائمة الطلاب.
-   */
   async list(
     filters: StudentListFilters = {},
   ): Promise<StudentListResponse> {
@@ -84,17 +132,15 @@ export const studentApi = {
       },
     );
 
-    return unwrapResponse(response.data);
+    return normalizeStudentListResponse(
+      unwrapResponse(response.data),
+    );
   },
 
-  /**
-   * البحث عن الطلاب.
-   */
   async search(
     params: StudentSearchParams,
   ): Promise<StudentListResponse> {
-    const normalizedQuery =
-      params.q.trim();
+    const normalizedQuery = params.q.trim();
 
     if (normalizedQuery.length < 2) {
       throw new Error(
@@ -114,14 +160,11 @@ export const studentApi = {
       },
     );
 
-    return unwrapResponse(response.data);
+    return normalizeStudentListResponse(
+      unwrapResponse(response.data),
+    );
   },
 
-  /**
-   * جلب معلومات الطالب الأساسية.
-   *
-   * هذا endpoint يستخدم studentId وليس enrollmentId.
-   */
   async getDetails(
     studentId: ApiId,
   ): Promise<StudentDetails> {
@@ -133,7 +176,15 @@ export const studentApi = {
       ),
     );
 
-    return unwrapResponse(response.data);
+    const details = unwrapResponse(response.data);
+
+    return {
+      ...details,
+      student: normalizePersonProfile(details.student),
+      guardian: details.guardian
+        ? normalizePersonProfile(details.guardian)
+        : null,
+    };
   },
 
   async getFullProfile(
@@ -147,7 +198,7 @@ export const studentApi = {
       ),
     );
 
-    return unwrapResponse(response.data);
+    return normalizeStudentFullProfile(unwrapResponse(response.data));
   },
 
   async register(
@@ -165,27 +216,20 @@ export const studentApi = {
       formData,
     );
 
-    return unwrapResponse(response.data);
+    return normalizeStudentFullProfile(unwrapResponse(response.data));
   },
 
-  /**
-   * تعديل البيانات الشخصية للطالب.
-   *
-   * هذا endpoint يستخدم studentId.
-   */
   async updatePersonal(
     studentId: ApiId,
     payload: UpdateStudentPersonalPayload,
-  ): Promise<StudentDetails["student"]> {
+  ): Promise<StudentFullProfile> {
     const formData =
       buildStudentPersonalFormData(
         payload,
       );
 
     const response = await axiosClient.post<
-      ApiResponse<
-        StudentDetails["student"]
-      >
+      ApiResponse<StudentFullProfile>
     >(
       API_ENDPOINTS.STUDENTS.PERSONAL(
         studentId,
@@ -193,59 +237,36 @@ export const studentApi = {
       formData,
     );
 
-    return unwrapResponse(response.data);
+    return normalizeStudentFullProfile(unwrapResponse(response.data));
   },
 
-  /**
-   * تعديل بيانات ولي الأمر.
-   *
-   * هذا endpoint يستخدم guardianId.
-   */
   async updateGuardian(
     guardianId: ApiId,
     payload: UpdateGuardianPersonalPayload,
-  ): Promise<
-    NonNullable<
-      StudentDetails["guardian"]
-    >
-  > {
+  ): Promise<StudentFullProfile> {
     const formData =
       buildGuardianPersonalFormData(
         payload,
       );
 
     const response = await axiosClient.post<
-      ApiResponse<
-        NonNullable<
-          StudentDetails["guardian"]
-        >
-      >
+      ApiResponse<StudentFullProfile>
     >(
-      API_ENDPOINTS.STUDENTS
-        .GUARDIAN_PERSONAL(
-          guardianId,
-        ),
+      API_ENDPOINTS.STUDENTS.GUARDIAN_PERSONAL(
+        guardianId,
+      ),
       formData,
     );
 
-    return unwrapResponse(response.data);
+    return normalizeStudentFullProfile(unwrapResponse(response.data));
   },
 
-  /**
-   * تعديل بيانات القيد الأكاديمي.
-   *
-   * هذا endpoint يستخدم enrollmentId.
-   */
   async updateEnrollment(
     enrollmentId: ApiId,
     payload: UpdateStudentEnrollmentPayload,
-  ): Promise<
-    StudentFullProfile["enrollment"]
-  > {
+  ): Promise<StudentFullProfile> {
     const response = await axiosClient.post<
-      ApiResponse<
-        StudentFullProfile["enrollment"]
-      >
+      ApiResponse<StudentFullProfile>
     >(
       API_ENDPOINTS.STUDENTS.ENROLLMENT(
         enrollmentId,
@@ -253,15 +274,9 @@ export const studentApi = {
       payload,
     );
 
-    return unwrapResponse(response.data);
+    return normalizeStudentFullProfile(unwrapResponse(response.data));
   },
 
-  /**
-   * تفعيل أو تعطيل حساب الطالب.
-   *
-   * مهم:
-   * يجب تمرير enrollmentId وليس studentId.
-   */
   async toggleAccountStatus(
     enrollmentId: ApiId,
   ): Promise<ToggleStudentAccountResponse> {
@@ -269,7 +284,6 @@ export const studentApi = {
       ApiResponse<
         ToggleStudentAccountResponse & {
           enrollment_id?: ApiId;
-
           account_status?:
             ToggleStudentAccountResponse["accountStatus"];
         }
@@ -290,12 +304,6 @@ export const studentApi = {
     );
   },
 
-  /**
-   * سحب الطالب أو حذف القيد.
-   *
-   * الباك يبحث عن Enrollment،
-   * لذلك يجب تمرير enrollmentId.
-   */
   async remove(
     enrollmentId: ApiId,
   ): Promise<DeleteStudentResponse> {
@@ -310,23 +318,30 @@ export const studentApi = {
       );
 
     if (
-      typeof response.data ===
-        "object" &&
+      typeof response.data === "object" &&
       response.data !== null &&
       "data" in response.data
     ) {
       return response.data.data;
     }
 
-    return null;
+    return {};
   },
 
-  /**
-   * رفع ملف Excel أو CSV.
-   *
-   * الباك يتوقع اسم الحقل:
-   * excel_file
-   */
+  async restore(
+    enrollmentId: ApiId,
+  ): Promise<StudentFullProfile> {
+    const response = await axiosClient.post<
+      ApiResponse<StudentFullProfile>
+    >(
+      API_ENDPOINTS.STUDENTS.RESTORE(
+        enrollmentId,
+      ),
+    );
+
+    return normalizeStudentFullProfile(unwrapResponse(response.data));
+  },
+
   async importFile(
     file: File,
   ): Promise<StudentImportStartResponse> {
@@ -348,9 +363,6 @@ export const studentApi = {
     return unwrapResponse(response.data);
   },
 
-  /**
-   * متابعة حالة عملية الاستيراد.
-   */
   async getImportStatus(
     batchId: ApiId,
   ): Promise<StudentImportBatchStatus> {
@@ -367,9 +379,6 @@ export const studentApi = {
     return unwrapResponse(response.data);
   },
 
-  /**
-   * جلب سجل عمليات الاستيراد.
-   */
   async getImportHistory(
     page = 1,
   ): Promise<StudentImportHistoryResponse> {
@@ -390,9 +399,6 @@ export const studentApi = {
     return unwrapResponse(response.data);
   },
 
-  /**
-   * تحميل ملف أخطاء الاستيراد.
-   */
   async exportImportErrors(
     batchId: ApiId,
   ): Promise<Blob> {

@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { GraduationCap } from "lucide-react";
+import { Check, GraduationCap, Minus } from "lucide-react";
 import { useAcademicStages } from "@/features/settings/academic/hooks/useAcademicSettings";
 
 import { CrudPage } from "../../shared/components/CrudPage";
@@ -42,10 +42,7 @@ export function GradesPage() {
   const stageNameById = useMemo(
     () =>
       new Map(
-        stageOptions.map((option) => [
-          option.value,
-          option.label,
-        ]),
+        stageOptions.map((option) => [option.value, option.label]),
       ),
     [stageOptions],
   );
@@ -59,10 +56,7 @@ export function GradesPage() {
       isLoading={gradesQuery.isLoading || stagesQuery.isLoading}
       isError={gradesQuery.isError || stagesQuery.isError}
       onRetry={() => {
-        void Promise.all([
-          gradesQuery.refetch(),
-          stagesQuery.refetch(),
-        ]);
+        void Promise.all([gradesQuery.refetch(), stagesQuery.refetch()]);
       }}
       loadEntity={gradeApi.getById}
       createMutation={createMutation}
@@ -94,127 +88,108 @@ export function GradesPage() {
         },
       ]}
       columns={[
-  {
-    key: "name",
-    header: "Grade",
-    searchableText: (row) =>
-      row.name,
-    render: (row) => (
-      <div className="flex items-center gap-3">
-        <span
-          className={[
-            "flex h-10 w-10 shrink-0 items-center",
-            "justify-center rounded-2xl",
-            "border border-primary/15",
-            "bg-primary/10 text-primary",
-          ].join(" ")}
-        >
-          <GraduationCap size={17} />
-        </span>
+        {
+          key: "name",
+          header: "Grade",
+          searchableText: (row) => row.name,
+          render: (row) => (
+            <div className="flex items-center gap-3.5">
+              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[16px] border border-[var(--academic-border)] bg-[var(--academic-soft)] text-[var(--academic-accent)] shadow-[var(--shadow-soft)]">
+                <GraduationCap size={18} strokeWidth={1.8} />
+              </span>
 
-        <div>
-          <p className="font-extrabold text-foreground">
-            {row.name}
-          </p>
+              <div className="min-w-0">
+                <p className="truncate text-sm font-semibold tracking-[-0.01em] text-foreground">
+                  {row.name}
+                </p>
+                <p className="mt-0.5 text-[11px] font-normal text-muted-foreground">
+                  Grade record
+                </p>
+              </div>
+            </div>
+          ),
+        },
+        {
+          key: "stage",
+          header: "Academic Stage",
+          searchableText: (row) =>
+            stageNameById.get(String(row.academicStageId)) ?? "",
+          render: (row) => {
+            const stageName =
+              stageNameById.get(String(row.academicStageId)) ??
+              `Stage ${row.academicStageId}`;
 
-          <p className="mt-0.5 text-[10px] font-medium text-muted-foreground">
-            Grade record
-          </p>
-        </div>
-      </div>
-    ),
-  },
+            return (
+              <div className="flex items-center gap-2.5">
+                <span className="h-2 w-2 shrink-0 rounded-full bg-[var(--academic-accent)]" />
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-medium text-foreground/85">
+                    {stageName}
+                  </p>
+                  <p className="mt-0.5 text-[10px] font-normal text-muted-foreground/80">
+                    Academic stage
+                  </p>
+                </div>
+              </div>
+            );
+          },
+        },
+        {
+          key: "level",
+          header: "Level",
+          searchableText: (row) => String(row.level),
+          render: (row) => (
+            <div>
+              <p className="text-[15px] font-semibold text-[var(--academic-accent)]">
+                {row.level}
+              </p>
+              <p className="mt-0.5 text-[10px] font-normal text-muted-foreground/80">
+                Grade level
+              </p>
+            </div>
+          ),
+        },
+        {
+          key: "graduation",
+          header: "Graduation",
+          searchableText: (row) =>
+            row.isGraduationGrade ? "yes graduation" : "no",
+          render: (row) => (
+            <div className="flex items-center gap-2.5">
+              <span
+                className={[
+                  "flex h-7 w-7 shrink-0 items-center justify-center rounded-[10px]",
+                  row.isGraduationGrade
+                    ? "bg-emerald-500/[0.09] text-emerald-600"
+                    : "bg-muted/60 text-muted-foreground",
+                ].join(" ")}
+              >
+                {row.isGraduationGrade ? (
+                  <Check size={14} strokeWidth={2.4} />
+                ) : (
+                  <Minus size={14} strokeWidth={2.2} />
+                )}
+              </span>
 
-  {
-    key: "stage",
-    header: "Academic Stage",
-    searchableText: (row) =>
-      stageNameById.get(
-        String(row.academicStageId),
-      ) ?? "",
-    render: (row) => {
-      const stageName =
-        stageNameById.get(
-          String(row.academicStageId),
-        ) ??
-        `Stage ${row.academicStageId}`;
-
-      return (
-        <span
-          className={[
-            "inline-flex items-center gap-2",
-            "rounded-full border",
-            "border-emerald-200",
-            "bg-emerald-50 px-3 py-1.5",
-            "text-xs font-bold text-emerald-700",
-          ].join(" ")}
-        >
-          <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-          {stageName}
-        </span>
-      );
-    },
-  },
-
-  {
-    key: "level",
-    header: "Level",
-    align: "center",
-    searchableText: (row) =>
-      String(row.level),
-    render: (row) => (
-      <span
-        className={[
-          "inline-flex h-8 min-w-8 items-center",
-          "justify-center rounded-xl",
-          "border border-violet-200",
-          "bg-violet-50 px-2.5",
-          "text-xs font-extrabold text-violet-700",
-        ].join(" ")}
-      >
-        {row.level}
-      </span>
-    ),
-  },
-
-  {
-    key: "graduation",
-    header: "Graduation",
-    align: "center",
-    searchableText: (row) =>
-      row.isGraduationGrade
-        ? "yes graduation"
-        : "no",
-    render: (row) =>
-      row.isGraduationGrade ? (
-        <span
-          className={[
-            "inline-flex items-center gap-1.5",
-            "rounded-full border border-emerald-200",
-            "bg-emerald-50 px-3 py-1.5",
-            "text-xs font-bold text-emerald-700",
-          ].join(" ")}
-        >
-          <span className="flex h-4 w-4 items-center justify-center rounded-full bg-emerald-500 text-[9px] text-white">
-            ✓
-          </span>
-          Yes
-        </span>
-      ) : (
-        <span
-          className={[
-            "inline-flex items-center gap-1.5",
-            "rounded-full border border-slate-200",
-            "bg-slate-50 px-3 py-1.5",
-            "text-xs font-bold text-slate-500",
-          ].join(" ")}
-        >
-          <span className="h-1.5 w-1.5 rounded-full bg-slate-400" />
-          No
-        </span>
-      ),
-  },
-]}
+              <div>
+                <p
+                  className={[
+                    "text-sm font-medium",
+                    row.isGraduationGrade
+                      ? "text-emerald-700"
+                      : "text-foreground/70",
+                  ].join(" ")}
+                >
+                  {row.isGraduationGrade ? "Graduating" : "Not graduating"}
+                </p>
+                <p className="mt-0.5 text-[10px] font-normal text-muted-foreground/80">
+                  Graduation status
+                </p>
+              </div>
+            </div>
+          ),
+        },
+      ]}
       toFormValues={(row) => ({
         academicStageId: String(row.academicStageId),
         name: row.name,
@@ -227,21 +202,16 @@ export function GradesPage() {
       })}
       buildUpdatePayload={(values, row) => {
         const payload: UpdateGradePayload = {};
-
         const academicStageId = Number(values.academicStageId);
         const name = String(values.name ?? "").trim();
-        const isGraduationGrade = Boolean(
-          values.isGraduationGrade,
-        );
+        const isGraduationGrade = Boolean(values.isGraduationGrade);
 
         if (academicStageId !== Number(row.academicStageId)) {
           payload.academicStageId = academicStageId;
         }
-
         if (name !== row.name) {
           payload.name = name;
         }
-
         if (isGraduationGrade !== row.isGraduationGrade) {
           payload.isGraduationGrade = isGraduationGrade;
         }

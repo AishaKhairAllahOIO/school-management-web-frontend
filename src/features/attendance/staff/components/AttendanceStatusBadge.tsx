@@ -1,37 +1,23 @@
 interface Props {
-  status:
-    | "Present"
-    | "Late"
-    | "Absent";
+  status: "Present" | "Absent";
 }
 
-export const AttendanceStatusBadge =
-({
-  status,
-}: Props) => {
-  const styles = {
-    Present:
-      "bg-green-100 text-green-700",
-
-    Late:
-      "bg-yellow-100 text-yellow-700",
-
-    Absent:
-      "bg-red-100 text-red-700",
-  };
+export function AttendanceStatusBadge({ status }: Props) {
+  const styles =
+    status === "Present"
+      ? "bg-success/[0.10] text-success"
+      : "bg-destructive/[0.09] text-destructive";
 
   return (
     <span
-      className={`
-        rounded-full
-        px-3
-        py-1
-        text-sm
-        font-medium
-        ${styles[status]}
-      `}
+      className={[
+        "inline-flex rounded-full",
+        "px-2.5 py-1",
+        "text-[10px] font-medium",
+        styles,
+      ].join(" ")}
     >
       {status}
     </span>
   );
-};
+}

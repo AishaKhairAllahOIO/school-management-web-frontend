@@ -1,10 +1,17 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
-import { fetchReports } from "../api/reports.api";
+import { fetchReports, generateReport } from "../api/reports.api";
 
-export const useReports = () => {
+export function useReports() {
   return useQuery({
-    queryKey: ["reports-summary"],
+    queryKey: ["reports", "workspace"],
     queryFn: fetchReports,
+    staleTime: 60_000,
   });
-};
+}
+
+export function useGenerateReport() {
+  return useMutation({
+    mutationFn: generateReport,
+  });
+}

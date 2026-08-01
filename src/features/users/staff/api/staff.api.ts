@@ -10,6 +10,12 @@ import {
   objectToFormData,
 } from "../../shared/api/form-data.utils";
 
+
+import {
+  normalizeApiDateOnly,
+  normalizeApiDateTime,
+} from "../../shared/utils/api-date";
+
 import type {
   ApiResponse,
 } from "../../shared/types/api.types";
@@ -19,6 +25,8 @@ import type {
   RegisterStaffValues,
   StaffAccountStatus,
   StaffPaginator,
+  StaffImportBatchStatus,
+  StaffImportStartResponse,
   StaffProfile,
   StaffRole,
   UpdateStaffEmploymentValues,
@@ -45,7 +53,7 @@ type RawUser = {
   birth_place?: string | null;
 
   gender?: StaffProfile["gender"];
-  nationality:
+  nationality?:
     StaffProfile["nationality"];
 
   address?: string | null;
@@ -130,6 +138,8 @@ type RawStaff = {
   role?:
     | StaffRole
     | string
+    | string[]
+    | RawRole[]
     | null;
 
   is_deleted?: boolean;
@@ -211,26 +221,36 @@ function nullableNumber(
 function normalizeRole(
   value: unknown,
 ): StaffRole | null {
-  const supportedRoles:
-    StaffRole[] = [
-      "teacher",
-      "adviser",
-      "secretary",
-      "counselor",
-      "service_staff",
-    ];
+  const supportedRoles: StaffRole[] = [
+    "teacher",
+    "adviser",
+    "secretary",
+    "counselor",
+    "service_staff",
+    "super_admin",
+  ];
 
-  return supportedRoles.includes(
-    value as StaffRole,
-  )
-    ? value as StaffRole
+  const roleValue = Array.isArray(value)
+    ? value
+        .map((item) =>
+          typeof item === "string"
+            ? item
+            : item && typeof item === "object" && "name" in item
+              ? String((item as RawRole).name ?? "")
+              : "",
+        )
+        .find((item) => supportedRoles.includes(item as StaffRole))
+    : value;
+
+  return supportedRoles.includes(roleValue as StaffRole)
+    ? (roleValue as StaffRole)
     : null;
 }
 
 function normalizeAccountStatus(
   value: unknown,
 ): StaffAccountStatus {
-  return value === "active"
+  return value === "active" || value === "enabled"
     ? "active"
     : "disabled";
 }
@@ -311,11 +331,12 @@ function normalizeStaff(
       user?.email ??
       null,
 
-    birthDate:
+    birthDate: normalizeApiDateOnly(
       raw.birthDate ??
       raw.birth_date ??
       user?.birth_date ??
       null,
+    ),
 
     birthPlace:
       raw.birthPlace ??
@@ -369,10 +390,11 @@ function normalizeStaff(
         raw.graduation_year,
       ),
 
-    hireDate:
+    hireDate: normalizeApiDateOnly(
       raw.hireDate ??
       raw.hire_date ??
       null,
+    ),
 
     experienceYears:
       raw.experienceYears ??
@@ -396,61 +418,85 @@ function normalizeStaff(
       raw.is_deleted ??
       Boolean(deletedAt),
 
-    deletedAt,
+    deletedAt: normalizeApiDateTime(deletedAt),
 
-    createdAt:
-      raw.createdAt ??
-      raw.created_at ??
-      null,
+    createdAt: normalizeApiDateTime(
+      raw.createdAt ?? raw.created_at ?? null,
+    ),
 
-    updatedAt:
-      raw.updatedAt ??
-      raw.updated_at ??
-      null,
+    updatedAt: normalizeApiDateTime(
+      raw.updatedAt ?? raw.updated_at ?? null,
+    ),
   };
 }
 
 function normalizePaginator(
-  raw: RawPaginator,
+  value: unknown,
 ): StaffPaginator {
-  const meta =
-    raw.meta ?? {};
+  let raw = value as RawPaginator | RawStaff[];
+
+  // Laravel ResourceCollection may arrive as:
+  // data: [...], or data: { data: [...], meta: {...} }.
+  if (
+    raw &&
+    !Array.isArray(raw) &&
+    typeof raw === "object" &&
+    "data" in raw &&
+    !Array.isArray((raw as RawPaginator).data)
+  ) {
+    raw = (raw as { data: RawPaginator }).data;
+  }
+
+  if (Array.isArray(raw)) {
+    const data = raw.map(normalizeStaff);
+
+    return {
+      data,
+      currentPage: 1,
+      lastPage: 1,
+      perPage: data.length,
+      total: data.length,
+      from: data.length > 0 ? 1 : null,
+      to: data.length > 0 ? data.length : null,
+    };
+  }
+
+  const paginator = raw ?? { data: [] };
+  const meta = paginator.meta ?? {};
+  const items = Array.isArray(paginator.data) ? paginator.data : [];
 
   return {
-    data: (
-      raw.data ?? []
-    ).map(normalizeStaff),
+    data: items.map(normalizeStaff),
 
     currentPage:
-      raw.current_page ??
+      paginator.current_page ??
       meta.current_page ??
       1,
 
     lastPage:
-      raw.last_page ??
+      paginator.last_page ??
       meta.last_page ??
       1,
 
     perPage:
-      raw.per_page ??
+      paginator.per_page ??
       meta.per_page ??
-      15,
+      items.length,
 
     total:
-      raw.total ??
+      paginator.total ??
       meta.total ??
-      raw.data?.length ??
-      0,
+      items.length,
 
     from:
-      raw.from ??
+      paginator.from ??
       meta.from ??
-      null,
+      (items.length > 0 ? 1 : null),
 
     to:
-      raw.to ??
+      paginator.to ??
       meta.to ??
-      null,
+      (items.length > 0 ? items.length : null),
   };
 }
 
@@ -479,6 +525,21 @@ export const staffApi = {
     return normalizePaginator(
       unwrap(response.data),
     );
+  },
+
+  async searchByRole(
+    role: StaffRole,
+    name: string,
+    page = 1,
+    perPage = 15,
+  ): Promise<StaffPaginator> {
+    const response = await axiosClient.get<
+      ApiResponse<RawPaginator> | RawPaginator
+    >(API_ENDPOINTS.STAFF.ROLE_SEARCH(role), {
+      params: { name: name.trim(), page, per_page: perPage },
+    });
+
+    return normalizePaginator(unwrap(response.data));
   },
 
   async getDetails(
@@ -578,10 +639,15 @@ export const staffApi = {
         | ApiResponse<RawStaff>
         | RawStaff
       >(
-        API_ENDPOINTS.STAFF.EMPLOYMENT(
+        API_ENDPOINTS.STAFF.PERSONAL(
           staffId,
         ),
-        values,
+        objectToFormData(
+          values as Record<
+            string,
+            unknown
+          >,
+        ),
       );
 
     return normalizeStaff(
@@ -608,4 +674,63 @@ export const staffApi = {
       ),
     );
   },
+
+  async restore(
+    staffId: ApiId,
+  ): Promise<StaffProfile> {
+    const response =
+      await axiosClient.post<
+        | ApiResponse<RawStaff>
+        | RawStaff
+      >(
+        API_ENDPOINTS.STAFF.RESTORE(
+          staffId,
+        ),
+      );
+
+    return normalizeStaff(
+      unwrap(response.data),
+    );
+  },
+
+  async importFile(
+    role: StaffRole,
+    file: File,
+  ): Promise<StaffImportStartResponse> {
+    const formData = new FormData();
+    formData.append("excel_file", file);
+
+    const response = await axiosClient.post<
+      ApiResponse<StaffImportStartResponse>
+    >(
+      API_ENDPOINTS.STAFF.IMPORT(role),
+      formData,
+    );
+
+    return unwrap(response.data);
+  },
+
+  async getImportStatus(
+    batchId: ApiId,
+  ): Promise<StaffImportBatchStatus> {
+    const response = await axiosClient.get<
+      ApiResponse<StaffImportBatchStatus>
+    >(
+      API_ENDPOINTS.STAFF.IMPORT_STATUS(batchId),
+    );
+
+    return unwrap(response.data);
+  },
+
+  async exportImportErrors(
+    batchId: ApiId,
+  ): Promise<Blob> {
+    const response = await axiosClient.get<Blob>(
+      API_ENDPOINTS.STAFF.IMPORT_ERRORS(batchId),
+      { responseType: "blob" },
+    );
+
+    return response.data;
+  },
+
 };

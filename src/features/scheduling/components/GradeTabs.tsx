@@ -5,25 +5,25 @@ type GradeTabsProps = {
   onChange: (grade: SchoolGrade) => void;
 };
 
-const grades: { label: string; value: SchoolGrade }[] = [
-  { label: "Seventh", value: "seventh" },
-  { label: "Eighth", value: "eighth" },
-  { label: "Ninth", value: "ninth" },
+const grades: { label: string; value: SchoolGrade; className: string }[] = [
+  { label: "Seventh", value: "seventh", className: "border-violet-200/70 bg-violet-50/80 text-violet-700" },
+  { label: "Eighth", value: "eighth", className: "border-sky-200/70 bg-sky-50/80 text-sky-700" },
+  { label: "Ninth", value: "ninth", className: "border-emerald-200/70 bg-emerald-50/80 text-emerald-700" },
 ];
 
 export function GradeTabs({ value, onChange }: GradeTabsProps) {
   return (
-    <div className="mx-auto grid w-full max-w-lg grid-cols-3 rounded-2xl border border-border/70 bg-background p-1">
+    <div className="flex flex-wrap gap-2">
       {grades.map((grade) => (
         <button
           key={grade.value}
           type="button"
           onClick={() => onChange(grade.value)}
           className={[
-            "h-10 rounded-xl text-sm font-semibold transition",
+            "rounded-full border px-4 py-2 text-[13px] font-medium transition",
             value === grade.value
-              ? "bg-primary text-primary-foreground shadow-soft"
-              : "text-muted-foreground hover:bg-muted hover:text-foreground",
+              ? grade.className
+              : "border-border/60 bg-background text-muted-foreground hover:bg-muted/35 hover:text-foreground",
           ].join(" ")}
         >
           {grade.label}

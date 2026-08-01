@@ -1,9 +1,8 @@
 import {
   AlertTriangle,
+  Check,
   ImagePlus,
   Loader2,
-  Pencil,
-  Plus,
   RefreshCw,
   Trash2,
   Upload,
@@ -19,9 +18,7 @@ import {
 import {
   useAddSchoolImages,
   useDeleteSchoolImage,
-  useSchoolImage,
   useSchoolImages,
-  useUpdateSchoolImage,
 } from "@/features/settings/general/hooks/useGeneralSettings";
 import type {
   SchoolImage,
@@ -37,6 +34,21 @@ type PendingImage =
     previewUrl: string;
   };
 
+type GalleryMediaItem =
+  | {
+      kind: "saved";
+      id: string;
+      url: string;
+      name: string;
+    }
+  | {
+      kind: "pending";
+      id: string;
+      url: string;
+      name: string;
+      index: number;
+    };
+
 const ACCEPTED_IMAGE_TYPES = [
   "image/jpeg",
   "image/png",
@@ -46,6 +58,9 @@ const ACCEPTED_IMAGE_TYPES = [
 
 const MAX_IMAGE_SIZE =
   10 * 1024 * 1024;
+
+const FEATURED_MEDIA_SIZE = 208;
+const SMALL_MEDIA_SIZE = 100;
 
 export function SchoolGallery({
   images,
@@ -61,9 +76,6 @@ export function SchoolGallery({
 
   const [selectionError, setSelectionError] =
     useState<string | null>(null);
-
-  const [editingImage, setEditingImage] =
-    useState<SchoolImage | null>(null);
 
   const [deletingImage, setDeletingImage] =
     useState<SchoolImage | null>(null);
@@ -90,34 +102,38 @@ export function SchoolGallery({
     refetch: refetchImages,
   } = useSchoolImages(images);
 
-  const {
-    data: editingImageDetails,
-    isLoading:
-      isLoadingImageDetails,
-  } = useSchoolImage(
-    editingImage?.id ?? null,
-  );
-
   const addImagesMutation =
     useAddSchoolImages();
-
-  const updateImageMutation =
-    useUpdateSchoolImage();
 
   const deleteImageMutation =
     useDeleteSchoolImage();
 
   const isPending =
     addImagesMutation.isPending ||
-    updateImageMutation.isPending ||
     deleteImageMutation.isPending;
 
   const canUpload =
-    pendingImages.length > 0 &&
-    pendingImages.every(
-      (image) =>
-        image.name.trim().length > 0,
-    );
+    pendingImages.length > 0;
+
+  const mediaItems: GalleryMediaItem[] = [
+    ...galleryImages.map(
+      (image): GalleryMediaItem => ({
+        kind: "saved",
+        id: image.id,
+        url: image.url,
+        name: image.name,
+      }),
+    ),
+    ...pendingImages.map(
+      (image, index): GalleryMediaItem => ({
+        kind: "pending",
+        id: `${image.file.name}-${index}`,
+        url: image.previewUrl,
+        name: image.name,
+        index,
+      }),
+    ),
+  ];
 
   function validateImageFile(
     file: File,
@@ -159,7 +175,6 @@ export function SchoolGallery({
       setSelectionError(
         validateImageFile(invalidFile),
       );
-
       return;
     }
 
@@ -202,23 +217,6 @@ export function SchoolGallery({
     });
   }
 
-  function updatePendingName(
-    index: number,
-    name: string,
-  ) {
-    setPendingImages((current) =>
-      current.map(
-        (image, itemIndex) =>
-          itemIndex === index
-            ? {
-                ...image,
-                name,
-              }
-            : image,
-      ),
-    );
-  }
-
   function clearPendingImages() {
     pendingImages.forEach((image) => {
       URL.revokeObjectURL(
@@ -240,7 +238,7 @@ export function SchoolGallery({
         images: pendingImages.map(
           ({ file, name }) => ({
             file,
-            name: name.trim(),
+            name,
           }),
         ),
       },
@@ -266,65 +264,64 @@ export function SchoolGallery({
     );
   }
 
-  const resolvedEditingImage =
-    editingImageDetails ??
-    editingImage;
-
   return (
     <>
       <section
         className={[
-          "rounded-[26px]",
+          "relative h-fit self-start",
+          "rounded-[22px]",
           "border border-border/45",
           "bg-card",
-          "p-5 sm:p-6",
+          "p-4",
           "shadow-[0_10px_35px_rgba(30,20,70,0.035)]",
         ].join(" ")}
       >
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-          <div className="flex items-start gap-3.5">
-            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[15px] bg-primary/[0.08] text-primary">
-              <ImagePlus
-                size={18}
-                strokeWidth={1.75}
-              />
-            </span>
-
-            <div className="pt-0.5">
-              <h2 className="text-[15px] font-semibold text-foreground">
-                School Gallery
-              </h2>
-
-              <p className="mt-1 text-xs leading-5 text-muted-foreground">
-                Upload school photos and add clear,
-                descriptive names.
-              </p>
-            </div>
-          </div>
-
-          <button
-            type="button"
-            disabled={isPending}
-            onClick={() =>
-              fileInputRef.current?.click()
-            }
+        {galleryImages.length > 0 ? (
+          <span
             className={[
-              "flex h-10 shrink-0",
-              "items-center justify-center gap-2",
+              "absolute right-4 top-4 z-10",
+              "flex h-7 w-7",
+              "items-center justify-center",
               "rounded-full",
-              "bg-muted/55 px-4",
-              "text-xs font-semibold",
-              "text-foreground/80",
-              "transition duration-200",
-              "hover:bg-muted",
-              "hover:text-foreground",
-              "disabled:cursor-not-allowed",
-              "disabled:opacity-50",
+              "border border-emerald-500/20",
+              "bg-emerald-500/10",
+              "text-emerald-600",
+            ].join(" ")}
+            title="School gallery completed"
+            aria-label="School gallery completed"
+          >
+            <Check
+              size={15}
+              strokeWidth={2.5}
+            />
+          </span>
+        ) : null}
+
+        <div className="flex min-h-[56px] items-start gap-3 pr-9">
+          <span
+            className={[
+              "flex h-9 w-9 shrink-0",
+              "items-center justify-center",
+              "rounded-[13px]",
+              "bg-primary/[0.08]",
+              "text-primary",
             ].join(" ")}
           >
-            <Plus size={15} />
-            Select Images
-          </button>
+            <ImagePlus
+              size={17}
+              strokeWidth={1.75}
+            />
+          </span>
+
+          <div className="min-w-0 pt-0.5">
+            <h2 className="text-[16px] font-semibold text-foreground">
+              School Gallery
+            </h2>
+
+            <p className="mt-1 text-[12px] leading-4 text-muted-foreground">
+              Upload school photos.
+            </p>
+          </div>
 
           <input
             ref={fileInputRef}
@@ -335,10 +332,186 @@ export function SchoolGallery({
             onChange={handleFilesChange}
           />
         </div>
+        <div
+          className={[
+            "mt-4 grid content-start items-start",
+            "grid-cols-[repeat(auto-fill,100px)]",
+            "auto-rows-[100px]",
+            "gap-2",
+          ].join(" ")}
+        >
+          {mediaItems.map(
+            (item, index) => {
+              const isFeatured =
+                index === 0;
+
+              return (
+                <article
+                  key={`${item.kind}-${item.id}`}
+                  style={{
+                    width: isFeatured
+                      ? FEATURED_MEDIA_SIZE
+                      : SMALL_MEDIA_SIZE,
+                    height: isFeatured
+                      ? FEATURED_MEDIA_SIZE
+                      : SMALL_MEDIA_SIZE,
+                  }}
+                  className={[
+                    "group relative overflow-hidden",
+                    "rounded-[13px]",
+                    "border border-border/60",
+                    "bg-muted/[0.22]",
+                    isFeatured
+                      ? "col-span-2 row-span-2"
+                      : "",
+                  ].join(" ")}
+                >
+                  <img
+                    src={item.url}
+                    alt={item.name}
+                    className={[
+                      "h-full w-full",
+                      item.kind === "saved"
+                        ? "object-contain p-1.5"
+                        : "object-cover",
+                    ].join(" ")}
+                  />
+
+                  <button
+                    type="button"
+                    aria-label={
+                      item.kind === "saved"
+                        ? `Delete ${item.name}`
+                        : "Remove selected image"
+                    }
+                    disabled={isPending}
+                    onClick={() => {
+                      if (
+                        item.kind === "saved"
+                      ) {
+                        const image =
+                          galleryImages.find(
+                            (entry) =>
+                              entry.id ===
+                              item.id,
+                          );
+
+                        if (image) {
+                          setDeletingImage(
+                            image,
+                          );
+                        }
+
+                        return;
+                      }
+
+                      removePendingImage(
+                        item.index,
+                      );
+                    }}
+                    className={[
+                      "absolute right-1.5 top-1.5",
+                      "flex h-6 w-6",
+                      "items-center justify-center",
+                      "rounded-full",
+                      "border border-border/45",
+                      "bg-card/95",
+                      "text-destructive",
+                      "shadow-md",
+                      "backdrop-blur",
+                      "transition duration-200",
+                      "hover:scale-105",
+                      "disabled:opacity-50",
+                    ].join(" ")}
+                  >
+                    {item.kind === "saved" ? (
+                      <Trash2 size={11} />
+                    ) : (
+                      <X size={11} />
+                    )}
+                  </button>
+
+                  {item.kind === "pending" ? (
+                    <span
+                      className={[
+                        "absolute bottom-1.5 left-1.5",
+                        "rounded-full",
+                        "bg-foreground/65",
+                        "px-1.5 py-0.5",
+                        "text-[9px] font-medium",
+                        "text-background",
+                        "backdrop-blur",
+                      ].join(" ")}
+                    >
+                      Pending
+                    </span>
+                  ) : null}
+                </article>
+              );
+            },
+          )}
+
+          <button
+            type="button"
+            disabled={isPending}
+            onClick={() =>
+              fileInputRef.current?.click()
+            }
+            style={{
+              width:
+                mediaItems.length === 0
+                  ? FEATURED_MEDIA_SIZE
+                  : SMALL_MEDIA_SIZE,
+              height:
+                mediaItems.length === 0
+                  ? FEATURED_MEDIA_SIZE
+                  : SMALL_MEDIA_SIZE,
+            }}
+            className={[
+              "group flex items-center justify-center",
+              "rounded-[13px]",
+              "border border-dashed",
+              "border-border/80",
+              "bg-muted/[0.16]",
+              "outline-none",
+              "transition duration-200",
+              "hover:border-primary/40",
+              "hover:bg-primary/[0.03]",
+              "focus-visible:ring-4",
+              "focus-visible:ring-primary/[0.10]",
+              "disabled:opacity-60",
+              mediaItems.length === 0
+                ? "col-span-2 row-span-2"
+                : "",
+            ].join(" ")}
+          >
+            <span
+              className={[
+                "flex items-center justify-center",
+                "bg-primary/[0.08]",
+                "text-primary",
+                "transition duration-200",
+                "group-hover:scale-105",
+                mediaItems.length === 0
+                  ? "h-11 w-11 rounded-[14px]"
+                  : "h-9 w-9 rounded-[12px]",
+              ].join(" ")}
+            >
+              <ImagePlus
+                size={
+                  mediaItems.length === 0
+                    ? 21
+                    : 17
+                }
+                strokeWidth={1.8}
+              />
+            </span>
+          </button>
+        </div>
 
         {selectionError ? (
-          <div className="mt-5 rounded-[16px] bg-destructive/[0.045] px-4 py-3">
-            <p className="text-[11px] font-medium text-destructive">
+          <div className="mt-3 rounded-[14px] bg-destructive/[0.045] px-4 py-3">
+            <p className="text-[12px] font-medium text-destructive">
               {selectionError}
             </p>
           </div>
@@ -347,137 +520,70 @@ export function SchoolGallery({
         {pendingImages.length > 0 ? (
           <div
             className={[
-              "mt-5 rounded-[22px]",
-              "bg-primary/[0.035]",
-              "p-4",
+              "mt-4 flex flex-wrap",
+              "items-center justify-end gap-2",
+              "border-t border-border/45",
+              "pt-4",
             ].join(" ")}
           >
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {pendingImages.map(
-                (image, index) => (
-                  <div
-                    key={`${image.file.name}-${index}`}
-                    className={[
-                      "overflow-hidden",
-                      "rounded-[20px]",
-                      "bg-card",
-                      "shadow-[0_8px_24px_rgba(30,20,70,0.06)]",
-                    ].join(" ")}
-                  >
-                    <div className="relative aspect-[4/3] overflow-hidden bg-muted">
-                      <img
-                        src={
-                          image.previewUrl
-                        }
-                        alt={image.name}
-                        className="h-full w-full object-cover"
-                      />
+            <button
+              type="button"
+              disabled={isPending}
+              onClick={clearPendingImages}
+              className={[
+                "h-9 rounded-full",
+                "border border-border/70",
+                "bg-background",
+                "px-4",
+                "text-[12px] font-semibold",
+                "text-foreground/70",
+                "transition duration-200",
+                "hover:bg-muted/55",
+                "hover:text-foreground",
+                "disabled:opacity-50",
+              ].join(" ")}
+            >
+              Clear
+            </button>
 
-                      <button
-                        type="button"
-                        aria-label="Remove selected image"
-                        disabled={isPending}
-                        onClick={() =>
-                          removePendingImage(
-                            index,
-                          )
-                        }
-                        className="absolute right-2.5 top-2.5 flex h-8 w-8 items-center justify-center rounded-full bg-card/90 text-destructive shadow-lg backdrop-blur transition hover:scale-105 hover:bg-card"
-                      >
-                        <X size={14} />
-                      </button>
-                    </div>
-
-                    <div className="p-3.5">
-                      <label className="block">
-                        <span className="mb-2 block text-[11px] font-semibold text-foreground/75">
-                          Image Name
-                        </span>
-
-                        <input
-                          value={image.name}
-                          disabled={isPending}
-                          onChange={(event) =>
-                            updatePendingName(
-                              index,
-                              event.target
-                                .value,
-                            )
-                          }
-                          className={[
-                            "h-10 w-full",
-                            "rounded-[14px]",
-                            "border border-transparent",
-                            "bg-muted/[0.42]",
-                            "px-3",
-                            "text-sm font-medium",
-                            "text-foreground",
-                            "outline-none transition",
-                            "hover:bg-muted/60",
-                            "focus:border-primary/20",
-                            "focus:bg-background",
-                            "focus:ring-4 focus:ring-primary/[0.07]",
-                          ].join(" ")}
-                        />
-                      </label>
-                    </div>
-                  </div>
-                ),
+            <button
+              type="button"
+              disabled={!canUpload || isPending}
+              onClick={handleUpload}
+              className={[
+                "flex h-9 items-center",
+                "justify-center gap-2",
+                "rounded-full bg-primary",
+                "px-4",
+                "text-[12px] font-semibold",
+                "text-primary-foreground",
+                "shadow-[0_8px_20px_rgba(98,74,180,0.16)]",
+                "transition duration-200",
+                "hover:-translate-y-0.5",
+                "hover:bg-primary/90",
+                "disabled:translate-y-0",
+                "disabled:opacity-50",
+              ].join(" ")}
+            >
+              {addImagesMutation.isPending ? (
+                <Loader2
+                  size={14}
+                  className="animate-spin"
+                />
+              ) : (
+                <Upload size={14} />
               )}
-            </div>
 
-            <div className="mt-4 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-              <button
-                type="button"
-                disabled={isPending}
-                onClick={
-                  clearPendingImages
-                }
-                className="h-10 rounded-full bg-card px-5 text-xs font-semibold text-foreground/75 shadow-sm transition hover:bg-muted disabled:opacity-50"
-              >
-                Clear
-              </button>
-
-              <button
-                type="button"
-                disabled={
-                  !canUpload || isPending
-                }
-                onClick={handleUpload}
-                className={[
-                  "flex h-10 items-center",
-                  "justify-center gap-2",
-                  "rounded-full bg-primary",
-                  "px-5",
-                  "text-xs font-semibold",
-                  "text-primary-foreground",
-                  "shadow-[0_8px_20px_rgba(98,74,180,0.16)]",
-                  "transition duration-200",
-                  "hover:-translate-y-0.5",
-                  "hover:bg-primary/90",
-                  "disabled:cursor-not-allowed",
-                  "disabled:translate-y-0",
-                  "disabled:opacity-50",
-                ].join(" ")}
-              >
-                {addImagesMutation.isPending ? (
-                  <Loader2
-                    size={15}
-                    className="animate-spin"
-                  />
-                ) : (
-                  <Upload size={15} />
-                )}
-
-                Upload Images
-              </button>
-            </div>
+              {addImagesMutation.isPending
+                ? "Uploading..."
+                : `Upload ${pendingImages.length}`}
+            </button>
           </div>
         ) : null}
 
         {isImagesError ? (
-          <div className="mt-5 rounded-[20px] bg-destructive/[0.035] p-6 text-center">
-            <p className="text-xs font-semibold text-destructive">
+          <div className="mt-4 rounded-[16px] bg-destructive/[0.035] p-5 text-center">
+            <p className="text-[13px] font-semibold text-destructive">
               Failed to load gallery images.
             </p>
 
@@ -486,7 +592,16 @@ export function SchoolGallery({
               onClick={() => {
                 void refetchImages();
               }}
-              className="mt-3 inline-flex h-9 items-center gap-2 rounded-full bg-card px-4 text-xs font-semibold text-foreground shadow-sm transition hover:bg-muted"
+              className={[
+                "mt-3 inline-flex h-9",
+                "items-center gap-2",
+                "rounded-full bg-card",
+                "px-4",
+                "text-[13px] font-semibold",
+                "text-foreground",
+                "shadow-sm",
+                "transition hover:bg-muted",
+              ].join(" ")}
             >
               <RefreshCw size={14} />
               Try Again
@@ -495,166 +610,14 @@ export function SchoolGallery({
         ) : null}
 
         {isLoadingImages ? (
-          <div className="mt-5 flex h-44 items-center justify-center rounded-[22px] bg-muted/[0.28]">
+          <div className="mt-4 flex h-36 items-center justify-center rounded-[16px] bg-muted/[0.28]">
             <Loader2
               size={22}
               className="animate-spin text-primary"
             />
           </div>
         ) : null}
-
-        {!isLoadingImages &&
-        !isImagesError ? (
-          <div className="mt-5 columns-1 gap-4 sm:columns-2 lg:columns-3 xl:columns-4">
-            {galleryImages.map(
-              (image) => (
-                <article
-                  key={image.id}
-                  className={[
-                    "group relative mb-4",
-                    "break-inside-avoid",
-                    "overflow-hidden",
-                    "rounded-[22px]",
-                    "bg-muted/25",
-                    "transition duration-300",
-                    "hover:-translate-y-1",
-                    "hover:shadow-[0_16px_36px_rgba(30,20,70,0.12)]",
-                  ].join(" ")}
-                >
-                  <div className="relative overflow-hidden">
-                    <img
-                      src={image.url}
-                      alt={image.name}
-                      loading="lazy"
-                      className={[
-                        "h-auto min-h-[170px]",
-                        "w-full object-cover",
-                        "transition duration-500",
-                        "group-hover:scale-[1.035]",
-                      ].join(" ")}
-                    />
-
-                    <div
-                      className={[
-                        "absolute inset-0",
-                        "bg-gradient-to-t",
-                        "from-foreground/45",
-                        "via-transparent",
-                        "to-transparent",
-                        "opacity-0",
-                        "transition duration-300",
-                        "group-hover:opacity-100",
-                        "group-focus-within:opacity-100",
-                      ].join(" ")}
-                    />
-
-                    <div
-                      className={[
-                        "absolute right-3 top-3",
-                        "flex gap-2",
-                        "translate-y-1",
-                        "opacity-0",
-                        "transition duration-200",
-                        "group-hover:translate-y-0",
-                        "group-hover:opacity-100",
-                        "group-focus-within:translate-y-0",
-                        "group-focus-within:opacity-100",
-                      ].join(" ")}
-                    >
-                      <button
-                        type="button"
-                        aria-label={`Edit ${image.name}`}
-                        disabled={isPending}
-                        onClick={() =>
-                          setEditingImage(
-                            image,
-                          )
-                        }
-                        className="flex h-9 w-9 items-center justify-center rounded-full bg-card/90 text-primary shadow-lg backdrop-blur transition hover:scale-105 hover:bg-card"
-                      >
-                        <Pencil size={14} />
-                      </button>
-
-                      <button
-                        type="button"
-                        aria-label={`Delete ${image.name}`}
-                        disabled={isPending}
-                        onClick={() =>
-                          setDeletingImage(
-                            image,
-                          )
-                        }
-                        className="flex h-9 w-9 items-center justify-center rounded-full bg-card/90 text-destructive shadow-lg backdrop-blur transition hover:scale-105 hover:bg-card"
-                      >
-                        <Trash2 size={14} />
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className="px-4 py-3.5">
-                    <p className="truncate text-sm font-semibold text-foreground">
-                      {image.name}
-                    </p>
-                  </div>
-                </article>
-              ),
-            )}
-
-            {galleryImages.length ===
-            0 ? (
-              <div className="break-inside-avoid rounded-[22px] bg-muted/[0.25] p-9 text-center">
-                <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-[18px] bg-card text-muted-foreground shadow-sm">
-                  <ImagePlus
-                    size={25}
-                    strokeWidth={1.7}
-                  />
-                </span>
-
-                <p className="mt-4 text-sm font-semibold text-foreground">
-                  No gallery images
-                </p>
-
-                <p className="mx-auto mt-1.5 max-w-xs text-xs leading-5 text-muted-foreground">
-                  Select image files to build the
-                  school gallery.
-                </p>
-              </div>
-            ) : null}
-          </div>
-        ) : null}
       </section>
-
-      {resolvedEditingImage ? (
-        <EditSchoolImageDialog
-          key={[
-            resolvedEditingImage.id,
-            resolvedEditingImage.url,
-            resolvedEditingImage.name,
-          ].join("-")}
-          image={
-            resolvedEditingImage
-          }
-          isLoading={
-            isLoadingImageDetails
-          }
-          isPending={
-            updateImageMutation.isPending
-          }
-          onClose={() =>
-            setEditingImage(null)
-          }
-          onSave={(payload) =>
-            updateImageMutation.mutate(
-              payload,
-              {
-                onSuccess: () => {
-                  setEditingImage(null);
-                },
-              },
-            )
-          }
-        />
-      ) : null}
 
       <DeleteSchoolImageDialog
         image={deletingImage}
@@ -667,255 +630,6 @@ export function SchoolGallery({
         onConfirm={confirmDelete}
       />
     </>
-  );
-}
-
-function EditSchoolImageDialog({
-  image,
-  isLoading,
-  isPending,
-  onClose,
-  onSave,
-}: {
-  image: SchoolImage;
-  isLoading: boolean;
-  isPending: boolean;
-
-  onClose: () => void;
-
-  onSave: (payload: {
-    imageId: string;
-    name?: string;
-    file?: File;
-  }) => void;
-}) {
-  const [name, setName] =
-    useState(image.name);
-
-  const [file, setFile] =
-    useState<File | undefined>();
-
-  const [previewUrl, setPreviewUrl] =
-    useState(image.url);
-
-  const objectUrlRef =
-    useRef<string | null>(null);
-
-  useEffect(() => {
-    return () => {
-      if (objectUrlRef.current) {
-        URL.revokeObjectURL(
-          objectUrlRef.current,
-        );
-      }
-    };
-  }, []);
-
-  useEffect(() => {
-    function handleKeyDown(
-      event: KeyboardEvent,
-    ) {
-      if (
-        event.key === "Escape" &&
-        !isPending
-      ) {
-        onClose();
-      }
-    }
-
-    window.addEventListener(
-      "keydown",
-      handleKeyDown,
-    );
-
-    return () => {
-      window.removeEventListener(
-        "keydown",
-        handleKeyDown,
-      );
-    };
-  }, [isPending, onClose]);
-
-  function handleReplacementFile(
-    event: ChangeEvent<HTMLInputElement>,
-  ) {
-    const nextFile =
-      event.target.files?.[0];
-
-    if (!nextFile) {
-      return;
-    }
-
-    if (objectUrlRef.current) {
-      URL.revokeObjectURL(
-        objectUrlRef.current,
-      );
-    }
-
-    const nextPreviewUrl =
-      URL.createObjectURL(nextFile);
-
-    objectUrlRef.current =
-      nextPreviewUrl;
-
-    setFile(nextFile);
-    setPreviewUrl(nextPreviewUrl);
-  }
-
-  const normalizedName = name.trim();
-
-  const hasChanges =
-    normalizedName !== image.name ||
-    Boolean(file);
-
-  return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="edit-image-title"
-      className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/35 p-4 backdrop-blur-md"
-      onMouseDown={(event) => {
-        if (
-          event.target ===
-            event.currentTarget &&
-          !isPending
-        ) {
-          onClose();
-        }
-      }}
-    >
-      <div className="w-full max-w-lg overflow-hidden rounded-[28px] border border-border/45 bg-card shadow-[0_28px_80px_rgba(20,15,45,0.2)]">
-        <header className="flex items-start justify-between px-6 pb-5 pt-6">
-          <div>
-            <h2
-              id="edit-image-title"
-              className="text-lg font-semibold text-foreground"
-            >
-              Edit Gallery Image
-            </h2>
-
-            <p className="mt-1 text-xs leading-5 text-muted-foreground">
-              Update the image name or replace its
-              file.
-            </p>
-          </div>
-
-          <button
-            type="button"
-            aria-label="Close dialog"
-            disabled={isPending}
-            onClick={onClose}
-            className="flex h-9 w-9 items-center justify-center rounded-full bg-muted/55 text-muted-foreground transition hover:bg-muted hover:text-foreground disabled:opacity-50"
-          >
-            <X size={16} />
-          </button>
-        </header>
-
-        <div className="px-6 pb-6">
-          {isLoading ? (
-            <div className="flex h-52 items-center justify-center rounded-[22px] bg-muted/[0.3]">
-              <Loader2
-                size={22}
-                className="animate-spin text-primary"
-              />
-            </div>
-          ) : (
-            <div className="overflow-hidden rounded-[22px] bg-muted">
-              <img
-                src={previewUrl}
-                alt={image.name}
-                className="aspect-video h-full w-full object-cover"
-              />
-            </div>
-          )}
-
-          <div className="mt-5 space-y-4">
-            <label className="block">
-              <span className="mb-2 block text-xs font-semibold text-foreground/80">
-                Image Name
-              </span>
-
-              <input
-                value={name}
-                disabled={
-                  isPending || isLoading
-                }
-                onChange={(event) =>
-                  setName(
-                    event.target.value,
-                  )
-                }
-                className="h-12 w-full rounded-[16px] border border-transparent bg-muted/[0.4] px-4 text-sm font-medium text-foreground outline-none transition hover:bg-muted/55 focus:border-primary/20 focus:bg-background focus:ring-4 focus:ring-primary/[0.07] disabled:opacity-60"
-              />
-            </label>
-
-            <label className="block">
-              <span className="mb-2 block text-xs font-semibold text-foreground/80">
-                Replace Image
-              </span>
-
-              <input
-                type="file"
-                accept=".jpg,.jpeg,.png,.svg,.webp,image/jpeg,image/png,image/svg+xml,image/webp"
-                disabled={
-                  isPending || isLoading
-                }
-                onChange={
-                  handleReplacementFile
-                }
-                className="block w-full rounded-[16px] bg-muted/[0.4] p-3 text-xs text-muted-foreground file:mr-3 file:rounded-full file:border-0 file:bg-card file:px-4 file:py-2 file:text-xs file:font-semibold file:text-foreground disabled:opacity-60"
-              />
-            </label>
-          </div>
-        </div>
-
-        <footer className="flex flex-col-reverse gap-3 bg-muted/[0.2] px-6 py-5 sm:flex-row sm:justify-end">
-          <button
-            type="button"
-            disabled={isPending}
-            onClick={onClose}
-            className="h-10 rounded-full bg-card px-5 text-xs font-semibold text-foreground/75 shadow-sm transition hover:bg-muted disabled:opacity-50"
-          >
-            Cancel
-          </button>
-
-          <button
-            type="button"
-            disabled={
-              !hasChanges ||
-              !normalizedName ||
-              isPending ||
-              isLoading
-            }
-            onClick={() =>
-              onSave({
-                imageId: image.id,
-                name:
-                  normalizedName !==
-                  image.name
-                    ? normalizedName
-                    : undefined,
-                file,
-              })
-            }
-            className="flex h-10 items-center justify-center gap-2 rounded-full bg-primary px-5 text-xs font-semibold text-primary-foreground shadow-[0_8px_20px_rgba(98,74,180,0.16)] transition hover:-translate-y-0.5 hover:bg-primary/90 disabled:cursor-not-allowed disabled:translate-y-0 disabled:opacity-50"
-          >
-            {isPending ? (
-              <Loader2
-                size={15}
-                className="animate-spin"
-              />
-            ) : (
-              <Pencil size={15} />
-            )}
-
-            {isPending
-              ? "Saving..."
-              : "Save Changes"}
-          </button>
-        </footer>
-      </div>
-    </div>
   );
 }
 
@@ -980,10 +694,27 @@ function DeleteSchoolImageDialog({
         }
       }}
     >
-      <div className="w-full max-w-md overflow-hidden rounded-[28px] border border-border/45 bg-card shadow-[0_28px_80px_rgba(20,15,45,0.2)]">
+      <div
+        className={[
+          "w-full max-w-md",
+          "overflow-hidden",
+          "rounded-[26px]",
+          "border border-border/45",
+          "bg-card",
+          "shadow-[0_28px_80px_rgba(20,15,45,0.2)]",
+        ].join(" ")}
+      >
         <div className="p-6">
           <div className="flex items-start gap-4">
-            <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[18px] bg-destructive/[0.08] text-destructive">
+            <span
+              className={[
+                "flex h-12 w-12 shrink-0",
+                "items-center justify-center",
+                "rounded-[18px]",
+                "bg-destructive/[0.08]",
+                "text-destructive",
+              ].join(" ")}
+            >
               <AlertTriangle
                 size={22}
                 strokeWidth={1.75}
@@ -1000,32 +731,43 @@ function DeleteSchoolImageDialog({
 
               <p
                 id="delete-image-description"
-                className="mt-1.5 text-sm leading-6 text-muted-foreground"
+                className="mt-1.5 text-[15px] leading-6 text-muted-foreground"
               >
-                The image{" "}
-                <strong className="font-semibold text-foreground">
-                  {image.name}
-                </strong>{" "}
-                will be permanently removed.
+                The image will be permanently removed.
               </p>
             </div>
           </div>
 
-          <div className="mt-5 overflow-hidden rounded-[22px] bg-muted">
+          <div className="mt-5 overflow-hidden rounded-[18px] bg-muted">
             <img
               src={image.url}
               alt={image.name}
-              className="aspect-video w-full object-cover"
+              className="aspect-video w-full object-contain"
             />
           </div>
         </div>
 
-        <footer className="flex flex-col-reverse gap-3 bg-muted/[0.2] px-6 py-5 sm:flex-row sm:justify-end">
+        <footer
+          className={[
+            "flex flex-col-reverse gap-3",
+            "bg-muted/[0.2]",
+            "px-6 py-5",
+            "sm:flex-row sm:justify-end",
+          ].join(" ")}
+        >
           <button
             type="button"
             disabled={isPending}
             onClick={onClose}
-            className="h-10 rounded-full bg-card px-5 text-xs font-semibold text-foreground/75 shadow-sm transition hover:bg-muted disabled:opacity-50"
+            className={[
+              "h-10 rounded-full",
+              "bg-card px-5",
+              "text-[13px] font-semibold",
+              "text-foreground/75",
+              "shadow-sm",
+              "transition hover:bg-muted",
+              "disabled:opacity-50",
+            ].join(" ")}
           >
             Keep Image
           </button>
@@ -1034,7 +776,20 @@ function DeleteSchoolImageDialog({
             type="button"
             disabled={isPending}
             onClick={onConfirm}
-            className="flex h-10 items-center justify-center gap-2 rounded-full bg-destructive px-5 text-xs font-semibold text-destructive-foreground shadow-[0_8px_20px_rgba(180,35,35,0.15)] transition hover:-translate-y-0.5 hover:bg-destructive/90 disabled:cursor-not-allowed disabled:translate-y-0 disabled:opacity-60"
+            className={[
+              "flex h-10 items-center",
+              "justify-center gap-2",
+              "rounded-full",
+              "bg-destructive px-5",
+              "text-[13px] font-semibold",
+              "text-destructive-foreground",
+              "shadow-[0_8px_20px_rgba(180,35,35,0.15)]",
+              "transition",
+              "hover:-translate-y-0.5",
+              "hover:bg-destructive/90",
+              "disabled:translate-y-0",
+              "disabled:opacity-60",
+            ].join(" ")}
           >
             {isPending ? (
               <Loader2

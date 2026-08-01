@@ -8,6 +8,8 @@ import { GradesPage } from "@/features/academics/grades/pages/GradesPage";
 import { AcademicsOverviewPage } from "@/features/academics/overview/pages/AcademicsOverviewPage";
 import { SubjectsPage } from "@/features/academics/subjects/pages/SubjectsPage";
 import { TimeSlotsPage } from "@/features/academics/time-slots/pages/TimeSlotsPage";
+import { TeacherWorkloadsPage } from "@/features/academics/teacher-workloads/pages/TeacherWorkloadsPage";
+import { TeacherAssignmentsPage } from "@/features/academics/teacher-assignments/pages/TeacherAssignmentsPage";
 
 export const academicsRoutes = [
   {
@@ -51,12 +53,12 @@ export const academicsRoutes = [
 
       {
         path: "teacher-workloads",
-        element: <SubjectsPage />,
+        element: <TeacherWorkloadsPage />,
       },
 
       {
         path: "teacher-assignments",
-        element: <SubjectsPage />,
+        element: <TeacherAssignmentsPage />,
       },
 
       {

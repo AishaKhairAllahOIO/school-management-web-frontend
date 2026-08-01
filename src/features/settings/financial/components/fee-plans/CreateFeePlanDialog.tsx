@@ -1,20 +1,8 @@
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/shared/ui/dialog";
-
 import { FeePlanForm } from "./FeePlanForm";
-
+import { FinancialBaseDialog } from "../../shared/FinancialBaseDialog";
 import type { FeePlanFormValues } from "../../schemas/feePlan.schema";
 
-type Option = {
-  id: number;
-  name: string;
-};
-
+type Option = { id: number; name: string };
 type Props = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -24,36 +12,21 @@ type Props = {
   onSubmit: (values: FeePlanFormValues) => void;
 };
 
-export function CreateFeePlanDialog({
-  open,
-  onOpenChange,
-  academicYears,
-  gradeLevels,
-  onSubmit,
-  isLoading,
-}: Props) {
-  function handleSubmit(values: FeePlanFormValues) {
-    onSubmit(values);
-    onOpenChange(false);
-  }
-
+export function CreateFeePlanDialog({ open, onOpenChange, academicYears, gradeLevels, onSubmit, isLoading }: Props) {
+  if (!open) return null;
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-3xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>Create Fee Plan</DialogTitle>
-          <DialogDescription>
-            Create a tuition fee configuration.
-          </DialogDescription>
-        </DialogHeader>
-
-        <FeePlanForm
-          academicYears={academicYears}
-          gradeLevels={gradeLevels}
-          isLoading={isLoading}
-          onSubmit={handleSubmit}
-        />
-      </DialogContent>
-    </Dialog>
+    <FinancialBaseDialog
+      title="Create Fee Plan"
+      description="Create a tuition fee configuration for an academic year and grade level."
+      onClose={() => onOpenChange(false)}
+    >
+      <FeePlanForm
+        academicYears={academicYears}
+        gradeLevels={gradeLevels}
+        isLoading={isLoading}
+        onCancel={() => onOpenChange(false)}
+        onSubmit={onSubmit}
+      />
+    </FinancialBaseDialog>
   );
 }

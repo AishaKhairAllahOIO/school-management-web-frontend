@@ -6,14 +6,20 @@ import {
 } from "lucide-react";
 import { useMemo } from "react";
 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/shared/ui/select";
+
+
 import { useClassrooms } from "@/features/academics/classrooms/hooks/useClassrooms";
 import { useGrades } from "@/features/academics/grades/hooks/useGrades";
 import { useAcademicYears } from "@/features/settings/academic/hooks/useAcademicSettings";
 
-import {
-  fieldClassName,
-  FormField,
-} from "./StudentFormPrimitives";
+import { FormField } from "./StudentFormPrimitives";
 
 type StudentAcademicFieldsProps = {
   academicYearId: string;
@@ -165,36 +171,25 @@ export function StudentAcademicFields({
             className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground"
           />
 
-          <select
-            required
-            value={academicYearId}
-            disabled={
-              disabled ||
-              academicYears.length === 0
+          <Select
+            value={academicYearId || "none"}
+            disabled={disabled || academicYears.length === 0}
+            onValueChange={(value) =>
+              onAcademicYearChange(value === "none" ? "" : value)
             }
-            onChange={(event) =>
-              onAcademicYearChange(
-                event.target.value,
-              )
-            }
-            className={`${fieldClassName} appearance-none pl-10 pr-9`}
           >
-            <option value="">
-              Select academic year
-            </option>
-
-            {academicYears.map((year) => (
-              <option
-                key={year.id}
-                value={String(year.id)}
-              >
-                {year.name}
-                {year.isCurrent
-                  ? " · Current"
-                  : ""}
-              </option>
-            ))}
-          </select>
+            <SelectTrigger className="h-12 rounded-[15px] pl-10">
+              <SelectValue placeholder="Select academic year" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="none">Select academic year</SelectItem>
+              {academicYears.map((year) => (
+                <SelectItem key={year.id} value={String(year.id)}>
+                  {year.name}{year.isCurrent ? " · Current" : ""}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       </FormField>
 
@@ -214,33 +209,25 @@ export function StudentAcademicFields({
             className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground"
           />
 
-          <select
-            required
-            value={gradeId}
-            disabled={
-              disabled ||
-              grades.length === 0
+          <Select
+            value={gradeId || "none"}
+            disabled={disabled || grades.length === 0}
+            onValueChange={(value) =>
+              onGradeChange(value === "none" ? "" : value)
             }
-            onChange={(event) =>
-              onGradeChange(
-                event.target.value,
-              )
-            }
-            className={`${fieldClassName} appearance-none pl-10 pr-9`}
           >
-            <option value="">
-              Select grade
-            </option>
-
-            {grades.map((grade) => (
-              <option
-                key={grade.id}
-                value={String(grade.id)}
-              >
-                {grade.name}
-              </option>
-            ))}
-          </select>
+            <SelectTrigger className="h-12 rounded-[15px] pl-10">
+              <SelectValue placeholder="Select grade" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="none">Select grade</SelectItem>
+              {grades.map((grade) => (
+                <SelectItem key={grade.id} value={String(grade.id)}>
+                  {grade.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       </FormField>
 
@@ -268,43 +255,34 @@ export function StudentAcademicFields({
             className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground"
           />
 
-          <select
-            required={!classroomOptional}
-            value={classroomId}
+          <Select
+            value={classroomId || "none"}
             disabled={
               disabled ||
               !academicYearId ||
               !gradeId ||
               classrooms.length === 0
             }
-            onChange={(event) =>
-              onClassroomChange(
-                event.target.value,
-              )
+            onValueChange={(value) =>
+              onClassroomChange(value === "none" ? "" : value)
             }
-            className={`${fieldClassName} appearance-none pl-10 pr-9`}
           >
-            <option value="">
-              {classroomOptional
-                ? "No classroom yet"
-                : "Select classroom"}
-            </option>
-
-            {classrooms.map(
-              (classroom) => (
-                <option
-                  key={classroom.id}
-                  value={String(
-                    classroom.id,
-                  )}
-                >
-                  {classroom.name} ·{" "}
-                  {classroom.availableSeats}{" "}
-                  seats available
-                </option>
-              ),
-            )}
-          </select>
+            <SelectTrigger className="h-12 rounded-[15px] pl-10">
+              <SelectValue
+                placeholder={classroomOptional ? "No classroom yet" : "Select classroom"}
+              />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="none">
+                {classroomOptional ? "No classroom yet" : "Select classroom"}
+              </SelectItem>
+              {classrooms.map((classroom) => (
+                <SelectItem key={classroom.id} value={String(classroom.id)}>
+                  {classroom.name} · {classroom.availableSeats} seats available
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       </FormField>
     </div>

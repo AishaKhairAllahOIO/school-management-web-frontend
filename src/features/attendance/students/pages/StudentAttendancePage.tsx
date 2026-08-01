@@ -1,252 +1,197 @@
-import { useMemo, useState } from "react";
+import { CalendarCheck2, Save } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 
-import { useStudentAttendance }
-from "../hooks/useStudentAttendance";
+import { Button } from "@/shared/ui/button";
+import { DatePicker } from "@/shared/ui/date-picker";
 
-import { AttendanceStats }
-from "../components/AttendanceStats";
+import { AttendanceFilters } from "../components/AttendanceFilters";
+import { AttendanceStats } from "../components/AttendanceStats";
+import { AttendanceTable } from "../components/AttendanceTable";
+import { useStudentAttendance } from "../hooks/useStudentAttendance";
+import type { StudentAttendance } from "../types/attendance.types";
 
-import { AttendanceTable }
-from "../components/AttendanceTable";
+function todayForApi() {
+  return new Date().toISOString().slice(0, 10);
+}
 
-import { AttendanceFilters }
-from "../components/AttendanceFilters";
+export function StudentAttendancePage() {
+  const attendanceQuery = useStudentAttendance();
+  const [records, setRecords] = useState<StudentAttendance[]>([]);
 
-export const StudentAttendancePage =
-() => {
+  const [search, setSearch] = useState("");
+  const [gradeFilter, setGradeFilter] = useState("all");
+  const [classroomFilter, setClassroomFilter] = useState("all");
+  const [supervisorFilter, setSupervisorFilter] = useState("all");
+  const [status, setStatus] = useState("all");
+  const [absenceType, setAbsenceType] = useState("all");
+  const [draftDate, setDraftDate] = useState(todayForApi());
+  const [selectedDate, setSelectedDate] = useState(todayForApi());
+  const [dirtyIds, setDirtyIds] = useState<Set<string>>(new Set());
+  const [savedAt, setSavedAt] = useState<string | null>(null);
 
-  const {
-    data = [],
-    isLoading,
-  } = useStudentAttendance();
+  useEffect(() => {
+    if (attendanceQuery.data) setRecords(attendanceQuery.data);
+  }, [attendanceQuery.data]);
 
-  const [search, setSearch] =
-    useState("");
+  const selectedDateRecords = useMemo(
+    () => records.filter((student) => student.date === selectedDate),
+    [records, selectedDate],
+  );
 
-  const [
-    classFilter,
-    setClassFilter,
-  ] = useState("all");
+  const filteredData = useMemo(
+    () =>
+      selectedDateRecords.filter((student) => {
+        const normalizedSearch = search.trim().toLowerCase();
 
-  const [
-    sectionFilter,
-    setSectionFilter,
-  ] = useState("all");
-
-  const [status, setStatus] =
-    useState("all");
-
-  const [
-    absenceType,
-    setAbsenceType,
-  ] = useState("all");
-
-  const filteredData =
-    useMemo(() => {
-      return data.filter(
-        (student) => {
-
-          const matchesSearch =
-            student.studentName
-              .toLowerCase()
-              .includes(
-                search.toLowerCase()
-              );
-
-          const matchesClass =
-            classFilter ===
-              "all" ||
-            student.className ===
-              classFilter;
-
-          const matchesSection =
-            sectionFilter ===
-              "all" ||
-            student.section ===
-              sectionFilter;
-
-          const matchesStatus =
-            status === "all" ||
-            student.status ===
-              status;
-
-          const matchesAbsenceType =
-            absenceType ===
-              "all" ||
-            student.absenceType ===
-              absenceType;
-
-          return (
-            matchesSearch &&
-            matchesClass &&
-            matchesSection &&
-            matchesStatus &&
-            matchesAbsenceType
-          );
-        }
-      );
-    }, [
-      data,
+        return (
+          (!normalizedSearch || student.studentName.toLowerCase().includes(normalizedSearch)) &&
+          (gradeFilter === "all" || student.className === gradeFilter) &&
+          (classroomFilter === "all" || student.section === classroomFilter) &&
+          (supervisorFilter === "all" || student.supervisorName === supervisorFilter) &&
+          (status === "all" || student.status === status) &&
+          (status !== "Absent" || absenceType === "all" || student.absenceType === absenceType)
+        );
+      }),
+    [
+      selectedDateRecords,
       search,
-      classFilter,
-      sectionFilter,
+      gradeFilter,
+      classroomFilter,
+      supervisorFilter,
       status,
       absenceType,
-    ]);
+    ],
+  );
 
-  if (isLoading) {
-    return (
-      <div>
-        Loading...
-      </div>
+  const isInitialLoading = attendanceQuery.isLoading && attendanceQuery.data === undefined;
+  const present = filteredData.filter((item) => item.status === "Present").length;
+  const absent = filteredData.filter((item) => item.status === "Absent").length;
+  const excused = filteredData.filter((item) => item.absenceType === "Excused").length;
+  const unexcused = filteredData.filter((item) => item.absenceType === "Unexcused").length;
+
+  function updateRecord(
+    id: string,
+    patch: Partial<Pick<StudentAttendance, "status" | "absenceType">>,
+  ) {
+    setRecords((current) =>
+      current.map((record) => {
+        if (record.id !== id) return record;
+
+        const next = { ...record, ...patch };
+
+        if (patch.status === "Present") {
+          delete next.absenceType;
+        }
+
+        if (patch.status === "Absent") {
+          next.absenceType = next.absenceType ?? "Excused";
+        }
+
+        return next;
+      }),
     );
+
+    setDirtyIds((current) => new Set(current).add(id));
+    setSavedAt(null);
   }
 
-  const present =
-    filteredData.filter(
-      (x) =>
-        x.status ===
-        "Present"
-    ).length;
+  function applyDate() {
+    if (!draftDate) return;
+    setSelectedDate(draftDate);
+    setDirtyIds(new Set());
+    setSavedAt(null);
+  }
 
-  const absent =
-    filteredData.filter(
-      (x) =>
-        x.status ===
-        "Absent"
-    ).length;
+  function saveAttendance() {
+    if (dirtyIds.size === 0) return;
+    setDirtyIds(new Set());
+    setSavedAt(new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }));
+  }
 
-  const excused =
-    filteredData.filter(
-      (x) =>
-        x.absenceType ===
-        "Excused"
-    ).length;
-
-  const unexcused =
-    filteredData.filter(
-      (x) =>
-        x.absenceType ===
-        "Unexcused"
-    ).length;
-
-console.log(filteredData);
-
-return (
-  <div className="space-y-6">
-
-    {/* Header */}
-
-    <div>
-      <h1 className="text-3xl font-bold">
-        Student Attendance
-      </h1>
-
-      <p className="text-muted-foreground">
-        Manage student attendance records.
-      </p>
-    </div>
-
-    {/* Statistics */}
-
-    <AttendanceStats
-      total={filteredData.length}
-      present={present}
-      absent={absent}
-      excused={excused}
-      unexcused={unexcused}
-    />
-
-    {/* Filters Card */}
-
-    <div
-      className="
-        soft-card
-        rounded-3xl
-        p-5
-        space-y-4
-      "
-    >
-      <div
-        className="
-          flex
-          flex-col
-          gap-4
-          lg:flex-row
-          lg:items-center
-          lg:justify-between
-        "
-      >
-        <div className="w-full lg:max-w-md">
-          <input
-            value={search}
-            onChange={(e) =>
-              setSearch(e.target.value)
-            }
-            placeholder="Search by student name..."
-            className="
-              h-11
-              w-full
-              rounded-2xl
-              border
-              border-border
-              bg-background
-              px-4
-              outline-none
-              transition-all
-              focus:ring-2
-              focus:ring-primary/20
-            "
+  return (
+    <section className="space-y-4 pt-5">
+      <div className="overflow-hidden rounded-[20px] border border-border/60 bg-card shadow-[0_8px_28px_rgba(30,20,70,0.04)]">
+        <div className="p-4">
+          <AttendanceFilters
+            data={records}
+            search={search}
+            setSearch={setSearch}
+            gradeFilter={gradeFilter}
+            setGradeFilter={setGradeFilter}
+            classroomFilter={classroomFilter}
+            setClassroomFilter={setClassroomFilter}
+            supervisorFilter={supervisorFilter}
+            setSupervisorFilter={setSupervisorFilter}
+            status={status}
+            setStatus={setStatus}
+            absenceType={absenceType}
+            setAbsenceType={setAbsenceType}
           />
         </div>
 
-        <div className="flex gap-3">
-          <button
-            className="
-              rounded-2xl
-              border
-              px-4
-              py-2
-              text-sm
-              font-medium
-            "
-          >
-            Export
-          </button>
+        <div className="flex flex-col gap-3 border-t border-border/45 bg-muted/[0.12] px-4 py-3 sm:flex-row sm:items-end sm:justify-between">
+          <div className="flex min-w-0 items-center gap-2.5">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[12px] bg-primary/[0.08] text-primary">
+              <CalendarCheck2 className="h-4 w-4" strokeWidth={1.8} />
+            </span>
+            <div className="min-w-0">
+              <p className="text-[12px] font-semibold text-foreground">Daily attendance date</p>
+              <p className="mt-0.5 text-[11px] text-muted-foreground">
+                Choose the working date, apply it, then save attendance changes.
+              </p>
+            </div>
+          </div>
 
-          <button
-            className="
-              rounded-2xl
-              bg-primary
-              px-4
-              py-2
-              text-sm
-              font-medium
-              text-white
-            "
-          >
-            Take Attendance
-          </button>
+          <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-end">
+            <DatePicker
+              value={draftDate}
+              onChange={setDraftDate}
+              label="Attendance date"
+              className="w-full sm:w-[220px]"
+            />
+
+            <Button
+              type="button"
+              variant="outline"
+              onClick={applyDate}
+              disabled={!draftDate || draftDate === selectedDate}
+              className="h-11 rounded-[13px] border-primary/20 bg-card px-4 text-primary hover:bg-primary/[0.06]"
+            >
+              Apply date
+            </Button>
+
+            <Button
+              type="button"
+              onClick={saveAttendance}
+              disabled={dirtyIds.size === 0}
+              className="h-11 rounded-[13px] px-5"
+            >
+              <Save className="h-4 w-4" />
+              Save
+            </Button>
+          </div>
         </div>
       </div>
 
-      <AttendanceFilters
-        classFilter={classFilter}
-        setClassFilter={setClassFilter}
-        sectionFilter={sectionFilter}
-        setSectionFilter={setSectionFilter}
-        status={status}
-        setStatus={setStatus}
-        absenceType={absenceType}
-        setAbsenceType={setAbsenceType}
+      {savedAt ? (
+        <p className="-mt-1 text-end text-[11px] font-medium text-success">
+          Attendance changes saved at {savedAt}.
+        </p>
+      ) : null}
+
+      <AttendanceStats
+        present={present}
+        absent={absent}
+        excused={excused}
+        unexcused={unexcused}
+        isLoading={isInitialLoading}
       />
-    </div>
 
-    {/* Table */}
-
-    <AttendanceTable
-      data={filteredData as any}
-    />
-  </div>
-);
-};
+      <AttendanceTable
+        data={filteredData}
+        isLoading={isInitialLoading}
+        onUpdate={updateRecord}
+      />
+    </section>
+  );
+}

@@ -2,6 +2,7 @@ import {
   ArrowRight,
   type LucideIcon,
 } from "lucide-react";
+
 import { Link } from "react-router-dom";
 
 type UserCategoryCardProps = {
@@ -12,9 +13,11 @@ type UserCategoryCardProps = {
 
   count?: number;
   countLabel: string;
+  isCountLoading?: boolean;
 
   secondaryCount?: number;
   secondaryCountLabel?: string;
+  isSecondaryCountLoading?: boolean;
 
   viewLabel: string;
 
@@ -26,13 +29,33 @@ type UserCategoryCardProps = {
 
 function formatCount(
   count?: number,
-) {
+): string {
   if (typeof count !== "number") {
     return "—";
   }
 
   return new Intl.NumberFormat().format(
     count,
+  );
+}
+
+function CountSkeleton({
+  compact = false,
+}: {
+  compact?: boolean;
+}) {
+  return (
+    <span
+      aria-hidden="true"
+      className={[
+        "block animate-pulse",
+        "rounded-[7px]",
+        "bg-muted/65",
+        compact
+          ? "h-[21px] w-10"
+          : "h-6 w-12",
+      ].join(" ")}
+    />
   );
 }
 
@@ -43,8 +66,10 @@ export function UserCategoryCard({
   icon: Icon,
   count,
   countLabel,
+  isCountLoading = false,
   secondaryCount,
   secondaryCountLabel,
+  isSecondaryCountLoading = false,
   viewLabel,
   accentClassName,
   iconClassName,
@@ -52,13 +77,18 @@ export function UserCategoryCard({
   footerTextClassName,
 }: UserCategoryCardProps) {
   const hasSecondaryCount =
-    typeof secondaryCount === "number" &&
-    Boolean(secondaryCountLabel);
+    Boolean(secondaryCountLabel) &&
+    (
+      typeof secondaryCount === "number" ||
+      isSecondaryCountLoading
+    );
 
   return (
     <article
       className={[
-        "group relative flex min-h-[232px] flex-col overflow-hidden",
+        "group relative",
+        "flex min-h-[232px] flex-col",
+        "overflow-hidden",
         "rounded-[18px]",
         "border border-border/65",
         "bg-card",
@@ -74,7 +104,9 @@ export function UserCategoryCard({
       <div
         aria-hidden="true"
         className={[
-          "pointer-events-none absolute inset-x-0 top-0 h-[3px]",
+          "pointer-events-none",
+          "absolute inset-x-0 top-0",
+          "h-[3px]",
           accentClassName,
         ].join(" ")}
       />
@@ -111,17 +143,31 @@ export function UserCategoryCard({
               "focus-visible:ring-4",
               "focus-visible:ring-primary/10",
             ].join(" ")}
-          >
-            
-          </Link>
+          />
         </div>
 
         <div className="mt-3">
-          <h2 className="text-[16px] font-semibold tracking-[-0.02em] text-foreground">
+          <h2
+            className={[
+              "text-[18px]",
+              "font-semibold",
+              "tracking-[-0.02em]",
+              "text-foreground",
+            ].join(" ")}
+          >
             {title}
           </h2>
 
-          <p className="mt-1 min-h-9 line-clamp-2 text-[12px] font-normal leading-[18px] text-muted-foreground">
+          <p
+            className={[
+              "mt-1 min-h-9",
+              "line-clamp-2",
+              "text-[13px]",
+              "font-normal",
+              "leading-[19px]",
+              "text-muted-foreground",
+            ].join(" ")}
+          >
             {description}
           </p>
         </div>
@@ -136,29 +182,79 @@ export function UserCategoryCard({
                   : "grid-cols-1",
               ].join(" ")}
             >
-              <div>
-                <strong className="block text-[22px] font-semibold leading-none tracking-[-0.04em] text-foreground">
-                  {formatCount(count)}
-                </strong>
+              <div className="min-w-0">
+                <div className="flex min-h-6 items-end">
+                  {isCountLoading ? (
+                    <CountSkeleton />
+                  ) : (
+                    <strong
+                      className={[
+                        "block",
+                        "text-[24px]",
+                        "font-semibold",
+                        "leading-none",
+                        "tracking-[-0.04em]",
+                        "text-foreground",
+                      ].join(" ")}
+                    >
+                      {formatCount(count)}
+                    </strong>
+                  )}
+                </div>
 
-                <span className="mt-1 block text-[10px] font-normal text-muted-foreground">
+                <span
+                  className={[
+                    "mt-1 block truncate",
+                    "text-[11px]",
+                    "font-normal",
+                    "text-muted-foreground",
+                  ].join(" ")}
+                >
                   {countLabel}
                 </span>
               </div>
 
-              {hasSecondaryCount ? (
-                <div className="border-l border-border/60 pl-3">
-                  <strong className="block text-[19px] font-semibold leading-none tracking-[-0.035em] text-foreground">
-                    {formatCount(
-                      secondaryCount,
+              {hasSecondaryCount && (
+                <div
+                  className={[
+                    "min-w-0",
+                    "border-s border-border/60",
+                    "ps-3",
+                  ].join(" ")}
+                >
+                  <div className="flex min-h-[21px] items-end">
+                    {isSecondaryCountLoading ? (
+                      <CountSkeleton compact />
+                    ) : (
+                      <strong
+                        className={[
+                          "block",
+                          "text-[21px]",
+                          "font-semibold",
+                          "leading-none",
+                          "tracking-[-0.035em]",
+                          "text-foreground",
+                        ].join(" ")}
+                      >
+                        {formatCount(
+                          secondaryCount,
+                        )}
+                      </strong>
                     )}
-                  </strong>
+                  </div>
 
-                  <span className="mt-1 block text-[10px] font-normal text-muted-foreground">
+                  <span
+                    className={[
+                      "mt-1 block truncate",
+                      "text-[11px]",
+                      "font-normal",
+                      "text-muted-foreground",
+                    ].join(" ")}
+                  >
                     {secondaryCountLabel}
                   </span>
                 </div>
-              ) : null}
+              )}
             </div>
           </div>
         </div>
@@ -167,16 +263,21 @@ export function UserCategoryCard({
       <Link
         to={path}
         className={[
-          "flex h-11 items-center",
-          "justify-between gap-3",
+          "flex h-11 shrink-0",
+          "items-center justify-between",
+          "gap-3",
           "border-t border-border/35",
           "px-5",
           "transition-colors duration-200",
           footerClassName,
           footerTextClassName,
+          "focus-visible:outline-none",
+          "focus-visible:ring-2",
+          "focus-visible:ring-inset",
+          "focus-visible:ring-primary/25",
         ].join(" ")}
       >
-        <span className="text-[11px] font-medium">
+        <span className="text-[12px] font-medium">
           {viewLabel}
         </span>
 
@@ -186,6 +287,8 @@ export function UserCategoryCard({
             "h-4 w-4",
             "transition-transform duration-200",
             "group-hover:translate-x-1",
+            "rtl:rotate-180",
+            "rtl:group-hover:-translate-x-1",
           ].join(" ")}
           strokeWidth={1.8}
         />

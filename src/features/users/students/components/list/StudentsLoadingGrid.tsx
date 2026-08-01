@@ -3,7 +3,7 @@ export function StudentsLoadingGrid() {
     <section
       aria-busy="true"
       aria-label="Loading students"
-      className="grid gap-5 md:grid-cols-2 2xl:grid-cols-3"
+      className="grid gap-4 md:grid-cols-2 2xl:grid-cols-3"
     >
       {Array.from({
         length: 6,
@@ -11,18 +11,18 @@ export function StudentsLoadingGrid() {
         <article
           key={index}
           className={[
-            "relative flex min-h-[365px] flex-col overflow-hidden",
-            "rounded-[24px] border",
+            "relative flex min-h-[315px] flex-col overflow-hidden",
+            "rounded-[20px] border",
             "border-primary/20 bg-card",
             "shadow-[var(--shadow-card)]",
           ].join(" ")}
         >
           <div className="absolute inset-x-0 top-0 h-[3px] animate-pulse bg-primary/25" />
 
-          <div className="flex flex-1 flex-col p-5">
+          <div className="flex flex-1 flex-col p-4">
             <div className="flex items-start justify-between gap-4">
               <div className="flex min-w-0 flex-1 items-center gap-3.5">
-                <div className="h-14 w-14 shrink-0 animate-pulse rounded-[18px] bg-muted" />
+                <div className="h-12 w-12 shrink-0 animate-pulse rounded-[15px] bg-muted" />
 
                 <div className="min-w-0 flex-1">
                   <div className="h-5 w-2/3 animate-pulse rounded-md bg-muted" />

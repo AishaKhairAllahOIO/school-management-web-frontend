@@ -1,4 +1,6 @@
+import { Search } from "lucide-react";
 
+import { Input } from "@/shared/ui/input";
 import {
   Select,
   SelectContent,
@@ -7,181 +9,135 @@ import {
   SelectValue,
 } from "@/shared/ui/select";
 
+import type { StudentAttendance } from "../types/attendance.types";
+
 type Props = {
-  classFilter: string;
-  setClassFilter: (value: string) => void;
-
-  sectionFilter: string;
-  setSectionFilter: (value: string) => void;
-
+  data: StudentAttendance[];
+  search: string;
+  setSearch: (value: string) => void;
+  gradeFilter: string;
+  setGradeFilter: (value: string) => void;
+  classroomFilter: string;
+  setClassroomFilter: (value: string) => void;
+  supervisorFilter: string;
+  setSupervisorFilter: (value: string) => void;
   status: string;
   setStatus: (value: string) => void;
-
   absenceType: string;
   setAbsenceType: (value: string) => void;
 };
 
-export const AttendanceFilters = ({
-  classFilter,
-  setClassFilter,
-  sectionFilter,
-  setSectionFilter,
+function unique(values: string[]) {
+  return [...new Set(values)].sort((a, b) => a.localeCompare(b));
+}
+
+export function AttendanceFilters({
+  data,
+  search,
+  setSearch,
+  gradeFilter,
+  setGradeFilter,
+  classroomFilter,
+  setClassroomFilter,
+  supervisorFilter,
+  setSupervisorFilter,
   status,
   setStatus,
   absenceType,
   setAbsenceType,
-}: Props) => {
+}: Props) {
+  const grades = unique(data.map((item) => item.className));
+  const classrooms = unique(data.map((item) => item.section));
+  const supervisors = unique(data.map((item) => item.supervisorName));
+  const triggerClass =
+    "h-11 rounded-[13px] border-border/60 bg-background/80 text-[12px] shadow-none";
+
+  const absenceTypeEnabled = status === "Absent";
+
   return (
-    <div
-      className="
-        flex
-        flex-wrap
-        gap-3
-      "
-    >
-     
-      {/* CLASS */}
+    <div className="grid gap-2.5 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-[minmax(220px,1.25fr)_130px_140px_155px_145px_160px]">
+      <div className="relative min-w-0 md:col-span-2 xl:col-span-3 2xl:col-span-1">
+        <Search className="absolute start-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        <Input
+          value={search}
+          onChange={(event) => setSearch(event.target.value)}
+          placeholder="Student name"
+          className={[triggerClass, "ps-9"].join(" ")}
+        />
+      </div>
 
-      <Select
-        value={classFilter}
-        onValueChange={
-          setClassFilter
-        }
-      >
-        <SelectTrigger className="
-        w-[180px]
-        py-5.5 
-        rounded-2xl
-        border-border/60
-        shadow-sm
-      ">
-          <SelectValue placeholder="Class" />
+      <Select value={gradeFilter} onValueChange={setGradeFilter}>
+        <SelectTrigger className={triggerClass}>
+          <SelectValue placeholder="Grade" />
         </SelectTrigger>
-
         <SelectContent>
-          <SelectItem value="all">
-            All Classes
-          </SelectItem>
-
-          <SelectItem value="Grade 7">
-            Grade 7
-          </SelectItem>
-
-          <SelectItem value="Grade 8">
-            Grade 8
-          </SelectItem>
-
-          <SelectItem value="Grade 9">
-            Grade 9
-          </SelectItem>
-
+          <SelectItem value="all">All grades</SelectItem>
+          {grades.map((grade) => (
+            <SelectItem key={grade} value={grade}>{grade}</SelectItem>
+          ))}
         </SelectContent>
       </Select>
 
-      {/* SECTION */}
-
-      <Select
-        value={sectionFilter}
-        onValueChange={
-          setSectionFilter
-        }
-      >
-        <SelectTrigger className="
-          w-[180px]
-          py-5.5 
-          rounded-2xl
-          border-border/60
-          shadow-sm
-        ">
-          <SelectValue placeholder="Section" />
+      <Select value={classroomFilter} onValueChange={setClassroomFilter}>
+        <SelectTrigger className={triggerClass}>
+          <SelectValue placeholder="Classroom" />
         </SelectTrigger>
-
         <SelectContent>
-          <SelectItem value="all">
-            All Sections
-          </SelectItem>
-
-          <SelectItem value="A">
-            Section A
-          </SelectItem>
-
-          <SelectItem value="B">
-            Section B
-          </SelectItem>
-
-          <SelectItem value="C">
-            Section C
-          </SelectItem>
-
-          <SelectItem value="D">
-            Section D
-          </SelectItem>
+          <SelectItem value="all">All classrooms</SelectItem>
+          {classrooms.map((classroom) => (
+            <SelectItem key={classroom} value={classroom}>Classroom {classroom}</SelectItem>
+          ))}
         </SelectContent>
       </Select>
 
-      {/* STATUS */}
+      <Select value={supervisorFilter} onValueChange={setSupervisorFilter}>
+        <SelectTrigger className={triggerClass}>
+          <SelectValue placeholder="Supervisor" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">All supervisors</SelectItem>
+          {supervisors.map((supervisor) => (
+            <SelectItem key={supervisor} value={supervisor}>{supervisor}</SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
 
       <Select
         value={status}
-        onValueChange={setStatus}
+        onValueChange={(value) => {
+          setStatus(value);
+          if (value !== "Absent") setAbsenceType("all");
+        }}
       >
-        <SelectTrigger className="
-          w-[180px]
-          py-5.5 
-          rounded-2xl
-          border-border/60
-          shadow-sm
-        ">
-          <SelectValue />
+        <SelectTrigger className={triggerClass}>
+          <SelectValue placeholder="Attendance" />
         </SelectTrigger>
-
         <SelectContent>
-          <SelectItem value="all">
-            All Statuses
-          </SelectItem>
-
-          <SelectItem value="Present">
-            Present
-          </SelectItem>
-
-          <SelectItem value="Absent">
-            Absent
-          </SelectItem>
+          <SelectItem value="all">All attendance</SelectItem>
+          <SelectItem value="Present">Present</SelectItem>
+          <SelectItem value="Absent">Absent</SelectItem>
         </SelectContent>
       </Select>
 
-      {/* ABSENCE TYPE */}
-
       <Select
-        value={absenceType}
-        onValueChange={
-          setAbsenceType
-        }
+        value={absenceTypeEnabled ? absenceType : "all"}
+        onValueChange={setAbsenceType}
+        disabled={!absenceTypeEnabled}
       >
-        <SelectTrigger className="
-          w-[180px]
-          py-5.5 
-          rounded-2xl
-          border-border/60
-          shadow-sm
-        ">
-          <SelectValue />
+        <SelectTrigger
+          className={[
+            triggerClass,
+            !absenceTypeEnabled ? "cursor-not-allowed opacity-50" : "",
+          ].join(" ")}
+        >
+          <SelectValue placeholder="Absence type" />
         </SelectTrigger>
-
         <SelectContent>
-          <SelectItem value="all">
-            All Absences
-          </SelectItem>
-
-          <SelectItem value="Excused">
-            Excused
-          </SelectItem>
-
-          <SelectItem value="Unexcused">
-            Unexcused
-          </SelectItem>
+          <SelectItem value="all">All absence types</SelectItem>
+          <SelectItem value="Excused">Excused</SelectItem>
+          <SelectItem value="Unexcused">Unexcused</SelectItem>
         </SelectContent>
       </Select>
     </div>
   );
-};
+}

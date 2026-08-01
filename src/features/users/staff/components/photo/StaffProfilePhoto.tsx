@@ -1,3 +1,5 @@
+import { AuthenticatedUserImage } from "../../../shared/components/AuthenticatedUserImage";
+
 import {
   Camera,
   UserRound,
@@ -69,13 +71,9 @@ export function StaffProfilePhoto({
         ].join(" ")}
       >
         {photoUrl ? (
-          <img
+          <AuthenticatedUserImage
             src={photoUrl}
-            alt={
-              alt ??
-              fullName ??
-              "Staff profile"
-            }
+            alt={alt ?? fullName ?? "Staff profile"}
             className="h-full w-full object-cover"
           />
         ) : initials ? (

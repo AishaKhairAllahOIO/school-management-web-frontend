@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, Loader2, RefreshCw } from "lucide-react";
+import { Banknote, CircleDollarSign, CreditCard, Plus, ReceiptText } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"; 
 
 import { Button } from "@/shared/ui/button";
@@ -10,11 +10,15 @@ import { financeOperationsService } from "../../services/finance-operations.serv
 import { PaymentsTable } from "./PaymentsTable";
 import { ProcessPaymentDialog } from "./ProcessPaymentDialog";
 import { UpdatePaymentDialog } from "./UpdatePaymentDialog";
-import { PaymentReceiptDialog } from "./PaymentReceiptDialog"; // 👈 استيراد نافذة الإيصال
+import { PaymentReceiptDialog } from "./PaymentReceiptDialog";
+import { DeletePaymentDialog } from "./DeletePaymentDialog";
 import { usePayments } from "../../hooks/usePayments";
 
 import type { PaymentReceipt } from "../../types/finance.types";
 import type { PaymentFormValues } from "../../schemas/payment.schema";
+import { FinanceSectionShell } from "../shared/FinanceSectionShell";
+import { FinanceSummarySkeleton, FinanceTableSkeleton } from "../shared/FinanceTableSkeleton";
+import { FinanceSummaryGrid } from "../shared/FinanceSummaryGrid";
 
 export function CashierSection() {
   const {
@@ -33,6 +37,8 @@ export function CashierSection() {
   const [createOpen, setCreateOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [selectedPayment, setSelectedPayment] = useState<PaymentReceipt | null>(null);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [selectedPaymentIdToDelete, setSelectedPaymentIdToDelete] = useState<string | number | null>(null);
 
 
   const [viewOpen, setViewOpen] = useState(false);
@@ -86,18 +92,37 @@ export function CashierSection() {
 
 
   function handleDelete(id: string | number) {
-    if (confirm("Are you sure you want to delete this payment? This will reverse the amount in the student's balance.")) {
-      deletePayment.mutate(id);  
-    }
+    setSelectedPaymentIdToDelete(id);
+    setDeleteOpen(true);
   }
 
+  function confirmDelete() {
+    if (selectedPaymentIdToDelete == null) return;
+    deletePayment.mutate(selectedPaymentIdToDelete, {
+      onSuccess: () => {
+        setDeleteOpen(false);
+        setSelectedPaymentIdToDelete(null);
+      },
+    });
+  }
+
+
   if (isLoadingPayments || isLoadingStudents) {
-    return <div className="py-10 text-center text-muted-foreground">Loading cashier data...</div>;
+    return (
+      <FinanceSectionShell
+        title="Student Payments"
+        description="Record collections and manage student receipts."
+        icon={ReceiptText}
+      >
+        <FinanceSummarySkeleton />
+        <FinanceTableSkeleton />
+      </FinanceSectionShell>
+    );
   }
 
   if (isError) {
     return (
-      <div className="flex flex-col items-center justify-center rounded-2xl border border-red-200 bg-red-50 py-12 text-center">
+      <div className="flex flex-col items-center justify-center rounded-[18px] border border-destructive/20 bg-destructive/[0.045] py-12 text-center">
         <Button variant="outline" onClick={() => refetch()} disabled={isFetching}>
           {isFetching ? "Retrying..." : "Retry Loading Cashier"}
         </Button>
@@ -106,21 +131,59 @@ export function CashierSection() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold">Cashier & Ledger</h2>
-          <p className="text-muted-foreground">
-            Process incoming payments and manage transaction receipts.
-          </p>
-        </div>
-        <Button onClick={() => setCreateOpen(true)} className="bg-green-600 hover:bg-green-700">
-          <Plus className="mr-2 h-4 w-4" /> Process Payment
-        </Button>
-      </div>
+    <FinanceSectionShell
+      title="Student Payments"
+      description="Record collections and manage student receipts."
+      icon={ReceiptText}
+    >
+      <FinanceSummaryGrid
+        items={[
+          {
+            label: "Recorded payments",
+            value: new Intl.NumberFormat().format(payments.length),
+            hint: "Official receipts",
+            icon: ReceiptText,
+            tone: "primary",
+          },
+          {
+            label: "Total collected",
+            value: `${payments.reduce((sum, item) => sum + Number(item.paidAmount ?? 0), 0).toLocaleString()} $`,
+            hint: "Across all methods",
+            icon: CircleDollarSign,
+            tone: "success",
+          },
+          {
+            label: "Cash receipts",
+            value: new Intl.NumberFormat().format(payments.filter((item) => item.paymentMethod === "cash").length),
+            hint: "Processed in cash",
+            icon: Banknote,
+            tone: "warning",
+          },
+          {
+            label: "Digital payments",
+            value: new Intl.NumberFormat().format(payments.filter((item) => item.paymentMethod !== "cash").length),
+            hint: "Transfer, cheque or wallet",
+            icon: CreditCard,
+            tone: "info",
+          },
+        ]}
+      />
 
-      <PaymentsTable 
-        payments={payments} 
+      <PaymentsTable
+        payments={payments}
+        headerAction={
+          <Button
+            type="button"
+            variant="outline"
+            size="icon"
+            onClick={() => setCreateOpen(true)}
+            aria-label="Process payment"
+            title="Process payment"
+            className="h-8 w-8 rounded-[11px] border-primary/25 bg-transparent text-primary shadow-none hover:border-primary/45 hover:bg-primary/[0.045] hover:text-primary"
+          >
+            <Plus className="h-4 w-4" strokeWidth={1.9} />
+          </Button>
+        } 
         onView={(id) => {
           setSelectedPaymentIdToView(id);
           setViewOpen(true);
@@ -152,6 +215,13 @@ export function CashierSection() {
       />
 
 
+      <DeletePaymentDialog
+        open={deleteOpen}
+        onOpenChange={(open) => { setDeleteOpen(open); if (!open) setSelectedPaymentIdToDelete(null); }}
+        isLoading={deletePayment.isPending}
+        onConfirm={confirmDelete}
+      />
+
       <PaymentReceiptDialog
         open={viewOpen}
         onOpenChange={(open) => {
@@ -160,6 +230,6 @@ export function CashierSection() {
         }}
         paymentId={selectedPaymentIdToView}
       />
-    </div>
+    </FinanceSectionShell>
   );
 }

@@ -189,10 +189,6 @@ export function useUpdateGuardian(
   });
 }
 
-/* -------------------------------------------------------------------------- */
-/* Enrollment                                                                  */
-/* -------------------------------------------------------------------------- */
-
 export function useUpdateStudentEnrollment() {
   const queryClient = useQueryClient();
 
@@ -295,6 +291,35 @@ export function useDeleteStudent() {
 
       toast.success(
         "Student enrollment was removed and the account was disabled.",
+      );
+    },
+
+    onError: (error) => {
+      toast.error(getAxiosErrorMessage(error));
+    },
+  });
+}
+
+export function useRestoreStudent() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (enrollmentId: ApiId) =>
+      studentApi.restore(enrollmentId),
+
+    onSuccess: async (_data, enrollmentId) => {
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: studentKeys.lists(),
+        }),
+        queryClient.invalidateQueries({
+          queryKey:
+            studentKeys.fullProfile(enrollmentId),
+        }),
+      ]);
+
+      toast.success(
+        "Student restored successfully.",
       );
     },
 

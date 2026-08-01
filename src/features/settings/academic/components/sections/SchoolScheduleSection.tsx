@@ -13,6 +13,16 @@ import {
   useState,
 } from "react";
 
+import { ConfirmationDialog } from "@/shared/ui/confirmation-dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/shared/ui/select";
+import { TimePicker } from "@/shared/ui/time-picker";
+
 import { useUpdateAcademicSettings } from "../../hooks/useAcademicSettings";
 import type {
   AcademicSettings,
@@ -39,6 +49,9 @@ export function SchoolScheduleSection({
       settings.scheduleSettings,
     );
 
+  const [pendingBreakDelete, setPendingBreakDelete] =
+    useState<SchoolBreak | null>(null);
+
   const updateSettings =
     useUpdateAcademicSettings();
 
@@ -62,11 +75,9 @@ export function SchoolScheduleSection({
       currentAcademicYearId: Number(
         settings.currentAcademicYearId,
       ),
-
       currentSemesterId: Number(
         settings.currentSemesterId,
       ),
-
       scheduleSettings: schedule,
     });
   }
@@ -76,7 +87,6 @@ export function SchoolScheduleSection({
 
     setSchedule((previousSchedule) => ({
       ...previousSchedule,
-
       workingDays: exists
         ? previousSchedule.workingDays.filter(
             (item) => item.day !== day,
@@ -97,7 +107,6 @@ export function SchoolScheduleSection({
   ) {
     setSchedule((previousSchedule) => ({
       ...previousSchedule,
-
       workingDays:
         previousSchedule.workingDays.map((item) =>
           item.day === day
@@ -113,7 +122,6 @@ export function SchoolScheduleSection({
   function addBreak() {
     setSchedule((previousSchedule) => ({
       ...previousSchedule,
-
       breaks: [
         ...previousSchedule.breaks,
         {
@@ -135,7 +143,6 @@ export function SchoolScheduleSection({
   ) {
     setSchedule((previousSchedule) => ({
       ...previousSchedule,
-
       breaks: previousSchedule.breaks.map(
         (item) =>
           item.id === id
@@ -151,11 +158,9 @@ export function SchoolScheduleSection({
   function deleteBreak(id: string) {
     setSchedule((previousSchedule) => ({
       ...previousSchedule,
-
-      breaks:
-        previousSchedule.breaks.filter(
-          (item) => item.id !== id,
-        ),
+      breaks: previousSchedule.breaks.filter(
+        (item) => item.id !== id,
+      ),
     }));
   }
 
@@ -166,18 +171,17 @@ export function SchoolScheduleSection({
         description="Set working days, lesson duration and break timing for the daily school routine."
       />
 
-      <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_340px]">
-        <div className="space-y-5">
+      <div className="grid items-start gap-4 xl:grid-cols-[minmax(0,1fr)_280px]">
+        <div className="space-y-4">
           <SchedulePanel
-            icon={<Clock3 size={18} />}
+            icon={<Clock3 size={17} />}
             title="Working Days"
-            description="Choose active days and the number of periods for each one."
+            description="Select active days and periods."
           >
-            <div className="space-y-2.5">
+            <div className="grid gap-2 sm:grid-cols-2">
               {schoolDays.map((day) => {
                 const dayConfiguration =
                   workingDaysMap.get(day);
-
                 const checked = Boolean(
                   dayConfiguration,
                 );
@@ -186,13 +190,12 @@ export function SchoolScheduleSection({
                   <div
                     key={day}
                     className={[
-                      "flex items-center justify-between",
-                      "gap-4 rounded-[16px]",
-                      "border px-4 py-3.5",
+                      "flex min-w-0 items-center justify-between",
+                      "gap-3 rounded-[14px] border px-3 py-2.5",
                       "transition-colors",
                       checked
                         ? "border-primary/15 bg-primary/[0.035]"
-                        : "border-border/60 bg-card hover:bg-muted/20",
+                        : "border-border/55 bg-background hover:bg-muted/[0.16]",
                     ].join(" ")}
                   >
                     <button
@@ -200,14 +203,12 @@ export function SchoolScheduleSection({
                       onClick={() =>
                         toggleWorkingDay(day)
                       }
-                      className="flex min-w-0 items-center gap-3 text-left"
+                      className="flex min-w-0 flex-1 items-center gap-2.5 text-left"
                     >
                       <span
                         className={[
-                          "flex h-5 w-5 shrink-0",
-                          "items-center justify-center",
-                          "rounded-md border",
-                          "transition-colors",
+                          "flex h-5 w-5 shrink-0 items-center justify-center",
+                          "rounded-[7px] border transition-colors",
                           checked
                             ? "border-primary bg-primary text-primary-foreground"
                             : "border-border bg-background",
@@ -215,7 +216,7 @@ export function SchoolScheduleSection({
                       >
                         {checked ? (
                           <Check
-                            size={13}
+                            size={12}
                             strokeWidth={2}
                           />
                         ) : null}
@@ -223,7 +224,7 @@ export function SchoolScheduleSection({
 
                       <span
                         className={[
-                          "truncate text-sm font-medium",
+                          "truncate text-[13px] font-medium",
                           checked
                             ? "text-foreground"
                             : "text-muted-foreground",
@@ -233,53 +234,48 @@ export function SchoolScheduleSection({
                       </span>
                     </button>
 
-                    <div className="flex items-center gap-2">
-                      <select
+                    <div className="flex shrink-0 items-center gap-1.5">
+                      <Select
                         value={
                           dayConfiguration
-                            ?.periodsCount ?? ""
+                            ? String(dayConfiguration.periodsCount)
+                            : "none"
                         }
                         disabled={!checked}
-                        onChange={(event) =>
+                        onValueChange={(value) => {
+                          if (value === "none") {
+                            return;
+                          }
+
                           updateDayPeriods(
                             day,
-                            Number(
-                              event.target.value,
-                            ),
-                          )
-                        }
-                        className={[
-                          "h-9 rounded-xl",
-                          "border border-border/70",
-                          "bg-background px-3",
-                          "text-sm font-normal",
-                          "text-foreground outline-none",
-                          "transition-all",
-                          "focus:border-primary/40",
-                          "focus:ring-4",
-                          "focus:ring-primary/10",
-                          "disabled:cursor-not-allowed",
-                          "disabled:opacity-50",
-                        ].join(" ")}
+                            Number(value),
+                          );
+                        }}
                       >
-                        <option value="">
-                          —
-                        </option>
+                        <SelectTrigger className="h-8 w-[62px] rounded-[10px] px-2.5">
+                          <SelectValue placeholder="—" />
+                        </SelectTrigger>
 
-                        {[
-                          1, 2, 3, 4, 5, 6, 7, 8,
-                          9,
-                        ].map((count) => (
-                          <option
-                            key={count}
-                            value={count}
-                          >
-                            {count}
-                          </option>
-                        ))}
-                      </select>
+                        <SelectContent>
+                          <SelectItem value="none">
+                            —
+                          </SelectItem>
 
-                      <span className="text-[11px] font-normal text-muted-foreground">
+                          {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(
+                            (count) => (
+                              <SelectItem
+                                key={count}
+                                value={String(count)}
+                              >
+                                {count}
+                              </SelectItem>
+                            ),
+                          )}
+                        </SelectContent>
+                      </Select>
+
+                      <span className="hidden text-[11px] text-muted-foreground 2xl:inline">
                         periods
                       </span>
                     </div>
@@ -290,25 +286,22 @@ export function SchoolScheduleSection({
           </SchedulePanel>
 
           <SchedulePanel
-            icon={<Clock3 size={18} />}
+            icon={<Clock3 size={17} />}
             title="Day Timing"
-            description="Define when the school day begins and how long each period lasts."
+            description="Set the starting time and lesson length."
           >
-            <div className="grid gap-4 md:grid-cols-2">
+            <div className="grid gap-3 md:grid-cols-2">
               <ScheduleField label="Day Starts At">
-                <input
-                  type="time"
+                <TimePicker
                   value={schedule.dayStartTime}
-                  onChange={(event) =>
+                  onChange={(dayStartTime) =>
                     setSchedule(
                       (previousSchedule) => ({
                         ...previousSchedule,
-                        dayStartTime:
-                          event.target.value,
+                        dayStartTime,
                       }),
                     )
                   }
-                  className={inputClassName}
                 />
               </ScheduleField>
 
@@ -324,7 +317,6 @@ export function SchoolScheduleSection({
                       setSchedule(
                         (previousSchedule) => ({
                           ...previousSchedule,
-
                           periodDurationMinutes:
                             Number(
                               event.target.value,
@@ -342,36 +334,32 @@ export function SchoolScheduleSection({
               </ScheduleField>
             </div>
 
-            <div className="mt-4 flex items-start gap-3 rounded-[16px] border border-primary/10 bg-primary/[0.045] p-4 text-primary">
+            <div className="mt-3 flex items-start gap-2.5 rounded-[13px] border border-primary/10 bg-primary/[0.04] px-3 py-2.5 text-primary">
               <Info
-                size={17}
+                size={15}
                 strokeWidth={1.75}
                 className="mt-0.5 shrink-0"
               />
 
-              <p className="text-xs font-normal leading-5">
-                The end time is calculated
-                automatically from working periods
-                and breaks.
+              <p className="text-[12px] leading-5">
+                End time is calculated automatically from periods and breaks.
               </p>
             </div>
           </SchedulePanel>
 
           <SchedulePanel
-            icon={<Coffee size={18} />}
+            icon={<Coffee size={17} />}
             title="Breaks"
-            description="Insert break periods between lessons."
+            description="Add break periods between lessons."
           >
-            <div className="space-y-3">
+            <div className="space-y-2.5">
               {schedule.breaks.map(
                 (breakItem, index) => (
                   <div
                     key={breakItem.id}
                     className={[
-                      "grid gap-3",
-                      "rounded-[16px]",
-                      "border border-border/60",
-                      "bg-card p-4",
+                      "grid gap-3 rounded-[14px]",
+                      "border border-border/55 bg-background p-3",
                       "sm:grid-cols-[1fr_1fr_auto]",
                     ].join(" ")}
                   >
@@ -427,20 +415,19 @@ export function SchoolScheduleSection({
                       type="button"
                       aria-label="Delete break"
                       onClick={() =>
-                        deleteBreak(breakItem.id)
+                        setPendingBreakDelete(
+                          breakItem,
+                        )
                       }
                       className={[
-                        "mt-auto flex h-11 w-11",
-                        "items-center justify-center",
-                        "rounded-xl border",
-                        "border-destructive/20",
-                        "bg-card text-destructive",
-                        "transition-colors",
-                        "hover:bg-destructive/[0.07]",
+                        "mt-auto flex h-10 w-10 items-center justify-center",
+                        "rounded-[11px] border border-destructive/18",
+                        "bg-background text-destructive",
+                        "transition-colors hover:bg-destructive/[0.06]",
                       ].join(" ")}
                     >
                       <Trash2
-                        size={16}
+                        size={15}
                         strokeWidth={1.75}
                       />
                     </button>
@@ -449,14 +436,12 @@ export function SchoolScheduleSection({
               )}
 
               {schedule.breaks.length === 0 ? (
-                <div className="rounded-[16px] border border-dashed border-border bg-muted/10 p-6 text-center">
-                  <p className="text-sm font-medium text-foreground">
+                <div className="rounded-[14px] border border-dashed border-border/70 bg-muted/[0.1] p-5 text-center">
+                  <p className="text-[13px] font-medium text-foreground">
                     No breaks added
                   </p>
-
-                  <p className="mt-1 text-xs font-normal text-muted-foreground">
-                    Add a break between school
-                    periods when needed.
+                  <p className="mt-1 text-[11px] text-muted-foreground">
+                    Add a break when needed.
                   </p>
                 </div>
               ) : null}
@@ -466,49 +451,33 @@ export function SchoolScheduleSection({
               type="button"
               onClick={addBreak}
               className={[
-                "mt-4 inline-flex h-10",
-                "items-center gap-2",
-                "rounded-xl border",
-                "border-primary/20",
-                "bg-card px-4",
-                "text-xs font-medium",
-                "text-primary transition-colors",
-                "hover:bg-primary/[0.055]",
+                "mt-3 inline-flex h-9 items-center gap-2",
+                "rounded-full border border-primary/18",
+                "bg-background px-4",
+                "text-[13px] font-medium text-primary",
+                "transition-colors hover:bg-primary/[0.05]",
               ].join(" ")}
             >
-              <Plus
-                size={15}
-                strokeWidth={1.8}
-              />
-
+              <Plus size={14} strokeWidth={1.8} />
               Add Break
             </button>
           </SchedulePanel>
 
-          <div className="flex justify-end">
+          <div className="flex justify-end pt-1">
             <button
               type="button"
-              disabled={
-                updateSettings.isPending
-              }
+              disabled={updateSettings.isPending}
               onClick={saveSchedule}
               className={[
-                "inline-flex h-11 items-center",
-                "gap-2 rounded-[14px]",
-                "bg-primary px-6",
-                "text-sm font-medium",
-                "text-primary-foreground",
-                "shadow-sm transition",
-                "hover:bg-primary/90",
-                "disabled:cursor-not-allowed",
-                "disabled:opacity-60",
+                "inline-flex h-10 items-center gap-2 rounded-full",
+                "bg-primary px-5",
+                "text-[13px] font-medium text-primary-foreground",
+                "shadow-[0_8px_20px_rgba(98,74,180,0.16)]",
+                "transition hover:-translate-y-0.5 hover:bg-primary/90",
+                "disabled:cursor-not-allowed disabled:translate-y-0 disabled:opacity-60",
               ].join(" ")}
             >
-              <Save
-                size={16}
-                strokeWidth={1.8}
-              />
-
+              <Save size={15} strokeWidth={1.8} />
               {updateSettings.isPending
                 ? "Saving..."
                 : "Save Calendar"}
@@ -516,32 +485,52 @@ export function SchoolScheduleSection({
           </div>
         </div>
 
-        <aside className="xl:sticky xl:top-6 xl:self-start">
+        <aside className="min-w-0 self-start">
           <SchedulePanel
-            icon={<Clock3 size={18} />}
+            icon={<Clock3 size={17} />}
             title="Day Preview"
-            description="A live view of the generated school day."
+            description="Live generated schedule."
           >
-            <SchedulePreview
-              schedule={schedule}
-            />
+            <SchedulePreview schedule={schedule} />
           </SchedulePanel>
         </aside>
       </div>
+
+      <ConfirmationDialog
+        open={Boolean(pendingBreakDelete)}
+        onOpenChange={(open) => {
+          if (!open) {
+            setPendingBreakDelete(null);
+          }
+        }}
+        title="Delete this break?"
+        description="The break will be removed from the current calendar draft. Save the calendar to persist the change."
+        itemName={
+          pendingBreakDelete
+            ? `Break after period ${pendingBreakDelete.afterPeriodIndex} · ${pendingBreakDelete.durationMinutes} minutes`
+            : undefined
+        }
+        onConfirm={() => {
+          if (!pendingBreakDelete) {
+            return;
+          }
+
+          deleteBreak(pendingBreakDelete.id);
+          setPendingBreakDelete(null);
+        }}
+      />
     </section>
   );
 }
 
 const inputClassName = [
-  "h-11 w-full rounded-xl",
-  "border border-border/70",
+  "h-10 w-full rounded-[12px]",
+  "border border-border/65",
   "bg-background px-3.5",
-  "text-sm font-normal",
-  "text-foreground outline-none",
-  "transition-all",
-  "focus:border-primary/40",
-  "focus:ring-4",
-  "focus:ring-primary/10",
+  "text-[13px] font-normal text-foreground",
+  "outline-none transition-all",
+  "hover:border-border",
+  "focus:border-primary/40 focus:ring-4 focus:ring-primary/10",
 ].join(" ");
 
 function ScheduleField({
@@ -553,10 +542,9 @@ function ScheduleField({
 }) {
   return (
     <label className="block">
-      <span className="mb-2 block text-xs font-medium text-foreground">
+      <span className="mb-1.5 block text-[12px] font-medium text-foreground/85">
         {label}
       </span>
-
       {children}
     </label>
   );
@@ -574,28 +562,26 @@ function SchedulePanel({
   children: React.ReactNode;
 }) {
   return (
-    <div className="rounded-[22px] border border-border/60 bg-muted/[0.12] p-5">
-      <div className="flex items-start gap-3">
-        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px] bg-primary/[0.075] text-primary">
+    <div className="rounded-[18px] border border-border/55 bg-muted/[0.08] p-4">
+      <div className="flex items-start gap-2.5">
+        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[12px] bg-primary/[0.07] text-primary">
           {icon}
         </span>
 
-        <div>
-          <h3 className="text-sm font-medium text-foreground">
+        <div className="min-w-0 pt-0.5">
+          <h3 className="text-[15px] font-medium text-foreground">
             {title}
           </h3>
 
           {description ? (
-            <p className="mt-1 text-[11px] font-normal leading-4 text-muted-foreground">
+            <p className="mt-0.5 text-[12px] leading-5 text-muted-foreground">
               {description}
             </p>
           ) : null}
         </div>
       </div>
 
-      <div className="mt-5">
-        {children}
-      </div>
+      <div className="mt-4">{children}</div>
     </div>
   );
 }

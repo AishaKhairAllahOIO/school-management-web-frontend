@@ -23,7 +23,7 @@ export function SectionHeader({
           {title}
         </h2>
 
-        <p className="mt-1.5 max-w-2xl text-[13px] font-normal leading-5 text-muted-foreground">
+        <p className="mt-1.5 max-w-2xl text-[14px] font-normal leading-5 text-muted-foreground">
           {description}
         </p>
 
@@ -39,7 +39,7 @@ export function SectionHeader({
             "items-center justify-center gap-2",
             "rounded-[14px] border",
             "border-primary/25 bg-card px-4",
-            "text-[13px] font-medium text-primary",
+            "text-[14px] font-medium text-primary",
             "transition-all duration-200",
             "hover:border-primary/40",
             "hover:bg-primary/[0.055]",

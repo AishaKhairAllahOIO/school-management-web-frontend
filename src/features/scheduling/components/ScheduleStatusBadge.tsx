@@ -3,18 +3,18 @@ type ScheduleStatusBadgeProps = {
 };
 
 export function ScheduleStatusBadge({ status }: ScheduleStatusBadgeProps) {
-  const isScheduled = status === "scheduled";
+  const isScheduled = status === "scheduled" || status === "upcoming";
   const isCompleted = status === "completed";
 
   return (
     <span
       className={[
-        "inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold capitalize",
+        "inline-flex items-center rounded-full px-2.5 py-1 text-[10px] font-medium capitalize",
         isScheduled
-          ? "bg-info/10 text-info"
+          ? "bg-sky-50 text-sky-700"
           : isCompleted
-            ? "bg-success/10 text-success"
-            : "bg-destructive/10 text-destructive",
+            ? "bg-emerald-50 text-emerald-700"
+            : "bg-rose-50 text-rose-700",
       ].join(" ")}
     >
       {status}

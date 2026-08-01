@@ -1,10 +1,8 @@
+import { ArrowLeft } from "lucide-react";
+
 import {
   useState,
 } from "react";
-
-import {
-  ArrowLeft,
-} from "lucide-react";
 
 import {
   useNavigate,
@@ -15,6 +13,8 @@ import {
 import {
   StaffPageHero,
 } from "../components/layout/StaffPageHero";
+
+import { UserPageBackButton } from "../../shared/components/UserPageBackButton";
 
 import {
   StaffContactViewSection,
@@ -222,9 +222,15 @@ export function StaffProfilePage({
   
 
   return (
-    <section className="space-y-5">
+    <section className="space-y-4 pb-8">
+      <UserPageBackButton
+        label={`Back to ${config.pluralLabel}`}
+        onClick={() => navigate(config.listPath)}
+      />
+
       <StaffPageHero
         mode="view"
+        showBackButton={false}
         title={
           staff.fullName ||
           `Unnamed ${config.singularLabel.toLowerCase()}`
@@ -241,9 +247,6 @@ export function StaffProfilePage({
         }
         photoAlt={
           staff.fullName
-        }
-        staffId={
-          staff.id
         }
         accountStatus={
           staff.accountStatus

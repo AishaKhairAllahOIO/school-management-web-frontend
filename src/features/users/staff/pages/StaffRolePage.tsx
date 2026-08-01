@@ -1,9 +1,12 @@
+import { toast } from "sonner";
+
 import {
+  useEffect,
+  useMemo,
   useState,
 } from "react";
 
 import {
-   ArrowLeft,
   ArrowUpAZ,
   BriefcaseBusiness,
   Download,
@@ -19,6 +22,11 @@ import {
   useNavigate,
 } from "react-router-dom";
 
+import { ConfirmActionDialog } from "../../shared/components/ConfirmActionDialog";
+import { UsersOverviewBackLink } from "../../shared/components/UsersOverviewBackLink";
+import { exportStaffToExcel } from "../../shared/utils/export-users-xlsx";
+import { staffApi } from "../api/staff.api";
+
 import {
   StaffCard,
 } from "../components/cards/StaffCard";
@@ -33,7 +41,9 @@ import {
 
 import {
   useDeleteStaff,
+  useRestoreStaff,
   useStaffByRole,
+  useStaffSearch,
   useToggleStaffStatus,
 } from "../hooks/useStaff";
 
@@ -75,8 +85,13 @@ export function StaffRolePage({
     "asc" | "desc"
   >("asc");
 
-  const [isExporting] =
+  const [isExporting, setIsExporting] =
     useState(false);
+
+  const [dialogAction, setDialogAction] = useState<
+    | { type: "delete" | "restore" | "toggle"; staff: StaffProfile }
+    | null
+  >(null);
 
   const [page, setPage] =
     useState(1);
@@ -87,16 +102,31 @@ export function StaffRolePage({
   ] = useState<ApiId>();
 
   const [
+    pendingRestoreId,
+    setPendingRestoreId,
+  ] = useState<ApiId>();
+
+  const [
     pendingDeleteId,
     setPendingDeleteId,
   ] = useState<ApiId>();
 
-  const query =
-    useStaffByRole(
-      role,
-      page,
-      12,
-    );
+  const normalizedSearch = searchTerm.trim();
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      setDebouncedSearch(normalizedSearch);
+    }, 350);
+
+    return () => window.clearTimeout(timer);
+  }, [normalizedSearch]);
+
+  const isSearchMode = debouncedSearch.length >= 2;
+
+  const listQuery = useStaffByRole(role, page, 12);
+  const searchQuery = useStaffSearch(role, debouncedSearch, page, 12);
+  const query = isSearchMode ? searchQuery : listQuery;
 
   const toggleStatus =
     useToggleStaffStatus(
@@ -106,19 +136,60 @@ export function StaffRolePage({
   const deleteStaff =
     useDeleteStaff(role);
 
-  const staff =
-    query.data?.data ?? [];
+  const restoreStaffMutation =
+    useRestoreStaff(role);
+
+  const staff = useMemo(() => {
+    const items = query.data?.data ?? [];
+
+    return [...items].sort((left, right) => {
+      const result = left.fullName.localeCompare(right.fullName, undefined, {
+        sensitivity: "base",
+      });
+
+      return sortDirection === "asc" ? result : -result;
+    });
+  }, [query.data?.data, sortDirection]);
 
   const total =
     query.data?.total ??
     staff.length;
 
-  function handleExport() {
-    // سيتم ربط Export API هنا.
+  async function handleExport() {
+    try {
+      setIsExporting(true);
+
+      const perPage = 100;
+      const firstPage = isSearchMode
+        ? await staffApi.searchByRole(role, debouncedSearch, 1, perPage)
+        : await staffApi.getByRole(role, 1, perPage);
+
+      const allStaff = [...firstPage.data];
+
+      for (let pageNumber = 2; pageNumber <= firstPage.lastPage; pageNumber += 1) {
+        const response = isSearchMode
+          ? await staffApi.searchByRole(
+              role,
+              debouncedSearch,
+              pageNumber,
+              perPage,
+            )
+          : await staffApi.getByRole(role, pageNumber, perPage);
+
+        allStaff.push(...response.data);
+      }
+
+      exportStaffToExcel(allStaff, config.pluralLabel);
+      toast.success(`${allStaff.length} ${config.pluralLabel.toLowerCase()} exported.`);
+    } catch {
+      toast.error(`${config.pluralLabel} could not be exported.`);
+    } finally {
+      setIsExporting(false);
+    }
   }
 
   function openImportDialog() {
-    // سيتم فتح نافذة الاستيراد هنا.
+    navigate(`${config.listPath}/import`);
   }
 
   function viewStaff(
@@ -137,71 +208,49 @@ export function StaffRolePage({
     );
   }
 
-  async function toggleStaff(
-    item: StaffProfile,
-  ) {
-    const isEnabled =
-      item.accountStatus ===
-      "active";
-
-    const action =
-      isEnabled
-        ? "disable"
-        : "enable";
-
-    const confirmed =
-      window.confirm(
-        `Are you sure you want to ${action} ${item.fullName}'s account?`,
-      );
-
-    if (!confirmed) {
-      return;
-    }
-
-    try {
-      setPendingToggleId(
-        item.id,
-      );
-
-      await toggleStatus.mutateAsync(
-        item.id,
-      );
-    } finally {
-      setPendingToggleId(
-        undefined,
-      );
-    }
+  function toggleStaff(item: StaffProfile) {
+    setDialogAction({ type: "toggle", staff: item });
   }
 
-  async function removeStaff(
-    item: StaffProfile,
-  ) {
-    const confirmed =
-      window.confirm(
-        `Delete ${item.fullName}? This action may affect their access to the school system.`,
-      );
+  function removeStaff(item: StaffProfile) {
+    setDialogAction({ type: "delete", staff: item });
+  }
 
-    if (!confirmed) {
+  function restoreStaff(item: StaffProfile) {
+    setDialogAction({ type: "restore", staff: item });
+  }
+
+  async function confirmStaffAction() {
+    if (!dialogAction) {
       return;
     }
 
-    try {
-      setPendingDeleteId(
-        item.id,
-      );
+    const { type, staff: item } = dialogAction;
 
-      await deleteStaff.mutateAsync(
-        item.id,
-      );
+    try {
+      if (type === "delete") {
+        setPendingDeleteId(item.id);
+        await deleteStaff.mutateAsync(item.id);
+      } else if (type === "restore") {
+        setPendingRestoreId(item.id);
+        await restoreStaffMutation.mutateAsync(item.id);
+      } else {
+        setPendingToggleId(item.id);
+        await toggleStatus.mutateAsync(item.id);
+      }
+
+      setDialogAction(null);
     } finally {
-      setPendingDeleteId(
-        undefined,
-      );
+      setPendingToggleId(undefined);
+      setPendingDeleteId(undefined);
+      setPendingRestoreId(undefined);
     }
   }
 
   return (
     <section className="space-y-5">
+      <UsersOverviewBackLink />
+
       <header
         className={[
           "relative overflow-hidden rounded-[26px]",
@@ -226,38 +275,11 @@ export function StaffRolePage({
         />
 
         <div className="relative flex flex-col gap-6 xl:flex-row xl:items-center xl:justify-between">
-          <div className="relative min-w-0 pt-2">
-  <button
-    type="button"
-    aria-label="Back to users"
-    title="Back to users"
-    onClick={() =>
-      navigate("/users")
-    }
-    className={[
-      "absolute left-2 top-0",
-      "inline-flex h-7 w-7",
-      "items-center justify-center",
-      "rounded-full",
-      "transition duration-200",
-      config.color.text,
-      config.color.hover,
-      "hover:-translate-x-0.5",
-      "focus-visible:outline-none",
-      "focus-visible:ring-4",
-      config.color.ring,
-    ].join(" ")}
-  >
-    <ArrowLeft
-      className="h-4 w-4"
-      strokeWidth={1.9}
-    />
-  </button>
-
-  <div className="flex min-w-0 items-start gap-3.5">
+          <div className="relative min-w-0">
+  <div className="flex min-w-0 items-center gap-3.5">
     <span
       className={[
-        "mt-5 flex h-10 w-12 shrink-0",
+        "flex h-10 w-10 shrink-0",
         "items-center justify-center",
         "rounded-[17px]",
         config.color.light,
@@ -607,6 +629,10 @@ export function StaffRolePage({
                   pendingToggleId ===
                   item.id
                 }
+                pendingRestore={
+                  pendingRestoreId ===
+                  item.id
+                }
                 pendingDelete={
                   pendingDeleteId ===
                   item.id
@@ -622,6 +648,9 @@ export function StaffRolePage({
                 }
                 onDelete={
                   removeStaff
+                }
+                onRestore={
+                  restoreStaff
                 }
               />
             ),
@@ -669,6 +698,55 @@ export function StaffRolePage({
           }}
         />
       ) : null}
+
+      <ConfirmActionDialog
+        open={Boolean(dialogAction)}
+        title={
+          dialogAction?.type === "delete"
+            ? `Delete ${config.singularLabel}?`
+            : dialogAction?.type === "restore"
+              ? `Restore ${config.singularLabel}?`
+              : "Change Account Status?"
+        }
+        description={
+          dialogAction?.type === "delete"
+            ? "The staff record will be moved to deleted records and access may be disabled."
+            : dialogAction?.type === "restore"
+              ? "The staff record and user account will be reactivated."
+              : "This changes whether the staff member can access the system."
+        }
+        confirmLabel={
+          dialogAction?.type === "delete"
+            ? "Delete"
+            : dialogAction?.type === "restore"
+              ? "Restore"
+              : "Confirm"
+        }
+        pendingLabel={
+          dialogAction?.type === "delete"
+            ? "Deleting..."
+            : dialogAction?.type === "restore"
+              ? "Restoring..."
+              : "Updating..."
+        }
+        tone={dialogAction?.type === "restore" ? "restore" : dialogAction?.type === "delete" ? "danger" : "neutral"}
+        isPending={
+          deleteStaff.isPending ||
+          restoreStaffMutation.isPending ||
+          toggleStatus.isPending
+        }
+        details={
+          dialogAction ? (
+            <span className="font-medium text-foreground">
+              {dialogAction.staff.fullName}
+            </span>
+          ) : null
+        }
+        onClose={() => setDialogAction(null)}
+        onConfirm={() => {
+          void confirmStaffAction();
+        }}
+      />
     </section>
   );
 }
@@ -687,7 +765,7 @@ function StaffGridSkeleton({
           <div
             key={index}
             className={[
-              "min-h-[365px] animate-pulse overflow-hidden",
+              "min-h-[315px] animate-pulse overflow-hidden",
               "rounded-[24px] border bg-card",
               color.border,
             ].join(" ")}

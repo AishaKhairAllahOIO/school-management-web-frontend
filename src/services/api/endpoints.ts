@@ -20,6 +20,8 @@ export const API_ENDPOINTS = {
       `/admin/settings/general/images/${imageId}`,
 
     ACADEMIC: "/admin/settings",
+    ACADEMIC_STATISTICS:
+      "/admin/settings/academic/statistics",
 
     ACADEMIC_YEARS: "/admin/settings/years",
     ACADEMIC_YEAR: (yearId: string) =>
@@ -37,8 +39,11 @@ export const API_ENDPOINTS = {
     ACADEMIC_GRADE: (gradeId: string) =>
       `/admin/settings/grades/${gradeId}`,
 
-    ACADEMIC_CONFIGURATIONS: "/admin/settings/configurations",
-    ACADEMIC_CONFIGURATION: (configurationId: string) =>
+    ACADEMIC_CONFIGURATIONS:
+      "/admin/settings/configurations",
+    ACADEMIC_CONFIGURATION: (
+      configurationId: string,
+    ) =>
       `/admin/settings/configurations/${configurationId}`,
 
     ACADEMIC_CLASSROOMS: "/admin/settings/classrooms",
@@ -57,7 +62,8 @@ export const API_ENDPOINTS = {
     IMPORT_ERRORS: (batchId: ApiId) =>
       `/admin/student/import-batches/${batchId}/errors/export`,
 
-    IMPORT_HISTORY: "/admin/student/import-batches/history",
+    IMPORT_HISTORY:
+      "/admin/student/import-batches/history",
 
     FILTER: "/admin/students/filter",
 
@@ -81,24 +87,24 @@ export const API_ENDPOINTS = {
     TOGGLE_ACCOUNT_STATUS: (enrollmentId: ApiId) =>
       `/admin/students/${enrollmentId}/toggle-account-status`,
 
-    DELETE: (studentId: ApiId) =>
-      `/admin/students/${studentId}`,
+    DELETE: (enrollmentId: ApiId) =>
+      `/admin/students/${enrollmentId}`,
+
+    RESTORE: (enrollmentId: ApiId) =>
+      `/admin/students/${enrollmentId}/student/restore`,
   },
 
   STAFF: {
     REGISTER: "/admin/staff/register",
 
-    IMPORT: "/admin/staff/import",
+    IMPORT: (role: string) =>
+      `/admin/staff/import/${encodeURIComponent(role)}`,
 
     IMPORT_STATUS: (batchId: ApiId) =>
       `/admin/staff/import-batches/${batchId}/status`,
 
     IMPORT_ERRORS: (batchId: ApiId) =>
       `/admin/staff/import-batches/${batchId}/errors/export`,
-
-    // LIST: "/admin/staff/showAllStaff",
-
-    SEARCH: "/admin/staff/search",
 
     ALPHABETICAL: "/admin/staff/alphabetical",
 
@@ -107,9 +113,6 @@ export const API_ENDPOINTS = {
 
     PERSONAL: (staffId: ApiId) =>
       `/admin/staff/${staffId}/personal`,
-
-    EMPLOYMENT: (staffId: ApiId) =>
-      `/admin/staff/${staffId}/employment`,
 
     ROLE_COUNTS: "/admin/staff/counts/roles",
 
@@ -123,6 +126,32 @@ export const API_ENDPOINTS = {
 
     DELETE: (staffId: ApiId) =>
       `/admin/staff/${staffId}`,
+
+    LIST: "/admin/staff/showAllStaff",
+
+    RESTORE: (staffId: ApiId) =>
+      `/admin/staff/${staffId}/restore`,
+
+    ASSIGNMENTS: (staffId: ApiId) =>
+      `/admin/staff/${staffId}/assignments`,
+
+    ASSIGNMENT: (
+      staffId: ApiId,
+      assignmentId: ApiId,
+    ) =>
+      `/admin/staff/${staffId}/assignments/${assignmentId}`,
+
+    WORKLOADS: (staffId: ApiId) =>
+      `/admin/staff/${staffId}/workloads`,
+
+    WORKLOAD: (
+      staffId: ApiId,
+      workloadId: ApiId,
+    ) =>
+      `/admin/staff/${staffId}/workloads/${workloadId}`,
+
+    ROLE_SEARCH: (role: string) =>
+      `/admin/staff/role/${encodeURIComponent(role)}/search`,
   },
 
   ACADEMICS: {
@@ -156,18 +185,20 @@ export const API_ENDPOINTS = {
     ASSESSMENTS: {
       LIST: "/subject/setting/assessment/subjects/show",
 
-      GROUPED: "/subject/setting/assessment/subjects/grouped",
+      GROUPED:
+        "/subject/setting/assessment/subjects/grouped",
 
       DETAILS: (assessmentId: ApiId) =>
         `/subject/setting/assessment/subject/show/${assessmentId}`,
 
-      CREATE: "/subject/setting/assessment/subject/store",
+      CREATE:
+        "/subject/setting/assessment/subject/store",
 
       UPDATE: (assessmentId: ApiId) =>
         `/subject/setting/assessment/subject/update/${assessmentId}`,
 
       DELETE: (assessmentId: ApiId) =>
-        `/subject/setting/assessment/subject/delete${assessmentId}`,
+        `/subject/setting/assessment/subject/delete/${assessmentId}`,
     },
   },
 
@@ -178,9 +209,11 @@ export const API_ENDPOINTS = {
 
     FEE_PLANS: "/admin/finance/settings/fee-plans",
 
-    POLICY_ITEMS: "/admin/finance/settings/policy-items",
+    POLICY_ITEMS:
+      "/admin/finance/settings/policy-items",
 
-    EXTRA_SERVICES: "/admin/finance/settings/extra-services",
+    EXTRA_SERVICES:
+      "/admin/finance/settings/extra-services",
   },
 
   FINANCE_OPERATIONS: {
@@ -189,12 +222,14 @@ export const API_ENDPOINTS = {
     ACCOUNT: (studentId: ApiId) =>
       `/admin/finance/contracts/accounts/${studentId}`,
 
-    FINALIZE_CONTRACT: "/admin/finance/contracts/finalize",
+    FINALIZE_CONTRACT:
+      "/admin/finance/contracts/finalize",
 
     UPDATE_CONTRACT: (studentId: ApiId) =>
       `/admin/finance/contracts/${studentId}`,
 
-    INSTALLMENTS: "/admin/finance/contracts/installments",
+    INSTALLMENTS:
+      "/admin/finance/contracts/installments",
 
     INSTALLMENT: (id: ApiId) =>
       `/admin/finance/contracts/installments/${id}`,
@@ -204,24 +239,29 @@ export const API_ENDPOINTS = {
     PAYMENT: (id: ApiId) =>
       `/admin/finance/contracts/payments/${id}`,
   },
+
   COMMUNICATIONS: {
-     
     ACTIVITIES: "/auth/activities/all",
-    ACTIVITY: (id: string | number) => `/auth/activity/${id}`,
-    CREATE_ACTIVITY: "/api/auth/activity",
-    UPDATE_ACTIVITY: (id: string | number) => `/auth/activity/update/${id}`,  
+    ACTIVITY: (id: ApiId) =>
+      `/auth/activity/${id}`,
+    CREATE_ACTIVITY: "/auth/activity",
+    UPDATE_ACTIVITY: (id: ApiId) =>
+      `/auth/activity/update/${id}`,
 
-     
-    ANNOUNCEMENTS: "/auth/announcements",  
-    MY_ANNOUNCEMENTS: "/auth/creater/show/announcements",  
-    STAFF_ANNOUNCEMENTS: "/auth/staff-announcements",  
-    UPDATE_ANNOUNCEMENT: (id: string | number) => `/auth/announcement/update/${id}`,  
-    DELETE_ANNOUNCEMENT: (id: string | number) => `/auth/announcements/${id}`,
+    ANNOUNCEMENTS: "/auth/announcements",
+    MY_ANNOUNCEMENTS:
+      "/auth/creater/show/announcements",
+    STAFF_ANNOUNCEMENTS:
+      "/auth/staff-announcements",
+    UPDATE_ANNOUNCEMENT: (id: ApiId) =>
+      `/auth/announcement/update/${id}`,
+    DELETE_ANNOUNCEMENT: (id: ApiId) =>
+      `/auth/announcements/${id}`,
 
-    
     PAYMENT_ALERTS: "/auth/payment-alerts",
     ADVISOR_ALERTS: "/auth/advisor-alerts",
     STAFF_ALERTS: "/auth/staff-alerts",
-    DELETE_ALERT: (id: string | number) => `/auth/alerts/${id}`,
+    DELETE_ALERT: (id: ApiId) =>
+      `/auth/alerts/${id}`,
   },
 } as const;

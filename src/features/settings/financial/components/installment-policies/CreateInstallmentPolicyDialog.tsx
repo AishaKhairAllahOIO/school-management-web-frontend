@@ -1,67 +1,27 @@
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/shared/ui/dialog";
-
 import { InstallmentPolicyForm } from "./InstallmentPolicyForm";
-
+import { FinancialBaseDialog } from "../../shared/FinancialBaseDialog";
 import type { InstallmentPolicyFormValues } from "../../schemas/installmentPolicy.schema";
 
 type Props = {
   open: boolean;
-
-  onOpenChange: (
-    open: boolean
-  ) => void;
-
+  onOpenChange: (open: boolean) => void;
   isLoading?: boolean;
-
-  onSubmit: (
-    values: InstallmentPolicyFormValues
-  ) => void;
+  onSubmit: (values: InstallmentPolicyFormValues) => void;
 };
 
-export function CreateInstallmentPolicyDialog({
-  open,
-  onOpenChange,
-  onSubmit,
-  isLoading,
-}: Props) {
-  function handleSubmit(
-    values: InstallmentPolicyFormValues
-  ) {
-    onSubmit(values);
-
-    onOpenChange(false);
-  }
-
+export function CreateInstallmentPolicyDialog({ open, onOpenChange, onSubmit, isLoading }: Props) {
+  if (!open) return null;
   return (
-    <Dialog
-      open={open}
-      onOpenChange={onOpenChange}
+    <FinancialBaseDialog
+      title="Create Installment Policy"
+      description="Define payment percentages and due dates for a new installment policy."
+      onClose={() => onOpenChange(false)}
     >
-      <DialogContent className="sm:max-w-3xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-
-          <DialogTitle>
-            Create Installment Policy
-          </DialogTitle>
-
-          <DialogDescription>
-            Create a new installment policy.
-          </DialogDescription>
-
-        </DialogHeader>
-
-        <InstallmentPolicyForm
-          onSubmit={handleSubmit}
-          isLoading={isLoading}
-        />
-
-      </DialogContent>
-    </Dialog>
+      <InstallmentPolicyForm
+        isLoading={isLoading}
+        onCancel={() => onOpenChange(false)}
+        onSubmit={onSubmit}
+      />
+    </FinancialBaseDialog>
   );
 }

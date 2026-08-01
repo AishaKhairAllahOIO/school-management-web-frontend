@@ -8,26 +8,25 @@ export function EntityTable({
   return (
     <div
       className={[
-        "w-full overflow-hidden",
-        "rounded-[20px]",
-        "border border-border/65",
+        "w-full min-w-0 overflow-hidden",
+        "rounded-[18px]",
+        "border border-border/60",
         "bg-card",
+        "shadow-[0_8px_24px_rgba(30,20,70,0.035)]",
       ].join(" ")}
     >
-      <div className="w-full overflow-x-auto">
-        <table
-          className={[
-            "w-full min-w-[860px]",
-            "border-collapse text-left",
-            "text-[13px]",
-            "[&_tbody_tr]:transition-colors",
-            "[&_tbody_tr]:duration-150",
-            "[&_tbody_tr:hover]:bg-primary/[0.025]",
-          ].join(" ")}
-        >
-          {children}
-        </table>
-      </div>
+      <table
+        className={[
+          "w-full table-fixed border-collapse text-left",
+          "text-[13px]",
+          "[&_tbody_tr]:transition-colors",
+          "[&_tbody_tr]:duration-150",
+          "[&_tbody_tr:hover]:bg-primary/[0.025]",
+          "[&_tbody_tr:last-child_td]:border-b-0",
+        ].join(" ")}
+      >
+        {children}
+      </table>
     </div>
   );
 }
@@ -43,18 +42,14 @@ export function EntityTh({
     <th
       scope="col"
       className={[
-        "whitespace-nowrap",
-        "border-b border-border/60",
-        "bg-muted/35 px-5 py-4",
+        "border-b border-border/55",
+        "bg-muted/25 px-3 py-3",
         "text-[10px] font-semibold",
-        "uppercase tracking-[0.08em]",
+        "uppercase tracking-[0.07em]",
         "text-muted-foreground",
-        align === "right"
-          ? "text-right"
-          : "",
-        align === "center"
-          ? "text-center"
-          : "",
+        "whitespace-normal break-words leading-4",
+        align === "right" ? "text-right" : "",
+        align === "center" ? "text-center" : "",
       ].join(" ")}
     >
       {children}
@@ -74,18 +69,15 @@ export function EntityTd({
   return (
     <td
       className={[
-        "border-b border-border/45",
-        "px-5 py-[18px]",
+        "min-w-0 border-b border-border/40",
+        "px-3 py-3 align-middle",
         "text-[13px] leading-5",
+        "whitespace-normal break-words",
         strong
           ? "font-medium text-foreground"
           : "font-normal text-muted-foreground",
-        align === "right"
-          ? "text-right"
-          : "",
-        align === "center"
-          ? "text-center"
-          : "",
+        align === "right" ? "text-right" : "",
+        align === "center" ? "text-center" : "",
       ].join(" ")}
     >
       {children}

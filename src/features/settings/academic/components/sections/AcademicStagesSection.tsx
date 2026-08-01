@@ -8,6 +8,8 @@ import {
   useState,
 } from "react";
 
+import { ConfirmationDialog } from "@/shared/ui/confirmation-dialog";
+
 import {
   useCreateAcademicStage,
   useDeleteAcademicStage,
@@ -43,6 +45,9 @@ export function AcademicStagesSection({
   const [openMenuId, setOpenMenuId] =
     useState<string | null>(null);
 
+  const [pendingDelete, setPendingDelete] =
+    useState<AcademicStage | null>(null);
+
   const createStage =
     useCreateAcademicStage();
 
@@ -65,19 +70,7 @@ export function AcademicStagesSection({
   function handleDelete(
     stage: AcademicStage,
   ) {
-    const stageLabel =
-      academicStageLabels[stage.type] ??
-      stage.type;
-
-    const confirmed = window.confirm(
-      `Delete academic stage "${stageLabel}"?\n\nGrades connected to this stage may prevent deletion.`,
-    );
-
-    if (!confirmed) {
-      return;
-    }
-
-    deleteStage.mutate(stage.id);
+    setPendingDelete(stage);
     setOpenMenuId(null);
   }
 
@@ -172,11 +165,11 @@ export function AcademicStagesSection({
             <GraduationCap size={20} />
           </span>
 
-          <p className="mt-4 text-sm font-medium text-foreground">
+          <p className="mt-4 text-[15px] font-medium text-foreground">
             No academic stages yet
           </p>
 
-          <p className="mt-1 text-xs font-normal text-muted-foreground">
+          <p className="mt-1 text-[13px] font-normal text-muted-foreground">
             Add the first stage to begin organizing
             grade levels.
           </p>
@@ -223,6 +216,23 @@ export function AcademicStagesSection({
           }}
         />
       ) : null}
+
+      <ConfirmationDialog
+        open={Boolean(pendingDelete)}
+        onOpenChange={(open) => {
+          if (!open) setPendingDelete(null);
+        }}
+        title="Delete academic stage?"
+        description="Grades connected to this stage may prevent deletion."
+        itemName={pendingDelete ? academicStageLabels[pendingDelete.type] ?? pendingDelete.type : undefined}
+        isPending={deleteStage.isPending}
+        onConfirm={() => {
+          if (!pendingDelete) return;
+          deleteStage.mutate(pendingDelete.id, {
+            onSuccess: () => setPendingDelete(null),
+          });
+        }}
+      />
     </>
   );
 }
@@ -258,11 +268,11 @@ function StageStat({
         {value}
       </p>
 
-      <p className="mt-1 text-xs font-medium text-foreground">
+      <p className="mt-1 text-[13px] font-medium text-foreground">
         {label}
       </p>
 
-      <p className="mt-1 text-[10px] font-normal text-muted-foreground">
+      <p className="mt-1 text-[11px] font-normal text-muted-foreground">
         {description}
       </p>
     </div>

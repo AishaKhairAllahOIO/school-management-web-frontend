@@ -36,11 +36,11 @@ export function AcademicSettingsDangerZone() {
             </span>
 
             <div>
-              <h2 className="text-sm font-medium text-foreground">
+              <h2 className="text-[15px] font-medium text-foreground">
                 Reset Academic Configuration
               </h2>
 
-              <p className="mt-1 max-w-2xl text-xs font-normal leading-5 text-muted-foreground">
+              <p className="mt-1 max-w-2xl text-[13px] font-normal leading-5 text-muted-foreground">
                 Remove the active year, semester
                 and daily calendar configuration.
                 Existing academic records remain
@@ -63,7 +63,7 @@ export function AcademicSettingsDangerZone() {
               "rounded-xl border",
               "border-destructive/20",
               "bg-card px-5",
-              "text-xs font-medium",
+              "text-[13px] font-medium",
               "text-destructive",
               "transition-colors",
               "hover:bg-destructive/[0.07]",

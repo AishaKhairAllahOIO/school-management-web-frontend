@@ -49,7 +49,7 @@ export function ExtraServiceForm({
   return (
     <form onSubmit={handleSubmit((data) => onSubmit(data as ExtraServiceFormValues))} className="space-y-6">
       <div className="space-y-2">
-        <label className="text-sm font-medium text-foreground">Fee Plan</label>
+        <label className="text-[15px] font-medium text-foreground">Fee Plan</label>
         <Controller
           control={control}
           name="feePlanId"
@@ -72,12 +72,12 @@ export function ExtraServiceForm({
           )}
         />
         {errors.feePlanId && (
-          <p className="text-sm text-red-500">{String(errors.feePlanId.message)}</p>
+          <p className="text-[15px] text-red-500">{String(errors.feePlanId.message)}</p>
         )}
       </div>
 
       <div className="space-y-2">
-        <label className="text-sm font-medium text-foreground">Type</label>
+        <label className="text-[15px] font-medium text-foreground">Type</label>
         <Controller
           control={control}
           name="type"
@@ -99,12 +99,12 @@ export function ExtraServiceForm({
           )}
         />
         {errors.type && (
-          <p className="text-sm text-red-500">{String(errors.type.message)}</p>
+          <p className="text-[15px] text-red-500">{String(errors.type.message)}</p>
         )}
       </div>
 
       <div className="space-y-2">
-        <label className="text-sm font-medium text-foreground">
+        <label className="text-[15px] font-medium text-foreground">
           Service Name
         </label>
         <Input
@@ -113,12 +113,12 @@ export function ExtraServiceForm({
           {...register("name")}
         />
         {errors.name && (
-          <p className="text-sm text-red-500">{String(errors.name.message)}</p>
+          <p className="text-[15px] text-red-500">{String(errors.name.message)}</p>
         )}
       </div>
 
       <div className="space-y-2">
-        <label className="text-sm font-medium text-foreground">Amount</label>
+        <label className="text-[15px] font-medium text-foreground">Amount</label>
         <Input
           type="number"
           min={0}
@@ -127,7 +127,7 @@ export function ExtraServiceForm({
           {...register("amount")}
         />
         {errors.amount && (
-          <p className="text-sm text-red-500">{String(errors.amount.message)}</p>
+          <p className="text-[15px] text-red-500">{String(errors.amount.message)}</p>
         )}
       </div>
 

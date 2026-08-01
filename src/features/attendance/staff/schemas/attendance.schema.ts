@@ -10,7 +10,6 @@ export const attendanceSchema =
 
     status: z.enum([
       "Present",
-      "Late",
       "Absent",
     ]),
 

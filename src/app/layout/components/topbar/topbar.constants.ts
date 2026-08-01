@@ -1,0 +1,18 @@
+export const TOPBAR_ICON_BUTTON_CLASS_NAME = [
+  "relative flex h-[56px] w-[56px] items-center justify-center",
+  "rounded-[18px]",
+  "border border-topbar-border/75",
+  "bg-topbar-surface/92",
+  "text-topbar-foreground",
+  "shadow-[0_8px_24px_rgb(46_38_108_/_0.07)]",
+  "backdrop-blur-xl",
+  "transition-all duration-200 ease-out",
+  "hover:-translate-y-0.5",
+  "hover:border-primary/15",
+  "hover:bg-topbar-soft",
+  "hover:shadow-[0_12px_28px_rgb(46_38_108_/_0.11)]",
+  "focus-visible:outline-none",
+  "focus-visible:ring-4",
+  "focus-visible:ring-primary/10",
+  "motion-reduce:transform-none",
+].join(" ");

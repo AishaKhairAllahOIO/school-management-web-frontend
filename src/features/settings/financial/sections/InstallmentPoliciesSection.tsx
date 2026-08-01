@@ -1,13 +1,14 @@
 import { useState } from "react";
-import { Plus } from "lucide-react";
+import { CalendarRange, Plus } from "lucide-react";
+
 import { Button } from "@/shared/ui/button";
 
-import { DeleteConfirmationDialog } from "../components/fee-plans/DeleteConfirmationDialog";
+import { ConfirmationDialog } from "@/shared/ui/confirmation-dialog";
 import { InstallmentPoliciesTable } from "../components/installment-policies/InstallmentPoliciesTable";
 import { CreateInstallmentPolicyDialog } from "../components/installment-policies/CreateInstallmentPolicyDialog";
 import { EditInstallmentPolicyDialog } from "../components/installment-policies/EditInstallmentPolicyDialog";
 import { InstallmentPoliciesSkeleton } from "../components/installment-policies/InstallmentPoliciesSkeleton";
-
+import { FinancialSectionHeader } from "../shared/FinancialSectionHeader";
 import { useInstallmentPolicies } from "../hooks/useInstallmentPolicies";
 import type { InstallmentPolicy } from "../types/installmentPolicy.types";
 import type { InstallmentPolicyFormValues } from "../schemas/installmentPolicy.schema";
@@ -28,14 +29,14 @@ export function InstallmentPoliciesSection() {
   const [createOpen, setCreateOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
-  const [selectedPolicy, setSelectedPolicy] = useState<InstallmentPolicy | null>(null);
+  const [selectedPolicy, setSelectedPolicy] =
+    useState<InstallmentPolicy | null>(null);
 
   function handleCreate(values: InstallmentPolicyFormValues) {
-    createPolicy.mutate(mapInstallmentPolicyFormToCreatePayload(values), {
-      onSuccess: () => {
-        setCreateOpen(false);
-      },
-    });
+    createPolicy.mutate(
+      mapInstallmentPolicyFormToCreatePayload(values),
+      { onSuccess: () => setCreateOpen(false) },
+    );
   }
 
   function handleEdit(values: InstallmentPolicyFormValues) {
@@ -51,7 +52,7 @@ export function InstallmentPoliciesSection() {
           setEditOpen(false);
           setSelectedPolicy(null);
         },
-      }
+      },
     );
   }
 
@@ -66,23 +67,28 @@ export function InstallmentPoliciesSection() {
     });
   }
 
-  return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold">Installment Policies</h2>
-          <p className="text-muted-foreground">Configure installment schedules.</p>
-        </div>
+  if (isLoading) {
+    return <InstallmentPoliciesSkeleton />;
+  }
 
-        <Button onClick={() => setCreateOpen(true)}>
+  return (
+    <div>
+      <FinancialSectionHeader
+        title="Installment Policies"
+        description="Create payment schedules and distribute tuition across due dates."
+        icon={CalendarRange}
+      >
+        <Button
+          type="button"
+          onClick={() => setCreateOpen(true)}
+          className="h-10 rounded-[14px] px-4 text-[13px] font-medium shadow-none"
+        >
           <Plus className="mr-2 h-4 w-4" />
           Create Policy
         </Button>
-      </div>
+      </FinancialSectionHeader>
 
-      {isLoading ? (
-        <InstallmentPoliciesSkeleton />
-      ) : (
+      <div className="p-4 sm:p-5">
         <InstallmentPoliciesTable
           policies={policies}
           onEdit={(policy) => {
@@ -94,7 +100,7 @@ export function InstallmentPoliciesSection() {
             setDeleteOpen(true);
           }}
         />
-      )}
+      </div>
 
       <CreateInstallmentPolicyDialog
         open={createOpen}
@@ -103,32 +109,33 @@ export function InstallmentPoliciesSection() {
         onSubmit={handleCreate}
       />
 
-
-      {editOpen && selectedPolicy && (
+      {editOpen && selectedPolicy ? (
         <EditInstallmentPolicyDialog
           open={editOpen}
           onOpenChange={(open) => {
             setEditOpen(open);
-            if (!open) setSelectedPolicy(null); 
+            if (!open) setSelectedPolicy(null);
           }}
           defaultValues={{
             name: selectedPolicy.name,
-            items: selectedPolicy.items?.map((item) => ({ ...item })) ?? [],
+            items:
+              selectedPolicy.items?.map((item) => ({ ...item })) ?? [],
           }}
           isLoading={updatePolicy.isPending}
           onSubmit={handleEdit}
         />
-      )}
+      ) : null}
 
-      <DeleteConfirmationDialog
+      <ConfirmationDialog
         open={deleteOpen}
         onOpenChange={(open) => {
           setDeleteOpen(open);
-          if (!open) setSelectedPolicy(null);  
+          if (!open) setSelectedPolicy(null);
         }}
-        title="Delete Installment Policy"
+        title="Delete installment policy?"
         description="This action cannot be undone."
-        isLoading={deletePolicy.isPending}
+        itemName={selectedPolicy?.name}
+        isPending={deletePolicy.isPending}
         onConfirm={handleDelete}
       />
     </div>
