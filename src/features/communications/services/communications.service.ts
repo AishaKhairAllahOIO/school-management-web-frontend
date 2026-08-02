@@ -24,8 +24,8 @@ const normalizePayload = (payload: unknown) => {
     (normalized as any).staff_ids = normalizeIds((normalized as any).staff_ids);
   }
 
-  if (Array.isArray((normalized as any).enrollement_ids)) {
-    (normalized as any).enrollement_ids = normalizeIds((normalized as any).enrollement_ids);
+ if (Array.isArray((normalized as any).enrollment_ids)) {
+    (normalized as any).enrollment_ids = normalizeIds((normalized as any).enrollment_ids);
   }
 
   return normalized;
@@ -36,7 +36,7 @@ export const communicationService = {
   // 1. خدمات الأنشطة (Activities Services)
   // ==========================================
   getAllActivities: async (): Promise<Activity[]> => {
-    const response = await axiosClient.get(API_ENDPOINTS.COMMUNICATIONS.ACTIVITIES);
+    const response = await axiosClient.get(API_ENDPOINTS.COMMUNICATIONS.ALL_ACTIVITIES);
     return response.data?.data ?? response.data ?? [];
   },
 

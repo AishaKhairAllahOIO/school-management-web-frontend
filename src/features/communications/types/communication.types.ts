@@ -1,79 +1,66 @@
-// ==========================================
-// 1. الأنشطة والرحلات (Activities)
-// ==========================================
+export type AudienceType = "student" | "staff" | "both";
+
 export interface ActivityPayload {
   activity_name: string;
   type: string;
-  activity_date: string;  
-  start_time: string;    
-  end_time: string;     
-  grade_level_id: string | number;
-  class_room_ids?: (string | number)[];
+  activity_date: string;
+  start_time: string;
+  end_time: string;
+  grade_level_id: number | string;
+  class_room_ids?: (number | string)[]; // مصفوفة كما في البوستمان
   description?: string;
 }
 
 export interface Activity extends ActivityPayload {
-  id: string | number;
+  id: number | string;
   created_at?: string;
-  updated_at?: string;
 }
 
-// ==========================================
-// 2. التعاميم والإعلانات (Announcements)
-// ==========================================
-export type AnnouncementAudience = "student" | "staff";
-
 export interface AnnouncementPayload {
-  audience: AnnouncementAudience;
+  audience: AudienceType;
   title: string;
   description: string;
-  grade_level_id?: string | number;
-  class_room_ids?: (string | number)[];
+  grade_level_id?: number | string;
+  class_room_ids?: (number | string)[];
 }
 
 export interface Announcement extends AnnouncementPayload {
-  id: string | number;
+  id: number | string;
   creator_name?: string;
   created_at?: string;
-  updated_at?: string;
 }
 
-// ==========================================
-// 3. التنبيهات الذكية والجماعية (Bulk Alerts)
-// ==========================================
-
- export interface PaymentAlertPayload {
-  audience: "student";
-  type: "payed" | "payment";
-  enrollement_ids: (string | number)[];  
-  meta: {
-    amount?: number;       
-    amount_due?: number;    
-    due_date?: string;      
-  };
-}
-
- export interface AdvisorAlertPayload {
-  audience: "student";
-  type: "behavior" | "escape" | "late" | "absence";
-  enrollement_ids: (string | number)[];
-  meta?: {
-    severity?: "low" | "medium" | "high";  
-    session?: string;                     
-    minutes_late?: number;             
-  };
-}
-
- export interface StaffAlertPayload {
+// التنبيهات الجماعية باستخدام المصفوفات 
+export interface StaffAlertPayload {
   audience: "staff";
   type: "salary" | "absence" | "late";
-  staff_ids: (string | number)[];
+  staff_ids: (number | string)[]; // مصفوفة المعرفات
   meta?: {
-    amount?: number;         
-    mounth?: string;        
-    session?: string;      
-    minutes_late?: number;   
+    amount?: number;
+    mounth?: string; // الخطأ الإملائي المعتمد في الباك إند
+    session?: string;
+    minutes_late?: number;
   };
 }
 
- export type AnyAlertPayload = PaymentAlertPayload | AdvisorAlertPayload | StaffAlertPayload;
+export interface PaymentAlertPayload {
+  audience: "student";
+  type: "payed" | "payment";
+  enrollment_ids: (number | string)[]; // مصفوفة المعرفات مع حرف e الزائد
+  meta?: {
+    amount?: number;
+    amount_due?: number;
+    due_date?: string;
+  };
+}
+
+export interface AdvisorAlertPayload {
+  audience: "student";
+  type: "behavior" | "escape" | "late" | "absence";
+  enrollment_ids: (number | string)[]; // مصفوفة المعرفات
+  meta?: {
+    severity?: "low" | "medium" | "high";
+    session?: string;
+    minutes_late?: number;
+  };
+}

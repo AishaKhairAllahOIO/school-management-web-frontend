@@ -1,23 +1,23 @@
 import { useState, useEffect } from "react";
-import { Calendar, Clock, Loader2, Sparkles} from "lucide-react";
+import { Sparkles, Loader2, CalendarDays, Clock } from "lucide-react";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
+  DialogDescription,
 } from "@/shared/ui/dialog";
 import { Button } from "@/shared/ui/button";
 import { MultiSelectAudience, type OptionItem } from "../shared/MultiSelectAudience";
 import { useActivities } from "../../hooks/useActivities";
-import type { Activity } from "../../types/communication.types";
+import type { Activity, ActivityPayload } from "../../types/communication.types";
 
 type Props = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   gradeLevels: { id: string | number; name: string }[];
-  classRooms: OptionItem[]; 
-  activityToEdit?: Activity | null;  
+  classRooms: OptionItem[];
+  activityToEdit?: Activity | null;
 };
 
 export function CreateActivityDialog({
@@ -31,235 +31,239 @@ export function CreateActivityDialog({
   const isEditing = !!activityToEdit;
   const isPending = createActivity.isPending || updateActivity.isPending;
 
-
+  // Form States
   const [activityName, setActivityName] = useState("");
   const [type, setType] = useState("");
   const [activityDate, setActivityDate] = useState("");
-  const [startTime, setStartTime] = useState("08:30");
-  const [endTime, setEndTime] = useState("12:00");
+  const [startTime, setStartTime] = useState("");
+  const [endTime, setEndTime] = useState("");
   const [gradeLevelId, setGradeLevelId] = useState<string | number>("");
   const [selectedClassRoomIds, setSelectedClassRoomIds] = useState<(string | number)[]>([]);
   const [description, setDescription] = useState("");
-
 
   useEffect(() => {
     if (activityToEdit && open) {
       setActivityName(activityToEdit.activity_name || "");
       setType(activityToEdit.type || "");
       setActivityDate(activityToEdit.activity_date || "");
-      setStartTime(activityToEdit.start_time || "08:30");
-      setEndTime(activityToEdit.end_time || "12:00");
+      setStartTime(activityToEdit.start_time || "");
+      setEndTime(activityToEdit.end_time || "");
       setGradeLevelId(activityToEdit.grade_level_id || "");
       setSelectedClassRoomIds(activityToEdit.class_room_ids || []);
       setDescription(activityToEdit.description || "");
     } else if (!open) {
-
       setActivityName("");
       setType("");
       setActivityDate("");
-      setStartTime("08:30");
-      setEndTime("12:00");
+      setStartTime("");
+      setEndTime("");
       setGradeLevelId("");
       setSelectedClassRoomIds([]);
       setDescription("");
     }
   }, [activityToEdit, open]);
 
- const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!gradeLevelId) {
-      alert("الرجاء تحديد المرحلة الدراسية.");
+  const handleError = (err: any) => {
+    console.error("Activity Error:", err?.response?.data || err);
+    
+    // 🌟 معالجة خطأ الصلاحيات 403
+    if (err?.response?.status === 403) {
+      alert("❌ عذراً، حسابك الحالي لا يمتلك الصلاحية الكافية لإضافة أو تعديل الأنشطة.");
       return;
     }
 
-     const payload: any = {
+    const backendMessage = err?.response?.data?.message;
+    const backendErrors = err?.response?.data?.errors;
+    const firstError = backendErrors ? Object.values(backendErrors)[0] : null;
+    alert(`❌ فشل الحفظ:\n[ ${firstError || backendMessage || "حدث خطأ غير معروف"} ]`);
+  };
+
+  const handleSuccess = () => {
+    alert(isEditing ? "✅ تم تعديل النشاط بنجاح!" : "✅ تم إضافة النشاط بنجاح!");
+    onOpenChange(false);
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!gradeLevelId) {
+      alert("الرجاء تحديد المرحلة الدراسية المستهدفة بالنشاط.");
+      return;
+    }
+
+    const payload: ActivityPayload = {
       activity_name: activityName.trim(),
       type: type.trim(),
       activity_date: activityDate,
       start_time: startTime,
       end_time: endTime,
-      grade_level_id: Number(gradeLevelId),  
+      grade_level_id: Number(gradeLevelId),
+      description: description.trim(),
     };
 
-     if (selectedClassRoomIds.length > 0) {
-      payload.class_room_ids = selectedClassRoomIds.map((id) => Number(id));
+    if (selectedClassRoomIds.length > 0) {
+      payload.class_room_ids = selectedClassRoomIds.map(Number);
     }
-
-    // if (description.trim()) {
-    //   payload.description = description.trim();
-    // }
 
     if (isEditing && activityToEdit) {
       updateActivity.mutate(
         { id: activityToEdit.id, payload },
-        { 
-          onSuccess: handleSuccess,
-          onError: (err: any) => {
-            console.error("Update Activity Error:", err?.response?.data || err);
-            alert(err?.response?.data?.message || "فشل في تعديل النشاط.");
-          }
-        }
+        { onSuccess: handleSuccess, onError: handleError }
       );
     } else {
       createActivity.mutate(payload, { 
-        onSuccess: handleSuccess,
-        onError: (err: any) => {
-          console.error("Create Activity Error:", err?.response?.data || err);
-          alert(err?.response?.data?.message || "فشل في إنشاء النشاط.");
-        }
+        onSuccess: handleSuccess, 
+        onError: handleError 
       });
     }
   };
 
-  const handleSuccess = () => {
-    alert(isEditing ? "تم تعديل النشاط بنجاح!" : "تم إنشاء النشاط بنجاح!");
-    onOpenChange(false);
-  };
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-xl bg-card text-card-foreground border-border shadow-floating">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-xl font-bold text-foreground">
-            <Sparkles className="w-5 h-5 text-primary" />
+      <DialogContent className="floating-card sm:max-w-xl rounded-3xl border border-border p-6 shadow-2xl" dir="rtl">
+        <DialogHeader className="space-y-1.5 text-right">
+          <DialogTitle className="flex items-center gap-2.5 text-xl font-bold tracking-tight text-foreground">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10 text-primary">
+              <Sparkles className="h-5 w-5" />
+            </div>
             {isEditing ? "تعديل النشاط المدرسي" : "إضافة نشاط مدرسي جديد"}
           </DialogTitle>
+          <DialogDescription className="text-sm text-muted-foreground pr-11">
+            قم بتعبئة تفاصيل النشاط، وتحديد الوقت، واختيار الشعب المستهدفة بوضوح.
+          </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4 mt-2">
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div>
-              <label className="text-xs font-semibold text-muted-foreground block mb-1">
+        <form onSubmit={handleSubmit} className="space-y-5 mt-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block">
                 اسم النشاط <span className="text-destructive">*</span>
               </label>
               <input
                 type="text"
                 value={activityName}
                 onChange={(e) => setActivityName(e.target.value)}
-                placeholder="مثال: رحلة إلى المرصد الفلكي"
+                placeholder="مثال: رحلة علمية"
                 required
-                className="w-full rounded-xl border border-input p-2.5 text-sm bg-card text-foreground focus:ring-2 focus:ring-ring outline-none transition-all"
+                className="w-full h-11 rounded-xl border border-input px-3 text-sm bg-card text-foreground focus:ring-2 focus:ring-ring outline-none transition-all"
               />
             </div>
-            <div>
-              <label className="text-xs font-semibold text-muted-foreground block mb-1">
+            <div className="space-y-2">
+              <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block">
                 نوع النشاط <span className="text-destructive">*</span>
               </label>
               <input
                 type="text"
                 value={type}
                 onChange={(e) => setType(e.target.value)}
-                placeholder="مثال: رحلة علمية، موسيقى، رياضة"
+                placeholder="مثال: ترفيهي، علمي..."
                 required
-                className="w-full rounded-xl border border-input p-2.5 text-sm bg-card text-foreground focus:ring-2 focus:ring-ring outline-none transition-all"
+                className="w-full h-11 rounded-xl border border-input px-3 text-sm bg-card text-foreground focus:ring-2 focus:ring-ring outline-none transition-all"
               />
             </div>
           </div>
 
-
-          <div className="p-3 bg-muted/40 rounded-xl border border-border grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <div>
-              <label className="text-xs font-semibold text-muted-foreground flex items-center gap-1 mb-1">
-                <Calendar className="w-3.5 h-3.5 text-primary" /> تاريخ النشاط
+          <div className="p-4 bg-muted/20 rounded-2xl border border-border space-y-4">
+            <div className="space-y-2">
+              <label className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                <CalendarDays className="w-3.5 h-3.5" /> تاريخ النشاط <span className="text-destructive">*</span>
               </label>
               <input
                 type="date"
                 value={activityDate}
                 onChange={(e) => setActivityDate(e.target.value)}
                 required
-                className="w-full rounded-lg border border-input p-2 text-sm bg-card text-foreground focus:ring-1 focus:ring-ring outline-none"
+                className="w-full h-11 rounded-xl border border-input px-3 text-sm bg-card text-foreground focus:ring-2 focus:ring-ring outline-none"
               />
             </div>
-            <div>
-              <label className="text-xs font-semibold text-muted-foreground flex items-center gap-1 mb-1">
-                <Clock className="w-3.5 h-3.5 text-primary" /> وقت البدء
-              </label>
-              <input
-                type="time"
-                value={startTime}
-                onChange={(e) => setStartTime(e.target.value)}
-                required
-                className="w-full rounded-lg border border-input p-2 text-sm bg-card text-foreground focus:ring-1 focus:ring-ring outline-none"
-              />
-            </div>
-            <div>
-              <label className="text-xs font-semibold text-muted-foreground flex items-center gap-1 mb-1">
-                <Clock className="w-3.5 h-3.5 text-primary" /> وقت الانتهاء
-              </label>
-              <input
-                type="time"
-                value={endTime}
-                onChange={(e) => setEndTime(e.target.value)}
-                required
-                className="w-full rounded-lg border border-input p-2 text-sm bg-card text-foreground focus:ring-1 focus:ring-ring outline-none"
-              />
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  <Clock className="w-3.5 h-3.5" /> وقت البدء <span className="text-destructive">*</span>
+                </label>
+                <input
+                  type="time"
+                  value={startTime}
+                  onChange={(e) => setStartTime(e.target.value)}
+                  required
+                  className="w-full h-11 rounded-xl border border-input px-3 text-sm bg-card text-foreground focus:ring-2 focus:ring-ring outline-none"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  <Clock className="w-3.5 h-3.5" /> وقت الانتهاء <span className="text-destructive">*</span>
+                </label>
+                <input
+                  type="time"
+                  value={endTime}
+                  onChange={(e) => setEndTime(e.target.value)}
+                  required
+                  className="w-full h-11 rounded-xl border border-input px-3 text-sm bg-card text-foreground focus:ring-2 focus:ring-ring outline-none"
+                />
+              </div>
             </div>
           </div>
 
-
-          <div className="space-y-3">
-            <div>
-              <label className="text-xs font-semibold text-muted-foreground block mb-1">
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block">
                 المرحلة الدراسية <span className="text-destructive">*</span>
               </label>
               <select
                 value={gradeLevelId}
                 onChange={(e) => setGradeLevelId(e.target.value)}
                 required
-                className="w-full rounded-xl border border-input p-2.5 text-sm bg-card text-foreground focus:ring-2 focus:ring-ring outline-none"
+                className="w-full h-11 rounded-xl border border-input px-3 text-sm bg-card text-foreground focus:ring-2 focus:ring-ring outline-none"
               >
                 <option value="">-- اختر المرحلة الدراسية --</option>
                 {gradeLevels.map((grade) => (
-                  <option key={grade.id} value={grade.id}>
-                    {grade.name}
-                  </option>
+                  <option key={grade.id} value={grade.id}>{grade.name}</option>
                 ))}
               </select>
             </div>
 
-
             <MultiSelectAudience
-              label="تخصيص شعب محددة (اختياري)"
-              placeholder="ابحث واختر الشعب المشمولة بالنشاط..."
+              label="تخصيص شعب محددة (اختياري - يترك فارغاً لكل الشعب)"
+              placeholder="ابحث واختر الشعب..."
               options={classRooms}
               selectedIds={selectedClassRoomIds}
               onChange={setSelectedClassRoomIds}
             />
           </div>
 
-
-          <div>
-            <label className="text-xs font-semibold text-muted-foreground block mb-1">
+          <div className="space-y-2">
+            <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block">
               تفاصيل وملاحظات النشاط
             </label>
             <textarea
               rows={3}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="اكتب تفاصيل الرحلة، المستلزمات المطلوبة من الطالب، أو أي شروط أخرى..."
-              className="w-full rounded-xl border border-input p-2.5 text-sm bg-card text-foreground focus:ring-2 focus:ring-ring outline-none transition-all resize-none"
+              placeholder="اكتب أي ملاحظات إضافية هنا..."
+              className="w-full rounded-2xl border border-input p-3 text-sm bg-card text-foreground focus:ring-2 focus:ring-ring outline-none transition-all resize-none min-h-[80px]"
             />
           </div>
 
-          <DialogFooter className="gap-2 pt-2 border-t border-border/60">
+          <div className="flex items-center gap-3 pt-4 border-t border-border/60">
             <Button
               type="button"
               variant="outline"
               onClick={() => onOpenChange(false)}
               disabled={isPending}
+              className="h-11 flex-1 rounded-xl border-border bg-transparent text-foreground hover:bg-muted"
             >
               إلغاء
             </Button>
             <Button
               type="submit"
               disabled={isPending}
-              className="primary-gradient text-primary-foreground gap-2"
+              className="primary-gradient h-11 flex-[2] rounded-xl font-semibold text-primary-foreground shadow-md transition-all hover:opacity-95 active:scale-[0.98]"
             >
-              {isPending && <Loader2 className="w-4 h-4 animate-spin" />}
+              {isPending && <Loader2 className="w-4 h-4 ml-2 animate-spin" />}
               {isEditing ? "حفظ التعديلات" : "اعتماد ونشر النشاط"}
             </Button>
-          </DialogFooter>
+          </div>
         </form>
       </DialogContent>
     </Dialog>

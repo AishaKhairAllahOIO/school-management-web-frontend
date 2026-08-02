@@ -5,40 +5,40 @@ import type { LawPayload } from "../types/school-laws.types";
 export function useSchoolLaws() {
   const queryClient = useQueryClient();
 
-
   const lawsQuery = useQuery({
     queryKey: ["school-laws"],
-    queryFn: schoolLawsService.getAllLaws,
+    queryFn: async () => {
+      try {
+        return await schoolLawsService.getAllLaws();
+      } catch (error: any) {
+        if (error?.response?.status === 403) {
+          console.warn("⚠️ غير مصرح لك بعرض القوانين.");
+          return [];
+        }
+        throw error;
+      }
+    },
   });
-
 
   const createLawMutation = useMutation({
     mutationFn: (payload: LawPayload) => schoolLawsService.createLaw(payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["school-laws"] });
-      alert("✅ تمت إضافة القانون بنجاح");
     },
-    onError: (err: any) => {
-      alert("❌ فشل في الإضافة: " + (err.response?.data?.message || "خطأ غير معروف"));
-    }
   });
-
 
   const updateLawMutation = useMutation({
     mutationFn: ({ id, payload }: { id: string | number; payload: Partial<LawPayload> }) =>
-      schoolLawsService.updateLaw(id, payload),
+      schoolLawsService.updateLaw(id, payload), // يستخدم POST كما في البوستمان
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["school-laws"] });
-      alert("✅ تم تعديل القانون بنجاح");
     },
   });
-
 
   const deleteLawMutation = useMutation({
     mutationFn: (id: string | number) => schoolLawsService.deleteLaw(id),
     onSuccess: (_, deletedId) => {
-
-        queryClient.setQueryData(["school-laws"], (oldData: any[] = []) =>
+      queryClient.setQueryData(["school-laws"], (oldData: any[] = []) =>
         oldData.filter((law) => law.id !== deletedId)
       );
     },

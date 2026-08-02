@@ -45,27 +45,20 @@ export function useCommunicationOptions() {
     },
   });
 
-  // 3. جلب الطلاب (مع كاشف ذكي للاسم من أي علاقة في لارافيل)
+  // 3. جلب الطلاب
   const studentsQuery = useQuery({
     queryKey: ["students", "options"],
     queryFn: async () => {
       const response = await axiosClient.get(API_ENDPOINTS.STUDENTS.FILTER);
       const data = extractArray(response.data);
       return data.map((item: any): OptionItem => {
-        const id = Number(item.enrollment_id || item.id || item.user_id);
+        // 🌟 استخراج آمن لمنع الـ NaN
+        const rawId = item.enrollment_id ?? item.id ?? item.user_id;
+        const id = rawId ? Number(rawId) : `student-${Math.random()}`; 
         
-        // 🌟 فحص جميع الحقول والعلاقات الممكنة للاسم
-        const name =
-          item.full_name ||
-          item.name ||
-          item.student_name ||
-          item.user?.name ||
-          item.user?.full_name ||
-          `${item.first_name || item.user?.first_name || item.student?.first_name || ""} ${item.last_name || item.user?.last_name || item.student?.last_name || ""}`.trim() ||
-          `${item.first_name_ar || ""} ${item.last_name_ar || ""}`.trim() ||
-          `طالب رقم ${id}`;
-
-        const subtitle = `${item.grade_name || item.grade?.name || ""} - ${item.classroom_name || item.classroom?.name || ""}`.replace(/^- |- $/g, "") || "طالب";
+        const name = item.full_name || item.name || item.student_name || "طالب بدون اسم";
+        const subtitle = `${item.grade_name || ""} - ${item.classroom_name || ""}`.replace(/^- |- $/g, "") || "طالب";
+        
         return { id, name, subtitle };
       });
     },
@@ -78,16 +71,13 @@ export function useCommunicationOptions() {
       const response = await axiosClient.get(API_ENDPOINTS.STAFF.ALPHABETICAL);
       const data = extractArray(response.data);
       return data.map((item: any): OptionItem => {
-        const id = Number(item.id || item.staff_id || item.user_id);
+        // 🌟 استخراج آمن لمنع الـ NaN
+        const rawId = item.id ?? item.staff_id ?? item.user_id;
+        const id = rawId ? Number(rawId) : `staff-${Math.random()}`;
         
-        const name =
-          item.full_name ||
-          item.name ||
-          item.user?.name ||
-          `${item.first_name || item.user?.first_name || ""} ${item.last_name || item.user?.last_name || ""}`.trim() ||
-          `موظف رقم ${id}`;
-
+        const name = item.full_name || item.name || "موظف بدون اسم";
         const subtitle = item.role || item.job_title || item.department || "موظف";
+        
         return { id, name, subtitle };
       });
     },

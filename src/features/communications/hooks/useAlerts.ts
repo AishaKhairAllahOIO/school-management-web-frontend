@@ -7,21 +7,17 @@ import type {
 } from "../types/communication.types";
 
 export function useAlerts() {
-
   const sendPaymentAlertMutation = useMutation({
     mutationFn: (payload: PaymentAlertPayload) => communicationService.sendPaymentAlert(payload),
   });
-
 
   const sendAdvisorAlertMutation = useMutation({
     mutationFn: (payload: AdvisorAlertPayload) => communicationService.sendAdvisorAlert(payload),
   });
 
-
   const sendStaffAlertMutation = useMutation({
     mutationFn: (payload: StaffAlertPayload) => communicationService.sendStaffAlert(payload),
   });
-
 
   const deleteAlertMutation = useMutation({
     mutationFn: (id: string | number) => communicationService.deleteAlert(id),
@@ -32,7 +28,6 @@ export function useAlerts() {
     sendAdvisorAlert: sendAdvisorAlertMutation,
     sendStaffAlert: sendStaffAlertMutation,
     deleteAlert: deleteAlertMutation,
-
     isSending:
       sendPaymentAlertMutation.isPending ||
       sendAdvisorAlertMutation.isPending ||
