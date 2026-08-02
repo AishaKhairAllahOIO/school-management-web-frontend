@@ -1,4 +1,5 @@
-export type AudienceType = "student" | "staff" | "both";
+// 🌟 1. تم تعديل الاسم هنا ليطابق الواجهة
+export type AnnouncementAudience = "student" | "staff" | "both";
 
 export interface ActivityPayload {
   activity_name: string;
@@ -17,7 +18,7 @@ export interface Activity extends ActivityPayload {
 }
 
 export interface AnnouncementPayload {
-  audience: AudienceType;
+  audience: AnnouncementAudience; // 🌟 تم التعديل هنا
   title: string;
   description: string;
   grade_level_id?: number | string;
@@ -46,7 +47,7 @@ export interface StaffAlertPayload {
 export interface PaymentAlertPayload {
   audience: "student";
   type: "payed" | "payment";
-  enrollment_ids: (number | string)[]; // مصفوفة المعرفات مع حرف e الزائد
+  enrollment_ids: (number | string)[];  
   meta?: {
     amount?: number;
     amount_due?: number;
@@ -56,11 +57,13 @@ export interface PaymentAlertPayload {
 
 export interface AdvisorAlertPayload {
   audience: "student";
-  type: "behavior" | "escape" | "late" | "absence";
-  enrollment_ids: (number | string)[]; // مصفوفة المعرفات
+  type: "behavior" | "escape" | "late" | "absence" | "homework";  
+  enrollment_ids: (number | string)[];  
   meta?: {
     severity?: "low" | "medium" | "high";
     session?: string;
     minutes_late?: number;
+    subject?: string; 
+    date?: string;   
   };
 }

@@ -220,10 +220,6 @@ export const API_ENDPOINTS = {
   },
 
   FINANCIAL: {
-    /*
-     * لا يوجد راوت مباشر:
-     * /admin/finance/settings
-     */
 
     POLICIES:
       "/admin/finance/settings/policies",
@@ -237,17 +233,9 @@ export const API_ENDPOINTS = {
     FEE_PLAN: (feePlanId: ApiId) =>
       `/admin/finance/settings/fee-plans/${feePlanId}`,
 
-    /*
-     * بحسب route:list لا توجد collection route
-     * لـ policy-items، بل توجد عمليات على عنصر محدد فقط.
-     */
     POLICY_ITEM: (policyItemId: ApiId) =>
       `/admin/finance/settings/policy-items/${policyItemId}`,
-
-    /*
-     * بحسب route:list لا توجد collection route
-     * لـ extra-services، بل توجد عمليات على عنصر محدد فقط.
-     */
+ 
     EXTRA_SERVICE: (extraServiceId: ApiId) =>
       `/admin/finance/settings/extra-services/${extraServiceId}`,
   },
@@ -279,9 +267,6 @@ export const API_ENDPOINTS = {
   },
 
   COMMUNICATIONS: {
-    /*
-     * Activities
-     */
 
     CREATE_ACTIVITY: "/auth/activity",
 
@@ -295,20 +280,7 @@ export const API_ENDPOINTS = {
       `/auth/activity/${activityId}`,
 
     ALL_ACTIVITIES: "/auth/activities/all",
-
-    MY_ACTIVITIES: "/user/my-activities",
-
-    CHILD_ACTIVITIES: "/user/child-activities",
-
-    ACTIVITY_UNREAD_COUNT:
-      "/user/activity-unread-count",
-
-    MARK_ALL_ACTIVITIES_READ:
-      "/user/activity-mark-all-read",
-
-    /*
-     * Announcements
-     */
+ 
 
     CREATE_ANNOUNCEMENT:
       "/auth/announcements",
@@ -346,11 +318,7 @@ export const API_ENDPOINTS = {
 
     MARK_ALL_USER_ANNOUNCEMENTS_READ:
       "/user/announcements/mark-all-read",
-
-    /*
-     * Alerts
-     */
-
+ 
     ALERTS: "/auth/alerts",
 
     ALERTS_UNREAD_COUNT:
@@ -390,6 +358,13 @@ export const API_ENDPOINTS = {
       "/user/alerts/mark-all-read",
   },
 
+  USER_PORTAL: {
+    MY_ACTIVITIES: "/user/my-activities",
+    CHILD_ACTIVITIES: "/user/child-activities",
+    ACTIVITY_UNREAD_COUNT: "/user/activity-unread-count",
+    MARK_ALL_ACTIVITIES_READ: "/user/activity-mark-all-read",
+  }, 
+  
   SCHOOL_LAWS: {
     GET_ALL: "/auth/school/laws/all/show",
 

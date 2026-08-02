@@ -7,6 +7,7 @@ import {
   FileText,
   LockKeyhole,
   ReceiptText,
+  Scale,
   ShieldCheck,
   UserCheck,
   Users,
@@ -78,6 +79,7 @@ const subNavigationSections: SubNavigationSection[] = [
     items: [
       { title: "Announcements", path: "/communications/announcements", icon: Bell },
       { title: "Activities", path: "/communications/activities", icon: FileText },
+      { title: "School Laws", path: "/communications/laws", icon: Scale },  
     ],
   },
   {

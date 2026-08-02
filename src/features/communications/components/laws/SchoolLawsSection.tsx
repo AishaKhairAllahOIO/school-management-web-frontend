@@ -6,10 +6,9 @@ import type { SchoolLaw, LawPayload } from "../../types/school-laws.types";
 
 import { LawsTable } from "./LawsTable";
 import { LawDialog } from "./LawDialog";
-
+ 
 export function SchoolLawsSection() {
   const { laws, isLoading, createLaw, updateLaw, deleteLaw } = useSchoolLaws();
-
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedLaw, setSelectedLaw] = useState<SchoolLaw | null>(null);
 
@@ -18,58 +17,34 @@ export function SchoolLawsSection() {
     setDialogOpen(true);
   };
 
-  const handleOpenEdit = (law: SchoolLaw) => {
-    setSelectedLaw(law);
-    setDialogOpen(true);
-  };
-
   const handleSubmit = (values: LawPayload) => {
     if (selectedLaw) {
-      updateLaw.mutate(
-        { id: selectedLaw.id, payload: values },
-        { 
-          onSuccess: () => {
-            alert("✅ تم تعديل القانون بنجاح");
-            setDialogOpen(false);
-          },
-          onError: (err: any) => {
-             alert(err?.response?.status === 403 ? "❌ غير مصرح لك بالتعديل." : "❌ فشل تعديل القانون.");
-          }
-        }
-      );
+      updateLaw.mutate({ id: selectedLaw.id, payload: values }, { onSuccess: () => setDialogOpen(false) });
     } else {
-      createLaw.mutate(values, { 
-        onSuccess: () => {
-          alert("✅ تمت إضافة القانون بنجاح");
-          setDialogOpen(false);
-        },
-        onError: (err: any) => {
-             alert(err?.response?.status === 403 ? "❌ غير مصرح لك بالإضافة." : "❌ فشل إضافة القانون.");
-        }
-      });
+      createLaw.mutate(values, { onSuccess: () => setDialogOpen(false) });
     }
   };
 
   if (isLoading) {
     return (
-      <div className="soft-card flex min-h-[300px] flex-col items-center justify-center rounded-3xl border border-border p-12 text-center">
+      <div className="soft-card flex min-h-[300px] flex-col items-center justify-center rounded-3xl border border-border p-12 text-center bg-card">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        <p className="mt-3 text-sm font-medium text-muted-foreground">جاري تحميل القوانين...</p>
+        <p className="mt-3 text-sm font-medium text-muted-foreground">Loading school laws...</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-300" dir="rtl">
-      <div className="soft-card rounded-3xl p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border border-border bg-card">
-        <div className="flex items-center gap-3">
-           <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-              <Scale className="h-6 w-6" />
+    <div className="space-y-6 animate-in fade-in duration-300">
+      <div className="soft-card rounded-3xl p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border border-border bg-card shadow-sm">
+        <div className="flex items-center gap-4">
+           <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+              <Scale className="h-7 w-7" />
             </div>
             <div>
-              <h2 className="text-2xl font-bold tracking-tight text-foreground">القوانين المدرسية</h2>
+              <h2 className="text-xl font-bold tracking-tight text-foreground">School Laws & Regulations</h2>
               <p className="text-sm text-muted-foreground mt-1">
-                إدارة اللوائح والقوانين المدرسية التي تظهر للطلاب وأولياء الأمور.
+                Manage the rules and policies visible to students and parents.
               </p>
             </div>
         </div>
@@ -77,18 +52,16 @@ export function SchoolLawsSection() {
           onClick={handleOpenCreate} 
           className="primary-gradient h-11 rounded-xl px-5 font-semibold text-primary-foreground shadow-md transition-all hover:opacity-95 active:scale-[0.98]"
         >
-          <Plus className="ml-2 h-5 w-5" /> إضافة قانون جديد
+          <Plus className="mr-2 h-5 w-5" /> Add New Law
         </Button>
       </div>
 
       <LawsTable 
         laws={laws} 
-        onEdit={handleOpenEdit} 
+        onEdit={(law) => { setSelectedLaw(law); setDialogOpen(true); }} 
         onDelete={(id) => {
-          if (confirm("هل أنت متأكد من حذف هذا القانون؟")) {
-             deleteLaw.mutate(id, {
-                onError: (err: any) => alert(err?.response?.status === 403 ? "❌ غير مصرح لك بالحذف." : "❌ فشل الحذف.")
-             });
+          if (confirm("Are you sure you want to permanently delete this law?")) {
+             deleteLaw.mutate(id);
           }
         }} 
       />

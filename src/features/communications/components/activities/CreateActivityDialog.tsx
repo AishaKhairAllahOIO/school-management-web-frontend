@@ -31,7 +31,6 @@ export function CreateActivityDialog({
   const isEditing = !!activityToEdit;
   const isPending = createActivity.isPending || updateActivity.isPending;
 
-  // Form States
   const [activityName, setActivityName] = useState("");
   const [type, setType] = useState("");
   const [activityDate, setActivityDate] = useState("");
@@ -63,40 +62,45 @@ export function CreateActivityDialog({
     }
   }, [activityToEdit, open]);
 
+  // 🌟 1. تفريغ الشعب تلقائياً عند تغيير المرحلة
+  useEffect(() => {
+    setSelectedClassRoomIds([]);
+  }, [gradeLevelId]);
+
+  // 🌟 2. فلترة الشعب لتطابق المرحلة المختارة فقط
+  const filteredClassRooms = classRooms.filter(
+    (c: any) => !gradeLevelId || String(c.parentId) === String(gradeLevelId)
+  );
+
   const handleError = (err: any) => {
     console.error("Activity Error:", err?.response?.data || err);
-    
-    // 🌟 معالجة خطأ الصلاحيات 403
     if (err?.response?.status === 403) {
-      alert("❌ عذراً، حسابك الحالي لا يمتلك الصلاحية الكافية لإضافة أو تعديل الأنشطة.");
+      alert("❌ عذراً، حسابك الحالي لا يمتلك الصلاحية لإدارة الأنشطة.");
       return;
     }
-
     const backendMessage = err?.response?.data?.message;
     const backendErrors = err?.response?.data?.errors;
-    const firstError = backendErrors ? Object.values(backendErrors)[0] : null;
+    const firstError = backendErrors ? Object.values(backendErrors).flat()[0] : null;
     alert(`❌ فشل الحفظ:\n[ ${firstError || backendMessage || "حدث خطأ غير معروف"} ]`);
-  };
-
-  const handleSuccess = () => {
-    alert(isEditing ? "✅ تم تعديل النشاط بنجاح!" : "✅ تم إضافة النشاط بنجاح!");
-    onOpenChange(false);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!gradeLevelId) {
-      alert("الرجاء تحديد المرحلة الدراسية المستهدفة بالنشاط.");
+      alert("الرجاء تحديد المرحلة الدراسية المستهدفة.");
       return;
     }
+
+    // 🌟 3. إصلاح صيغة الوقت لتتوافق مع لارافيل (H:i)
+    const formatTime = (timeStr: string) => timeStr ? timeStr.substring(0, 5) : "";
 
     const payload: ActivityPayload = {
       activity_name: activityName.trim(),
       type: type.trim(),
       activity_date: activityDate,
-      start_time: startTime,
-      end_time: endTime,
+      start_time: formatTime(startTime),
+      end_time: formatTime(endTime),
       grade_level_id: Number(gradeLevelId),
       description: description.trim(),
     };
@@ -108,11 +112,11 @@ export function CreateActivityDialog({
     if (isEditing && activityToEdit) {
       updateActivity.mutate(
         { id: activityToEdit.id, payload },
-        { onSuccess: handleSuccess, onError: handleError }
+        { onSuccess: () => onOpenChange(false), onError: handleError }
       );
     } else {
       createActivity.mutate(payload, { 
-        onSuccess: handleSuccess, 
+        onSuccess: () => onOpenChange(false), 
         onError: handleError 
       });
     }
@@ -120,7 +124,7 @@ export function CreateActivityDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="floating-card sm:max-w-xl rounded-3xl border border-border p-6 shadow-2xl" dir="rtl">
+      <DialogContent className="floating-card sm:max-w-xl rounded-3xl border border-border p-6 shadow-2xl max-h-[85vh] overflow-y-auto" dir="rtl">
         <DialogHeader className="space-y-1.5 text-right">
           <DialogTitle className="flex items-center gap-2.5 text-xl font-bold tracking-tight text-foreground">
             <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10 text-primary">
@@ -143,7 +147,6 @@ export function CreateActivityDialog({
                 type="text"
                 value={activityName}
                 onChange={(e) => setActivityName(e.target.value)}
-                placeholder="مثال: رحلة علمية"
                 required
                 className="w-full h-11 rounded-xl border border-input px-3 text-sm bg-card text-foreground focus:ring-2 focus:ring-ring outline-none transition-all"
               />
@@ -156,7 +159,6 @@ export function CreateActivityDialog({
                 type="text"
                 value={type}
                 onChange={(e) => setType(e.target.value)}
-                placeholder="مثال: ترفيهي، علمي..."
                 required
                 className="w-full h-11 rounded-xl border border-input px-3 text-sm bg-card text-foreground focus:ring-2 focus:ring-ring outline-none transition-all"
               />
@@ -216,17 +218,15 @@ export function CreateActivityDialog({
                 required
                 className="w-full h-11 rounded-xl border border-input px-3 text-sm bg-card text-foreground focus:ring-2 focus:ring-ring outline-none"
               >
-                <option value="">-- اختر المرحلة الدراسية --</option>
-                {gradeLevels.map((grade) => (
-                  <option key={grade.id} value={grade.id}>{grade.name}</option>
-                ))}
+                <option value="">-- اختر المرحلة --</option>
+                {gradeLevels.map((g) => <option key={g.id} value={g.id}>{g.name}</option>)}
               </select>
             </div>
 
             <MultiSelectAudience
               label="تخصيص شعب محددة (اختياري - يترك فارغاً لكل الشعب)"
               placeholder="ابحث واختر الشعب..."
-              options={classRooms}
+              options={filteredClassRooms}
               selectedIds={selectedClassRoomIds}
               onChange={setSelectedClassRoomIds}
             />
@@ -240,28 +240,15 @@ export function CreateActivityDialog({
               rows={3}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="اكتب أي ملاحظات إضافية هنا..."
               className="w-full rounded-2xl border border-input p-3 text-sm bg-card text-foreground focus:ring-2 focus:ring-ring outline-none transition-all resize-none min-h-[80px]"
             />
           </div>
 
           <div className="flex items-center gap-3 pt-4 border-t border-border/60">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-              disabled={isPending}
-              className="h-11 flex-1 rounded-xl border-border bg-transparent text-foreground hover:bg-muted"
-            >
-              إلغاء
-            </Button>
-            <Button
-              type="submit"
-              disabled={isPending}
-              className="primary-gradient h-11 flex-[2] rounded-xl font-semibold text-primary-foreground shadow-md transition-all hover:opacity-95 active:scale-[0.98]"
-            >
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={isPending} className="h-11 flex-1 rounded-xl">إلغاء</Button>
+            <Button type="submit" disabled={isPending} className="primary-gradient h-11 flex-[2] rounded-xl font-semibold text-primary-foreground shadow-md active:scale-[0.98]">
               {isPending && <Loader2 className="w-4 h-4 ml-2 animate-spin" />}
-              {isEditing ? "حفظ التعديلات" : "اعتماد ونشر النشاط"}
+              {isEditing ? "حفظ التعديلات" : "اعتماد النشاط"}
             </Button>
           </div>
         </form>

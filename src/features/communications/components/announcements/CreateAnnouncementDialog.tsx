@@ -10,7 +10,7 @@ import {
 import { Button } from "@/shared/ui/button";
 import { MultiSelectAudience, type OptionItem } from "../shared/MultiSelectAudience";
 import { useAnnouncements } from "../../hooks/useAnnouncements";
-import type { Announcement } from "../../types/communication.types";
+import type { Announcement, AnnouncementAudience } from "../../types/communication.types";
 
 type Props = {
   open: boolean;
@@ -31,7 +31,7 @@ export function CreateAnnouncementDialog({
   const isEditing = !!announcementToEdit;
   const isPending = createAnnouncement.isPending || updateAnnouncement.isPending;
 
-  const [audience, setAudience] = useState("student");
+  const [audience, setAudience] = useState<AnnouncementAudience>("student");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [gradeLevelId, setGradeLevelId] = useState<string | number>("");
@@ -53,15 +53,22 @@ export function CreateAnnouncementDialog({
     }
   }, [announcementToEdit, open]);
 
+  // 🌟 1. تفريغ الشعب المحددة تلقائياً عند تغيير المرحلة الدراسية
+  useEffect(() => {
+    setSelectedClassRoomIds([]);
+  }, [gradeLevelId]);
+
+  // 🌟 2. فلترة قائمة الشعب لتُظهر فقط شعب المرحلة المختارة
+  const filteredClassRooms = classRooms.filter(
+    (c: any) => !gradeLevelId || String(c.parentId) === String(gradeLevelId)
+  );
+
   const handleError = (err: any) => {
     console.error("Announcement Error:", err?.response?.data || err);
-    
-    // 🌟 معالجة خطأ الصلاحيات 403 الذي يظهر في الباك إند
     if (err?.response?.status === 403) {
       alert("❌ عذراً، حسابك الحالي لا يمتلك الصلاحيات الكافية لنشر هذا الإعلان.");
       return;
     }
-
     const backendMessage = err?.response?.data?.message;
     const backendErrors = err?.response?.data?.errors;
     const firstError = backendErrors ? Object.values(backendErrors)[0] : null;
@@ -109,8 +116,8 @@ export function CreateAnnouncementDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      {/* 🌟 تطبيق الـ Classes الخاصة بالتصميم الموحد */}
-      <DialogContent className="floating-card sm:max-w-xl rounded-3xl border border-border p-6 shadow-2xl" dir="rtl">
+      {/* 🌟 3. إضافة ميزة السكرول للنافذة (max-h-[85vh] overflow-y-auto) */}
+      <DialogContent className="floating-card sm:max-w-xl rounded-3xl border border-border p-6 shadow-2xl max-h-[85vh] overflow-y-auto" dir="rtl">
         <DialogHeader className="space-y-1.5 text-right">
           <DialogTitle className="flex items-center gap-2.5 text-xl font-bold tracking-tight text-foreground">
             <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-secondary text-primary">
@@ -128,28 +135,40 @@ export function CreateAnnouncementDialog({
             <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block">
               الفئة المستهدفة بالإعلان <span className="text-destructive">*</span>
             </label>
-            <div className="grid grid-cols-2 gap-3 p-1.5 bg-muted/30 rounded-2xl border border-border">
+            {/* 🌟 4. إضافة خيار "الجميع" ليتوافق مع الباك إند */}
+            <div className="grid grid-cols-3 gap-3 p-1.5 bg-muted/30 rounded-2xl border border-border">
               <button
                 type="button"
                 onClick={() => setAudience("student")}
-                className={`flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                className={`flex flex-col items-center justify-center gap-1.5 py-2.5 rounded-xl text-sm font-medium transition-all ${
                   audience === "student"
                     ? "bg-card text-primary shadow-sm border border-border"
                     : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
                 }`}
               >
-                <School className="w-4 h-4" /> الطلاب وأولياء الأمور
+                <School className="w-4 h-4" /> الطلاب
               </button>
               <button
                 type="button"
                 onClick={() => setAudience("staff")}
-                className={`flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                className={`flex flex-col items-center justify-center gap-1.5 py-2.5 rounded-xl text-sm font-medium transition-all ${
                   audience === "staff"
                     ? "bg-card text-primary shadow-sm border border-border"
                     : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
                 }`}
               >
-                <Users className="w-4 h-4" /> الكادر التدريسي والإداري
+                <Users className="w-4 h-4" /> الكادر
+              </button>
+              <button
+                type="button"
+                onClick={() => setAudience("both")}
+                className={`flex flex-col items-center justify-center gap-1.5 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                  audience === "both"
+                    ? "bg-card text-primary shadow-sm border border-border"
+                    : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
+                }`}
+              >
+                <Megaphone className="w-4 h-4" /> الجميع
               </button>
             </div>
           </div>
@@ -187,10 +206,11 @@ export function CreateAnnouncementDialog({
                 </select>
               </div>
 
+              {/* 🌟 استخدام المصفوفة المفلترة هنا */}
               <MultiSelectAudience
                 label="تخصيص شعب محددة (اختياري - يترك فارغاً لكل الشعب)"
                 placeholder="ابحث واختر الشعب..."
-                options={classRooms}
+                options={filteredClassRooms}
                 selectedIds={selectedClassRoomIds}
                 onChange={setSelectedClassRoomIds}
               />
