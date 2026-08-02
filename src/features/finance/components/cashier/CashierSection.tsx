@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { Button } from "@/shared/ui/button";
 import { axiosClient } from "@/services/axios/axiosClient";
-import { API_ENDPOINTS } from "@/services/api/endpoints"; // 👈 استيراد المسارات الصحيحة
+import { API_ENDPOINTS } from "@/services/api/endpoints";
 import { financeOperationsService } from "../../services/finance-operations.service"; 
 
 import { PaymentsTable } from "./PaymentsTable";
@@ -33,7 +33,6 @@ export function CashierSection() {
 
   const queryClient = useQueryClient();
 
-
   const [createOpen, setCreateOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [selectedPayment, setSelectedPayment] = useState<PaymentReceipt | null>(null);
@@ -43,7 +42,6 @@ export function CashierSection() {
 
   const [viewOpen, setViewOpen] = useState(false);
   const [selectedPaymentIdToView, setSelectedPaymentIdToView] = useState<string | number | null>(null);
-
 
   const { data: students = [], isLoading: isLoadingStudents } = useQuery({
     queryKey: ["students-list"],
@@ -89,7 +87,6 @@ export function CashierSection() {
       alert("Update failed: " + (error.response?.data?.message || "Unknown error"));
     }
   });
-
 
   function handleDelete(id: string | number) {
     setSelectedPaymentIdToDelete(id);
