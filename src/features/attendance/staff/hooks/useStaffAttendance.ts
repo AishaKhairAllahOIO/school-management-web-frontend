@@ -1,19 +1,137 @@
-import { useQuery }
-from "@tanstack/react-query";
+import {
+  useQueries,
+} from "@tanstack/react-query";
+import {
+  useMemo,
+} from "react";
 
 import {
-  staffAttendanceMock,
+  staffApi,
+} from "@/features/users/staff/api/staff.api";
+import type {
+  StaffProfile,
+  StaffRole as ApiStaffRole,
+} from "@/features/users/staff/types/staff.types";
+
+import type {
+  StaffAttendance,
+  StaffRole,
+} from "../types/staffAttendance.types";
+
+const attendanceRoles: ApiStaffRole[] = [
+  "teacher",
+  "adviser",
+  "secretary",
+  "counselor",
+  "service_staff",
+];
+
+function toAttendanceRole(
+  role: ApiStaffRole | null,
+): StaffRole | null {
+  switch (role) {
+    case "teacher":
+      return "Teacher";
+    case "adviser":
+      return "Supervisor";
+    case "secretary":
+      return "Secretary";
+    case "counselor":
+      return "Counselor";
+    case "service_staff":
+      return "Service Staff";
+    default:
+      return null;
+  }
 }
-from "../mocks/staffAttendance.mock";
 
-export const useStaffAttendance =
-() => {
-  return useQuery({
-    queryKey: [
-      "staff-attendance",
-    ],
+function mapStaff(
+  staff: StaffProfile,
+  attendanceDate: string,
+): StaffAttendance | null {
+  const role = toAttendanceRole(staff.role);
 
-    queryFn: async () =>
-      staffAttendanceMock,
+  if (!role || staff.isDeleted) {
+    return null;
+  }
+
+  return {
+    id: String(staff.id),
+    employeeId: String(staff.id),
+    employeeName:
+      staff.fullName ||
+      [staff.firstName, staff.fatherName, staff.lastName]
+        .filter(Boolean)
+        .join(" ") ||
+      "Unnamed staff member",
+    role,
+    date: attendanceDate,
+    status: "Present",
+
+    // Teacher periods are not yet supplied by a real attendance endpoint.
+    // Keep the fields ready without inventing a daily period count.
+    requiredPeriods:
+      role === "Teacher" ? 0 : undefined,
+    attendedPeriods:
+      role === "Teacher" ? 0 : undefined,
+  };
+}
+
+export function useStaffAttendance(
+  attendanceDate: string,
+) {
+  const queries = useQueries({
+    queries: attendanceRoles.map((role) => ({
+      queryKey: [
+        "attendance",
+        "staff-directory",
+        role,
+      ],
+      queryFn: () =>
+        staffApi.getByRole(role, 1, 100),
+      staleTime: 60_000,
+    })),
   });
-};
+
+  const data = useMemo<StaffAttendance[]>(
+    () =>
+      queries
+        .flatMap(
+          (query) => query.data?.data ?? [],
+        )
+        .map((staff) =>
+          mapStaff(staff, attendanceDate),
+        )
+        .filter(
+          (
+            record,
+          ): record is StaffAttendance =>
+            record !== null,
+        )
+        .sort((a, b) =>
+          a.employeeName.localeCompare(
+            b.employeeName,
+          ),
+        ),
+    [attendanceDate, queries],
+  );
+
+  return {
+    data,
+    isLoading: queries.some(
+      (query) => query.isLoading,
+    ),
+    isFetching: queries.some(
+      (query) => query.isFetching,
+    ),
+    isError: queries.some(
+      (query) => query.isError,
+    ),
+    refetch: async () =>
+      Promise.all(
+        queries.map((query) =>
+          query.refetch(),
+        ),
+      ),
+  };
+}

@@ -1,8 +1,3 @@
-import type {
-  SchoolGrade,
-  SchoolSubject,
-} from "@/features/settings/school-config/types/school.enums";
-
 export type ScheduleType = "classes" | "teachers" | "exams" | "quizzes" | "holidays";
 
 export type WeekDay =
@@ -21,18 +16,19 @@ export type TimeSlot = {
 
 export type ClassScheduleCell = {
   id: string;
-  grade: SchoolGrade;
+  grade: string;
   day: WeekDay;
   timeSlotId: string;
-  subject: SchoolSubject;
+  subject: string;
   teacherName: string;
   room: string;
 };
 
 export type ExamScheduleItem = {
   id: string;
-  grade: SchoolGrade;
-  subject: SchoolSubject;
+  gradeId: string;
+  classroomId: string;
+  subjectId: string;
   date: string;
   startTime: string;
   duration: string;
@@ -42,11 +38,11 @@ export type ExamScheduleItem = {
 
 export type QuizScheduleItem = {
   id: string;
-  grade: SchoolGrade;
-  subject: SchoolSubject;
+  gradeId: string;
+  classroomId: string;
+  subjectId: string;
   date: string;
   lesson: string;
-  teacherName: string;
   status: "scheduled" | "completed" | "cancelled";
 };
 
@@ -54,7 +50,7 @@ export type UpcomingClassItem = {
   id: string;
   day: WeekDay;
   time: string;
-  subject: SchoolSubject;
+  subject: string;
   teacherName: string;
   room: string;
 };
