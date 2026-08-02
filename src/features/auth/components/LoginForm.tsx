@@ -1,4 +1,6 @@
-import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  zodResolver,
+} from "@hookform/resolvers/zod";
 import {
   ArrowRight,
   Eye,
@@ -7,31 +9,70 @@ import {
   LockKeyhole,
   Mail,
 } from "lucide-react";
-import { useForm } from "react-hook-form";
-import { Link, useNavigate } from "react-router-dom";
+import {
+  useState,
+} from "react";
+import {
+  Controller,
+  useForm,
+} from "react-hook-form";
+import {
+  Link,
+  useNavigate,
+} from "react-router-dom";
 
-import { getAxiosValidationErrors } from "@/services/axios/axiosError";
-import { Button } from "@/shared/ui/button";
-import { Input } from "@/shared/ui/input";
-import { useState } from "react";
-import { AUTH_ROUTES } from "../constants/auth.constants";
-import { useLogin } from "../hooks/use-login";
-import { loginSchema, type LoginSchema } from "../schemas/login.schema";
+import {
+  getAxiosValidationErrors,
+} from "@/services/axios/axiosError";
+import {
+  Button,
+} from "@/shared/ui/button";
+import {
+  Checkbox,
+} from "@/shared/ui/checkbox";
+import {
+  Input,
+} from "@/shared/ui/input";
+import {
+  Label,
+} from "@/shared/ui/label";
+
+import {
+  AUTH_ROUTES,
+} from "../constants/auth.constants";
+import {
+  useLogin,
+} from "../hooks/use-login";
+import {
+  loginSchema,
+  type LoginSchema,
+} from "../schemas/login.schema";
+import type {
+  LoginResponse,
+} from "../types/auth.types";
 
 export function LoginForm() {
   const navigate = useNavigate();
   const loginMutation = useLogin();
-  const [showPassword, setShowPassword] = useState(false);
+
+  const [
+    showPassword,
+    setShowPassword,
+  ] = useState(false);
 
   const form = useForm<LoginSchema>({
     resolver: zodResolver(loginSchema),
+
     defaultValues: {
       email: "",
       password: "",
+      rememberMe: false,
     },
   });
 
-  function onSubmit(values: LoginSchema) {
+  function onSubmit(
+    values: LoginSchema,
+  ) {
     form.clearErrors();
 
     loginMutation.mutate(
@@ -40,18 +81,41 @@ export function LoginForm() {
         password: values.password,
       },
       {
-        onSuccess: () => {
-          navigate(AUTH_ROUTES.VERIFY_OTP, {
-            state: {
-              email: values.email,
-              isResetFlow: false,
+        onSuccess: (response) => {
+          const responseData =
+            response.data.data as
+              | LoginResponse
+              | null
+              | undefined;
+
+          navigate(
+            AUTH_ROUTES.VERIFY_OTP,
+            {
+              state: {
+                email: values.email,
+                isResetFlow: false,
+                rememberMe:
+                  values.rememberMe,
+                remainingTime:
+                  responseData
+                    ?.remaining_time ??
+                  60,
+              },
             },
-          });
+          );
         },
+
         onError: (error) => {
-          const validationErrors = getAxiosValidationErrors(error);
-          const emailMessage = validationErrors.email?.[0];
-          const passwordMessage = validationErrors.password?.[0];
+          const validationErrors =
+            getAxiosValidationErrors(
+              error,
+            );
+
+          const emailMessage =
+            validationErrors.email?.[0];
+
+          const passwordMessage =
+            validationErrors.password?.[0];
 
           if (emailMessage) {
             form.setError("email", {
@@ -73,12 +137,13 @@ export function LoginForm() {
 
   return (
     <form
-  onSubmit={form.handleSubmit(onSubmit)}
-  className="space-y-5"
-  autoComplete="off"
-  noValidate
->
-  
+      onSubmit={form.handleSubmit(
+        onSubmit,
+      )}
+      className="space-y-5"
+      autoComplete="on"
+      noValidate
+    >
       <div className="space-y-2">
         <label
           htmlFor="login-email"
@@ -94,21 +159,29 @@ export function LoginForm() {
           />
 
           <Input
-  id="login-email"
-  type="email"
-  autoComplete="off"
-  autoCapitalize="none"
-  spellCheck={false}
-  placeholder="Enter your email"
-  aria-invalid={form.formState.errors.email ? "true" : "false"}
-  className="h-14 rounded-xl border-input bg-background pl-12 pr-4 text-base text-foreground shadow-none placeholder:text-muted-foreground/70 focus-visible:border-primary focus-visible:ring-4 focus-visible:ring-primary/10"
-  {...form.register("email")}
-/>
+            id="login-email"
+            type="email"
+            autoComplete="email"
+            autoCapitalize="none"
+            spellCheck={false}
+            placeholder="Enter your email"
+            aria-invalid={
+              form.formState.errors.email
+                ? "true"
+                : "false"
+            }
+            className="h-14 rounded-xl border-input bg-background pl-12 pr-4 text-base text-foreground shadow-none placeholder:text-muted-foreground/70 focus-visible:border-primary focus-visible:ring-4 focus-visible:ring-primary/10"
+            {...form.register("email")}
+          />
         </div>
 
-        {form.formState.errors.email?.message && (
+        {form.formState.errors.email
+          ?.message && (
           <p className="text-sm text-destructive">
-            {form.formState.errors.email.message}
+            {
+              form.formState.errors
+                .email.message
+            }
           </p>
         )}
       </div>
@@ -127,21 +200,41 @@ export function LoginForm() {
             className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground"
           />
 
-         <Input
-  id="login-password"
-  type={showPassword ? "text" : "password"}
-  autoComplete="new-password"
-  placeholder="Enter your password"
-  aria-invalid={form.formState.errors.password ? "true" : "false"}
-  className="h-14 rounded-xl border-input bg-background pl-12 pr-12 text-base text-foreground shadow-none placeholder:text-muted-foreground/70 focus-visible:border-primary focus-visible:ring-4 focus-visible:ring-primary/10"
-  {...form.register("password")}
-/>
+          <Input
+            id="login-password"
+            type={
+              showPassword
+                ? "text"
+                : "password"
+            }
+            autoComplete="current-password"
+            placeholder="Enter your password"
+            aria-invalid={
+              form.formState.errors
+                .password
+                ? "true"
+                : "false"
+            }
+            className="h-14 rounded-xl border-input bg-background pl-12 pr-12 text-base text-foreground shadow-none placeholder:text-muted-foreground/70 focus-visible:border-primary focus-visible:ring-4 focus-visible:ring-primary/10"
+            {...form.register(
+              "password",
+            )}
+          />
 
           <button
             type="button"
-            onClick={() => setShowPassword((current) => !current)}
+            onClick={() =>
+              setShowPassword(
+                (current) =>
+                  !current,
+              )
+            }
             className="absolute right-4 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-lg text-muted-foreground transition hover:bg-muted hover:text-foreground"
-            aria-label={showPassword ? "Hide password" : "Show password"}
+            aria-label={
+              showPassword
+                ? "Hide password"
+                : "Show password"
+            }
           >
             {showPassword ? (
               <EyeOff className="h-5 w-5" />
@@ -151,16 +244,50 @@ export function LoginForm() {
           </button>
         </div>
 
-        {form.formState.errors.password?.message && (
+        {form.formState.errors
+          .password?.message && (
           <p className="text-sm text-destructive">
-            {form.formState.errors.password.message}
+            {
+              form.formState.errors
+                .password.message
+            }
           </p>
         )}
 
-        <div className="flex justify-end pt-1">
+        <div className="flex items-center justify-between gap-4 pt-1">
+          <Controller
+            control={form.control}
+            name="rememberMe"
+            render={({ field }) => (
+              <div className="flex items-center gap-2">
+                <Checkbox
+                  id="remember-me"
+                  checked={field.value}
+                  onCheckedChange={(
+                    checked,
+                  ) =>
+                    field.onChange(
+                      checked === true,
+                    )
+                  }
+                  className="h-4 w-4 rounded border-input data-[state=checked]:border-primary data-[state=checked]:bg-primary"
+                />
+
+                <Label
+                  htmlFor="remember-me"
+                  className="cursor-pointer text-sm font-normal text-muted-foreground"
+                >
+                  Remember me
+                </Label>
+              </div>
+            )}
+          />
+
           <Link
-            to={AUTH_ROUTES.FORGOT_PASSWORD}
-            className="text-sm font-semibold text-primary transition-opacity hover:opacity-80"
+            to={
+              AUTH_ROUTES.FORGOT_PASSWORD
+            }
+            className="shrink-0 text-sm font-semibold text-primary transition-opacity hover:opacity-80"
           >
             Forgot password?
           </Link>
@@ -169,19 +296,23 @@ export function LoginForm() {
 
       {loginMutation.isError &&
         !form.formState.errors.email &&
-        !form.formState.errors.password && (
+        !form.formState.errors
+          .password && (
           <div
             role="alert"
             className="rounded-xl border border-destructive/20 bg-destructive/5 px-4 py-3 text-sm text-destructive"
           >
-            We couldn&apos;t sign you in. Please check your credentials and try
-            again.
+            We couldn&apos;t sign you
+            in. Please check your
+            credentials and try again.
           </div>
         )}
 
       <Button
         type="submit"
-        disabled={loginMutation.isPending}
+        disabled={
+          loginMutation.isPending
+        }
         className="group h-14 w-full rounded-xl primary-gradient text-base font-semibold text-primary-foreground shadow-sm transition hover:opacity-95"
       >
         {loginMutation.isPending ? (
@@ -192,16 +323,16 @@ export function LoginForm() {
         ) : (
           <>
             Sign in
+
             <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
           </>
         )}
       </Button>
 
       <p className="pt-1 text-center text-sm text-muted-foreground">
-        Access is limited to authorized school staff and administrators.
+        Access is limited to authorized
+        school staff and administrators.
       </p>
     </form>
-    
   );
-  
 }

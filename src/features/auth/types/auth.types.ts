@@ -19,8 +19,13 @@ export type VerifyLoginOtpPayload = {
   remember_me?: "1" | "0";
 };
 
+export type OtpPurpose =
+  | "login"
+  | "password_reset";
+
 export type ForgotPasswordPayload = {
   email: string;
+  purpose?: "password_reset";
 };
 
 export type VerifyPasswordOtpPayload = {
@@ -28,8 +33,9 @@ export type VerifyPasswordOtpPayload = {
   otp: string;
 };
 
-export type ResendPasswordOtpPayload = {
+export type ResendOtpPayload = {
   email: string;
+  purpose: OtpPurpose;
 };
 
 export type ResetPasswordPayload = {
@@ -44,9 +50,12 @@ export type AuthSessionResponse = {
   token: string;
 };
 
-export type LoginResponse = undefined;
+export type LoginResponse = {
+  remaining_time?: number;
+};
 
-export type VerifyLoginOtpResponse = AuthSessionResponse;
+export type VerifyLoginOtpResponse =
+  AuthSessionResponse;
 
 export type ForgotPasswordResponse = {
   remaining_time: number;
@@ -56,11 +65,12 @@ export type VerifyPasswordOtpResponse = {
   temp_token: string;
 };
 
-export type ResendPasswordOtpResponse = {
+export type ResendOtpResponse = {
   remaining_time: number;
 };
 
-export type ResetPasswordResponse = AuthSessionResponse;
+export type ResetPasswordResponse =
+  AuthSessionResponse;
 
 export type LogoutResponse = undefined;
 
@@ -74,6 +84,8 @@ export type AuthStorageData = {
 export type LoginOtpRouteState = {
   email: string;
   isResetFlow?: false;
+  rememberMe?: boolean;
+  remainingTime?: number;
 };
 
 export type ResetOtpRouteState = {

@@ -1,22 +1,43 @@
-import { Navigate, useLocation } from "react-router-dom";
+import {
+  Navigate,
+  useLocation,
+} from "react-router-dom";
 
-import { AuthFormShell } from "../components/AuthFormShell";
-import { AuthLayout } from "../components/AuthLayout";
-import { VerifyOtpForm } from "../components/VerifyOtpForm";
-import { AUTH_ROUTES } from "../constants/auth.constants";
+import {
+  AuthFormShell,
+} from "../components/AuthFormShell";
+import {
+  AuthLayout,
+} from "../components/AuthLayout";
+import {
+  VerifyOtpForm,
+} from "../components/VerifyOtpForm";
+import {
+  AUTH_ROUTES,
+} from "../constants/auth.constants";
 
 type VerifyOtpLocationState = {
   email?: string;
   isResetFlow?: boolean;
   remainingTime?: number;
+  rememberMe?: boolean;
 };
 
 export function VerifyOtpPage() {
   const location = useLocation();
-  const state = location.state as VerifyOtpLocationState | null;
+
+  const state =
+    location.state as
+      | VerifyOtpLocationState
+      | null;
 
   if (!state?.email) {
-    return <Navigate to={AUTH_ROUTES.LOGIN} replace />;
+    return (
+      <Navigate
+        to={AUTH_ROUTES.LOGIN}
+        replace
+      />
+    );
   }
 
   return (
@@ -29,18 +50,28 @@ export function VerifyOtpPage() {
         }
         description={
           <>
-            Enter the 6-digit verification code sent to{" "}
+            Enter the 6-digit
+            verification code sent to{" "}
+
             <span className="font-semibold text-foreground">
               {state.email}
             </span>
+
             .
           </>
         }
       >
         <VerifyOtpForm
           email={state.email}
-          isResetFlow={state.isResetFlow}
-          initialRemainingTime={state.remainingTime}
+          isResetFlow={
+            state.isResetFlow
+          }
+          initialRemainingTime={
+            state.remainingTime
+          }
+          rememberMe={
+            state.rememberMe
+          }
         />
       </AuthFormShell>
     </AuthLayout>
