@@ -27,8 +27,8 @@ export interface AnnouncementPayload {
   audience: AnnouncementAudience;
   title: string;
   description: string;
-  grade_level_id?: string | number;       
-  class_room_ids?: (string | number)[];   
+  grade_level_id?: string | number;
+  class_room_ids?: (string | number)[];
 }
 
 export interface Announcement extends AnnouncementPayload {

@@ -205,7 +205,7 @@ export function CashierSection() {
 
       <UpdatePaymentDialog
         open={editOpen}
-        onOpenChange={(open) => {
+        onOpenChange={(open: boolean) => {
           setEditOpen(open);
           if (!open) setSelectedPayment(null);
         }}
@@ -217,14 +217,14 @@ export function CashierSection() {
 
       <DeletePaymentDialog
         open={deleteOpen}
-        onOpenChange={(open) => { setDeleteOpen(open); if (!open) setSelectedPaymentIdToDelete(null); }}
+        onOpenChange={(open: boolean) => { setDeleteOpen(open); if (!open) setSelectedPaymentIdToDelete(null); }}
         isLoading={deletePayment.isPending}
         onConfirm={confirmDelete}
       />
 
       <PaymentReceiptDialog
         open={viewOpen}
-        onOpenChange={(open) => {
+        onOpenChange={(open: boolean) => {
           setViewOpen(open);
           if (!open) setSelectedPaymentIdToView(null);
         }}

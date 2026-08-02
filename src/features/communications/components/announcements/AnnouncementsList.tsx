@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Megaphone, Edit3, Trash2, Users, School, AlertCircle, Loader2 } from "lucide-react";
+import { Megaphone, Edit3, Trash2, Users, School, Loader2 } from "lucide-react";
 import { Button } from "@/shared/ui/button";
 import { useAnnouncements } from "../../hooks/useAnnouncements";
 import type { Announcement } from "../../types/communication.types";
