@@ -10,7 +10,6 @@ import { CreateAnnouncementDialog } from "../components/announcements/CreateAnno
 import { SendBulkAlertDialog } from "../components/alerts/SendBulkAlertDialog";
 import { SchoolLawsSection } from "../components/laws/SchoolLawsSection";
 import { useCommunicationOptions } from "../hooks/useCommunicationOptions";
-import { useUserActivities } from "../hooks/useUserActivities";  
 import type { Activity, Announcement } from "../types/communication.types";
 
 export function CommunicationsPage() {
@@ -36,7 +35,6 @@ export function CommunicationsPage() {
   const { students, staff, gradeLevels, classRooms, isLoadingOptions } = useCommunicationOptions();
   
 
-  const { unreadCount, markAllAsRead } = useUserActivities("student");
 
   const handleOpenAlert = (target: "student" | "staff") => {
     setAlertTarget(target);
@@ -53,12 +51,6 @@ export function CommunicationsPage() {
     setActivityDialogOpen(true);
   };
 
-
-  useEffect(() => {
-    if (unreadCount > 0) {
-      markAllAsRead.mutate();
-    }
-  }, [unreadCount, markAllAsRead]);
 
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
