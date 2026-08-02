@@ -32,14 +32,19 @@ function toAttendanceRole(
   switch (role) {
     case "teacher":
       return "Teacher";
+
     case "adviser":
       return "Supervisor";
+
     case "secretary":
       return "Secretary";
+
     case "counselor":
       return "Counselor";
+
     case "service_staff":
       return "Service Staff";
+
     default:
       return null;
   }
@@ -49,7 +54,9 @@ function mapStaff(
   staff: StaffProfile,
   attendanceDate: string,
 ): StaffAttendance | null {
-  const role = toAttendanceRole(staff.role);
+  const role = toAttendanceRole(
+    staff.role,
+  );
 
   if (!role || staff.isDeleted) {
     return null;
@@ -58,49 +65,105 @@ function mapStaff(
   return {
     id: String(staff.id),
     employeeId: String(staff.id),
+
     employeeName:
       staff.fullName ||
-      [staff.firstName, staff.fatherName, staff.lastName]
+      [
+        staff.firstName,
+        staff.fatherName,
+        staff.lastName,
+      ]
         .filter(Boolean)
         .join(" ") ||
       "Unnamed staff member",
+
     role,
     date: attendanceDate,
     status: "Present",
 
-    // Teacher periods are not yet supplied by a real attendance endpoint.
-    // Keep the fields ready without inventing a daily period count.
+    /*
+     * Teacher daily periods do not come from a real
+     * attendance endpoint yet. Keep the fields ready
+     * without inventing a period count.
+     */
     requiredPeriods:
-      role === "Teacher" ? 0 : undefined,
+      role === "Teacher"
+        ? 0
+        : undefined,
+
     attendedPeriods:
-      role === "Teacher" ? 0 : undefined,
+      role === "Teacher"
+        ? 0
+        : undefined,
   };
 }
 
 export function useStaffAttendance(
   attendanceDate: string,
 ) {
-  const queries = useQueries({
-    queries: attendanceRoles.map((role) => ({
-      queryKey: [
-        "attendance",
-        "staff-directory",
-        role,
-      ],
-      queryFn: () =>
-        staffApi.getByRole(role, 1, 100),
-      staleTime: 60_000,
-    })),
+  const queryResults = useQueries({
+    queries: attendanceRoles.map(
+      (role) => ({
+        queryKey: [
+          "attendance",
+          "staff-directory",
+          role,
+        ],
+
+        queryFn: () =>
+          staffApi.getByRole(
+            role,
+            1,
+            100,
+          ),
+
+        staleTime: 60_000,
+      }),
+    ),
   });
 
-  const data = useMemo<StaffAttendance[]>(
+  /*
+   * useQueries returns a new outer array during renders.
+   * Depending on that array directly makes the mapped
+   * attendance list new on every render. The page then
+   * synchronizes that list into local state, which can
+   * produce an endless render/update cycle.
+   *
+   * The role count is fixed, so depending on each query's
+   * actual data reference keeps the derived list stable
+   * until server data or the selected date changes.
+   */
+  const teacherData =
+    queryResults[0]?.data;
+
+  const adviserData =
+    queryResults[1]?.data;
+
+  const secretaryData =
+    queryResults[2]?.data;
+
+  const counselorData =
+    queryResults[3]?.data;
+
+  const serviceStaffData =
+    queryResults[4]?.data;
+
+  const data = useMemo<
+    StaffAttendance[]
+  >(
     () =>
-      queries
-        .flatMap(
-          (query) => query.data?.data ?? [],
-        )
+      [
+        ...(teacherData?.data ?? []),
+        ...(adviserData?.data ?? []),
+        ...(secretaryData?.data ?? []),
+        ...(counselorData?.data ?? []),
+        ...(serviceStaffData?.data ?? []),
+      ]
         .map((staff) =>
-          mapStaff(staff, attendanceDate),
+          mapStaff(
+            staff,
+            attendanceDate,
+          ),
         )
         .filter(
           (
@@ -113,23 +176,35 @@ export function useStaffAttendance(
             b.employeeName,
           ),
         ),
-    [attendanceDate, queries],
+
+    [
+      attendanceDate,
+      teacherData,
+      adviserData,
+      secretaryData,
+      counselorData,
+      serviceStaffData,
+    ],
   );
 
   return {
     data,
-    isLoading: queries.some(
+
+    isLoading: queryResults.some(
       (query) => query.isLoading,
     ),
-    isFetching: queries.some(
+
+    isFetching: queryResults.some(
       (query) => query.isFetching,
     ),
-    isError: queries.some(
+
+    isError: queryResults.some(
       (query) => query.isError,
     ),
+
     refetch: async () =>
       Promise.all(
-        queries.map((query) =>
+        queryResults.map((query) =>
           query.refetch(),
         ),
       ),
