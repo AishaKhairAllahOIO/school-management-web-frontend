@@ -4,50 +4,64 @@ export const API_ENDPOINTS = {
   AUTH: {
     LOGIN: "/auth/login",
     VERIFY_LOGIN_OTP: "/auth/verify-otp",
+
     FORGOT_PASSWORD: "/auth/password/forgot",
     VERIFY_PASSWORD_OTP: "/auth/password/verify-otp",
     RESEND_PASSWORD_OTP: "/auth/password/resend-otp",
     RESET_PASSWORD: "/auth/password/reset",
+
     LOGOUT: "/auth/logout",
+
     DEVICE_TOKENS: "/auth/device-tokens",
   },
 
   SETTINGS: {
     GENERAL: "/admin/settings/general",
 
+    GENERAL_BASIC: "/admin/settings/general/basic",
+
     GENERAL_IMAGES: "/admin/settings/general/images",
-    GENERAL_IMAGE: (imageId: string) =>
+
+    GENERAL_IMAGE: (imageId: ApiId) =>
       `/admin/settings/general/images/${imageId}`,
 
     ACADEMIC: "/admin/settings",
+
     ACADEMIC_STATISTICS:
       "/admin/settings/academic/statistics",
 
     ACADEMIC_YEARS: "/admin/settings/years",
-    ACADEMIC_YEAR: (yearId: string) =>
+
+    ACADEMIC_YEAR: (yearId: ApiId) =>
       `/admin/settings/years/${yearId}`,
 
     ACADEMIC_TERMS: "/admin/settings/terms",
-    ACADEMIC_TERM: (termId: string) =>
+
+    ACADEMIC_TERM: (termId: ApiId) =>
       `/admin/settings/terms/${termId}`,
 
     ACADEMIC_STAGES: "/admin/settings/stages",
-    ACADEMIC_STAGE: (stageId: string) =>
+
+    ACADEMIC_STAGE: (stageId: ApiId) =>
       `/admin/settings/stages/${stageId}`,
 
     ACADEMIC_GRADES: "/admin/settings/grades",
-    ACADEMIC_GRADE: (gradeId: string) =>
+
+    ACADEMIC_GRADE: (gradeId: ApiId) =>
       `/admin/settings/grades/${gradeId}`,
 
     ACADEMIC_CONFIGURATIONS:
       "/admin/settings/configurations",
+
     ACADEMIC_CONFIGURATION: (
-      configurationId: string,
+      configurationId: ApiId,
     ) =>
       `/admin/settings/configurations/${configurationId}`,
 
-    ACADEMIC_CLASSROOMS: "/admin/settings/classrooms",
-    ACADEMIC_CLASSROOM: (classroomId: string) =>
+    ACADEMIC_CLASSROOMS:
+      "/admin/settings/classrooms",
+
+    ACADEMIC_CLASSROOM: (classroomId: ApiId) =>
       `/admin/settings/classrooms/${classroomId}`,
   },
 
@@ -87,8 +101,8 @@ export const API_ENDPOINTS = {
     TOGGLE_ACCOUNT_STATUS: (enrollmentId: ApiId) =>
       `/admin/students/${enrollmentId}/toggle-account-status`,
 
-    DELETE: (enrollmentId: ApiId) =>
-      `/admin/students/${enrollmentId}`,
+    DELETE: (studentId: ApiId) =>
+      `/admin/students/${studentId}`,
 
     RESTORE: (enrollmentId: ApiId) =>
       `/admin/students/${enrollmentId}/student/restore`,
@@ -118,6 +132,9 @@ export const API_ENDPOINTS = {
 
     BY_ROLE: (role: string) =>
       `/admin/staff/role/${encodeURIComponent(role)}`,
+
+    ROLE_SEARCH: (role: string) =>
+      `/admin/staff/role/${encodeURIComponent(role)}/search`,
 
     PROFILE: "/admin/staff/profile",
 
@@ -149,9 +166,6 @@ export const API_ENDPOINTS = {
       workloadId: ApiId,
     ) =>
       `/admin/staff/${staffId}/workloads/${workloadId}`,
-
-    ROLE_SEARCH: (role: string) =>
-      `/admin/staff/role/${encodeURIComponent(role)}/search`,
   },
 
   ACADEMICS: {
@@ -168,12 +182,14 @@ export const API_ENDPOINTS = {
     },
 
     GRADE_SUBJECTS: {
-      LIST: "/subject/setting/grade/subjects/show",
+      LIST:
+        "/subject/setting/grade/subjects/show",
 
       DETAILS: (gradeSubjectId: ApiId) =>
         `/subject/setting/grade/subjects/show/${gradeSubjectId}`,
 
-      CREATE: "/subject/setting/grade/subject/store",
+      CREATE:
+        "/subject/setting/grade/subject/store",
 
       UPDATE: (gradeSubjectId: ApiId) =>
         `/subject/setting/grade/subjects/update/${gradeSubjectId}`,
@@ -183,7 +199,8 @@ export const API_ENDPOINTS = {
     },
 
     ASSESSMENTS: {
-      LIST: "/subject/setting/assessment/subjects/show",
+      LIST:
+        "/subject/setting/assessment/subjects/show",
 
       GROUPED:
         "/subject/setting/assessment/subjects/grouped",
@@ -203,21 +220,41 @@ export const API_ENDPOINTS = {
   },
 
   FINANCIAL: {
-    BASE: "/admin/finance/settings",
+    /*
+     * لا يوجد راوت مباشر:
+     * /admin/finance/settings
+     */
 
-    POLICIES: "/admin/finance/settings/policies",
+    POLICIES:
+      "/admin/finance/settings/policies",
 
-    FEE_PLANS: "/admin/finance/settings/fee-plans",
+    POLICY: (policyId: ApiId) =>
+      `/admin/finance/settings/policies/${policyId}`,
 
-    POLICY_ITEMS:
-      "/admin/finance/settings/policy-items",
+    FEE_PLANS:
+      "/admin/finance/settings/fee-plans",
 
-    EXTRA_SERVICES:
-      "/admin/finance/settings/extra-services",
+    FEE_PLAN: (feePlanId: ApiId) =>
+      `/admin/finance/settings/fee-plans/${feePlanId}`,
+
+    /*
+     * بحسب route:list لا توجد collection route
+     * لـ policy-items، بل توجد عمليات على عنصر محدد فقط.
+     */
+    POLICY_ITEM: (policyItemId: ApiId) =>
+      `/admin/finance/settings/policy-items/${policyItemId}`,
+
+    /*
+     * بحسب route:list لا توجد collection route
+     * لـ extra-services، بل توجد عمليات على عنصر محدد فقط.
+     */
+    EXTRA_SERVICE: (extraServiceId: ApiId) =>
+      `/admin/finance/settings/extra-services/${extraServiceId}`,
   },
 
   FINANCE_OPERATIONS: {
-    ACCOUNTS: "/admin/finance/contracts/accounts",
+    ACCOUNTS:
+      "/admin/finance/contracts/accounts",
 
     ACCOUNT: (studentId: ApiId) =>
       `/admin/finance/contracts/accounts/${studentId}`,
@@ -225,50 +262,156 @@ export const API_ENDPOINTS = {
     FINALIZE_CONTRACT:
       "/admin/finance/contracts/finalize",
 
-    UPDATE_CONTRACT: (studentId: ApiId) =>
-      `/admin/finance/contracts/${studentId}`,
+    UPDATE_CONTRACT: (accountId: ApiId) =>
+      `/admin/finance/contracts/${accountId}`,
 
     INSTALLMENTS:
       "/admin/finance/contracts/installments",
 
-    INSTALLMENT: (id: ApiId) =>
-      `/admin/finance/contracts/installments/${id}`,
+    INSTALLMENT: (installmentId: ApiId) =>
+      `/admin/finance/contracts/installments/${installmentId}`,
 
-    PAYMENTS: "/admin/finance/contracts/payments",
+    PAYMENTS:
+      "/admin/finance/contracts/payments",
 
-    PAYMENT: (id: ApiId) =>
-      `/admin/finance/contracts/payments/${id}`,
-  },
-COMMUNICATIONS: {
-
- CREATE_ACTIVITY: "/activity",
-    UPDATE_ACTIVITY: (id: string | number) => `/activity/update/${id}`,
-    DELETE_ACTIVITY: (id: string | number) => `/activity/${id}`,
-    ACTIVITY: (id: string | number) => `/activity/${id}`, 
-    ACTIVITIES: "/user/my-activities",
-    
-    ANNOUNCEMENTS: "/announcements",
-    CREATE_ANNOUNCEMENT: "/announcements",  
-    UPDATE_ANNOUNCEMENT: (id: string | number) => `/announcement/update/${id}`,
-    DELETE_ANNOUNCEMENT: (id: string | number) => `/announcements/${id}`,
-    MY_ANNOUNCEMENTS: "/staff-announcements",
-    STAFF_ANNOUNCEMENTS: "/staff-announcements",
-    CREATER_ANNOUNCEMENTS: "/creater/show/announcements",
-
-
-    PAYMENT_ALERTS: "/payment-alerts",
-    ADVISOR_ALERTS: "/advisor-alerts",
-    STAFF_ALERTS: "/staff-alerts",
-    DELETE_ALERT: (id: string | number) => `/alerts/${id}`,
+    PAYMENT: (paymentId: ApiId) =>
+      `/admin/finance/contracts/payments/${paymentId}`,
   },
 
+  COMMUNICATIONS: {
+    /*
+     * Activities
+     */
+
+    CREATE_ACTIVITY: "/auth/activity",
+
+    UPDATE_ACTIVITY: (activityId: ApiId) =>
+      `/auth/activity/update/${activityId}`,
+
+    DELETE_ACTIVITY: (activityId: ApiId) =>
+      `/auth/activity/${activityId}`,
+
+    ACTIVITY: (activityId: ApiId) =>
+      `/auth/activity/${activityId}`,
+
+    ALL_ACTIVITIES: "/auth/activities/all",
+
+    MY_ACTIVITIES: "/user/my-activities",
+
+    CHILD_ACTIVITIES: "/user/child-activities",
+
+    ACTIVITY_UNREAD_COUNT:
+      "/user/activity-unread-count",
+
+    MARK_ALL_ACTIVITIES_READ:
+      "/user/activity-mark-all-read",
+
+    /*
+     * Announcements
+     */
+
+    CREATE_ANNOUNCEMENT:
+      "/auth/announcements",
+
+    UPDATE_ANNOUNCEMENT: (
+      announcementId: ApiId,
+    ) =>
+      `/auth/announcement/update/${announcementId}`,
+
+    DELETE_ANNOUNCEMENT: (
+      announcementId: ApiId,
+    ) =>
+      `/auth/announcements/${announcementId}`,
+
+    STAFF_ANNOUNCEMENTS:
+      "/auth/staff-announcements",
+
+    CREATOR_ANNOUNCEMENTS:
+      "/auth/creater/show/announcements",
+
+    MY_ANNOUNCEMENTS:
+      "/user/my-announcements",
+
+    CHILD_ANNOUNCEMENTS:
+      "/user/child-announcements",
+
+    ANNOUNCEMENTS_UNREAD_COUNT:
+      "/auth/announcements/unread-count",
+
+    MARK_ALL_ANNOUNCEMENTS_READ:
+      "/auth/announcements/mark-all-read",
+
+    USER_ANNOUNCEMENTS_UNREAD_COUNT:
+      "/user/announcements/unread-count",
+
+    MARK_ALL_USER_ANNOUNCEMENTS_READ:
+      "/user/announcements/mark-all-read",
+
+    /*
+     * Alerts
+     */
+
+    ALERTS: "/auth/alerts",
+
+    ALERTS_UNREAD_COUNT:
+      "/auth/alerts/unread-count",
+
+    MARK_ALL_ALERTS_READ:
+      "/auth/alerts/mark-all-read",
+
+    DELETE_ALERT: (alertId: ApiId) =>
+      `/auth/alerts/${alertId}`,
+
+    PAYMENT_ALERTS:
+      "/auth/payment-alerts",
+
+    ADVISOR_ALERTS:
+      "/auth/advisor-alerts",
+
+    STAFF_ALERTS:
+      "/auth/staff-alerts",
+
+    TEACHER_ALERTS:
+      "/auth/teacher/teacher-alerts",
+
+    MY_ALERTS:
+      "/user/my-alerts",
+
+    CHILD_ALERTS: (studentId: ApiId) =>
+      `/user/child-alerts/${studentId}`,
+
+    CHILD_PAYMENT_ALERTS: (studentId: ApiId) =>
+      `/user/payment-alerts/${studentId}`,
+
+    USER_ALERTS_UNREAD_COUNT:
+      "/user/alerts/unread-count",
+
+    MARK_ALL_USER_ALERTS_READ:
+      "/user/alerts/mark-all-read",
+  },
 
   SCHOOL_LAWS: {
     GET_ALL: "/auth/school/laws/all/show",
-    GET_ONE: (id: string | number) => `/auth/school/law/one/show/${id}`,
+
+    GET_ONE: (lawId: ApiId) =>
+      `/auth/school/law/one/show/${lawId}`,
+
     CREATE: "/auth/school/law/create",
-    UPDATE: (id: string | number) => `/auth/school/law/update/${id}`,
-    DELETE: (id: string | number) => `/auth/school/law/delete/${id}`,
+
+    UPDATE: (lawId: ApiId) =>
+      `/auth/school/law/update/${lawId}`,
+
+    DELETE: (lawId: ApiId) =>
+      `/auth/school/law/delete/${lawId}`,
   },
-   
+
+  SYSTEM_NOTICES: {
+    LIST: "/auth/system/notices",
+
+    UNREAD_COUNT:
+      "/auth/system/notices/unread-count",
+
+    MARK_ALL_READ:
+      "/auth/system/notices/mark-all-read",
+  },
 } as const;

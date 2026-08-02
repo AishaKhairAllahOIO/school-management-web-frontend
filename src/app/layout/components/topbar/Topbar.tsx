@@ -12,7 +12,7 @@ import { useLocale } from "@/app/providers/locale";
 
 import { LanguageToggle } from "@/shared/components/locale";
 
-import { NotificationsMenu } from "./NotificationsMenu";
+import { NotificationsMenu } from "./notifications/NotificationsMenu";
 import { ProfileMenu } from "./profile/ProfileMenu";
 import { ThemeButton } from "./ThemeButton";
 import { TopbarBreadcrumb } from "./TopbarBreadcrumb";

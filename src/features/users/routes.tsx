@@ -63,6 +63,18 @@ import {
 } from "@/features/users/staff/pages/StaffImportPage";
 
 import {
+  AdministratorsPage,
+} from "@/features/users/administrators/pages/AdministratorsPage";
+
+import {
+  AdministratorProfilePage,
+} from "@/features/users/administrators/pages/AdministratorProfilePage";
+
+import {
+  AdministratorEditPage,
+} from "@/features/users/administrators/pages/AdministratorEditPage";
+
+import {
   AdministratorRegistrationPage,
 } from "@/features/users/administrators/pages/AdministratorRegistrationPage";
 
@@ -78,8 +90,23 @@ export const usersRoutes = [
 
 
       {
+        path: "administrators",
+        element: <AdministratorsPage />,
+      },
+
+      {
         path: "administrators/new",
         element: <AdministratorRegistrationPage />,
+      },
+
+      {
+        path: "administrators/:staffId/edit",
+        element: <AdministratorEditPage />,
+      },
+
+      {
+        path: "administrators/:staffId",
+        element: <AdministratorProfilePage />,
       },
 
       {

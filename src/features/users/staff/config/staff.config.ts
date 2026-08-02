@@ -228,7 +228,7 @@ export const staffSectionConfigs: Record<
     singularLabel: "Administrator",
     pluralLabel: "Administrators",
 
-    listPath: "/profile",
+    listPath: "/users/administrators",
     createPath: "/users/administrators/new",
 
     icon: UserRoundCog,

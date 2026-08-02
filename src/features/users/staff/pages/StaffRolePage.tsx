@@ -59,10 +59,12 @@ import type {
 
 type StaffRolePageProps = {
   role: StaffRole;
+  allowImport?: boolean;
 };
 
 export function StaffRolePage({
   role,
+  allowImport = true,
 }: StaffRolePageProps) {
   const navigate =
     useNavigate();

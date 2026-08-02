@@ -111,8 +111,9 @@ export type StudentListFilters = {
   page?: number;
   per_page?: number;
 
-  level?: number | ApiId;
-  classroom_name?: string;
+  search?: string;
+  grade_level_id?: ApiId;
+  class_room_id?: ApiId;
   status?: EnrollmentStatus;
 
   sort?: "asc" | "desc";

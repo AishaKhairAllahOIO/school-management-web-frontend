@@ -1,9 +1,11 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { toast } from "sonner";
 
 import {
   ArrowUpAZ,
+  BookOpen,
+  Building2,
   Download,
   Filter,
   GraduationCap,
@@ -30,6 +32,9 @@ import {
   SelectValue,
 } from "@/shared/ui/select";
 
+import { useClassrooms } from "@/features/academics/classrooms/hooks/useClassrooms";
+import { useGrades } from "@/features/academics/grades/hooks/useGrades";
+
 import { StudentCard } from "../components/list/StudentCard";
 import { StudentsEmptyState } from "../components/list/StudentsEmptyState";
 import { StudentsLoadingGrid } from "../components/list/StudentsLoadingGrid";
@@ -38,7 +43,6 @@ import { StudentsPagination } from "../components/list/StudentsPagination";
 import {
   useDeleteStudent,
   useRestoreStudent,
-  useStudentSearch,
   useStudents,
   useToggleStudentAccount,
 } from "../hooks/useStudents";
@@ -87,6 +91,9 @@ export function StudentsPage() {
   const [searchValue, setSearchValue] =
     useState("");
 
+  const [debouncedSearch, setDebouncedSearch] =
+    useState("");
+
   const [filters, setFilters] =
     useState<StudentListFilters>(
       defaultFilters,
@@ -115,25 +122,72 @@ export function StudentsPage() {
     setPendingToggleId,
   ] = useState<ApiId>();
 
+  const gradesQuery = useGrades();
+  const classroomsQuery = useClassrooms();
+
   const normalizedSearch =
     searchValue.trim();
 
-  const isSearchMode =
-    normalizedSearch.length >= 2;
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      setDebouncedSearch(normalizedSearch);
+    }, 350);
 
-  const listQuery =
-    useStudents(filters);
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [normalizedSearch]);
 
-  const searchQuery =
-    useStudentSearch({
-      q: normalizedSearch,
-      page: filters.page,
-      per_page: filters.per_page,
-    });
+  useEffect(() => {
+    setFilters((current) => ({
+      ...current,
+      page: 1,
+      search: debouncedSearch || undefined,
+    }));
+  }, [debouncedSearch]);
 
-  const activeQuery = isSearchMode
-    ? searchQuery
-    : listQuery;
+  const grades = useMemo(
+    () =>
+      [...(gradesQuery.data ?? [])].sort(
+        (first, second) =>
+          first.level - second.level ||
+          first.name.localeCompare(second.name),
+      ),
+    [gradesQuery.data],
+  );
+
+  const classrooms = useMemo(() => {
+    if (!filters.grade_level_id) {
+      return [];
+    }
+
+    return (classroomsQuery.data ?? [])
+      .filter(
+        (classroom) =>
+          String(classroom.gradeId) ===
+          String(filters.grade_level_id),
+      )
+      .sort((first, second) =>
+        first.name.localeCompare(second.name),
+      );
+  }, [
+    classroomsQuery.data,
+    filters.grade_level_id,
+  ]);
+
+  const selectedGrade = grades.find(
+    (grade) =>
+      String(grade.id) ===
+      String(filters.grade_level_id),
+  );
+
+  const selectedClassroom = classrooms.find(
+    (classroom) =>
+      String(classroom.id) ===
+      String(filters.class_room_id),
+  );
+
+  const activeQuery = useStudents(filters);
 
   const deleteMutation =
     useDeleteStudent();
@@ -156,6 +210,8 @@ export function StudentsPage() {
 
   const hasFilters =
     Boolean(normalizedSearch) ||
+    Boolean(filters.grade_level_id) ||
+    Boolean(filters.class_room_id) ||
     Boolean(filters.status) ||
     filters.sort === "desc";
 
@@ -163,10 +219,32 @@ export function StudentsPage() {
     value: string,
   ) {
     setSearchValue(value);
+  }
 
+  function changeGrade(
+    value: string,
+  ) {
     setFilters((current) => ({
       ...current,
       page: 1,
+      grade_level_id:
+        value === "all"
+          ? undefined
+          : value,
+      class_room_id: undefined,
+    }));
+  }
+
+  function changeClassroom(
+    value: string,
+  ) {
+    setFilters((current) => ({
+      ...current,
+      page: 1,
+      class_room_id:
+        value === "all"
+          ? undefined
+          : value,
     }));
   }
 
@@ -195,6 +273,7 @@ export function StudentsPage() {
 
   function resetFilters() {
     setSearchValue("");
+    setDebouncedSearch("");
     setFilters(defaultFilters);
   }
 
@@ -203,40 +282,30 @@ export function StudentsPage() {
       setIsExporting(true);
 
       const perPage = 100;
-      const firstPage = isSearchMode
-        ? await studentApi.search({
-            q: normalizedSearch,
-            page: 1,
-            per_page: perPage,
-          })
-        : await studentApi.list({
-            ...filters,
-            page: 1,
-            per_page: perPage,
-          });
+      const firstPage = await studentApi.list({
+        ...filters,
+        search: debouncedSearch || undefined,
+        page: 1,
+        per_page: perPage,
+      });
 
       const allStudents = [...firstPage.data];
       const lastPage = firstPage.meta?.last_page ?? 1;
 
       for (let page = 2; page <= lastPage; page += 1) {
-        const response = isSearchMode
-          ? await studentApi.search({
-              q: normalizedSearch,
-              page,
-              per_page: perPage,
-            })
-          : await studentApi.list({
-              ...filters,
-              page,
-              per_page: perPage,
-            });
+        const response = await studentApi.list({
+          ...filters,
+          search: debouncedSearch || undefined,
+          page,
+          per_page: perPage,
+        });
 
         allStudents.push(...response.data);
       }
 
       exportStudentsToExcel(
         allStudents,
-        isSearchMode ? "filtered-students.xlsx" : "students.xlsx",
+        hasFilters ? "filtered-students.xlsx" : "students.xlsx",
       );
 
       toast.success(`${allStudents.length} students exported.`);
@@ -361,11 +430,12 @@ export function StudentsPage() {
             </div>
           </div>
 
-          <div className="grid w-full gap-2.5 xl:w-[640px]">
+          <div className="grid w-full gap-2.5 xl:w-[860px]">
             <div
               className={[
                 "grid w-full gap-2",
-                "sm:grid-cols-[minmax(0,1fr)_160px_82px_40px]",
+                "sm:grid-cols-2",
+                "xl:grid-cols-[minmax(180px,1.35fr)_145px_145px_150px_82px_40px]",
               ].join(" ")}
             >
               <div className="relative min-w-0">
@@ -417,6 +487,93 @@ export function StudentsPage() {
                   />
                 ) : null}
               </div>
+
+              <Select
+                value={
+                  filters.grade_level_id
+                    ? String(filters.grade_level_id)
+                    : "all"
+                }
+                onValueChange={changeGrade}
+                disabled={gradesQuery.isLoading}
+              >
+                <SelectTrigger
+                  aria-label="Grade level"
+                  className={[
+                    "h-10 w-full rounded-xl border",
+                    "border-primary/20 bg-card/80",
+                    "px-3 text-xs font-medium",
+                    filters.grade_level_id
+                      ? "text-primary"
+                      : "text-muted-foreground",
+                    "focus:ring-2 focus:ring-primary/10",
+                  ].join(" ")}
+                >
+                  <div className="flex min-w-0 items-center gap-2">
+                    <BookOpen className="h-4 w-4 shrink-0" strokeWidth={1.8} />
+                    <SelectValue placeholder="All grades" />
+                  </div>
+                </SelectTrigger>
+
+                <SelectContent>
+                  <SelectItem value="all">All grades</SelectItem>
+                  {grades.map((grade) => (
+                    <SelectItem key={grade.id} value={String(grade.id)}>
+                      {grade.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              <Select
+                value={
+                  filters.class_room_id
+                    ? String(filters.class_room_id)
+                    : "all"
+                }
+                onValueChange={changeClassroom}
+                disabled={
+                  !filters.grade_level_id ||
+                  classroomsQuery.isLoading
+                }
+              >
+                <SelectTrigger
+                  aria-label="Classroom"
+                  className={[
+                    "h-10 w-full rounded-xl border",
+                    "border-primary/20 bg-card/80",
+                    "px-3 text-xs font-medium",
+                    filters.class_room_id
+                      ? "text-primary"
+                      : "text-muted-foreground",
+                    "focus:ring-2 focus:ring-primary/10",
+                    "disabled:cursor-not-allowed disabled:opacity-55",
+                  ].join(" ")}
+                >
+                  <div className="flex min-w-0 items-center gap-2">
+                    <Building2 className="h-4 w-4 shrink-0" strokeWidth={1.8} />
+                    <SelectValue
+                      placeholder={
+                        filters.grade_level_id
+                          ? "All classrooms"
+                          : "Select grade first"
+                      }
+                    />
+                  </div>
+                </SelectTrigger>
+
+                <SelectContent>
+                  <SelectItem value="all">All classrooms</SelectItem>
+                  {classrooms.map((classroom) => (
+                    <SelectItem
+                      key={classroom.id}
+                      value={String(classroom.id)}
+                    >
+                      {classroom.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
 
               <Select
                 value={filters.status ?? "all"}
@@ -667,13 +824,6 @@ export function StudentsPage() {
               </button>
             </div>
 
-            {normalizedSearch.length ===
-            1 ? (
-              <p className="px-1 text-[11px] font-medium text-warning">
-                Enter at least two
-                characters to search.
-              </p>
-            ) : null}
           </div>
         </div>
       </header>
@@ -716,6 +866,38 @@ export function StudentsPage() {
             Updated directory
           </span>
 
+          {selectedGrade ? (
+            <span
+              className={[
+                "inline-flex items-center gap-1.5",
+                "rounded-full border",
+                "border-primary/20",
+                "bg-primary/[0.07]",
+                "px-3 py-1.5",
+                "text-xs font-medium text-primary",
+              ].join(" ")}
+            >
+              <BookOpen className="h-3.5 w-3.5" />
+              {selectedGrade.name}
+            </span>
+          ) : null}
+
+          {selectedClassroom ? (
+            <span
+              className={[
+                "inline-flex items-center gap-1.5",
+                "rounded-full border",
+                "border-primary/20",
+                "bg-primary/[0.07]",
+                "px-3 py-1.5",
+                "text-xs font-medium text-primary",
+              ].join(" ")}
+            >
+              <Building2 className="h-3.5 w-3.5" />
+              {selectedClassroom.name}
+            </span>
+          ) : null}
+
           {filters.status ? (
             <span
               className={[
@@ -732,7 +914,7 @@ export function StudentsPage() {
             </span>
           ) : null}
 
-          {isSearchMode ? (
+          {debouncedSearch ? (
             <span
               className={[
                 "inline-flex max-w-56",
@@ -746,7 +928,7 @@ export function StudentsPage() {
               ].join(" ")}
             >
               Search:{" "}
-              {normalizedSearch}
+              {debouncedSearch}
             </span>
           ) : null}
         </div>
@@ -765,6 +947,8 @@ export function StudentsPage() {
         <StudentsEmptyState
           hasSearch={Boolean(
             normalizedSearch ||
+              filters.grade_level_id ||
+              filters.class_room_id ||
               filters.status,
           )}
           onReset={resetFilters}
