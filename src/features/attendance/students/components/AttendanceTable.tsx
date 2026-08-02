@@ -84,13 +84,13 @@ export function AttendanceTable({ data, isLoading = false, onUpdate }: Props) {
                         <div className="min-w-0">
                           <p className="truncate font-medium text-foreground">{student.studentName}</p>
                           <p className="mt-0.5 truncate text-[11px] text-muted-foreground">
-                            Classroom {student.section} · {student.supervisorName}
+                            Classroom {student.classroomName ?? "No classroom"} · {student.supervisorName}
                           </p>
                         </div>
                       </div>
                     </td>
 
-                    <td className="px-5 py-3.5 text-muted-foreground">{student.className}</td>
+                    <td className="px-5 py-3.5 text-muted-foreground">{student.gradeName}</td>
 
                     <td className="px-5 py-3.5">
                       <Select
