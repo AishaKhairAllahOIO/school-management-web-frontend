@@ -24,7 +24,7 @@ const normalizePayload = (payload: unknown) => {
     (normalized as any).staff_ids = normalizeIds((normalized as any).staff_ids);
   }
 
- if (Array.isArray((normalized as any).enrollment_ids)) {
+  if (Array.isArray((normalized as any).enrollment_ids)) {
     (normalized as any).enrollment_ids = normalizeIds((normalized as any).enrollment_ids);
   }
 
@@ -55,9 +55,8 @@ export const communicationService = {
     return response.data;
   },
 
-deleteActivity: async (id: string | number) => {
-
-  const response = await axiosClient.delete(API_ENDPOINTS.COMMUNICATIONS.DELETE_ACTIVITY(id));
+  deleteActivity: async (id: string | number) => {
+    const response = await axiosClient.delete(API_ENDPOINTS.COMMUNICATIONS.DELETE_ACTIVITY(id));
     return response.data;
   },
 
@@ -65,7 +64,8 @@ deleteActivity: async (id: string | number) => {
   // 2. خدمات الإعلانات (Announcements Services)
   // ==========================================
   getCreatedAnnouncements: async (): Promise<Announcement[]> => {
-    const response = await axiosClient.get(API_ENDPOINTS.COMMUNICATIONS.MY_ANNOUNCEMENTS);
+    // 🌟 تم التعديل هنا لاستخدام مسار الإدارة الصحيح بدلاً من مسار الطالب
+    const response = await axiosClient.get(API_ENDPOINTS.COMMUNICATIONS.CREATOR_ANNOUNCEMENTS);
     return response.data?.data ?? response.data ?? [];
   },
 
@@ -74,13 +74,10 @@ deleteActivity: async (id: string | number) => {
     return response.data?.data ?? response.data ?? [];
   },
 
-
   createAnnouncement: async (payload: AnnouncementPayload) => {
     const response = await axiosClient.post(API_ENDPOINTS.COMMUNICATIONS.CREATE_ANNOUNCEMENT, normalizePayload(payload));
     return response.data;
   },
-  
- 
 
   updateAnnouncement: async (id: string | number, payload: Partial<AnnouncementPayload>) => {
     const response = await axiosClient.post(API_ENDPOINTS.COMMUNICATIONS.UPDATE_ANNOUNCEMENT(id), normalizePayload(payload));

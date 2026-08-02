@@ -235,7 +235,7 @@ export const API_ENDPOINTS = {
 
     POLICY_ITEM: (policyItemId: ApiId) =>
       `/admin/finance/settings/policy-items/${policyItemId}`,
- 
+  
     EXTRA_SERVICE: (extraServiceId: ApiId) =>
       `/admin/finance/settings/extra-services/${extraServiceId}`,
   },
@@ -279,8 +279,8 @@ export const API_ENDPOINTS = {
     ACTIVITY: (activityId: ApiId) =>
       `/auth/activity/${activityId}`,
 
+    // 🌟 تم التعديل هنا ليتطابق مع route:list الصحيح
     ALL_ACTIVITIES: "/auth/activities/all",
- 
 
     CREATE_ANNOUNCEMENT:
       "/auth/announcements",
@@ -318,7 +318,7 @@ export const API_ENDPOINTS = {
 
     MARK_ALL_USER_ANNOUNCEMENTS_READ:
       "/user/announcements/mark-all-read",
- 
+  
     ALERTS: "/auth/alerts",
 
     ALERTS_UNREAD_COUNT:
