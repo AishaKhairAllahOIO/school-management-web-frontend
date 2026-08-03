@@ -6,7 +6,6 @@ import {
   useState,
 } from "react";
 import {
-  Camera,
   GraduationCap,
   Save,
   UserPlus,
@@ -32,6 +31,8 @@ import {
 import { StudentAcademicFields } from "../components/form/StudentAcademicFields";
 import { StudentPageHeader } from "../components/shared/StudentPageHeader";
 import { UserPageBackButton } from "../../shared/components/UserPageBackButton";
+import { UserPhotoCard } from "../../shared/components/UserPhotoCard";
+import { USER_NATIONALITIES } from "../../shared/constants/user-nationalities";
 import { useRegisterStudent } from "../hooks/useStudents";
 import type {
   RegisterStudentPayload,
@@ -338,63 +339,15 @@ export function StudentRegistrationPage() {
 
         <div className="space-y-5">
             <div className="grid items-start gap-5 xl:grid-cols-[340px_minmax(0,1fr)]">
-              <FormSection
-                eyebrow="Profile image"
+              <UserPhotoCard
                 title="Student photo"
-                description="Add a clear portrait for the student directory and profile."
-                icon={
-                  <Camera
-                    size={18}
-                    strokeWidth={1.7}
-                  />
-                }
-                completed={Boolean(
-                  form.student.photo_url,
-                )}
-              >
-                <div className="flex flex-col items-center gap-5 sm:flex-row">
-                  <div className="flex h-36 w-28 shrink-0 items-center justify-center overflow-hidden rounded-[20px] border border-border/60 bg-primary/[0.035]">
-                    {studentPreview ? (
-                      <img
-                        src={studentPreview}
-                        alt="Student preview"
-                        className="h-full w-full object-cover"
-                      />
-                    ) : (
-                      <Camera
-                        size={35}
-                        strokeWidth={1.4}
-                        className="text-primary"
-                      />
-                    )}
-                  </div>
-
-                  <div>
-                    <label className="inline-flex h-11 cursor-pointer items-center gap-2 rounded-xl border border-primary/20 bg-primary/[0.06] px-5 text-sm font-medium text-primary transition hover:bg-primary/[0.1]">
-                      <Camera
-                        size={16}
-                        strokeWidth={1.8}
-                      />
-
-                      Choose photo
-
-                      <input
-                        type="file"
-                        accept="image/*"
-                        className="hidden"
-                        onChange={
-                          selectStudentPhoto
-                        }
-                      />
-                    </label>
-
-                    <p className="mt-3 text-xs font-normal leading-5 text-muted-foreground">
-                      Use a portrait JPG or PNG
-                      image with a clear face.
-                    </p>
-                  </div>
-                </div>
-              </FormSection>
+                description="Click the card to choose a clear student portrait."
+                photoUrl={studentPreview}
+                alt="Student preview"
+                editable
+                disabled={registerMutation.isPending}
+                onChange={selectStudentPhoto}
+              />
 
               <PersonFormSection
                 eyebrow="Student details"
@@ -414,60 +367,15 @@ export function StudentRegistrationPage() {
             </div>
 
             <div className="grid items-start gap-5 xl:grid-cols-[340px_minmax(0,1fr)]">
-              <FormSection
-                eyebrow="Guardian profile"
+              <UserPhotoCard
                 title="Guardian photo"
-                description="Add a clear photo for the guardian profile."
-                icon={
-                  <Camera
-                    size={18}
-                    strokeWidth={1.7}
-                  />
-                }
-                completed={Boolean(
-                  form.guardian.photo_url,
-                )}
-              >
-                <div className="flex flex-col items-center gap-5 sm:flex-row">
-                  <div className="flex h-36 w-28 shrink-0 items-center justify-center overflow-hidden rounded-[20px] border border-border/60 bg-primary/[0.035]">
-                    {guardianPreview ? (
-                      <img
-                        src={guardianPreview}
-                        alt="Guardian preview"
-                        className="h-full w-full object-cover"
-                      />
-                    ) : (
-                      <Camera
-                        size={35}
-                        strokeWidth={1.4}
-                        className="text-primary"
-                      />
-                    )}
-                  </div>
-
-                  <div>
-                    <label className="inline-flex h-11 cursor-pointer items-center gap-2 rounded-xl border border-primary/20 bg-primary/[0.06] px-5 text-sm font-medium text-primary transition hover:bg-primary/[0.1]">
-                      <Camera
-                        size={16}
-                        strokeWidth={1.8}
-                      />
-
-                      Choose guardian photo
-
-                      <input
-                        type="file"
-                        accept="image/png,image/jpeg,image/webp"
-                        className="hidden"
-                        onChange={selectGuardianPhoto}
-                      />
-                    </label>
-
-                    <p className="mt-3 text-xs font-normal leading-5 text-muted-foreground">
-                      PNG, JPG or WEBP. A square portrait works best.
-                    </p>
-                  </div>
-                </div>
-              </FormSection>
+                description="Click the card to choose a clear guardian portrait."
+                photoUrl={guardianPreview}
+                alt="Guardian preview"
+                editable
+                disabled={registerMutation.isPending}
+                onChange={selectGuardianPhoto}
+              />
 
               <PersonFormSection
                 eyebrow="Family contact"
@@ -712,21 +620,24 @@ function PersonFormSection({
           </Select>
         </FormField>
 
-        <FormField
-          label="Nationality"
-          required
-        >
-          <input
-            required
-            value={value.nationality}
-            onChange={(event) =>
-              onChange(
-                "nationality",
-                event.target.value,
-              )
+        <FormField label="Nationality">
+          <Select
+            value={value.nationality || "syrian"}
+            onValueChange={(nextValue) =>
+              onChange("nationality", nextValue)
             }
-            className={fieldClassName}
-          />
+          >
+            <SelectTrigger className="h-12 rounded-[15px]">
+              <SelectValue placeholder="Select nationality" />
+            </SelectTrigger>
+            <SelectContent>
+              {USER_NATIONALITIES.map((item) => (
+                <SelectItem key={item.value} value={item.value}>
+                  {item.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </FormField>
 
         <FormField

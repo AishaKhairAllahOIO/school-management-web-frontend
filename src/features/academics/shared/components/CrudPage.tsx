@@ -4,7 +4,6 @@ import {
   ChevronLeft,
   ChevronRight,
   Eye,
-  Loader2,
   Pencil,
   Plus,
   RefreshCw,
@@ -15,9 +14,11 @@ import { Link } from "react-router-dom";
 import {
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
+import { createPortal } from "react-dom";
 
 import { useAcademicTheme } from "../hooks/useAcademicTheme";
 import {
@@ -527,7 +528,7 @@ pageSizeOptions = [6, 10, 15, 25],
             <button
               type="button"
               onClick={openCreate}
-              className="inline-flex h-10 shrink-0 items-center justify-center gap-2 rounded-full bg-[var(--academic-accent)] px-5 text-sm font-semibold text-white shadow-[0_10px_24px_var(--academic-shadow)] transition hover:-translate-y-0.5 hover:bg-[var(--academic-accent)]/92"
+              className="inline-flex h-10 w-full shrink-0 items-center justify-center gap-2 rounded-full bg-[var(--academic-accent)] px-5 text-sm font-semibold text-white shadow-[0_10px_24px_var(--academic-shadow)] transition hover:-translate-y-0.5 hover:bg-[var(--academic-accent)]/92 sm:w-auto"
             >
               <Plus size={17} />
               {addLabel}
@@ -585,7 +586,7 @@ pageSizeOptions = [6, 10, 15, 25],
                 {visibleRows.map((row) => (
                   <article
                     key={row.id}
-                    className="group relative overflow-hidden rounded-[22px] border border-border/65 bg-card shadow-[var(--shadow-card)] transition-[transform,border-color,box-shadow] duration-300 hover:-translate-y-0.5 hover:border-[var(--academic-border)] hover:shadow-[var(--shadow-floating)] motion-reduce:transform-none motion-reduce:transition-none"
+                    className="group relative overflow-visible rounded-[22px] border border-border/65 bg-card shadow-[var(--shadow-card)] transition-[transform,border-color,box-shadow] duration-300 hover:-translate-y-0.5 hover:border-[var(--academic-border)] hover:shadow-[var(--shadow-floating)] motion-reduce:transform-none motion-reduce:transition-none"
                   >
                     <span
                       aria-hidden="true"
@@ -642,17 +643,11 @@ pageSizeOptions = [6, 10, 15, 25],
 
             <TablePagination
               currentPage={currentPage}
-              pageSize={currentPageSize}
-              pageSizeOptions={pageSizeOptions}
               totalPages={totalPages}
               totalRecords={rows.length}
               firstVisibleRecord={firstVisibleRecord}
               lastVisibleRecord={lastVisibleRecord}
               onPageChange={setCurrentPage}
-              onPageSizeChange={(nextSize) => {
-                setCurrentPageSize(nextSize);
-                setCurrentPage(1);
-              }}
             />
           </>
         )}
@@ -781,74 +776,36 @@ function TableSkeleton({
 
 function TablePagination({
   currentPage,
-  pageSize,
-  pageSizeOptions,
   totalPages,
   totalRecords,
   firstVisibleRecord,
   lastVisibleRecord,
   onPageChange,
-  onPageSizeChange,
 }: {
   currentPage: number;
-  pageSize: number;
-  pageSizeOptions: number[];
   totalPages: number;
   totalRecords: number;
   firstVisibleRecord: number;
   lastVisibleRecord: number;
   onPageChange: (page: number) => void;
-  onPageSizeChange: (size: number) => void;
 }) {
-  const pageNumbers = useMemo(() => {
-    const start = Math.max(1, Math.min(currentPage - 1, totalPages - 2));
-    const end = Math.min(totalPages, start + 2);
-    return Array.from({ length: end - start + 1 }, (_, index) => start + index);
-  }, [currentPage, totalPages]);
-
   return (
-    <div className="flex flex-col gap-3 border-t border-border/55 bg-muted/15 px-5 py-3.5 sm:flex-row sm:items-center sm:justify-between sm:px-6">
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-muted-foreground">
-        <span>
-          Showing <strong className="font-medium text-foreground">{firstVisibleRecord}-{lastVisibleRecord}</strong> of{" "}
-          <strong className="font-medium text-foreground">{totalRecords}</strong>
-        </span>
+    <div className="flex flex-col gap-3 border-t border-border/60 bg-muted/[0.10] px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+      <p className="text-center text-[11px] text-muted-foreground sm:text-start">
+        Showing{" "}
+        <strong className="font-medium text-foreground">
+          {firstVisibleRecord}-{lastVisibleRecord}
+        </strong>{" "}
+        of{" "}
+        <strong className="font-medium text-foreground">
+          {totalRecords}
+        </strong>
+      </p>
 
-        <label className="flex items-center gap-2">
-          <span>Rows</span>
-          <Select
-            value={String(pageSize)}
-            onValueChange={(value) =>
-              onPageSizeChange(Number(value))
-            }
-          >
-            <SelectTrigger
-              aria-label="Rows per page"
-              className="h-8 w-[74px] rounded-[10px] border-border/70 bg-card px-2.5 text-xs font-medium"
-            >
-              <SelectValue />
-            </SelectTrigger>
-
-            <SelectContent
-              position="popper"
-              sideOffset={6}
-              className="z-[160] min-w-[74px] rounded-[14px] border-border/60 p-1.5"
-            >
-              {pageSizeOptions.map((size) => (
-                <SelectItem
-                  key={size}
-                  value={String(size)}
-                  className="rounded-[10px] text-xs"
-                >
-                  {size}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </label>
-      </div>
-
-      <nav className="flex items-center gap-1.5" aria-label="Table pagination">
+      <nav
+        aria-label="Table pagination"
+        className="flex items-center justify-center gap-2 sm:justify-end"
+      >
         <button
           type="button"
           aria-label="Previous page"
@@ -859,22 +816,9 @@ function TablePagination({
           <ChevronLeft size={15} />
         </button>
 
-        {pageNumbers.map((page) => (
-          <button
-            key={page}
-            type="button"
-            aria-current={page === currentPage ? "page" : undefined}
-            onClick={() => onPageChange(page)}
-            className={[
-              "inline-flex h-8 min-w-8 items-center justify-center rounded-lg border px-2 text-xs font-semibold transition",
-              page === currentPage
-                ? "border-[var(--academic-accent)] bg-[var(--academic-accent)] text-white shadow-[0_5px_14px_var(--academic-shadow)]"
-                : "border-border/70 bg-card text-muted-foreground hover:border-[var(--academic-border)] hover:bg-[var(--academic-soft)] hover:text-[var(--academic-accent)]",
-            ].join(" ")}
-          >
-            {page}
-          </button>
-        ))}
+        <span className="inline-flex h-9 min-w-9 items-center justify-center rounded-xl bg-[var(--academic-accent)] px-3 text-xs font-semibold text-white shadow-sm">
+          {currentPage}
+        </span>
 
         <button
           type="button"
@@ -902,7 +846,7 @@ function RowActions({
   onDelete: () => void;
 }) {
   return (
-    <div className="inline-flex items-center justify-end gap-2">
+    <div className="flex flex-wrap items-center justify-end gap-2">
       <ActionButton
         label="View details"
         variant="view"
@@ -946,6 +890,12 @@ function ActionButton({
   onClick: () => void;
   children: ReactNode;
 }) {
+  const buttonRef = useRef<HTMLButtonElement | null>(null);
+  const [tooltipPosition, setTooltipPosition] = useState<{
+    top: number;
+    left: number;
+  } | null>(null);
+
   const variantClasses = {
     view: [
       "border-border/70",
@@ -974,13 +924,36 @@ function ActionButton({
     ].join(" "),
   };
 
+  function showTooltip() {
+    const rect = buttonRef.current?.getBoundingClientRect();
+
+    if (!rect) {
+      return;
+    }
+
+    setTooltipPosition({
+      top: rect.top - 8,
+      left: rect.left + rect.width / 2,
+    });
+  }
+
+  function hideTooltip() {
+    setTooltipPosition(null);
+  }
+
   return (
-    <div className="group/action relative">
+    <>
       <button
+        ref={buttonRef}
         type="button"
         aria-label={label}
+        title={label}
         disabled={disabled}
         onClick={onClick}
+        onMouseEnter={showTooltip}
+        onMouseLeave={hideTooltip}
+        onFocus={showTooltip}
+        onBlur={hideTooltip}
         className={[
           "flex h-9 w-9 items-center justify-center",
           "rounded-xl border",
@@ -999,32 +972,26 @@ function ActionButton({
         {children}
       </button>
 
-      <span
-        role="tooltip"
-        className={[
-          "pointer-events-none absolute bottom-full left-1/2 z-50",
-          "mb-2 -translate-x-1/2 whitespace-nowrap",
-          "rounded-lg bg-foreground px-2.5 py-1.5",
-          "text-[10px] font-semibold text-white",
-          "opacity-0 shadow-xl transition-opacity",
-          "group-hover/action:opacity-100",
-          "group-focus-within/action:opacity-100",
-        ].join(" ")}
-      >
-        {label}
-
-        <span
-          className={[
-            "absolute left-1/2 top-full",
-            "-translate-x-1/2",
-            "border-4 border-transparent",
-            "border-t-foreground",
-          ].join(" ")}
-        />
-      </span>
-    </div>
+      {tooltipPosition && typeof document !== "undefined"
+        ? createPortal(
+            <span
+              role="tooltip"
+              style={{
+                top: tooltipPosition.top,
+                left: tooltipPosition.left,
+              }}
+              className="pointer-events-none fixed z-[9999] -translate-x-1/2 -translate-y-full whitespace-nowrap rounded-lg bg-foreground px-2.5 py-1.5 text-[10px] font-semibold text-background shadow-xl"
+            >
+              {label}
+              <span className="absolute left-1/2 top-full -translate-x-1/2 border-4 border-transparent border-t-foreground" />
+            </span>,
+            document.body,
+          )
+        : null}
+    </>
   );
 }
+
 function DetailsDrawer<
   TEntity extends BaseEntity,
 >({
@@ -1046,7 +1013,10 @@ function DetailsDrawer<
     <div
       role="dialog"
       aria-modal="true"
-      className="fixed inset-0 z-50 bg-foreground/35 backdrop-blur-[3px]"
+      className={[
+        "fixed inset-0 z-50 flex items-center justify-center",
+        "bg-foreground/35 p-4 backdrop-blur-[5px]",
+      ].join(" ")}
       onMouseDown={(event) => {
         if (
           event.target === event.currentTarget &&
@@ -1056,49 +1026,45 @@ function DetailsDrawer<
         }
       }}
     >
-      <aside
+      <section
         className={[
-          "absolute inset-y-0 right-0",
-          "flex w-full max-w-[440px] flex-col",
-          "border-l border-border/70 bg-card",
-          "shadow-[-24px_0_60px_rgba(15,23,42,0.16)]",
-          "animate-in slide-in-from-right duration-300",
+          "flex max-h-[90vh] w-full max-w-[720px] flex-col overflow-hidden",
+          "rounded-[24px] border border-border/60 bg-card",
+          "shadow-[0_28px_90px_rgba(15,10,40,0.22)]",
+          "animate-in zoom-in-95 fade-in duration-200",
         ].join(" ")}
       >
         <header
           className={[
-            "relative overflow-hidden",
-            "border-b border-border/60",
-            "bg-card",
-            "px-5 py-4",
+            "relative overflow-hidden border-b border-border/60",
+            "bg-card px-5 py-4 sm:px-6",
           ].join(" ")}
         >
-          <div className="absolute -right-14 -top-14 h-36 w-36 rounded-full bg-[var(--academic-soft)] blur-2xl" />
+          <div className="absolute -right-16 -top-20 h-48 w-48 rounded-full bg-[var(--academic-soft)] blur-3xl" />
 
           <div className="relative flex items-start justify-between gap-4">
-            <div className="flex items-start gap-4">
+            <div className="flex min-w-0 items-start gap-4">
               <span
                 className={[
-                  "flex h-10 w-10 shrink-0 items-center",
-                  "justify-center rounded-[14px]",
-                  "border border-[var(--academic-border)]",
-                  "bg-card text-[var(--academic-accent)] shadow-sm",
+                  "flex h-10 w-10 shrink-0 items-center justify-center",
+                  "rounded-[14px] border border-[var(--academic-border)]",
+                  "bg-[var(--academic-soft)] text-[var(--academic-accent)]",
                 ].join(" ")}
               >
-                <Eye size={21} />
+                <Eye size={20} strokeWidth={1.8} />
               </span>
 
-              <div>
+              <div className="min-w-0">
                 <p className="text-[10px] font-medium uppercase tracking-[0.12em] text-[var(--academic-accent)]">
-                  Record information
+                  Record overview
                 </p>
 
                 <h2 className="mt-1 text-[17px] font-semibold tracking-tight text-foreground">
                   View details
                 </h2>
 
-                <p className="mt-1 text-xs text-muted-foreground">
-                  Record details
+                <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                  Review the complete record information in one place.
                 </p>
               </div>
             </div>
@@ -1121,93 +1087,77 @@ function DetailsDrawer<
           </div>
         </header>
 
-        <div className="flex-1 overflow-y-auto p-6">
+        <div className="min-h-0 flex-1 overflow-y-auto px-5 py-5 sm:px-6 [scrollbar-width:thin]">
           {isLoading ? (
-            <div className="flex min-h-[260px] items-center justify-center">
-              <div className="text-center">
-                <span className="mx-auto flex h-10 w-10 items-center justify-center rounded-[14px] bg-[var(--academic-soft)]">
-                  <Loader2
-                    size={24}
-                    className="animate-spin text-[var(--academic-accent)]"
+            <div className="grid gap-3 sm:grid-cols-2">
+              {Array.from({ length: Math.max(columns.length, 4) }).map(
+                (_, index) => (
+                  <div
+                    key={index}
+                    className="h-[84px] animate-pulse rounded-[15px] border border-border/50 bg-muted/25"
                   />
-                </span>
-
-                <p className="mt-4 text-sm font-medium text-foreground">
-                  Loading details
-                </p>
-
-                <p className="mt-1 text-xs text-muted-foreground">
-                  Loading record details.
-                </p>
-              </div>
+                ),
+              )}
             </div>
           ) : error ? (
-            <div className="rounded-[14px] border border-destructive/20 bg-destructive/5 p-5">
-              <AlertTriangle
-                size={22}
-                className="text-destructive"
-              />
+            <div className="rounded-[15px] border border-destructive/20 bg-destructive/5 p-5">
+              <div className="flex items-start gap-3">
+                <AlertTriangle
+                  size={20}
+                  className="mt-0.5 shrink-0 text-destructive"
+                />
 
-              <p className="mt-3 text-sm font-semibold text-destructive">
-                Failed to load details
-              </p>
+                <div>
+                  <p className="text-sm font-semibold text-destructive">
+                    Failed to load details
+                  </p>
 
-              <p className="mt-1 text-xs leading-5 text-muted-foreground">
-                {error}
-              </p>
+                  <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                    {error}
+                  </p>
+                </div>
+              </div>
             </div>
           ) : (
-            <dl className="grid gap-3">
-              {columns.map((column, index) => (
+            <dl className="grid gap-3 sm:grid-cols-2">
+              {columns.map((column) => (
                 <div
                   key={column.key}
                   className={[
-                    "group rounded-[14px] border border-border/60",
-                    "bg-muted/[0.14] p-4",
-                    "transition-all duration-200",
+                    "rounded-[15px] border border-border/60",
+                    "bg-muted/[0.12] p-4",
+                    "transition-colors duration-200",
                     "hover:border-[var(--academic-border)]",
                     "hover:bg-[var(--academic-soft)]",
-                    "hover:shadow-sm",
                   ].join(" ")}
                 >
-                  <div className="flex items-start gap-3">
-                    <span
-                      className={[
-                        "flex h-8 w-8 shrink-0 items-center",
-                        "justify-center rounded-xl",
-                        "bg-[var(--academic-soft)] text-[11px]",
-                        "font-black text-[var(--academic-accent)]",
-                      ].join(" ")}
-                    >
-                      {index + 1}
-                    </span>
+                  <dt className="text-[10px] font-medium uppercase tracking-[0.09em] text-muted-foreground">
+                    {column.header}
+                  </dt>
 
-                    <div className="min-w-0">
-                      <dt className="text-[10px] font-medium uppercase tracking-[0.075em] text-muted-foreground">
-                        {column.header}
-                      </dt>
-
-                      <dd className="mt-1.5 break-words text-sm font-medium text-foreground">
-                        {column.render(row)}
-                      </dd>
-                    </div>
-                  </div>
+                  <dd className="mt-2 break-words text-sm font-medium leading-6 text-foreground">
+                    {column.render(row)}
+                  </dd>
                 </div>
               ))}
             </dl>
           )}
         </div>
 
-        <footer className="flex justify-end gap-3 border-t border-border/60 bg-muted/[0.14] p-5">
+        <footer
+          className={[
+            "flex flex-col-reverse gap-3 border-t border-border/60",
+            "bg-muted/[0.14] p-5 sm:flex-row sm:justify-end",
+          ].join(" ")}
+        >
           <button
             type="button"
             disabled={isLoading}
             onClick={onClose}
             className={[
               "h-10 rounded-full border border-border/70",
-              "bg-card px-5 text-xs font-medium text-foreground",
-              "transition hover:bg-muted",
-              "disabled:opacity-50",
+              "bg-card px-6 text-sm font-medium text-foreground",
+              "transition hover:bg-muted disabled:opacity-50",
             ].join(" ")}
           >
             Close
@@ -1218,18 +1168,18 @@ function DetailsDrawer<
             disabled={isLoading || Boolean(error)}
             onClick={onEdit}
             className={[
-              "flex h-10 items-center gap-2 rounded-xl",
-              "bg-[var(--academic-accent)] px-5 text-xs font-bold",
-              "text-white shadow-sm transition",
+              "flex h-10 items-center justify-center gap-2",
+              "rounded-full bg-[var(--academic-accent)] px-6",
+              "text-sm font-semibold text-white shadow-sm transition",
               "hover:-translate-y-0.5 hover:bg-[var(--academic-accent)]/90",
               "disabled:translate-y-0 disabled:opacity-50",
             ].join(" ")}
           >
-            <Pencil size={14} />
+            <Pencil size={15} />
             Edit record
           </button>
         </footer>
-      </aside>
+      </section>
     </div>
   );
 }
@@ -1284,7 +1234,7 @@ function EditorDialog<
     >
       <div
         className={[
-          "max-h-[92vh] w-full max-w-[620px] overflow-visible",
+          "flex max-h-[90vh] w-full max-w-[720px] flex-col overflow-hidden",
           "rounded-[24px] border border-border/55 bg-card",
           "shadow-[0_28px_90px_rgba(15,10,40,0.22)]",
           "animate-in zoom-in-95 fade-in duration-200",
@@ -1352,19 +1302,18 @@ function EditorDialog<
           </div>
         </header>
 
-        <div className="max-h-[64vh] overflow-y-auto px-5 py-5 [scrollbar-width:thin]">
+        <div className="min-h-0 flex-1 overflow-y-auto px-5 py-5 sm:px-6 [scrollbar-width:thin]">
           {isLoading ? (
-            <div className="mb-6 flex h-28 items-center justify-center rounded-[14px] border border-border/50 bg-muted/20">
-              <div className="text-center">
-                <Loader2
-                  size={23}
-                  className="mx-auto animate-spin text-[var(--academic-accent)]"
-                />
-
-                <p className="mt-3 text-xs font-bold text-muted-foreground">
-                  Loading the latest record
-                </p>
-              </div>
+            <div className="mb-6 grid animate-pulse gap-3 sm:grid-cols-2">
+              {Array.from({ length: 4 }).map((_, index) => (
+                <div
+                  key={index}
+                  className="space-y-2 rounded-[14px] border border-border/50 bg-muted/[0.12] p-4"
+                >
+                  <span className="block h-2.5 w-20 rounded-full bg-muted" />
+                  <span className="block h-10 w-full rounded-xl bg-muted/70" />
+                </div>
+              ))}
             </div>
           ) : null}
 
@@ -1499,10 +1448,7 @@ function EditorDialog<
             ].join(" ")}
           >
             {isSubmitting ? (
-              <Loader2
-                size={16}
-                className="animate-spin"
-              />
+              <span className="h-3.5 w-3.5 animate-pulse rounded-full bg-white/45" />
             ) : isEdit ? (
               <Pencil size={15} />
             ) : (
@@ -1754,7 +1700,7 @@ function DeleteDialog({
     >
       <div
         className={[
-          "w-full max-w-[420px] overflow-hidden",
+          "w-full max-w-[480px] overflow-hidden",
           "rounded-[24px] border border-destructive/20 bg-card",
           "shadow-[0_28px_90px_rgba(15,23,42,0.25)]",
           "animate-in zoom-in-95 fade-in duration-200",
@@ -1762,10 +1708,8 @@ function DeleteDialog({
       >
         <div
           className={[
-            "relative overflow-hidden",
-            "bg-gradient-to-br",
-            "from-destructive/[0.045] via-card to-card",
-            "px-6 pb-5 pt-6",
+            "relative overflow-hidden border-b border-border/60",
+            "bg-card px-6 py-5",
           ].join(" ")}
         >
           <div className="absolute -right-12 -top-14 h-36 w-36 rounded-full bg-red-200/30 blur-3xl" />
@@ -1794,12 +1738,12 @@ function DeleteDialog({
           </div>
         </div>
 
-        <div className="px-6 pb-6">
+        <div className="px-6 py-5">
           <p className="text-sm leading-6 text-muted-foreground">
             {description}
           </p>
 
-          <div className="mt-5 rounded-[14px] border border-destructive/20/70 bg-red-50/70 p-4">
+          <div className="mt-5 rounded-[14px] border border-destructive/20 bg-destructive/[0.045] p-4">
             <div className="flex items-start gap-3">
               <AlertTriangle
                 size={18}
@@ -1856,10 +1800,7 @@ function DeleteDialog({
             ].join(" ")}
           >
             {isPending ? (
-              <Loader2
-                size={16}
-                className="animate-spin"
-              />
+              <span className="h-3.5 w-3.5 animate-pulse rounded-full bg-white/45" />
             ) : (
               <Trash2 size={16} />
             )}

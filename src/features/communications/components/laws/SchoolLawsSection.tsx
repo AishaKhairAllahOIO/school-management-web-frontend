@@ -1,69 +1,99 @@
-import { useState } from "react";
-import { Plus, Loader2, Scale } from "lucide-react";
-import { Button } from "@/shared/ui/button";
-import { useSchoolLaws } from "../../hooks/useSchoolLaws";
-import type { SchoolLaw, LawPayload } from "../../types/school-laws.types";
+import {
+  Plus,
+} from "lucide-react";
+import {
+  useState,
+} from "react";
 
-import { LawsTable } from "./LawsTable";
-import { LawDialog } from "./LawDialog";
- 
+import {
+  Button,
+} from "@/shared/ui/button";
+
+import {
+  useSchoolLaws,
+} from "../../hooks/useSchoolLaws";
+import type {
+  LawPayload,
+  SchoolLaw,
+} from "../../types/school-laws.types";
+import {
+  CommunicationError,
+  CommunicationLoading,
+} from "../shared/CommunicationState";
+import {
+  DeleteConfirmationDialog,
+} from "../shared/DeleteConfirmationDialog";
+import {
+  LawDialog,
+} from "./LawDialog";
+import {
+  LawsTable,
+} from "./LawsTable";
+
 export function SchoolLawsSection() {
-  const { laws, isLoading, createLaw, updateLaw, deleteLaw } = useSchoolLaws();
+  const {
+    laws,
+    isLoading,
+    isError,
+    refetch,
+    createLaw,
+    updateLaw,
+    deleteLaw,
+  } = useSchoolLaws();
+
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedLaw, setSelectedLaw] = useState<SchoolLaw | null>(null);
+  const [pendingDelete, setPendingDelete] = useState<SchoolLaw | null>(null);
 
-  const handleOpenCreate = () => {
+  function openCreate() {
     setSelectedLaw(null);
     setDialogOpen(true);
-  };
+  }
 
-  const handleSubmit = (values: LawPayload) => {
+  function submit(values: LawPayload) {
     if (selectedLaw) {
-      updateLaw.mutate({ id: selectedLaw.id, payload: values }, { onSuccess: () => setDialogOpen(false) });
-    } else {
-      createLaw.mutate(values, { onSuccess: () => setDialogOpen(false) });
+      updateLaw.mutate(
+        { id: selectedLaw.id, payload: values },
+        { onSuccess: () => setDialogOpen(false) },
+      );
+      return;
     }
-  };
+
+    createLaw.mutate(values, {
+      onSuccess: () => setDialogOpen(false),
+    });
+  }
 
   if (isLoading) {
+    return <CommunicationLoading cards={5} variant="rows" />;
+  }
+
+  if (isError) {
     return (
-      <div className="soft-card flex min-h-[300px] flex-col items-center justify-center rounded-3xl border border-border p-12 text-center bg-card">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        <p className="mt-3 text-sm font-medium text-muted-foreground">Loading school laws...</p>
-      </div>
+      <CommunicationError
+        title="School laws could not be loaded"
+        description="The regulations library is temporarily unavailable. Check the connection and try again."
+        onRetry={() => void refetch()}
+      />
     );
   }
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-300">
-      <div className="soft-card rounded-3xl p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border border-border bg-card shadow-sm">
-        <div className="flex items-center gap-4">
-           <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-              <Scale className="h-7 w-7" />
-            </div>
-            <div>
-              <h2 className="text-xl font-bold tracking-tight text-foreground">School Laws & Regulations</h2>
-              <p className="text-sm text-muted-foreground mt-1">
-                Manage the rules and policies visible to students and parents.
-              </p>
-            </div>
-        </div>
-        <Button 
-          onClick={handleOpenCreate} 
-          className="primary-gradient h-11 rounded-xl px-5 font-semibold text-primary-foreground shadow-md transition-all hover:opacity-95 active:scale-[0.98]"
-        >
-          <Plus className="mr-2 h-5 w-5" /> Add New Law
+    <div className="space-y-3">
+      <div className="flex justify-end">
+        <Button type="button" onClick={openCreate} className="h-10 rounded-[12px] px-4 text-[12px] font-medium">
+          <Plus className="h-4 w-4" />
+          Add law
         </Button>
       </div>
 
-      <LawsTable 
-        laws={laws} 
-        onEdit={(law) => { setSelectedLaw(law); setDialogOpen(true); }} 
-        onDelete={(id) => {
-          if (confirm("Are you sure you want to permanently delete this law?")) {
-             deleteLaw.mutate(id);
-          }
-        }} 
+      <LawsTable
+        laws={laws}
+        onEdit={(law) => {
+          setSelectedLaw(law);
+          setDialogOpen(true);
+        }}
+        onDelete={setPendingDelete}
       />
 
       <LawDialog
@@ -71,7 +101,23 @@ export function SchoolLawsSection() {
         onOpenChange={setDialogOpen}
         lawToEdit={selectedLaw}
         isLoading={createLaw.isPending || updateLaw.isPending}
-        onSubmit={handleSubmit}
+        onSubmit={submit}
+      />
+
+      <DeleteConfirmationDialog
+        open={Boolean(pendingDelete)}
+        onOpenChange={(open) => {
+          if (!open) setPendingDelete(null);
+        }}
+        title="Delete school law?"
+        description={`“${pendingDelete?.title ?? "This law"}” will be permanently removed from the regulations library.`}
+        isPending={deleteLaw.isPending}
+        onConfirm={() => {
+          if (!pendingDelete) return;
+          deleteLaw.mutate(pendingDelete.id, {
+            onSuccess: () => setPendingDelete(null),
+          });
+        }}
       />
     </div>
   );

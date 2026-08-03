@@ -14,8 +14,10 @@ import {
   UploadCloud,
   XCircle,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 import { StudentPageHeader } from "../components/shared/StudentPageHeader";
+import { UserPageBackButton } from "../../shared/components/UserPageBackButton";
 import {
   getStudentImportBatchId,
   useDownloadStudentImportErrors,
@@ -110,6 +112,7 @@ function statusTone(
 }
 
 export function StudentImportPage() {
+  const navigate = useNavigate();
   const fileInputRef =
     useRef<HTMLInputElement>(null);
 
@@ -197,10 +200,15 @@ export function StudentImportPage() {
   return (
     <main className="min-h-screen bg-background px-4 py-5 text-foreground sm:px-6 lg:px-8">
       <div className="mx-auto flex max-w-[1450px] flex-col gap-6">
-        <StudentPageHeader
+        <UserPageBackButton
+        label="Back to students"
+        onClick={() => navigate("/users/students")}
+      />
+
+      <StudentPageHeader
           title="Import students"
           description="Upload a spreadsheet and monitor the processing result for every row."
-          showBackButton
+          showBackButton={false}
           icon={
             <FileSpreadsheet
               size={23}
@@ -233,17 +241,17 @@ export function StudentImportPage() {
               className={[
                 "group flex min-h-64 w-full",
                 "flex-col items-center justify-center",
-                "rounded-[20px]",
-                "border border-dashed border-primary/25",
+                "rounded-[18px]",
+                "border border-border/55",
                 "bg-primary/[0.025] px-6",
                 "text-center transition-all",
-                "hover:border-primary/40",
+                "hover:border-primary/20",
                 "hover:bg-primary/[0.045]",
                 "disabled:cursor-not-allowed",
                 "disabled:opacity-60",
               ].join(" ")}
             >
-              <span className="flex h-16 w-16 items-center justify-center rounded-[20px] bg-primary/[0.08] text-primary transition-transform group-hover:scale-105">
+              <span className="flex h-16 w-16 items-center justify-center rounded-[18px] bg-primary/[0.08] text-primary transition-transform group-hover:scale-105">
                 {importMutation.isPending ? (
                   <LoaderCircle
                     size={28}

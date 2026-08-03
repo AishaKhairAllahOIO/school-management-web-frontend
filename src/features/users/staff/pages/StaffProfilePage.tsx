@@ -15,6 +15,8 @@ import {
 } from "../components/layout/StaffPageHero";
 
 import { UserPageBackButton } from "../../shared/components/UserPageBackButton";
+import { UserPhotoCard } from "../../shared/components/UserPhotoCard";
+import { formatUserNationality } from "../../shared/constants/user-nationalities";
 
 import {
   StaffContactViewSection,
@@ -242,12 +244,6 @@ export function StaffProfilePage({
             config.listPath,
           )
         }
-        photoUrl={
-          staff.photoUrl
-        }
-        photoAlt={
-          staff.fullName
-        }
         accountStatus={
           staff.accountStatus
         }
@@ -270,7 +266,17 @@ export function StaffProfilePage({
         />
       ) : null}
 
-      <div className="grid gap-5 xl:grid-cols-[1.1fr_.9fr]">
+      <div className="grid items-start gap-5 xl:grid-cols-[340px_minmax(0,1fr)]">
+        <UserPhotoCard
+          title={`${config.singularLabel} photo`}
+          description="Profile image used across the staff directory."
+          photoUrl={staff.photoUrl}
+          alt={staff.fullName || config.singularLabel}
+          authenticated
+          accentClassName={[config.color.light, config.color.text].join(" ")}
+        />
+
+        <div className="grid gap-5 xl:grid-cols-[1.1fr_.9fr]">
         <StaffPersonalViewSection
           color={config.color}
           firstName={formatText(
@@ -294,9 +300,7 @@ export function StaffProfilePage({
           gender={formatText(
             staff.gender,
           )}
-          nationality={formatText(
-            staff.nationality,
-          )}
+          nationality={formatUserNationality(staff.nationality)}
           address={formatText(
             staff.address,
           )}
@@ -343,6 +347,7 @@ export function StaffProfilePage({
             }
           />
         </div>
+      </div>
       </div>
     </section>
   );

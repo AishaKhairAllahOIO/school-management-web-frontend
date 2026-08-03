@@ -8,8 +8,29 @@ export function GroupedAssessmentComponentsPage() {
 
   if (groupedQuery.isLoading) {
     return (
-      <div className="p-6">
-        Loading assessment components...
+      <div className="space-y-4">
+        {Array.from({ length: 3 }).map((_, groupIndex) => (
+          <section
+            key={groupIndex}
+            className="animate-pulse overflow-hidden rounded-[22px] border border-border/60 bg-card"
+          >
+            <div className="flex items-center gap-3 border-b border-border/50 p-5">
+              <span className="h-10 w-10 rounded-[14px] bg-muted" />
+              <div className="flex-1 space-y-2">
+                <span className="block h-3 w-40 rounded-full bg-muted" />
+                <span className="block h-2.5 w-56 rounded-full bg-muted/70" />
+              </div>
+            </div>
+            <div className="grid gap-3 p-5 md:grid-cols-2">
+              {Array.from({ length: 4 }).map((__, itemIndex) => (
+                <div
+                  key={itemIndex}
+                  className="h-20 rounded-[15px] bg-muted/50"
+                />
+              ))}
+            </div>
+          </section>
+        ))}
       </div>
     );
   }

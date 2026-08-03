@@ -1,54 +1,68 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { schoolLawsService } from "../services/school-laws.service";
-import type { LawPayload } from "../types/school-laws.types";
+import {
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
+import {
+  toast,
+} from "sonner";
+
+import {
+  getAxiosErrorMessage,
+} from "@/services/axios/axiosError";
+
+import {
+  schoolLawsService,
+} from "../services/school-laws.service";
+import type {
+  LawPayload,
+} from "../types/school-laws.types";
+
+const lawsKey = ["communications", "school-laws"] as const;
 
 export function useSchoolLaws() {
   const queryClient = useQueryClient();
 
   const lawsQuery = useQuery({
-    queryKey: ["school-laws"],
-    queryFn: async () => {
-      try {
-        return await schoolLawsService.getAllLaws();
-      } catch (error: any) {
-        if (error?.response?.status === 403) {
-          console.warn("⚠️ غير مصرح لك بعرض القوانين.");
-          return [];
-        }
-        throw error;
-      }
-    },
+    queryKey: lawsKey,
+    queryFn: schoolLawsService.getAllLaws,
   });
 
-  const createLawMutation = useMutation({
+  const createLaw = useMutation({
     mutationFn: (payload: LawPayload) => schoolLawsService.createLaw(payload),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["school-laws"] });
+    onSuccess: async () => {
+      toast.success("School law created successfully.");
+      await queryClient.invalidateQueries({ queryKey: lawsKey });
     },
+    onError: (error) => toast.error(getAxiosErrorMessage(error)),
   });
 
-  const updateLawMutation = useMutation({
+  const updateLaw = useMutation({
     mutationFn: ({ id, payload }: { id: string | number; payload: Partial<LawPayload> }) =>
-      schoolLawsService.updateLaw(id, payload), // يستخدم POST كما في البوستمان
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["school-laws"] });
+      schoolLawsService.updateLaw(id, payload),
+    onSuccess: async () => {
+      toast.success("School law updated successfully.");
+      await queryClient.invalidateQueries({ queryKey: lawsKey });
     },
+    onError: (error) => toast.error(getAxiosErrorMessage(error)),
   });
 
-  const deleteLawMutation = useMutation({
+  const deleteLaw = useMutation({
     mutationFn: (id: string | number) => schoolLawsService.deleteLaw(id),
-    onSuccess: (_, deletedId) => {
-      queryClient.setQueryData(["school-laws"], (oldData: any[] = []) =>
-        oldData.filter((law) => law.id !== deletedId)
-      );
+    onSuccess: async () => {
+      toast.success("School law deleted successfully.");
+      await queryClient.invalidateQueries({ queryKey: lawsKey });
     },
+    onError: (error) => toast.error(getAxiosErrorMessage(error)),
   });
 
   return {
     laws: lawsQuery.data ?? [],
     isLoading: lawsQuery.isLoading,
-    createLaw: createLawMutation,
-    updateLaw: updateLawMutation,
-    deleteLaw: deleteLawMutation,
+    isError: lawsQuery.isError,
+    refetch: lawsQuery.refetch,
+    createLaw,
+    updateLaw,
+    deleteLaw,
   };
 }

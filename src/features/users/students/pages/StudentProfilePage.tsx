@@ -12,7 +12,8 @@ import {
 } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 
-import { AuthenticatedUserImage } from "../../shared/components/AuthenticatedUserImage";
+import { UserPhotoCard } from "../../shared/components/UserPhotoCard";
+import { formatUserNationality } from "../../shared/constants/user-nationalities";
 import { ProfileInfoCard } from "../components/profile/ProfileInfoCard";
 import { StudentProfileSection } from "../components/profile/StudentProfileSection";
 import { StudentPageHeader } from "../components/shared/StudentPageHeader";
@@ -95,8 +96,6 @@ export function StudentProfilePage() {
         description="Review personal, guardian and academic enrollment information."
         backLabel="Back to students"
         onBack={() => navigate("/users/students")}
-        photoUrl={student.photoUrl}
-        photoAlt={student.fullName}
         icon={<UserRound size={23} strokeWidth={1.7} />}
       />
 
@@ -105,16 +104,25 @@ export function StudentProfilePage() {
         description="Identity, birth and contact information shown in the student form."
         icon={<UserRound size={18} strokeWidth={1.7} />}
       >
-        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="grid items-start gap-5 xl:grid-cols-[340px_minmax(0,1fr)]">
+          <UserPhotoCard
+            title="Student photo"
+            description="Student profile image."
+            photoUrl={student.photoUrl}
+            alt={student.fullName}
+            authenticated
+          />
+          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
           <ProfileInfoCard icon={<UserRound size={18} />} label="Full name" value={student.fullName} className="sm:col-span-2" />
           <ProfileInfoCard icon={<UsersRound size={18} />} label="Father name" value={displayValue(student.fatherName)} />
           <ProfileInfoCard icon={<UsersRound size={18} />} label="Mother name" value={displayValue(student.motherName)} />
           <ProfileInfoCard icon={<CalendarDays size={18} />} label="Birth date" value={formatDateOnly(student.birthDate)} />
           <ProfileInfoCard icon={<MapPin size={18} />} label="Birth place" value={displayValue(student.birthPlace)} />
           <ProfileInfoCard icon={<IdCard size={18} />} label="Gender" value={displayValue(student.gender)} />
-          <ProfileInfoCard icon={<IdCard size={18} />} label="Nationality" value={displayValue(student.nationality)} />
+          <ProfileInfoCard icon={<IdCard size={18} />} label="Nationality" value={formatUserNationality(student.nationality)} />
           <ProfileInfoCard icon={<Phone size={18} />} label="Phone number" value={<span dir="ltr">{displayValue(student.phoneNumber)}</span>} />
           <ProfileInfoCard icon={<Home size={18} />} label="Address" value={displayValue(student.address)} className="sm:col-span-2 xl:col-span-4" />
+          </div>
         </div>
       </StudentProfileSection>
 
@@ -124,23 +132,25 @@ export function StudentProfilePage() {
         icon={<UsersRound size={18} strokeWidth={1.7} />}
       >
         {guardian ? (
-          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-            <div className="flex min-h-44 items-center justify-center overflow-hidden rounded-[18px] border border-border/60 bg-primary/[0.035] sm:row-span-2">
-              <AuthenticatedUserImage
-                src={guardian.photoUrl}
-                alt={guardian.fullName}
-                className="h-44 w-full object-cover"
-              />
-            </div>
+          <div className="grid items-start gap-5 xl:grid-cols-[340px_minmax(0,1fr)]">
+            <UserPhotoCard
+              title="Guardian photo"
+              description="Guardian profile image."
+              photoUrl={guardian.photoUrl}
+              alt={guardian.fullName}
+              authenticated
+            />
+            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
             <ProfileInfoCard icon={<UsersRound size={18} />} label="Full name" value={guardian.fullName} className="sm:col-span-2" />
             <ProfileInfoCard icon={<UsersRound size={18} />} label="Father name" value={displayValue(guardian.fatherName)} />
             <ProfileInfoCard icon={<UsersRound size={18} />} label="Mother name" value={displayValue(guardian.motherName)} />
             <ProfileInfoCard icon={<CalendarDays size={18} />} label="Birth date" value={formatDateOnly(guardian.birthDate)} />
             <ProfileInfoCard icon={<MapPin size={18} />} label="Birth place" value={displayValue(guardian.birthPlace)} />
             <ProfileInfoCard icon={<IdCard size={18} />} label="Gender" value={displayValue(guardian.gender)} />
-            <ProfileInfoCard icon={<IdCard size={18} />} label="Nationality" value={displayValue(guardian.nationality)} />
+            <ProfileInfoCard icon={<IdCard size={18} />} label="Nationality" value={formatUserNationality(guardian.nationality)} />
             <ProfileInfoCard icon={<Phone size={18} />} label="Phone number" value={<span dir="ltr">{displayValue(guardian.phoneNumber)}</span>} />
             <ProfileInfoCard icon={<Home size={18} />} label="Address" value={displayValue(guardian.address)} className="sm:col-span-2 xl:col-span-4" />
+            </div>
           </div>
         ) : (
           <div className="rounded-[18px] border border-dashed border-amber-500/25 bg-amber-500/[0.045] p-6 text-center">

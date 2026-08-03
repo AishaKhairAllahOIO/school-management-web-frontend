@@ -105,9 +105,9 @@ const modules = [
 ];
 
 const matrix = [
-  ["Users", "Full Access", "Full Access", "Limited Access"],
-  ["Academics", "Full Access", "Limited Access", "Full Access"],
-  ["Attendance", "Full Access", "Limited Access", "Full Access"],
+  ["Users", "Full Access", "Limited Access", "Limited Access"],
+  ["Academics", "Full Access", "Limited Access", "Limited Access"],
+  ["Attendance", "Full Access", "Limited Access", "Limited Access"],
   ["Scheduling", "Full Access", "Limited Access", "Limited Access"],
   ["Finance", "Full Access", "Full Access", "No Access"],
   ["Communications", "Full Access", "Full Access", "Limited Access"],

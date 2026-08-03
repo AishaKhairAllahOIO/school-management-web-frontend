@@ -26,6 +26,7 @@ export function SendBulkAlertDialog({ open, onOpenChange, targetAudience, audien
   const [minutesLate, setMinutesLate] = useState<string>("15");
   const [monthName, setMonthName] = useState<string>("June 2026");
   const [subjectName, setSubjectName] = useState<string>("");
+  const [formError, setFormError] = useState<string | null>(null);
 
   const resetState = () => {
     setSelectedIds([]);
@@ -37,11 +38,17 @@ export function SendBulkAlertDialog({ open, onOpenChange, targetAudience, audien
     setMinutesLate("15");
     setMonthName("June 2026");
     setSubjectName("");
+    setFormError(null);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (selectedIds.length === 0) return alert("Please select at least one person.");
+    if (selectedIds.length === 0) {
+      setFormError("Select at least one recipient before sending the alert.");
+      return;
+    }
+
+    setFormError(null);
 
     const numericIds = selectedIds.map(Number);
     const successCb = { onSuccess: () => { resetState(); onOpenChange(false); } };
@@ -81,10 +88,10 @@ export function SendBulkAlertDialog({ open, onOpenChange, targetAudience, audien
 
   return (
     <Dialog open={open} onOpenChange={(nextOpen) => { if (!nextOpen) resetState(); onOpenChange(nextOpen); }}>
-      <DialogContent className="floating-card sm:max-w-xl rounded-3xl border border-border p-6 shadow-2xl max-h-[85vh] overflow-y-auto" dir="ltr">
+      <DialogContent className="sm:max-w-xl rounded-[22px] border border-border/70 bg-card p-5 sm:p-6 shadow-[0_24px_70px_rgba(27,19,66,0.18)] max-h-[88vh] overflow-y-auto" dir="ltr">
         <DialogHeader className="space-y-1.5 text-left">
-          <DialogTitle className="flex items-center gap-2.5 text-xl font-bold tracking-tight text-foreground">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-secondary text-primary">
+          <DialogTitle className="flex items-center gap-2.5 text-[18px] font-semibold tracking-tight text-foreground">
+            <div className="flex h-9 w-9 items-center justify-center rounded-[15px] bg-primary/[0.09] text-primary">
               <Bell className="h-5 w-5" />
             </div>
             Send Bulk Alert ({targetAudience === "student" ? "Students" : "Staff"})
@@ -124,11 +131,17 @@ export function SendBulkAlertDialog({ open, onOpenChange, targetAudience, audien
             onSubjectNameChange={setSubjectName}
           />
 
+          {formError ? (
+            <p className="rounded-[10px] bg-destructive/[0.07] px-3 py-2 text-[11px] text-destructive">
+              {formError}
+            </p>
+          ) : null}
+
           <div className="flex items-center gap-3 pt-4 border-t border-border/60">
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={isSending} className="h-11 flex-1 rounded-xl">
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={isSending} className="h-10 flex-1 rounded-[12px]">
               Cancel
             </Button>
-            <Button type="submit" disabled={isSending || selectedIds.length === 0} className="primary-gradient h-11 flex-[2] rounded-xl font-semibold text-primary-foreground shadow-md active:scale-[0.98]">
+            <Button type="submit" disabled={isSending || selectedIds.length === 0} className="h-10 flex-[2] rounded-[12px] text-[12px] font-medium">
               {isSending ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Send className="w-4 h-4 mr-2" />}
               Send Alert ({selectedIds.length})
             </Button>

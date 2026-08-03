@@ -106,9 +106,9 @@ export function NotificationsMenu({
       {isOpen ? (
         <div
           role="menu"
-          className="topbar-menu-shadow absolute end-0 top-full z-50 mt-3 w-[360px] max-w-[calc(100vw-24px)] overflow-hidden rounded-[22px] border border-topbar-border/80 bg-topbar-surface/95 backdrop-blur-2xl"
+          className="topbar-menu-shadow absolute end-0 top-full z-50 mt-3 w-[360px] max-w-[calc(100vw-16px)] sm:max-w-[calc(100vw-24px)] overflow-hidden rounded-[18px] border border-topbar-border/80 bg-topbar-surface/95 backdrop-blur-2xl"
         >
-          <div className="flex items-start justify-between gap-3 border-b border-topbar-divider px-4 py-4">
+          <div className="flex items-start justify-between gap-3 border-b border-topbar-divider px-3 py-3">
             <div className="min-w-0">
               <h2 className="text-[14px] font-semibold text-topbar-title">
                 {
@@ -142,22 +142,28 @@ export function NotificationsMenu({
                   strokeWidth={1.9}
                 />
 
-                Mark all read
+                {t.layout.topbar.markAllRead}
               </button>
             ) : null}
           </div>
 
-          <div className="max-h-[330px] overflow-y-auto p-3 pe-2">
+          <div className="max-h-[330px] overflow-y-auto p-2 pe-1 sm:p-3 sm:pe-2">
             {noticesQuery.isLoading ? (
               <NotificationsSkeleton />
             ) : noticesQuery.isError ? (
               <div className="flex flex-col items-center justify-center px-5 py-8 text-center">
                 <p className="text-[12px] font-medium text-topbar-text">
-                  Notifications could not be loaded
+                  {
+                    t.layout.topbar
+                      .notificationsLoadErrorTitle
+                  }
                 </p>
 
                 <p className="mt-1 text-[11px] leading-5 text-topbar-subtle">
-                  Check the connection and try again.
+                  {
+                    t.layout.topbar
+                      .notificationsLoadErrorDescription
+                  }
                 </p>
 
                 <button
@@ -173,7 +179,7 @@ export function NotificationsMenu({
                     strokeWidth={1.9}
                   />
 
-                  Try again
+                  {t.common.tryAgain}
                 </button>
               </div>
             ) : notices.length > 0 ? (

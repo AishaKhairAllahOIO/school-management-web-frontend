@@ -21,7 +21,7 @@ export function useCommunicationOptions() {
       const data = extractArray(response.data);
       return data.map((item: any) => ({
         id: Number(item.id),
-        name: item.name || item.grade_name || `مرحلة ${item.id}`,
+        name: item.name || item.grade_name || `Grade ${item.id}`,
       }));
     },
   });
@@ -33,7 +33,7 @@ export function useCommunicationOptions() {
       const data = extractArray(response.data);
       return data.map((item: any) => ({
         id: Number(item.id),
-        name: item.name || item.classroom_name || `شعبة ${item.id}`,
+        name: item.name || item.classroom_name || `Classroom ${item.id}`,
         subtitle: item.grade?.name || item.grade_name || undefined,
 
         parentId: Number(item.grade_id || item.grade_level_id || item.grade?.id),

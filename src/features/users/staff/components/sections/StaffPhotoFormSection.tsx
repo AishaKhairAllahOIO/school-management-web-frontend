@@ -10,13 +10,6 @@ import {
   defaultStaffSectionColor,
 } from "../theme/staff-theme";
 
-import {
-  Camera,
-} from "lucide-react";
-
-import {
-  StaffSection,
-} from "../layout/StaffSection";
 
 import {
   StaffPhotoEditor,
@@ -50,19 +43,6 @@ export function StaffPhotoFormSection({
     mode === "edit";
 
   return (
-    <StaffSection
-      eyebrow="Profile"
-      title="Profile photo"
-      description={
-        isEdit
-          ? "Update the staff member's profile photo."
-          : "Add a clear photo to make the staff profile easier to recognize."
-      }
-      icon={
-        <Camera className="h-5 w-5" />
-      }
-      color={color}
-    >
       <StaffPhotoEditor
         photoUrl={photoUrl}
         disabled={disabled}
@@ -85,6 +65,5 @@ export function StaffPhotoFormSection({
         onChange={onChange}
         onRemove={onRemove}
       />
-    </StaffSection>
   );
 }

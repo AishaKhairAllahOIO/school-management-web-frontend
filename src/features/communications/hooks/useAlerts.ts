@@ -1,36 +1,74 @@
-import { useMutation } from "@tanstack/react-query";
-import { communicationService } from "../services/communications.service";
+import {
+  useMutation,
+} from "@tanstack/react-query";
+import {
+  toast,
+} from "sonner";
+
+import {
+  getAxiosErrorMessage,
+} from "@/services/axios/axiosError";
+
+import {
+  communicationService,
+} from "../services/communications.service";
 import type {
-  PaymentAlertPayload,
   AdvisorAlertPayload,
+  PaymentAlertPayload,
   StaffAlertPayload,
 } from "../types/communication.types";
 
 export function useAlerts() {
-  const sendPaymentAlertMutation = useMutation({
-    mutationFn: (payload: PaymentAlertPayload) => communicationService.sendPaymentAlert(payload),
+  const commonOptions = {
+    onSuccess: () => {
+      toast.success("Alert sent successfully.");
+    },
+    onError: (error: unknown) => {
+      toast.error(
+        getAxiosErrorMessage(error),
+      );
+    },
+  };
+
+  const sendPaymentAlert = useMutation({
+    mutationFn: (payload: PaymentAlertPayload) =>
+      communicationService.sendPaymentAlert(payload),
+    ...commonOptions,
   });
 
-  const sendAdvisorAlertMutation = useMutation({
-    mutationFn: (payload: AdvisorAlertPayload) => communicationService.sendAdvisorAlert(payload),
+  const sendAdvisorAlert = useMutation({
+    mutationFn: (payload: AdvisorAlertPayload) =>
+      communicationService.sendAdvisorAlert(payload),
+    ...commonOptions,
   });
 
-  const sendStaffAlertMutation = useMutation({
-    mutationFn: (payload: StaffAlertPayload) => communicationService.sendStaffAlert(payload),
+  const sendStaffAlert = useMutation({
+    mutationFn: (payload: StaffAlertPayload) =>
+      communicationService.sendStaffAlert(payload),
+    ...commonOptions,
   });
 
-  const deleteAlertMutation = useMutation({
-    mutationFn: (id: string | number) => communicationService.deleteAlert(id),
+  const deleteAlert = useMutation({
+    mutationFn: (id: string | number) =>
+      communicationService.deleteAlert(id),
+    onSuccess: () => {
+      toast.success("Alert deleted successfully.");
+    },
+    onError: (error) => {
+      toast.error(
+        getAxiosErrorMessage(error),
+      );
+    },
   });
 
   return {
-    sendPaymentAlert: sendPaymentAlertMutation,
-    sendAdvisorAlert: sendAdvisorAlertMutation,
-    sendStaffAlert: sendStaffAlertMutation,
-    deleteAlert: deleteAlertMutation,
+    sendPaymentAlert,
+    sendAdvisorAlert,
+    sendStaffAlert,
+    deleteAlert,
     isSending:
-      sendPaymentAlertMutation.isPending ||
-      sendAdvisorAlertMutation.isPending ||
-      sendStaffAlertMutation.isPending,
+      sendPaymentAlert.isPending ||
+      sendAdvisorAlert.isPending ||
+      sendStaffAlert.isPending,
   };
 }

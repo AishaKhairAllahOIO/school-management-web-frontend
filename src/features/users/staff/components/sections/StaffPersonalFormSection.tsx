@@ -3,6 +3,7 @@ import {
 } from "lucide-react";
 
 import { DatePicker } from "@/shared/ui/date-picker";
+import { USER_NATIONALITIES } from "../../../shared/constants/user-nationalities";
 import {
   Select,
   SelectContent,
@@ -213,11 +214,11 @@ export function StaffPersonalFormSection({
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="syrian">Syrian</SelectItem>
-              <SelectItem value="lebanese">Lebanese</SelectItem>
-              <SelectItem value="palestinian">Palestinian</SelectItem>
-              <SelectItem value="jordanian">Jordanian</SelectItem>
-              <SelectItem value="other">Other</SelectItem>
+              {USER_NATIONALITIES.map((item) => (
+                <SelectItem key={item.value} value={item.value}>
+                  {item.label}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </StaffFormField>

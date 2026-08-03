@@ -1,101 +1,204 @@
-import { useState } from "react";
-import { Megaphone, Edit3, Trash2, Users, School, Loader2 } from "lucide-react";
-import { Button } from "@/shared/ui/button";
-import { useAnnouncements } from "../../hooks/useAnnouncements";
-import type { Announcement } from "../../types/communication.types";
+import {
+  CalendarDays,
+  Edit3,
+  Megaphone,
+  School,
+  Trash2,
+  Users,
+} from "lucide-react";
+import {
+  useState,
+} from "react";
+
+import {
+  Button,
+} from "@/shared/ui/button";
+
+import {
+  useAnnouncements,
+} from "../../hooks/useAnnouncements";
+import type {
+  Announcement,
+} from "../../types/communication.types";
+import {
+  CommunicationEmpty,
+  CommunicationError,
+  CommunicationLoading,
+} from "../shared/CommunicationState";
+import {
+  DeleteConfirmationDialog,
+} from "../shared/DeleteConfirmationDialog";
 
 type Props = {
-  activeTab: "created" | "staff";  
+  activeTab: "created" | "staff";
   onEdit: (announcement: Announcement) => void;
 };
 
-export function AnnouncementsList({ activeTab, onEdit }: Props) {
-  const { myAnnouncements, staffAnnouncements, isLoadingMy, isLoadingStaff, deleteAnnouncement } = useAnnouncements();
-  const [deletingId, setDeletingId] = useState<string | number | null>(null);
+export function AnnouncementsList({
+  activeTab,
+  onEdit,
+}: Props) {
+  const {
+    myAnnouncements,
+    staffAnnouncements,
+    isLoadingMy,
+    isLoadingStaff,
+    isErrorMy,
+    isErrorStaff,
+    refetchMy,
+    refetchStaff,
+    deleteAnnouncement,
+  } = useAnnouncements();
 
-  const announcements = activeTab === "created" ? myAnnouncements : staffAnnouncements;
-  const isLoading = activeTab === "created" ? isLoadingMy : isLoadingStaff;
+  const [pendingDelete, setPendingDelete] =
+    useState<Announcement | null>(null);
 
-  const handleDelete = async (id: string | number, title: string) => {
-    if (confirm(`Are you sure you want to delete "${title}"?`)) {
-      setDeletingId(id);
-      deleteAnnouncement.mutate(id, {
-        onSettled: () => setDeletingId(null),
-        onError: (err: any) => {
-          if (err?.response?.status === 403) alert("❌ You are not authorized to delete this announcement.");
-          else alert("❌ Failed to delete announcement.");
-        }
-      });
-    }
-  };
+  const announcements =
+    activeTab === "created"
+      ? myAnnouncements
+      : staffAnnouncements;
+
+  const isLoading =
+    activeTab === "created"
+      ? isLoadingMy
+      : isLoadingStaff;
+
+  const isError =
+    activeTab === "created"
+      ? isErrorMy
+      : isErrorStaff;
 
   if (isLoading) {
+    return <CommunicationLoading cards={4} variant="rows" />;
+  }
+
+  if (isError) {
     return (
-      <div className="flex flex-col items-center justify-center py-16 text-muted-foreground space-y-3">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
-        <p className="text-sm font-medium">Loading announcements...</p>
-      </div>
+      <CommunicationError
+        title="Announcements could not be loaded"
+        description="The announcement feed is temporarily unavailable. Check the connection and try again."
+        onRetry={() => {
+          if (activeTab === "created") void refetchMy();
+          else void refetchStaff();
+        }}
+      />
     );
   }
 
   if (!announcements.length) {
     return (
-      <div className="soft-card flex flex-col items-center justify-center rounded-3xl border border-dashed border-border p-12 text-center my-6">
-        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-secondary text-primary">
-          <Megaphone className="w-7 h-7" />
-        </div>
-        <h3 className="mt-4 text-lg font-bold text-foreground">No announcements found</h3>
-      </div>
+      <CommunicationEmpty
+        icon={Megaphone}
+        title="No announcements yet"
+        description={activeTab === "created"
+          ? "Create the first announcement to share a clear update with the school community."
+          : "No staff announcements are available in the current feed."}
+      />
     );
   }
 
   return (
-    <div className="space-y-4">
-      {announcements.map((item) => {
-        const isDeleting = deletingId === item.id;
-        const isStudentAudience = item.audience === "student";
-        const isBothAudience = item.audience === "both";
+    <>
+      <div className="overflow-hidden rounded-[20px] border border-border/60 bg-card shadow-[0_8px_26px_rgba(30,20,70,0.04)]">
+        {announcements.map((item, index) => {
+          const audience = item.audience;
+          const AudienceIcon =
+            audience === "student"
+              ? School
+              : audience === "staff"
+                ? Users
+                : Megaphone;
 
-        return (
-          <div key={item.id} className="soft-card rounded-3xl p-5 border border-border bg-card transition-all hover:shadow-floating flex flex-col md:flex-row md:items-center justify-between gap-4 relative overflow-hidden" dir="ltr">
-            <div className={`absolute top-0 bottom-0 left-0 w-1.5 ${isBothAudience ? "bg-purple-500" : isStudentAudience ? "bg-info" : "bg-primary"}`} />
+          const tone =
+            audience === "student"
+              ? "bg-info/[0.09] text-info"
+              : audience === "staff"
+                ? "bg-primary/[0.08] text-primary"
+                : "bg-success/[0.09] text-success";
 
-            <div className="space-y-2 flex-1 pl-4">
-              <div className="flex flex-wrap items-center gap-2">
-                <span className={`inline-flex items-center gap-1 rounded-lg px-2 py-0.5 text-xs font-bold ${
-                  isBothAudience ? "bg-purple-500/15 text-purple-600 border border-purple-500/20" :
-                  isStudentAudience ? "bg-info/15 text-info border border-info/20" : "bg-primary/15 text-primary border border-primary/20"
-                }`}>
-                  {isBothAudience ? <Megaphone className="w-3 h-3" /> : isStudentAudience ? <School className="w-3 h-3" /> : <Users className="w-3 h-3" />}
-                  {isBothAudience ? "All Audiences" : isStudentAudience ? "Students" : "Staff"}
-                </span>
-                
-                {item.created_at && (
-                  <span className="text-xs text-muted-foreground font-medium">
-                    • {new Date(item.created_at).toLocaleDateString("en-US")}
+          return (
+            <article
+              key={item.id}
+              className={[
+                "group flex flex-col gap-4 px-5 py-4 transition-colors hover:bg-muted/[0.16] sm:flex-row sm:items-center",
+                index > 0 ? "border-t border-border/45" : "",
+              ].join(" ")}
+            >
+              <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-[15px] ${tone}`}>
+                <AudienceIcon className="h-[19px] w-[19px]" strokeWidth={1.8} />
+              </span>
+
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-center gap-2">
+                  <h3 className="truncate text-[15px] font-medium text-foreground">
+                    {item.title}
+                  </h3>
+                  <span className={`rounded-full px-2 py-0.5 text-[9.5px] font-medium ${tone}`}>
+                    {audience === "both" ? "Students & staff" : audience === "student" ? "Students" : "Staff"}
                   </span>
-                )}
+                </div>
+
+                <p className="mt-1 line-clamp-2 text-[12px] leading-[18px] text-muted-foreground">
+                  {item.description}
+                </p>
+
+                {item.created_at ? (
+                  <span className="mt-2 inline-flex items-center gap-1.5 text-[10.5px] text-muted-foreground/80">
+                    <CalendarDays className="h-3.5 w-3.5" />
+                    {new Date(item.created_at).toLocaleDateString("en-US", {
+                      month: "short",
+                      day: "2-digit",
+                      year: "numeric",
+                    })}
+                  </span>
+                ) : null}
               </div>
 
-              <h3 className="text-lg font-extrabold text-foreground">{item.title}</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                {item.description}
-              </p>
-            </div>
+              {activeTab === "created" ? (
+                <div className="flex shrink-0 items-center gap-1.5">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => onEdit(item)}
+                    className="h-9 rounded-[11px] border-border/65 bg-transparent px-3 text-[11px] font-medium text-info hover:bg-info/[0.06] hover:text-info"
+                  >
+                    <Edit3 className="h-3.5 w-3.5" />
+                    Edit
+                  </Button>
 
-            {activeTab === "created" && (
-              <div className="flex md:flex-col items-center justify-end gap-2 border-t md:border-t-0 md:border-l border-border/60 pt-3 md:pt-0 md:pl-4">
-                <Button size="sm" variant="ghost" onClick={() => onEdit(item)} className="w-full h-9 rounded-xl text-info hover:text-info hover:bg-info/10 text-xs gap-1 justify-start">
-                  <Edit3 className="w-4 h-4" /> Edit
-                </Button>
-                <Button size="sm" variant="ghost" onClick={() => handleDelete(item.id, item.title)} disabled={isDeleting} className="w-full h-9 rounded-xl text-destructive hover:text-destructive hover:bg-destructive/10 text-xs gap-1 justify-start">
-                  {isDeleting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />} Delete
-                </Button>
-              </div>
-            )}
-          </div>
-        );
-      })}
-    </div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setPendingDelete(item)}
+                    className="h-9 rounded-[11px] border-border/65 bg-transparent px-3 text-[11px] font-medium text-destructive hover:bg-destructive/[0.06] hover:text-destructive"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                    Delete
+                  </Button>
+                </div>
+              ) : null}
+            </article>
+          );
+        })}
+      </div>
+
+      <DeleteConfirmationDialog
+        open={Boolean(pendingDelete)}
+        onOpenChange={(open) => {
+          if (!open) setPendingDelete(null);
+        }}
+        title="Delete announcement?"
+        description={`“${pendingDelete?.title ?? "This announcement"}” will be permanently removed from the communication feed.`}
+        isPending={deleteAnnouncement.isPending}
+        onConfirm={() => {
+          if (!pendingDelete) return;
+          deleteAnnouncement.mutate(pendingDelete.id, {
+            onSuccess: () => setPendingDelete(null),
+          });
+        }}
+      />
+    </>
   );
 }

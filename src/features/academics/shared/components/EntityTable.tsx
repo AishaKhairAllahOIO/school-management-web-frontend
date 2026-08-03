@@ -76,7 +76,7 @@ export function EntityTable<T>({
           <article
             key={getRowId(row)}
             className={[
-              "group relative overflow-hidden rounded-[22px] border bg-card",
+              "group relative overflow-visible rounded-[22px] border bg-card",
               "border-border/65 shadow-[var(--shadow-card)]",
               "transition-[transform,border-color,box-shadow] duration-300",
               "hover:-translate-y-0.5 hover:border-[var(--academic-border)]",
@@ -120,7 +120,7 @@ export function EntityTable<T>({
               ))}
 
               {actions ? (
-                <div className="flex items-center justify-end border-t border-border/50 pt-3 md:border-0 md:pt-0">
+                <div className="flex flex-wrap items-center justify-end gap-2 border-t border-border/50 pt-3 md:border-0 md:pt-0">
                   {actions(row)}
                 </div>
               ) : null}

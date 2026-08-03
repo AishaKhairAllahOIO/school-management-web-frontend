@@ -43,21 +43,47 @@ export function ProfileMenu({
 
   const displayName = user
     ? `${user.firstName} ${user.lastName}`.trim()
-    : "Loading...";
+    : t.layout.topbar.loadingUser;
 
   const photoUrl =
     useAuthenticatedImage(user?.photoUrl);
 
-  const roleLabel = user?.role?.[0]
-    ? user.role[0]
-        .split("_")
-        .map(
-          (word) =>
-            word.charAt(0).toUpperCase() +
-            word.slice(1),
-        )
-        .join(" ")
-    : "User";
+  const primaryRole =
+    user?.role?.[0] ?? "";
+
+  const roleLabel = (() => {
+    switch (primaryRole) {
+      case "super_admin":
+        return t.layout.topbar.roles.superAdmin;
+
+      case "teacher":
+        return t.layout.topbar.roles.teacher;
+
+      case "adviser":
+        return t.layout.topbar.roles.adviser;
+
+      case "supervisor":
+        return t.layout.topbar.roles.supervisor;
+
+      case "secretary":
+        return t.layout.topbar.roles.secretary;
+
+      case "counselor":
+        return t.layout.topbar.roles.counselor;
+
+      case "service_staff":
+        return t.layout.topbar.roles.serviceStaff;
+
+      case "student":
+        return t.layout.topbar.roles.student;
+
+      case "guardian":
+        return t.layout.topbar.roles.guardian;
+
+      default:
+        return t.layout.topbar.roles.user;
+    }
+  })();
 
   const isSuperAdmin =
     user?.role?.includes("super_admin");
@@ -104,7 +130,7 @@ export function ProfileMenu({
           "focus-visible:outline-none",
           "focus-visible:ring-4",
           "focus-visible:ring-primary/10",
-          "lg:w-[278px]",
+          "w-[48px] sm:w-[56px] lg:w-[278px]",
           "lg:justify-start",
           "lg:gap-3",
           "lg:rounded-[20px]",
@@ -197,7 +223,7 @@ export function ProfileMenu({
               title={
                 t.layout.topbar.viewProfile
               }
-              description="Personal account details"
+              description={t.layout.topbar.viewProfileDescription}
               icon={Eye}
               onClick={() =>
                 navigateAndClose("/profile")
@@ -207,8 +233,14 @@ export function ProfileMenu({
             {isSuperAdmin && (
               <>
                 <ProfileMenuItem
-                  title="View All Administrators"
-                  description="Manage administrator accounts"
+                  title={
+                    t.layout.topbar
+                      .viewAllAdministrators
+                  }
+                  description={
+                    t.layout.topbar
+                      .viewAllAdministratorsDescription
+                  }
                   icon={UsersRound}
                   onClick={() =>
                     navigateAndClose(
@@ -218,8 +250,14 @@ export function ProfileMenu({
                 />
 
                 <ProfileMenuItem
-                  title="Add Administrator"
-                  description="Create an administrator account"
+                  title={
+                    t.layout.topbar
+                      .addAdministrator
+                  }
+                  description={
+                    t.layout.topbar
+                      .addAdministratorDescription
+                  }
                   icon={UserPlus}
                   onClick={() =>
                     navigateAndClose(
@@ -232,7 +270,7 @@ export function ProfileMenu({
                   title={
                     t.layout.topbar.manageUsers
                   }
-                  description="Open the users workspace"
+                  description={t.layout.topbar.manageUsersDescription}
                   icon={Settings}
                   onClick={() =>
                     navigateAndClose("/users")

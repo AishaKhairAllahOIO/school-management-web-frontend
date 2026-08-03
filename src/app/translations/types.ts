@@ -10,6 +10,8 @@ export type TranslationDictionary = {
     back: string;
     close: string;
     confirm: string;
+    tryAgain: string;
+    backToHome: string;
   };
 
   navigation: {
@@ -43,18 +45,54 @@ export type TranslationDictionary = {
 
   errors: {
     somethingWentWrong: string;
+    unexpectedError: string;
     unauthorized: string;
     forbidden: string;
     notFound: string;
+    pageNotFound: string;
   };
 
   layout: {
     sidebar: {
       navigation: string;
+      schoolName: string;
       schoolWebsite: string;
+      viewWebsite: string;
+      mainMenu: string;
+      goodMorning: string;
+      goodAfternoon: string;
+      goodEvening: string;
       expandSidebar: string;
       collapseSidebar: string;
       closeSidebar: string;
+    };
+
+    subNavigation: {
+      sectionNavigation: string;
+      students: string;
+      staff: string;
+      classes: string;
+      exams: string;
+      quizzes: string;
+      holidays: string;
+      studentContracts: string;
+      studentInstallments: string;
+      studentPayments: string;
+      staffPayroll: string;
+      announcements: string;
+      activities: string;
+      schoolLaws: string;
+      general: string;
+      academic: string;
+      financial: string;
+      attendance: string;
+      roles: string;
+      permissions: string;
+    };
+
+    breadcrumb: {
+      label: string;
+      pages: Record<string, string>;
     };
 
     topbar: {
@@ -63,13 +101,39 @@ export type TranslationDictionary = {
       notifications: string;
       notificationsTitle: string;
       unreadUpdates: string;
+      markAllRead: string;
+      notificationsLoadErrorTitle: string;
+      notificationsLoadErrorDescription: string;
+      noSystemNotificationsTitle: string;
+      noSystemNotificationsDescription: string;
+      unread: string;
       overview: string;
       online: string;
       viewProfile: string;
+      viewProfileDescription: string;
+      viewAllAdministrators: string;
+      viewAllAdministratorsDescription: string;
+      addAdministrator: string;
+      addAdministratorDescription: string;
       changePassword: string;
       manageUsers: string;
+      manageUsersDescription: string;
       logout: string;
       openProfileMenu: string;
+      loadingUser: string;
+      fallbackUser: string;
+      roles: {
+        superAdmin: string;
+        teacher: string;
+        adviser: string;
+        supervisor: string;
+        secretary: string;
+        counselor: string;
+        serviceStaff: string;
+        student: string;
+        guardian: string;
+        user: string;
+      };
     };
   };
 };

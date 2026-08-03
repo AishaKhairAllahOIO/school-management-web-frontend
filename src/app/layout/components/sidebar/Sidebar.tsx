@@ -31,18 +31,18 @@ function formatSidebarDate(locale: string) {
   };
 }
 
-function getGreeting() {
+function getGreetingKey() {
   const hour = new Date().getHours();
 
   if (hour < 12) {
-    return "Good morning";
+    return "goodMorning" as const;
   }
 
   if (hour < 18) {
-    return "Good afternoon";
+    return "goodAfternoon" as const;
   }
 
-  return "Good evening";
+  return "goodEvening" as const;
 }
 
 export function Sidebar() {
@@ -60,7 +60,7 @@ export function Sidebar() {
   const isRtl = direction === "rtl";
 
   const date = formatSidebarDate(locale);
-  const greeting = getGreeting();
+  const greeting = t.layout.sidebar[getGreetingKey()];
 
   const sidebarPositionClass = isRtl
     ? "right-0 rounded-l-[28px]"
@@ -274,7 +274,7 @@ export function Sidebar() {
                   text-sidebar-foreground
                 "
               >
-                School Management
+                {t.layout.sidebar.schoolName}
               </h1>
 
               {/* Date centered below title */}
@@ -373,7 +373,7 @@ export function Sidebar() {
                   text-sidebar-muted/58
                 "
               >
-                Main menu
+                {t.layout.sidebar.mainMenu}
               </span>
 
               <span
@@ -413,8 +413,12 @@ export function Sidebar() {
               href={WEBSITE_URL}
               target="_blank"
               rel="noopener noreferrer"
-              aria-label="View website"
-              title="View website"
+              aria-label={
+                t.layout.sidebar.viewWebsite
+              }
+              title={
+                t.layout.sidebar.viewWebsite
+              }
               className={[
                 "group flex items-center",
                 "bg-sidebar-foreground/[0.105]",
@@ -468,7 +472,7 @@ export function Sidebar() {
                     tracking-[-0.01em]
                   "
                 >
-                  View Website
+                  {t.layout.sidebar.viewWebsite}
                 </span>
               )}
             </a>

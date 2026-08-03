@@ -386,8 +386,6 @@ export function StaffEditPage({
         onBack={() =>
           navigate(config.listPath)
         }
-        photoUrl={visiblePhoto}
-        photoAlt={staff.fullName}
         roleLabel={config.singularLabel}
         badgeLabel="Edit profile"
         icon={config.icon}

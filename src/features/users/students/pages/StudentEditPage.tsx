@@ -39,6 +39,8 @@ import { StudentAcademicFields } from "../components/form/StudentAcademicFields"
 import { StudentPageHeader } from "../components/shared/StudentPageHeader";
 import { UserPageBackButton } from "../../shared/components/UserPageBackButton";
 import { AuthenticatedUserImage } from "../../shared/components/AuthenticatedUserImage";
+import { UserPhotoCard } from "../../shared/components/UserPhotoCard";
+import { USER_NATIONALITIES } from "../../shared/constants/user-nationalities";
 import {
   useStudentFullProfile,
   useUpdateStudentPersonal,
@@ -907,7 +909,6 @@ function PersonPhotoSection({
   authenticated,
   disabled,
   onChange,
-  onRemove,
 }: {
   title: string;
   description: string;
@@ -918,60 +919,16 @@ function PersonPhotoSection({
   onRemove: () => void;
 }) {
   return (
-    <FormSection
-      eyebrow="Profile"
+    <UserPhotoCard
       title={title}
       description={description}
-      icon={<Camera size={18} strokeWidth={1.7} />}
-      completed={Boolean(photoUrl)}
-    >
-      <div className="flex flex-col items-center gap-5 sm:flex-row">
-        <div className="flex h-36 w-28 shrink-0 items-center justify-center overflow-hidden rounded-[20px] border border-border/60 bg-primary/[0.035]">
-          {photoUrl ? (
-            authenticated ? (
-              <AuthenticatedUserImage
-                src={photoUrl}
-                alt={title}
-                className="h-full w-full object-cover"
-              />
-            ) : (
-              <img
-                src={photoUrl}
-                alt={title}
-                className="h-full w-full object-cover"
-              />
-            )
-          ) : (
-            <Camera size={35} strokeWidth={1.4} className="text-primary" />
-          )}
-        </div>
-
-        <div className="flex flex-wrap gap-3">
-          <label className="inline-flex h-11 cursor-pointer items-center gap-2 rounded-xl border border-primary/20 bg-primary/[0.06] px-5 text-sm font-medium text-primary transition hover:bg-primary/[0.1]">
-            <Camera size={16} strokeWidth={1.8} />
-            Choose photo
-            <input
-              type="file"
-              accept="image/png,image/jpeg,image/webp"
-              className="hidden"
-              disabled={disabled}
-              onChange={onChange}
-            />
-          </label>
-
-          {photoUrl && !authenticated ? (
-            <button
-              type="button"
-              disabled={disabled}
-              onClick={onRemove}
-              className="inline-flex h-11 items-center rounded-xl border border-border/70 bg-card px-4 text-sm font-medium text-foreground transition hover:bg-muted/40 disabled:opacity-60"
-            >
-              Remove
-            </button>
-          ) : null}
-        </div>
-      </div>
-    </FormSection>
+      photoUrl={photoUrl}
+      alt={title}
+      authenticated={authenticated}
+      editable
+      disabled={disabled}
+      onChange={onChange}
+    />
   );
 }
 
@@ -1017,7 +974,6 @@ function EditablePersonSection({
             ["father_name", "Father name"],
             ["mother_name", "Mother name"],
             ["birth_place", "Birth place"],
-            ["nationality", "Nationality"],
             ["phone_number", "Phone number"],
           ] as const
         ).map(([key, label]) => (
@@ -1042,6 +998,26 @@ function EditablePersonSection({
             />
           </FormField>
         ))}
+
+        <FormField label="Nationality">
+          <Select
+            value={value.nationality || "syrian"}
+            onValueChange={(nextValue) =>
+              update("nationality", nextValue)
+            }
+          >
+            <SelectTrigger className="h-12 rounded-[15px]">
+              <SelectValue placeholder="Select nationality" />
+            </SelectTrigger>
+            <SelectContent>
+              {USER_NATIONALITIES.map((item) => (
+                <SelectItem key={item.value} value={item.value}>
+                  {item.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </FormField>
 
         <FormField label="Birth date">
           <DatePicker

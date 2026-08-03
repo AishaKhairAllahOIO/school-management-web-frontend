@@ -24,18 +24,18 @@ function formatMobileSidebarDate(locale: string) {
   };
 }
 
-function getGreeting() {
+function getGreetingKey() {
   const hour = new Date().getHours();
 
   if (hour < 12) {
-    return "Good morning";
+    return "goodMorning" as const;
   }
 
   if (hour < 18) {
-    return "Good afternoon";
+    return "goodAfternoon" as const;
   }
 
-  return "Good evening";
+  return "goodEvening" as const;
 }
 
 export function MobileSidebar() {
@@ -51,7 +51,7 @@ export function MobileSidebar() {
 
   const isRtl = direction === "rtl";
   const date = formatMobileSidebarDate(locale);
-  const greeting = getGreeting();
+  const greeting = t.layout.sidebar[getGreetingKey()];
 
   const sidebarPositionClass = isRtl
     ? "right-0 rounded-l-[28px]"
@@ -75,7 +75,7 @@ export function MobileSidebar() {
         className={[
           "sidebar-gradient sidebar-shell",
           "absolute top-0 z-10",
-          "flex h-full w-[264px] max-w-[86vw] flex-col",
+          "flex h-full w-[248px] max-w-[82vw] flex-col",
           "overflow-hidden text-sidebar-foreground",
           sidebarPositionClass,
         ].join(" ")}
@@ -120,7 +120,7 @@ export function MobileSidebar() {
                 </div>
 
                 <h1 className="mt-2 text-[15px] font-semibold leading-[19px] tracking-[-0.02em] text-sidebar-foreground">
-                  School Management
+                  {t.layout.sidebar.schoolName}
                 </h1>
 
                 <div className="mt-3 flex items-center gap-2 text-[10px] text-sidebar-muted/78">
@@ -140,7 +140,7 @@ export function MobileSidebar() {
           <div className="flex min-h-0 flex-1 flex-col overflow-hidden px-3.5">
             <div className="mb-2 mt-2 flex h-5 shrink-0 items-center gap-3 px-2">
               <span className="text-[9px] font-semibold uppercase tracking-[0.15em] text-sidebar-muted/58">
-                Main menu
+                {t.layout.sidebar.mainMenu}
               </span>
               <span className="relative -top-[2px] h-px flex-1 bg-sidebar-foreground/[0.055]" />
             </div>

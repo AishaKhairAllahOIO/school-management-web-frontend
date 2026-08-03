@@ -1,256 +1,88 @@
-import { useState, useEffect } from "react";
-import { Megaphone, Loader2, Users, School } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from "@/shared/ui/dialog";
+import { LoaderCircle, Megaphone, School, Users } from "lucide-react";
+import { useEffect, useState } from "react";
 import { Button } from "@/shared/ui/button";
-import { MultiSelectAudience, type OptionItem } from "../shared/MultiSelectAudience";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/shared/ui/dialog";
 import { useAnnouncements } from "../../hooks/useAnnouncements";
 import type { Announcement, AnnouncementAudience } from "../../types/communication.types";
+import { MultiSelectAudience, type OptionItem } from "../shared/MultiSelectAudience";
 
-type Props = {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  gradeLevels: { id: string | number; name: string }[];
-  classRooms: OptionItem[];
-  announcementToEdit?: Announcement | null;
-};
+type Props = { open: boolean; onOpenChange: (open: boolean) => void; gradeLevels: { id: string | number; name: string }[]; classRooms: OptionItem[]; announcementToEdit?: Announcement | null };
 
-export function CreateAnnouncementDialog({
-  open,
-  onOpenChange,
-  gradeLevels = [],
-  classRooms = [],
-  announcementToEdit = null,
-}: Props) {
+export function CreateAnnouncementDialog({ open, onOpenChange, gradeLevels = [], classRooms = [], announcementToEdit = null }: Props) {
   const { createAnnouncement, updateAnnouncement } = useAnnouncements();
-  const isEditing = !!announcementToEdit;
+  const isEditing = Boolean(announcementToEdit);
   const isPending = createAnnouncement.isPending || updateAnnouncement.isPending;
-
   const [audience, setAudience] = useState<AnnouncementAudience>("student");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [gradeLevelId, setGradeLevelId] = useState<string | number>("");
   const [selectedClassRoomIds, setSelectedClassRoomIds] = useState<(string | number)[]>([]);
+  const [formError, setFormError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (announcementToEdit && open) {
-      setAudience(announcementToEdit.audience || "student");
-      setTitle(announcementToEdit.title || "");
-      setDescription(announcementToEdit.description || "");
-      setGradeLevelId(announcementToEdit.grade_level_id || "");
-      setSelectedClassRoomIds(announcementToEdit.class_room_ids || []);
+    if (open && announcementToEdit) {
+      setAudience(announcementToEdit.audience ?? "student");
+      setTitle(announcementToEdit.title ?? "");
+      setDescription(announcementToEdit.description ?? "");
+      setGradeLevelId(announcementToEdit.grade_level_id ?? "");
+      setSelectedClassRoomIds(announcementToEdit.class_room_ids ?? []);
+      setFormError(null);
     } else if (!open) {
-      setAudience("student");
-      setTitle("");
-      setDescription("");
-      setGradeLevelId("");
-      setSelectedClassRoomIds([]);
+      setAudience("student"); setTitle(""); setDescription(""); setGradeLevelId(""); setSelectedClassRoomIds([]); setFormError(null);
     }
   }, [announcementToEdit, open]);
 
-  // 🌟 1. تفريغ الشعب المحددة تلقائياً عند تغيير المرحلة الدراسية
-  useEffect(() => {
-    setSelectedClassRoomIds([]);
-  }, [gradeLevelId]);
+  const filteredClassRooms = classRooms.filter((item: any) => !gradeLevelId || String(item.parentId) === String(gradeLevelId));
 
-  // 🌟 2. فلترة قائمة الشعب لتُظهر فقط شعب المرحلة المختارة
-  const filteredClassRooms = classRooms.filter(
-    (c: any) => !gradeLevelId || String(c.parentId) === String(gradeLevelId)
-  );
+  function submit(event: React.FormEvent) {
+    event.preventDefault();
+    setFormError(null);
+    if (!title.trim() || !description.trim()) { setFormError("Title and announcement details are required."); return; }
+    if (audience === "student" && !gradeLevelId) { setFormError("Select a grade for student announcements."); return; }
 
-  const handleError = (err: any) => {
-    console.error("Announcement Error:", err?.response?.data || err);
-    if (err?.response?.status === 403) {
-      alert("❌ عذراً، حسابك الحالي لا يمتلك الصلاحيات الكافية لنشر هذا الإعلان.");
-      return;
-    }
-    const backendMessage = err?.response?.data?.message;
-    const backendErrors = err?.response?.data?.errors;
-    const firstError = backendErrors ? Object.values(backendErrors)[0] : null;
-    alert(`❌ فشل النشر:\n[ ${firstError || backendMessage || "حدث خطأ غير معروف"} ]`);
-  };
-
-  const handleSuccess = () => {
-    alert(isEditing ? "✅ تم تعديل الإعلان بنجاح!" : "✅ تم نشر الإعلان بنجاح!");
-    onOpenChange(false);
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (audience === "student" && !gradeLevelId) {
-      alert("الرجاء تحديد المرحلة الدراسية الموجه إليها الإعلان.");
-      return;
-    }
-
-    const payload: any = {
-      audience,
-      title: title.trim(),
-      description: description.trim(),
-    };
-
+    const payload: any = { audience, title: title.trim(), description: description.trim() };
     if (audience === "student") {
       payload.grade_level_id = Number(gradeLevelId);
-      if (selectedClassRoomIds.length > 0) {
-        payload.class_room_ids = selectedClassRoomIds.map((id) => Number(id));
-      }
+      if (selectedClassRoomIds.length) payload.class_room_ids = selectedClassRoomIds.map(Number);
     }
 
-    if (isEditing && announcementToEdit) {
-      updateAnnouncement.mutate(
-        { id: announcementToEdit.id, payload },
-        { onSuccess: handleSuccess, onError: handleError }
-      );
-    } else {
-      createAnnouncement.mutate(payload, { 
-        onSuccess: handleSuccess, 
-        onError: handleError 
-      });
-    }
-  };
+    const options = { onSuccess: () => onOpenChange(false) };
+    if (isEditing && announcementToEdit) updateAnnouncement.mutate({ id: announcementToEdit.id, payload }, options);
+    else createAnnouncement.mutate(payload, options);
+  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      {/* 🌟 3. إضافة ميزة السكرول للنافذة (max-h-[85vh] overflow-y-auto) */}
-      <DialogContent className="floating-card sm:max-w-xl rounded-3xl border border-border p-6 shadow-2xl max-h-[85vh] overflow-y-auto" dir="rtl">
-        <DialogHeader className="space-y-1.5 text-right">
-          <DialogTitle className="flex items-center gap-2.5 text-xl font-bold tracking-tight text-foreground">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-secondary text-primary">
-              <Megaphone className="h-5 w-5" />
+      <DialogContent className="max-h-[88vh] overflow-y-auto rounded-[22px] border border-border/70 bg-card p-0 shadow-[0_24px_70px_rgba(27,19,66,0.18)] sm:max-w-xl">
+        <div className="p-5 sm:p-6">
+          <DialogHeader className="text-start">
+            <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-[15px] bg-primary/[0.09] text-primary"><Megaphone className="h-5 w-5" /></div>
+            <DialogTitle className="text-[18px] font-semibold tracking-[-0.02em]">{isEditing ? "Edit announcement" : "New announcement"}</DialogTitle>
+            <DialogDescription className="pt-1 text-[12.5px] leading-5">Publish a focused message and choose exactly who should receive it.</DialogDescription>
+          </DialogHeader>
+
+          <form onSubmit={submit} className="mt-5 space-y-4">
+            <div className="grid grid-cols-3 gap-2">
+              {([ ["student", School, "Students"], ["staff", Users, "Staff"], ["both", Megaphone, "Both"] ] as const).map(([value, Icon, label]) => (
+                <button key={value} type="button" onClick={() => { setAudience(value); if (value !== "student") { setGradeLevelId(""); setSelectedClassRoomIds([]); } }} className={["flex h-11 items-center justify-center gap-2 rounded-[12px] border text-[11px] font-medium transition", audience === value ? "border-primary/25 bg-primary/[0.07] text-primary" : "border-border/65 bg-background text-muted-foreground hover:bg-muted/30"].join(" ")}><Icon className="h-4 w-4" />{label}</button>
+              ))}
             </div>
-            {isEditing ? "تعديل التعميم / الإعلان" : "نشر تعميم أو إعلان جديد"}
-          </DialogTitle>
-          <DialogDescription className="text-sm text-muted-foreground pr-11">
-            أدخل تفاصيل التعميم وحدد الفئة المستهدفة ليتم إرساله وتنبيههم فوراً.
-          </DialogDescription>
-        </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-5 mt-4">
-          <div className="space-y-2">
-            <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block">
-              الفئة المستهدفة بالإعلان <span className="text-destructive">*</span>
-            </label>
-            {/* 🌟 4. إضافة خيار "الجميع" ليتوافق مع الباك إند */}
-            <div className="grid grid-cols-3 gap-3 p-1.5 bg-muted/30 rounded-2xl border border-border">
-              <button
-                type="button"
-                onClick={() => setAudience("student")}
-                className={`flex flex-col items-center justify-center gap-1.5 py-2.5 rounded-xl text-sm font-medium transition-all ${
-                  audience === "student"
-                    ? "bg-card text-primary shadow-sm border border-border"
-                    : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
-                }`}
-              >
-                <School className="w-4 h-4" /> الطلاب
-              </button>
-              <button
-                type="button"
-                onClick={() => setAudience("staff")}
-                className={`flex flex-col items-center justify-center gap-1.5 py-2.5 rounded-xl text-sm font-medium transition-all ${
-                  audience === "staff"
-                    ? "bg-card text-primary shadow-sm border border-border"
-                    : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
-                }`}
-              >
-                <Users className="w-4 h-4" /> الكادر
-              </button>
-              <button
-                type="button"
-                onClick={() => setAudience("both")}
-                className={`flex flex-col items-center justify-center gap-1.5 py-2.5 rounded-xl text-sm font-medium transition-all ${
-                  audience === "both"
-                    ? "bg-card text-primary shadow-sm border border-border"
-                    : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
-                }`}
-              >
-                <Megaphone className="w-4 h-4" /> الجميع
-              </button>
-            </div>
-          </div>
+            <div className="space-y-1.5"><label className="text-[11px] font-medium">Announcement title</label><input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Example: Parent meeting update" className="h-11 w-full rounded-[12px] border border-input bg-background px-3 text-[12px] outline-none focus:ring-4 focus:ring-primary/[0.07]" /></div>
 
-          <div className="space-y-2">
-            <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block">
-              عنوان الإعلان <span className="text-destructive">*</span>
-            </label>
-            <input
-              type="text"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="مثال: اجتماع طارئ، عطلة رسمية..."
-              required
-              className="w-full h-11 rounded-xl border border-input p-3 text-sm bg-card text-foreground focus:ring-2 focus:ring-ring outline-none transition-all"
-            />
-          </div>
-
-          {audience === "student" && (
-            <div className="p-4 bg-muted/20 rounded-2xl border border-border space-y-4 animate-in fade-in duration-200">
-              <div className="space-y-2">
-                <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block">
-                  المرحلة الدراسية <span className="text-destructive">*</span>
-                </label>
-                <select
-                  value={gradeLevelId}
-                  onChange={(e) => setGradeLevelId(e.target.value)}
-                  required
-                  className="w-full h-11 rounded-xl border border-input px-3 text-sm bg-card text-foreground focus:ring-2 focus:ring-ring outline-none"
-                >
-                  <option value="">-- اختر المرحلة الدراسية --</option>
-                  {gradeLevels.map((grade) => (
-                    <option key={grade.id} value={grade.id}>{grade.name}</option>
-                  ))}
-                </select>
+            {audience === "student" ? (
+              <div className="space-y-4 rounded-[16px] border border-info/[0.12] bg-info/[0.025] p-4">
+                <div className="space-y-1.5"><label className="text-[11px] font-medium">Grade</label><select value={gradeLevelId} onChange={(e) => { setGradeLevelId(e.target.value); setSelectedClassRoomIds([]); }} className="h-11 w-full rounded-[12px] border border-input bg-background px-3 text-[12px]"><option value="">Select grade</option>{gradeLevels.map((grade) => <option key={grade.id} value={grade.id}>{grade.name}</option>)}</select></div>
+                <MultiSelectAudience label="Classrooms (optional)" placeholder="Search classrooms" options={filteredClassRooms} selectedIds={selectedClassRoomIds} onChange={setSelectedClassRoomIds} />
               </div>
+            ) : null}
 
-              {/* 🌟 استخدام المصفوفة المفلترة هنا */}
-              <MultiSelectAudience
-                label="تخصيص شعب محددة (اختياري - يترك فارغاً لكل الشعب)"
-                placeholder="ابحث واختر الشعب..."
-                options={filteredClassRooms}
-                selectedIds={selectedClassRoomIds}
-                onChange={setSelectedClassRoomIds}
-              />
-            </div>
-          )}
+            <div className="space-y-1.5"><label className="text-[11px] font-medium">Announcement details</label><textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Write a clear and complete announcement." className="min-h-[135px] w-full resize-none rounded-[14px] border border-input bg-background p-3 text-[12px] leading-5 outline-none focus:ring-4 focus:ring-primary/[0.07]" /></div>
+            {formError ? <p className="rounded-[10px] bg-destructive/[0.07] px-3 py-2 text-[11px] text-destructive">{formError}</p> : null}
 
-          <div className="space-y-2">
-            <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block">
-              نص الإعلان والتفاصيل <span className="text-destructive">*</span>
-            </label>
-            <textarea
-              rows={4}
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="اكتب تفاصيل التعميم بوضوح هنا..."
-              required
-              className="w-full rounded-2xl border border-input p-3 text-sm bg-card text-foreground focus:ring-2 focus:ring-ring outline-none transition-all resize-none min-h-[100px]"
-            />
-          </div>
-
-          <div className="flex items-center gap-3 pt-4 border-t border-border/60">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-              disabled={isPending}
-              className="h-11 flex-1 rounded-xl border-border bg-transparent text-foreground hover:bg-muted"
-            >
-              إلغاء
-            </Button>
-            <Button
-              type="submit"
-              disabled={isPending}
-              className="primary-gradient h-11 flex-[2] rounded-xl font-semibold text-primary-foreground shadow-md transition-all hover:opacity-95 active:scale-[0.98]"
-            >
-              {isPending && <Loader2 className="w-4 h-4 ml-2 animate-spin" />}
-              {isEditing ? "حفظ التعديلات" : "اعتماد ونشر التعميم"}
-            </Button>
-          </div>
-        </form>
+            <div className="flex justify-end gap-2.5 border-t border-border/50 pt-4"><Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={isPending} className="h-10 rounded-[12px] border-border/70 bg-transparent px-4 text-[12px]">Cancel</Button><Button type="submit" disabled={isPending} className="h-10 rounded-[12px] px-4 text-[12px]">{isPending ? <LoaderCircle className="h-4 w-4 animate-spin" /> : null}{isEditing ? "Save changes" : "Publish announcement"}</Button></div>
+          </form>
+        </div>
       </DialogContent>
     </Dialog>
   );

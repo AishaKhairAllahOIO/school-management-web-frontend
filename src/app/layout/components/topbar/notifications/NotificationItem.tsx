@@ -2,6 +2,9 @@ import {
   BellRing,
 } from "lucide-react";
 
+import {
+  useLocale,
+} from "@/app/providers/locale";
 import type {
   SystemNotice,
 } from "@/features/system-notices";
@@ -19,6 +22,8 @@ export function NotificationItem({
   notice,
   locale,
 }: NotificationItemProps) {
+  const { t } = useLocale();
+
   return (
     <article
       className={[
@@ -47,7 +52,7 @@ export function NotificationItem({
 
             {notice.is_read === false ? (
               <span
-                aria-label="Unread"
+                aria-label={t.layout.topbar.unread}
                 className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary"
               />
             ) : null}

@@ -1,57 +1,70 @@
-import { lazy, Suspense } from "react";
-import type { RouteObject } from "react-router-dom";
-import { Navigate } from "react-router-dom";
-import { Loader2 } from "lucide-react";
-
+import {
+  lazy,
+  Suspense,
+} from "react";
+import type {
+  RouteObject,
+} from "react-router-dom";
+import {
+  Navigate,
+} from "react-router-dom";
 
 const CommunicationsPage = lazy(() =>
-  import("@/features/communications/pages/CommunicationsPage").then((module) => ({
+  import(
+    "@/features/communications/pages/CommunicationsPage"
+  ).then((module) => ({
     default: module.CommunicationsPage,
-  }))
+  })),
 );
 
+function PageFallback() {
+  return (
+    <div className="-mt-1 space-y-4">
+      <div className="h-[78px] animate-pulse rounded-[22px] border border-border/60 bg-card" />
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        {Array.from({ length: 6 }).map((_, index) => (
+          <div
+            key={index}
+            className="h-[220px] animate-pulse rounded-[20px] border border-border/60 bg-card"
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
 
-const PageFallback = () => (
-  <div className="flex items-center justify-center min-h-[60vh] w-full text-primary">
-    <Loader2 className="w-8 h-8 animate-spin" />
-  </div>
-);
-
+function CommunicationRoute() {
+  return (
+    <Suspense fallback={<PageFallback />}>
+      <CommunicationsPage />
+    </Suspense>
+  );
+}
 
 export const communicationsRoutes = [
   {
     path: "communications",
     children: [
-
       {
         index: true,
-        element: <Navigate to="announcements" replace />,
+        element: (
+          <Navigate
+            to="announcements"
+            replace
+          />
+        ),
       },
-
       {
         path: "announcements",
-        element: (
-          <Suspense fallback={<PageFallback />}>
-            <CommunicationsPage />
-          </Suspense>
-        ),
+        element: <CommunicationRoute />,
       },
-
       {
         path: "activities",
-        element: (
-          <Suspense fallback={<PageFallback />}>
-            <CommunicationsPage />
-          </Suspense>
-        ),
+        element: <CommunicationRoute />,
       },
       {
         path: "laws",
-        element: (
-          <Suspense fallback={<PageFallback />}>
-            <CommunicationsPage />
-          </Suspense>
-        ),
+        element: <CommunicationRoute />,
       },
     ],
   },
