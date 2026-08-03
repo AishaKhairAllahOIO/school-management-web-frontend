@@ -1,11 +1,13 @@
 import {
   Banknote,
-  Bell,
+  BellRing,
   BookOpen,
   Building2,
   CalendarDays,
+  CalendarRange,
   FileText,
   LockKeyhole,
+  Megaphone,
   ReceiptText,
   Scale,
   ShieldCheck,
@@ -37,6 +39,11 @@ type SubNavigationItem = {
   path: string;
   icon: LucideIcon;
   group?: "student" | "staff";
+  tone?:
+    | "primary"
+    | "info"
+    | "warning"
+    | "success";
 };
 
 type SubNavigationSection = {
@@ -120,17 +127,26 @@ const subNavigationSections: SubNavigationSection[] = [
       {
         titleKey: "announcements",
         path: "/communications/announcements",
-        icon: Bell,
+        icon: Megaphone,
+        tone: "primary",
+      },
+      {
+        titleKey: "alerts",
+        path: "/communications/alerts",
+        icon: BellRing,
+        tone: "warning",
       },
       {
         titleKey: "activities",
         path: "/communications/activities",
-        icon: FileText,
+        icon: CalendarRange,
+        tone: "info",
       },
       {
         titleKey: "schoolLaws",
         path: "/communications/laws",
         icon: Scale,
+        tone: "success",
       },
     ],
   },
@@ -171,69 +187,125 @@ const subNavigationSections: SubNavigationSection[] = [
   },
 ];
 
+function getToneClasses(
+  tone: SubNavigationItem["tone"],
+  isActive: boolean,
+) {
+  if (!isActive) {
+    return {
+      shell:
+        "text-muted-foreground hover:bg-muted/40 hover:text-foreground",
+      icon:
+        "text-muted-foreground transition-colors group-hover:text-foreground",
+      indicator: "bg-primary",
+      ring: "focus-visible:ring-primary/10",
+    };
+  }
+
+  switch (tone) {
+    case "info":
+      return {
+        shell: "bg-info/[0.09] text-info",
+        icon: "text-info",
+        indicator: "bg-info",
+        ring: "focus-visible:ring-info/10",
+      };
+
+    case "warning":
+      return {
+        shell:
+          "bg-warning/[0.10] text-warning",
+        icon: "text-warning",
+        indicator: "bg-warning",
+        ring:
+          "focus-visible:ring-warning/10",
+      };
+
+    case "success":
+      return {
+        shell:
+          "bg-success/[0.09] text-success",
+        icon: "text-success",
+        indicator: "bg-success",
+        ring:
+          "focus-visible:ring-success/10",
+      };
+
+    default:
+      return {
+        shell:
+          "bg-primary/[0.07] text-primary",
+        icon: "text-primary",
+        indicator: "bg-primary",
+        ring:
+          "focus-visible:ring-primary/10",
+      };
+  }
+}
+
 function TabItem({
   titleKey,
   path,
   icon: Icon,
+  tone,
 }: SubNavigationItem) {
   const { t } = useLocale();
+
   const title =
     t.layout.subNavigation[titleKey];
-
-  const staffPayroll =
-    path === "/finance/payroll";
 
   return (
     <NavLink
       to={path}
-      className={({ isActive }) =>
-        [
+      className={({ isActive }) => {
+        const classes = getToneClasses(
+          tone,
+          isActive,
+        );
+
+        return [
           "group relative inline-flex h-11 min-w-max items-center justify-center gap-2 rounded-[14px] px-4 text-[13px] font-medium transition-all duration-200 ease-out",
           "focus-visible:outline-none focus-visible:ring-4",
-          staffPayroll
-            ? "focus-visible:ring-info/10"
-            : "focus-visible:ring-primary/10",
-          isActive
-            ? staffPayroll
-              ? "bg-info/[0.09] text-info"
-              : "bg-primary/[0.07] text-primary"
-            : "text-muted-foreground hover:bg-muted/40 hover:text-foreground",
-        ].join(" ")
-      }
+          classes.ring,
+          classes.shell,
+        ].join(" ");
+      }}
     >
-      {({ isActive }) => (
-        <>
-          <Icon
-            aria-hidden
-            size={17}
-            strokeWidth={1.8}
-            className={
-              isActive
-                ? staffPayroll
-                  ? "shrink-0 text-info"
-                  : "shrink-0 text-primary"
-                : "shrink-0 text-muted-foreground transition-colors group-hover:text-foreground"
-            }
-          />
+      {({ isActive }) => {
+        const classes = getToneClasses(
+          tone,
+          isActive,
+        );
 
-          <span className="whitespace-nowrap">
-            {title}
-          </span>
+        return (
+          <>
+            <Icon
+              aria-hidden
+              size={17}
+              strokeWidth={1.8}
+              className={[
+                "shrink-0",
+                classes.icon,
+              ].join(" ")}
+            />
 
-          <span
-            aria-hidden
-            className={[
-              "absolute bottom-0 left-4 right-4 h-[2px] origin-center rounded-full transition-transform duration-200",
-              staffPayroll
-                ? "bg-info"
-                : "bg-primary",
-              isActive
-                ? "scale-x-100"
-                : "scale-x-0",
-            ].join(" ")}
-          />
-        </>
-      )}
+            <span className="whitespace-nowrap">
+              {title}
+            </span>
+
+            <span
+              aria-hidden
+              className={[
+                "absolute bottom-0 left-4 right-4 h-[2px] origin-center rounded-full transition-transform duration-200",
+                classes.indicator,
+                isActive
+                  ? "scale-x-100"
+                  : "scale-x-0",
+              ].join(" ")}
+            />
+          </>
+        );
+      }}
     </NavLink>
   );
 }
@@ -243,23 +315,30 @@ function DefaultSubNavigation({
 }: {
   items: SubNavigationItem[];
 }) {
-  const { direction, t } = useLocale();
+  const { direction, t } =
+    useLocale();
 
-  const hasFinanceGroups = items.some(
-    (item) => item.group === "staff",
-  );
+  const hasFinanceGroups =
+    items.some(
+      (item) =>
+        item.group === "staff",
+    );
 
-  const studentItems = hasFinanceGroups
-    ? items.filter(
-        (item) => item.group !== "staff",
-      )
-    : items;
+  const studentItems =
+    hasFinanceGroups
+      ? items.filter(
+          (item) =>
+            item.group !== "staff",
+        )
+      : items;
 
-  const staffItems = hasFinanceGroups
-    ? items.filter(
-        (item) => item.group === "staff",
-      )
-    : [];
+  const staffItems =
+    hasFinanceGroups
+      ? items.filter(
+          (item) =>
+            item.group === "staff",
+        )
+      : [];
 
   return (
     <nav
@@ -271,12 +350,14 @@ function DefaultSubNavigation({
     >
       <div className="flex h-11 w-full min-w-0 items-center overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         <div className="flex min-w-max items-center gap-1">
-          {studentItems.map((item) => (
-            <TabItem
-              key={item.path}
-              {...item}
-            />
-          ))}
+          {studentItems.map(
+            (item) => (
+              <TabItem
+                key={item.path}
+                {...item}
+              />
+            ),
+          )}
         </div>
 
         {staffItems.length ? (
@@ -288,12 +369,14 @@ function DefaultSubNavigation({
                 : "ml-2 border-l border-border/55 pl-3",
             ].join(" ")}
           >
-            {staffItems.map((item) => (
-              <TabItem
-                key={item.path}
-                {...item}
-              />
-            ))}
+            {staffItems.map(
+              (item) => (
+                <TabItem
+                  key={item.path}
+                  {...item}
+                />
+              ),
+            )}
           </div>
         ) : null}
       </div>
@@ -302,13 +385,18 @@ function DefaultSubNavigation({
 }
 
 export function SubNavigation() {
-  const { pathname } = useLocation();
+  const { pathname } =
+    useLocation();
 
   if (
     pathname === "/users" ||
-    pathname.startsWith("/users/") ||
+    pathname.startsWith(
+      "/users/",
+    ) ||
     pathname === "/academics" ||
-    pathname.startsWith("/academics/")
+    pathname.startsWith(
+      "/academics/",
+    )
   ) {
     return null;
   }
@@ -316,7 +404,8 @@ export function SubNavigation() {
   const currentSection =
     subNavigationSections.find(
       (section) =>
-        pathname === section.basePath ||
+        pathname ===
+          section.basePath ||
         pathname.startsWith(
           `${section.basePath}/`,
         ),

@@ -88,6 +88,7 @@ export type TranslationDictionary = {
       attendance: string;
       roles: string;
       permissions: string;
+      alerts: string;
     };
 
     breadcrumb: {

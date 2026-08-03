@@ -89,6 +89,7 @@ export const ar: TranslationDictionary = {
       financial: "المالية",
       attendance: "الحضور",
       roles: "الأدوار",
+      alerts: "التنبيهات",
       permissions: "الصلاحيات",
     },
 

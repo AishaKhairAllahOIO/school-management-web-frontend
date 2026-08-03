@@ -89,6 +89,7 @@ export const en: TranslationDictionary = {
       financial: "Financial",
       attendance: "Attendance",
       roles: "Roles",
+      alerts: "Alerts",
       permissions: "Permissions",
     },
 
