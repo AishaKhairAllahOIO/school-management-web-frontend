@@ -81,7 +81,7 @@ export function SchoolLawsSection() {
   return (
     <div className="space-y-3">
       <div className="flex justify-end">
-        <Button type="button" onClick={openCreate} className="h-10 rounded-[12px] px-4 text-[12px] font-medium">
+        <Button type="button" onClick={openCreate} className="h-10 rounded-[12px] bg-success px-4 text-[12px] font-semibold text-white hover:bg-success/90">
           <Plus className="h-4 w-4" />
           Add law
         </Button>

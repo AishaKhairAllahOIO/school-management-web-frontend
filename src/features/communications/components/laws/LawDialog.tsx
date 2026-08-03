@@ -141,7 +141,7 @@ export function LawDialog({
                 <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={isLoading} className="h-10 rounded-[12px] border-border/70 bg-transparent px-4 text-[12px]">
                   Cancel
                 </Button>
-                <Button type="submit" disabled={isLoading} className="h-10 rounded-[12px] px-5 text-[12px]">
+                <Button type="submit" disabled={isLoading} className="h-10 rounded-[12px] bg-success px-5 text-[12px] font-semibold text-white hover:bg-success/90">
                   {isLoading ? (
                     <span className="h-3 w-20 animate-pulse rounded-full bg-primary-foreground/60" />
                   ) : isEditing ? (

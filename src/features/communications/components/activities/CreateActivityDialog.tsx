@@ -402,7 +402,7 @@ export function CreateActivityDialog({
                 <Button
                   type="submit"
                   disabled={isPending}
-                  className="h-10 rounded-[12px] px-5 text-[12px]"
+                  className="h-10 rounded-[12px] bg-info px-5 text-[12px] font-semibold text-white shadow-[0_10px_24px_rgba(59,130,246,0.17)] hover:bg-info/90"
                 >
                   {isPending ? (
                     <span className="h-3 w-24 animate-pulse rounded-full bg-primary-foreground/60" />

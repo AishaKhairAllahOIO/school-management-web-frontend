@@ -68,8 +68,8 @@ export function SendBulkAlertDialog({
     ? "border-info/15 bg-info/[0.10] text-info"
     : "border-warning/15 bg-warning/[0.11] text-warning";
   const submitClassName = isStudent
-    ? "bg-info text-info-foreground hover:bg-info/90"
-    : "bg-warning text-warning-foreground hover:bg-warning/90";
+    ? "bg-info text-white hover:bg-info/90"
+    : "bg-warning text-white hover:bg-warning/90";
   const AudienceIcon = isStudent ? School : Users;
 
   useEffect(() => {

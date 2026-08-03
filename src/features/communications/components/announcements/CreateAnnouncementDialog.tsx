@@ -289,7 +289,7 @@ export function CreateAnnouncementDialog({
             <Button
               type="submit"
               disabled={isPending}
-              className="h-10 rounded-[12px] px-5 text-[12px]"
+              className="h-10 rounded-[12px] bg-primary px-5 text-[12px] font-semibold text-white shadow-[0_10px_24px_rgba(91,62,220,0.18)] hover:bg-primary/90"
             >
               {isPending ? (
                 <span className="h-3 w-24 animate-pulse rounded-full bg-primary-foreground/60" />
