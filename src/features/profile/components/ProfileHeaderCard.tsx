@@ -3,6 +3,7 @@ import {
   BriefcaseBusiness,
   CalendarDays,
   Mail,
+  Pencil,
   Phone,
   ShieldCheck,
 } from "lucide-react";
@@ -22,11 +23,15 @@ import {
 type ProfileHeaderCardProps = {
   user: DashboardProfileUser;
   identity: ProfileIdentity;
+  canEditPersonalInfo?: boolean;
+  onEditPersonalInfo?: () => void;
 };
 
 export function ProfileHeaderCard({
   user,
   identity,
+  canEditPersonalInfo = false,
+  onEditPersonalInfo,
 }: ProfileHeaderCardProps) {
   const fullName =
     user.fullName ||
@@ -35,8 +40,8 @@ export function ProfileHeaderCard({
       user.lastName,
     );
 
-const photoUrl =
-  useAuthenticatedImage(user?.photoUrl);
+  const photoUrl =
+    useAuthenticatedImage(user?.photoUrl);
 
   const isEnabled =
     String(
@@ -180,38 +185,65 @@ const photoUrl =
           </div>
         </div>
 
-        <div
-          className={[
-            "inline-flex w-fit items-center",
-            "gap-2 self-start",
-            "rounded-xl border",
-            "px-3.5 py-2.5",
-            "text-xs font-semibold",
-            isEnabled
-              ? [
-                  "border-emerald-200/80",
-                  "bg-emerald-50",
-                  "text-emerald-700",
-                  "dark:border-emerald-500/20",
-                  "dark:bg-emerald-500/10",
-                  "dark:text-emerald-400",
-                ].join(" ")
-              : [
-                  "border-amber-200/80",
-                  "bg-amber-50",
-                  "text-amber-700",
-                  "dark:border-amber-500/20",
-                  "dark:bg-amber-500/10",
-                  "dark:text-amber-400",
-                ].join(" "),
-            "lg:self-center",
-          ].join(" ")}
-        >
-          <BadgeCheck className="h-4 w-4" />
+        <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row lg:self-center">
+          {canEditPersonalInfo &&
+          onEditPersonalInfo ? (
+            <button
+              type="button"
+              onClick={onEditPersonalInfo}
+              className={[
+                "inline-flex min-h-10 items-center justify-center gap-2",
+                "rounded-xl border border-primary/15",
+                "bg-primary px-4 py-2.5",
+                "text-xs font-semibold text-primary-foreground",
+                "shadow-[0_10px_24px_rgb(93_63_211_/_0.16)]",
+                "transition-all duration-200",
+                "hover:-translate-y-0.5 hover:bg-primary/92",
+                "hover:shadow-[0_14px_28px_rgb(93_63_211_/_0.22)]",
+                "focus-visible:outline-none focus-visible:ring-4",
+                "focus-visible:ring-primary/15",
+              ].join(" ")}
+            >
+              <Pencil
+                aria-hidden="true"
+                className="h-4 w-4"
+              />
 
-          {formatLabel(
-            user.accountStatus,
-          )}
+              Edit personal information
+            </button>
+          ) : null}
+
+          <div
+            className={[
+              "inline-flex min-h-10 items-center justify-center",
+              "gap-2 rounded-xl border",
+              "px-3.5 py-2.5",
+              "text-xs font-semibold",
+              isEnabled
+                ? [
+                    "border-emerald-200/80",
+                    "bg-emerald-50",
+                    "text-emerald-700",
+                    "dark:border-emerald-500/20",
+                    "dark:bg-emerald-500/10",
+                    "dark:text-emerald-400",
+                  ].join(" ")
+                : [
+                    "border-amber-200/80",
+                    "bg-amber-50",
+                    "text-amber-700",
+                    "dark:border-amber-500/20",
+                    "dark:bg-amber-500/10",
+                    "dark:text-amber-400",
+                  ].join(" "),
+            ].join(" ")}
+          >
+            <BadgeCheck className="h-4 w-4" />
+
+            {formatLabel(
+              user.accountStatus,
+            )}
+          </div>
         </div>
       </div>
     </section>

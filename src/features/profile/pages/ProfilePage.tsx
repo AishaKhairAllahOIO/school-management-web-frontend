@@ -1,3 +1,7 @@
+import {
+  useNavigate,
+} from "react-router-dom";
+
 import { AccountOverviewCard } from "@/features/profile/components/AccountOverviewCard";
 import { EmploymentInformationCard } from "@/features/profile/components/EmploymentInformationCard";
 import { PersonalInformationCard } from "@/features/profile/components/PersonalInformationCard";
@@ -7,6 +11,8 @@ import { ProfileProductivityCard } from "@/features/profile/components/ProfilePr
 import { useProfile } from "@/features/profile/hooks/use-my-profile";
 
 export function ProfilePage() {
+  const navigate = useNavigate();
+
   const {
     user,
     identity,
@@ -23,11 +29,23 @@ export function ProfilePage() {
     return <ProfilePageSkeleton />;
   }
 
+  function handleEditPersonalInformation() {
+    navigate(
+      `/users/administrators/${user.id}/edit`,
+    );
+  }
+
   return (
     <div className="space-y-4">
       <ProfileHeaderCard
         user={user}
         identity={identity}
+        canEditPersonalInfo={
+          permissions.canEditPersonalInfo
+        }
+        onEditPersonalInfo={
+          handleEditPersonalInformation
+        }
       />
 
       <div
@@ -104,7 +122,10 @@ function ProfilePageSkeleton() {
             </div>
           </div>
 
-          <div className="h-10 w-28 rounded-xl bg-muted" />
+          <div className="flex gap-2">
+            <div className="h-10 w-32 rounded-xl bg-muted" />
+            <div className="h-10 w-28 rounded-xl bg-muted" />
+          </div>
         </div>
       </section>
 
