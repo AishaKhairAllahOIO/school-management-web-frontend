@@ -106,7 +106,7 @@ export function NotificationsMenu({
       {isOpen ? (
         <div
           role="menu"
-          className="topbar-menu-shadow absolute end-0 top-full z-50 mt-3 w-[360px] max-w-[calc(100vw-16px)] sm:max-w-[calc(100vw-24px)] overflow-hidden rounded-[18px] border border-topbar-border/80 bg-topbar-surface/95 backdrop-blur-2xl"
+          className="topbar-menu-shadow absolute end-0 top-full z-50 mt-3 w-[min(320px,calc(100vw-24px))] overflow-hidden rounded-[18px] border border-topbar-border/80 bg-topbar-surface/95 backdrop-blur-2xl"
         >
           <div className="flex items-start justify-between gap-3 border-b border-topbar-divider px-3 py-3">
             <div className="min-w-0">

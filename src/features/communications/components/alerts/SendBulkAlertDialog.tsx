@@ -1,10 +1,30 @@
-import { useState } from "react";
-import { Bell, Loader2, Send } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/shared/ui/dialog";
+import {
+  Bell,
+  School,
+  Send,
+  Users,
+} from "lucide-react";
+import {
+  useEffect,
+  useState,
+} from "react";
+
 import { Button } from "@/shared/ui/button";
-import { MultiSelectAudience, type OptionItem } from "../shared/MultiSelectAudience";
-import { AlertTypeForm, type AlertCategory } from "./AlertTypeForm";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/shared/ui/dialog";
+
 import { useAlerts } from "../../hooks/useAlerts";
+import { AlertTypeForm, type AlertCategory } from "./AlertTypeForm";
+import { DialogFormSkeleton } from "../shared/DialogFormSkeleton";
+import {
+  MultiSelectAudience,
+  type OptionItem,
+} from "../shared/MultiSelectAudience";
 
 type Props = {
   open: boolean;
@@ -14,139 +34,249 @@ type Props = {
   isLoadingAudience?: boolean;
 };
 
-export function SendBulkAlertDialog({ open, onOpenChange, targetAudience, audienceList = [], isLoadingAudience = false }: Props) {
-  const { sendPaymentAlert, sendAdvisorAlert, sendStaffAlert, isSending } = useAlerts();
+export function SendBulkAlertDialog({
+  open,
+  onOpenChange,
+  targetAudience,
+  audienceList = [],
+  isLoadingAudience = false,
+}: Props) {
+  const {
+    sendPaymentAlert,
+    sendAdvisorAlert,
+    sendStaffAlert,
+    isSending,
+  } = useAlerts();
 
   const [selectedIds, setSelectedIds] = useState<(string | number)[]>([]);
-  const [alertType, setAlertType] = useState<AlertCategory>(targetAudience === "student" ? "absence" : "salary");
-  const [amount, setAmount] = useState<string>("");
-  const [dueDate, setDueDate] = useState<string>("");
+  const [alertType, setAlertType] = useState<AlertCategory>(
+    targetAudience === "student" ? "absence" : "salary",
+  );
+  const [amount, setAmount] = useState("");
+  const [dueDate, setDueDate] = useState("");
   const [severity, setSeverity] = useState<"low" | "medium" | "high">("medium");
-  const [sessionName, setSessionName] = useState<string>("");
-  const [minutesLate, setMinutesLate] = useState<string>("15");
-  const [monthName, setMonthName] = useState<string>("June 2026");
-  const [subjectName, setSubjectName] = useState<string>("");
+  const [sessionName, setSessionName] = useState("");
+  const [minutesLate, setMinutesLate] = useState("15");
+  const [monthName, setMonthName] = useState("");
+  const [subjectName, setSubjectName] = useState("");
   const [formError, setFormError] = useState<string | null>(null);
 
-  const resetState = () => {
+  const isStudent = targetAudience === "student";
+  const tone = isStudent ? "info" : "warning";
+  const headerSurface = isStudent ? "bg-info/[0.04]" : "bg-warning/[0.04]";
+  const iconSurface = isStudent
+    ? "border-info/15 bg-info/[0.10] text-info"
+    : "border-warning/15 bg-warning/[0.11] text-warning";
+  const submitClassName = isStudent
+    ? "bg-info text-info-foreground hover:bg-info/90"
+    : "bg-warning text-warning-foreground hover:bg-warning/90";
+  const AudienceIcon = isStudent ? School : Users;
+
+  useEffect(() => {
+    if (open) {
+      setAlertType(isStudent ? "absence" : "salary");
+    }
+  }, [open, isStudent]);
+
+  function resetState() {
     setSelectedIds([]);
-    setAlertType(targetAudience === "student" ? "absence" : "salary");
+    setAlertType(isStudent ? "absence" : "salary");
     setAmount("");
     setDueDate("");
     setSeverity("medium");
     setSessionName("");
     setMinutesLate("15");
-    setMonthName("June 2026");
+    setMonthName("");
     setSubjectName("");
     setFormError(null);
-  };
+  }
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (selectedIds.length === 0) {
-      setFormError("Select at least one recipient before sending the alert.");
+  function handleSubmit(event: React.FormEvent) {
+    event.preventDefault();
+
+    if (!selectedIds.length) {
+      setFormError("Choose at least one recipient before sending the alert.");
       return;
     }
 
     setFormError(null);
-
     const numericIds = selectedIds.map(Number);
-    const successCb = { onSuccess: () => { resetState(); onOpenChange(false); } };
+    const options = {
+      onSuccess: () => {
+        resetState();
+        onOpenChange(false);
+      },
+    };
 
-    if (targetAudience === "staff" && ["salary", "absence", "late"].includes(alertType)) {
-      sendStaffAlert.mutate({
-        audience: "staff",
-        type: alertType as any,
-        staff_ids: numericIds,
-        meta: alertType === "salary" ? { amount: Number(amount) || 0, mounth: monthName || "Unspecified" }
-            : alertType === "late" ? { session: sessionName || "Unspecified", minutes_late: Number(minutesLate) || 0 } : undefined,
-      }, successCb);
+    if (targetAudience === "staff") {
+      sendStaffAlert.mutate(
+        {
+          audience: "staff",
+          type: alertType as any,
+          staff_ids: numericIds,
+          meta:
+            alertType === "salary"
+              ? {
+                  amount: Number(amount) || 0,
+                  mounth: monthName || "Unspecified",
+                }
+              : alertType === "late"
+                ? {
+                    session: sessionName || "Unspecified",
+                    minutes_late: Number(minutesLate) || 0,
+                  }
+                : undefined,
+        },
+        options,
+      );
       return;
     }
 
-    if (["payed", "payment"].includes(alertType)) {
-      sendPaymentAlert.mutate({
+    if (alertType === "payed" || alertType === "payment") {
+      sendPaymentAlert.mutate(
+        {
+          audience: "student",
+          type: alertType,
+          enrollment_ids: numericIds,
+          meta:
+            alertType === "payed"
+              ? { amount: Number(amount) || 0 }
+              : {
+                  amount_due: Number(amount) || 0,
+                  due_date: dueDate || new Date().toISOString().slice(0, 10),
+                },
+        },
+        options,
+      );
+      return;
+    }
+
+    sendAdvisorAlert.mutate(
+      {
         audience: "student",
         type: alertType as any,
         enrollment_ids: numericIds,
-        meta: alertType === "payed" ? { amount: Number(amount) || 0 }
-            : { amount_due: Number(amount) || 0, due_date: dueDate || new Date().toISOString().split("T")[0] },
-      }, successCb);
-      return;
-    }
-
-    sendAdvisorAlert.mutate({
-      audience: "student",
-      type: alertType as any,
-      enrollment_ids: numericIds,
-      meta: alertType === "behavior" ? { severity }
-          : alertType === "homework" ? { subject: subjectName || "Unspecified", date: dueDate || new Date().toISOString().split("T")[0] }
-          : alertType === "escape" ? { session: sessionName || "Unspecified" }
-          : alertType === "late" ? { session: sessionName || "Unspecified", minutes_late: Number(minutesLate) || 0 } : undefined,
-    }, successCb);
-  };
+        meta:
+          alertType === "behavior"
+            ? { severity }
+            : alertType === "homework"
+              ? {
+                  subject: subjectName || "Unspecified",
+                  date: dueDate || new Date().toISOString().slice(0, 10),
+                }
+              : alertType === "escape"
+                ? { session: sessionName || "Unspecified" }
+                : alertType === "late"
+                  ? {
+                      session: sessionName || "Unspecified",
+                      minutes_late: Number(minutesLate) || 0,
+                    }
+                  : undefined,
+      },
+      options,
+    );
+  }
 
   return (
-    <Dialog open={open} onOpenChange={(nextOpen) => { if (!nextOpen) resetState(); onOpenChange(nextOpen); }}>
-      <DialogContent className="sm:max-w-xl rounded-[22px] border border-border/70 bg-card p-5 sm:p-6 shadow-[0_24px_70px_rgba(27,19,66,0.18)] max-h-[88vh] overflow-y-auto" dir="ltr">
-        <DialogHeader className="space-y-1.5 text-left">
-          <DialogTitle className="flex items-center gap-2.5 text-[18px] font-semibold tracking-tight text-foreground">
-            <div className="flex h-9 w-9 items-center justify-center rounded-[15px] bg-primary/[0.09] text-primary">
-              <Bell className="h-5 w-5" />
+    <Dialog
+      open={open}
+      onOpenChange={(nextOpen) => {
+        if (!nextOpen) resetState();
+        onOpenChange(nextOpen);
+      }}
+    >
+      <DialogContent className="max-h-[92vh] overflow-hidden rounded-[26px] border border-border/70 bg-card p-0 shadow-[0_30px_100px_rgba(20,14,54,0.24)] sm:max-w-2xl">
+        <div className={`border-b border-border/50 px-5 py-5 sm:px-6 ${headerSurface}`}>
+          <DialogHeader className="text-start">
+            <div className="flex items-start gap-3.5">
+              <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-[15px] border ${iconSurface}`}>
+                <AudienceIcon className="h-5 w-5" strokeWidth={1.8} />
+              </span>
+              <div className="min-w-0">
+                <DialogTitle className="text-[18px] font-semibold tracking-[-0.02em]">
+                  {isStudent ? "Notify students" : "Notify staff"}
+                </DialogTitle>
+                <DialogDescription className="mt-1 text-[12px] leading-5">
+                  {isStudent
+                    ? "Choose enrolled students, select the situation, and send one clear school alert."
+                    : "Choose staff members by name, select the staff event, and send one focused alert."}
+                </DialogDescription>
+              </div>
             </div>
-            Send Bulk Alert ({targetAudience === "student" ? "Students" : "Staff"})
-          </DialogTitle>
-          <DialogDescription className="text-sm text-muted-foreground pl-11">
-            Select the target audience and configure the alert details.
-          </DialogDescription>
-        </DialogHeader>
+          </DialogHeader>
+        </div>
 
-        <form onSubmit={handleSubmit} className="space-y-5 mt-4">
-          <MultiSelectAudience
-            label={targetAudience === "student" ? "Select Students" : "Select Staff Members"}
-            placeholder="Search by name..."
-            options={audienceList}
-            selectedIds={selectedIds}
-            onChange={setSelectedIds}
-            isLoading={isLoadingAudience}
-          />
+        <div className="max-h-[calc(92vh-96px)] overflow-y-auto px-5 py-5 sm:px-6">
+          {isLoadingAudience ? (
+            <DialogFormSkeleton rows={4} />
+          ) : (
+            <form onSubmit={handleSubmit} className="space-y-5">
+              <div className={`rounded-[19px] border p-4 ${isStudent ? "border-info/[0.13] bg-info/[0.025]" : "border-warning/[0.14] bg-warning/[0.025]"}`}>
+                <MultiSelectAudience
+                  label={isStudent ? "Student recipients" : "Staff recipients"}
+                  placeholder={isStudent ? "Search student name" : "Search staff name or role"}
+                  options={audienceList}
+                  selectedIds={selectedIds}
+                  onChange={setSelectedIds}
+                  tone={tone}
+                />
+              </div>
 
-          <AlertTypeForm
-            audience={targetAudience}
-            alertType={alertType}
-            onAlertTypeChange={setAlertType}
-            amount={amount}
-            onAmountChange={setAmount}
-            dueDate={dueDate}
-            onDueDateChange={setDueDate}
-            severity={severity}
-            onSeverityChange={setSeverity}
-            sessionName={sessionName}
-            onSessionNameChange={setSessionName}
-            minutesLate={minutesLate}
-            onMinutesLateChange={setMinutesLate}
-            monthName={monthName}
-            onMonthNameChange={setMonthName}
-            subjectName={subjectName}
-            onSubjectNameChange={setSubjectName}
-          />
+              <AlertTypeForm
+                audience={targetAudience}
+                alertType={alertType}
+                onAlertTypeChange={setAlertType}
+                amount={amount}
+                onAmountChange={setAmount}
+                dueDate={dueDate}
+                onDueDateChange={setDueDate}
+                severity={severity}
+                onSeverityChange={setSeverity}
+                sessionName={sessionName}
+                onSessionNameChange={setSessionName}
+                minutesLate={minutesLate}
+                onMinutesLateChange={setMinutesLate}
+                monthName={monthName}
+                onMonthNameChange={setMonthName}
+                subjectName={subjectName}
+                onSubjectNameChange={setSubjectName}
+                tone={targetAudience}
+              />
 
-          {formError ? (
-            <p className="rounded-[10px] bg-destructive/[0.07] px-3 py-2 text-[11px] text-destructive">
-              {formError}
-            </p>
-          ) : null}
+              {formError ? (
+                <p className="rounded-[12px] border border-destructive/15 bg-destructive/[0.055] px-3 py-2.5 text-[11px] text-destructive">
+                  {formError}
+                </p>
+              ) : null}
 
-          <div className="flex items-center gap-3 pt-4 border-t border-border/60">
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={isSending} className="h-10 flex-1 rounded-[12px]">
-              Cancel
-            </Button>
-            <Button type="submit" disabled={isSending || selectedIds.length === 0} className="h-10 flex-[2] rounded-[12px] text-[12px] font-medium">
-              {isSending ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Send className="w-4 h-4 mr-2" />}
-              Send Alert ({selectedIds.length})
-            </Button>
-          </div>
-        </form>
+              <div className="flex flex-col-reverse gap-2 border-t border-border/50 pt-4 sm:flex-row sm:justify-end">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => onOpenChange(false)}
+                  disabled={isSending}
+                  className="h-10 rounded-[12px] border-border/70 bg-transparent px-4 text-[12px]"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={isSending || selectedIds.length === 0}
+                  className={`h-10 rounded-[12px] px-5 text-[12px] ${submitClassName}`}
+                >
+                  {isSending ? (
+                    <span className="h-3 w-24 animate-pulse rounded-full bg-current/25" />
+                  ) : (
+                    <>
+                      <Send className="h-4 w-4" />
+                      Send to {selectedIds.length}
+                    </>
+                  )}
+                </Button>
+              </div>
+            </form>
+          )}
+        </div>
       </DialogContent>
     </Dialog>
   );

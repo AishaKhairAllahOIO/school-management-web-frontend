@@ -1,9 +1,8 @@
 import {
   BellRing,
-  CalendarDays,
+  CalendarPlus,
   Megaphone,
   Plus,
-  Scale,
   School,
   Users,
 } from "lucide-react";
@@ -11,105 +10,40 @@ import {
   useMemo,
   useState,
 } from "react";
-import {
-  useLocation,
-} from "react-router-dom";
+import { useLocation } from "react-router-dom";
 
-import {
-  Button,
-} from "@/shared/ui/button";
+import { Button } from "@/shared/ui/button";
 
-import {
-  ActivitiesList,
-} from "../components/activities/ActivitiesList";
-import {
-  CreateActivityDialog,
-} from "../components/activities/CreateActivityDialog";
-import {
-  SendBulkAlertDialog,
-} from "../components/alerts/SendBulkAlertDialog";
-import {
-  AnnouncementsList,
-} from "../components/announcements/AnnouncementsList";
-import {
-  CreateAnnouncementDialog,
-} from "../components/announcements/CreateAnnouncementDialog";
-import {
-  SchoolLawsSection,
-} from "../components/laws/SchoolLawsSection";
-import {
-  useCommunicationOptions,
-} from "../hooks/useCommunicationOptions";
-import type {
-  Activity,
-  Announcement,
-} from "../types/communication.types";
+import { ActivitiesList } from "../components/activities/ActivitiesList";
+import { CreateActivityDialog } from "../components/activities/CreateActivityDialog";
+import { SendBulkAlertDialog } from "../components/alerts/SendBulkAlertDialog";
+import { AnnouncementsList } from "../components/announcements/AnnouncementsList";
+import { CreateAnnouncementDialog } from "../components/announcements/CreateAnnouncementDialog";
+import { SchoolLawsSection } from "../components/laws/SchoolLawsSection";
+import { useCommunicationOptions } from "../hooks/useCommunicationOptions";
+import type { Activity, Announcement } from "../types/communication.types";
 
-const sectionVisuals = {
-  announcements: {
-    icon: Megaphone,
-    label: "Announcements",
-    description:
-      "Publish focused school updates for students, staff, or both audiences.",
-    accent: "bg-primary",
-    iconSurface: "bg-primary/[0.09] text-primary",
-    border: "border-primary/[0.12]",
-    actionLabel: "New announcement",
-  },
-  activities: {
-    icon: CalendarDays,
-    label: "Activities",
-    description:
-      "Plan school events with a clear date, time, grade, and classroom audience.",
-    accent: "bg-info",
-    iconSurface: "bg-info/[0.10] text-info",
-    border: "border-info/[0.13]",
-    actionLabel: "New activity",
-  },
-  laws: {
-    icon: Scale,
-    label: "School laws",
-    description:
-      "Maintain the official rules and regulations shared across the school community.",
-    accent: "bg-success",
-    iconSurface: "bg-success/[0.10] text-success",
-    border: "border-success/[0.13]",
-    actionLabel: "Add law",
-  },
-} as const;
-
-type CommunicationSection = keyof typeof sectionVisuals;
+type CommunicationSection = "announcements" | "activities" | "laws";
 
 export function CommunicationsPage() {
   const location = useLocation();
 
   const activeSection = useMemo<CommunicationSection>(() => {
-    if (location.pathname.includes("activities")) {
-      return "activities";
-    }
-    if (location.pathname.includes("laws")) {
-      return "laws";
-    }
+    if (location.pathname.includes("activities")) return "activities";
+    if (location.pathname.includes("laws")) return "laws";
     return "announcements";
   }, [location.pathname]);
 
   const [announcementTab, setAnnouncementTab] =
     useState<"created" | "staff">("created");
-
-  const [alertDialogOpen, setAlertDialogOpen] =
-    useState(false);
+  const [alertDialogOpen, setAlertDialogOpen] = useState(false);
   const [alertTarget, setAlertTarget] =
     useState<"student" | "staff">("student");
-
-  const [announcementDialogOpen, setAnnouncementDialogOpen] =
-    useState(false);
+  const [announcementDialogOpen, setAnnouncementDialogOpen] = useState(false);
   const [selectedAnnouncement, setSelectedAnnouncement] =
     useState<Announcement | null>(null);
-
-  const [activityDialogOpen, setActivityDialogOpen] =
-    useState(false);
-  const [selectedActivity, setSelectedActivity] =
-    useState<Activity | null>(null);
+  const [activityDialogOpen, setActivityDialogOpen] = useState(false);
+  const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null);
 
   const {
     students,
@@ -118,9 +52,6 @@ export function CommunicationsPage() {
     classRooms,
     isLoadingOptions,
   } = useCommunicationOptions();
-
-  const visual = sectionVisuals[activeSection];
-  const SectionIcon = visual.icon;
 
   function openAlert(target: "student" | "staff") {
     setAlertTarget(target);
@@ -137,91 +68,12 @@ export function CommunicationsPage() {
     setActivityDialogOpen(true);
   }
 
-  function handlePrimaryAction() {
-    if (activeSection === "announcements") {
-      openAnnouncement();
-      return;
-    }
-    if (activeSection === "activities") {
-      openActivity();
-    }
-  }
-
   return (
-    <section className="-mt-1 min-w-0 space-y-4 pb-8">
-      <article
-        className={[
-          "relative overflow-hidden rounded-[22px] border bg-card",
-          "shadow-[0_10px_30px_rgba(38,24,84,0.05)]",
-          visual.border,
-        ].join(" ")}
-      >
-        <span
-          aria-hidden="true"
-          className={`absolute inset-x-0 top-0 h-[3px] ${visual.accent}`}
-        />
-
-        <div className="flex min-h-[76px] flex-col gap-4 px-5 py-4 sm:px-6 lg:flex-row lg:items-center lg:justify-between">
-          <div className="flex min-w-0 items-center gap-3.5">
-            <span
-              className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-[15px] ${visual.iconSurface}`}
-            >
-              <SectionIcon className="h-5 w-5" strokeWidth={1.85} />
-            </span>
-
-            <div className="min-w-0">
-              <h1 className="text-[18px] font-medium leading-6 tracking-[0.003em] text-foreground">
-                {visual.label}
-              </h1>
-              <p className="mt-1 text-[12.5px] leading-[18px] text-muted-foreground">
-                {visual.description}
-              </p>
-            </div>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-2">
-            {activeSection !== "laws" ? (
-              <>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => openAlert("staff")}
-                  className="h-10 rounded-[12px] border-border/70 bg-transparent px-3.5 text-[12px] font-medium"
-                >
-                  <Users className="h-4 w-4" />
-                  Staff alert
-                </Button>
-
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => openAlert("student")}
-                  className="h-10 rounded-[12px] border-primary/20 bg-transparent px-3.5 text-[12px] font-medium text-primary hover:bg-primary/[0.05]"
-                >
-                  <School className="h-4 w-4" />
-                  Student alert
-                </Button>
-              </>
-            ) : null}
-
-            {activeSection !== "laws" ? (
-              <Button
-                type="button"
-                onClick={handlePrimaryAction}
-                className="h-10 rounded-[12px] px-4 text-[12px] font-medium"
-              >
-                <Plus className="h-4 w-4" />
-                {visual.actionLabel}
-              </Button>
-            ) : null}
-          </div>
-        </div>
-      </article>
-
+    <section className="min-w-0 space-y-4 pb-8">
       {activeSection === "announcements" ? (
-        <div className="space-y-4">
-          <div className="flex items-center justify-between gap-3 rounded-[18px] border border-border/60 bg-card p-1.5 shadow-[0_7px_22px_rgba(38,24,84,0.035)]">
-            <div className="flex min-w-0 items-center gap-1">
+        <>
+          <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_auto]">
+            <div className="flex min-w-0 items-center gap-1 rounded-[20px] border border-primary/[0.12] bg-card p-1.5 shadow-[0_10px_30px_rgba(38,24,84,0.045)]">
               {([
                 ["created", "Created by me"],
                 ["staff", "Staff feed"],
@@ -231,43 +83,78 @@ export function CommunicationsPage() {
                   type="button"
                   onClick={() => setAnnouncementTab(value)}
                   className={[
-                    "relative h-10 rounded-[12px] px-4 text-[12px] font-medium transition-colors",
+                    "relative h-11 flex-1 rounded-[14px] px-4 text-[12px] font-medium transition",
                     announcementTab === value
-                      ? "bg-primary/[0.075] text-primary"
-                      : "text-muted-foreground hover:bg-muted/40 hover:text-foreground",
+                      ? "bg-primary/[0.085] text-primary"
+                      : "text-muted-foreground hover:bg-muted/35 hover:text-foreground",
                   ].join(" ")}
                 >
                   {label}
-                  <span
-                    className={[
-                      "absolute inset-x-4 bottom-0 h-[2px] rounded-full bg-primary transition-transform",
-                      announcementTab === value ? "scale-x-100" : "scale-x-0",
-                    ].join(" ")}
-                  />
+                  <span className={[
+                    "absolute inset-x-5 bottom-0 h-[2px] rounded-full bg-primary transition-transform",
+                    announcementTab === value ? "scale-x-100" : "scale-x-0",
+                  ].join(" ")} />
                 </button>
               ))}
             </div>
 
-            <span className="hidden items-center gap-1.5 pe-3 text-[10.5px] text-muted-foreground sm:flex">
-              <BellRing className="h-3.5 w-3.5" />
-              School-wide communication feed
-            </span>
+            <Button
+              type="button"
+              onClick={() => openAnnouncement()}
+              className="h-[56px] rounded-[18px] px-5 text-[12px] shadow-[0_12px_28px_rgba(91,62,220,0.16)]"
+            >
+              <Megaphone className="h-4 w-4" />
+              Publish announcement
+            </Button>
+          </div>
+
+          <div className="rounded-[18px] border border-primary/[0.10] bg-primary/[0.025] px-4 py-3 text-[11.5px] leading-5 text-muted-foreground">
+            Use announcements for broad, reusable messages. Choose a feed above, then publish or manage items directly from the list.
           </div>
 
           <AnnouncementsList
             activeTab={announcementTab}
             onEdit={openAnnouncement}
           />
-        </div>
+        </>
       ) : null}
 
       {activeSection === "activities" ? (
-        <ActivitiesList onEdit={openActivity} />
+        <>
+          <div className="grid gap-3 md:grid-cols-3">
+            <ActionCard
+              icon={CalendarPlus}
+              title="Plan an activity"
+              description="Create the event, schedule it, then target grades and classrooms."
+              tone="info"
+              onClick={() => openActivity()}
+            />
+            <ActionCard
+              icon={School}
+              title="Notify students"
+              description="Send attendance, behavior, homework, or payment alerts to selected enrollments."
+              tone="primary"
+              onClick={() => openAlert("student")}
+            />
+            <ActionCard
+              icon={Users}
+              title="Notify staff"
+              description="Send salary, absence, or lateness alerts to staff members by name."
+              tone="warning"
+              onClick={() => openAlert("staff")}
+            />
+          </div>
+
+          <div className="flex items-center gap-2 rounded-[18px] border border-info/[0.11] bg-info/[0.025] px-4 py-3 text-[11.5px] leading-5 text-muted-foreground">
+            <BellRing className="h-4 w-4 shrink-0 text-info" />
+            Activities organize events. Alerts are separate, direct notifications for specific students or staff members.
+          </div>
+
+          <ActivitiesList onEdit={openActivity} />
+        </>
       ) : null}
 
-      {activeSection === "laws" ? (
-        <SchoolLawsSection />
-      ) : null}
+      {activeSection === "laws" ? <SchoolLawsSection /> : null}
 
       <SendBulkAlertDialog
         open={alertDialogOpen}
@@ -293,5 +180,45 @@ export function CommunicationsPage() {
         activityToEdit={selectedActivity}
       />
     </section>
+  );
+}
+
+function ActionCard({
+  icon: Icon,
+  title,
+  description,
+  tone,
+  onClick,
+}: {
+  icon: typeof Plus;
+  title: string;
+  description: string;
+  tone: "primary" | "info" | "warning";
+  onClick: () => void;
+}) {
+  const styles = {
+    primary: "border-primary/[0.13] bg-primary/[0.035] text-primary",
+    info: "border-info/[0.14] bg-info/[0.04] text-info",
+    warning: "border-warning/[0.16] bg-warning/[0.04] text-warning",
+  }[tone];
+
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`group flex min-h-[118px] items-start gap-3.5 rounded-[22px] border p-4 text-start shadow-[0_10px_28px_rgba(38,24,84,0.04)] transition hover:-translate-y-0.5 hover:shadow-[0_16px_34px_rgba(38,24,84,0.08)] ${styles}`}
+    >
+      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[15px] bg-background/85 shadow-sm">
+        <Icon className="h-5 w-5" strokeWidth={1.8} />
+      </span>
+      <span className="min-w-0">
+        <span className="block text-[13px] font-semibold text-foreground">
+          {title}
+        </span>
+        <span className="mt-1.5 block text-[11px] leading-5 text-muted-foreground">
+          {description}
+        </span>
+      </span>
+    </button>
   );
 }

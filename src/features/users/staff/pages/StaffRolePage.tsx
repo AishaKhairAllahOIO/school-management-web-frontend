@@ -449,33 +449,35 @@ export function StaffRolePage({
                 </span>
               </button>
 
-              <button
-                type="button"
-                onClick={
-                  openImportDialog
-                }
-                className={[
-                  "inline-flex h-10 items-center justify-center gap-2",
-                  "rounded-xl border bg-card/80 px-3",
-                  "text-xs font-semibold transition-colors",
-                  config.color.border,
-                  config.color.text,
-                  config.color.hover,
-                  "focus-visible:outline-none focus-visible:ring-4",
-                  config.color.ring,
-                ].join(" ")}
-              >
-                <Upload
-                  className="h-4 w-4"
-                  strokeWidth={
-                    1.8
+              {allowImport && (
+                <button
+                  type="button"
+                  onClick={
+                    openImportDialog
                   }
-                />
+                  className={[
+                    "inline-flex h-10 items-center justify-center gap-2",
+                    "rounded-xl border bg-card/80 px-3",
+                    "text-xs font-semibold transition-colors",
+                    config.color.border,
+                    config.color.text,
+                    config.color.hover,
+                    "focus-visible:outline-none focus-visible:ring-4",
+                    config.color.ring,
+                  ].join(" ")}
+                >
+                  <Upload
+                    className="h-4 w-4"
+                    strokeWidth={
+                      1.8
+                    }
+                  />
 
-                <span>
-                  Import
-                </span>
-              </button>
+                  <span>
+                    Import
+                  </span>
+                </button>
+              )}
 
               <button
                 type="button"

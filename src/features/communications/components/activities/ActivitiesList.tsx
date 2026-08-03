@@ -32,6 +32,32 @@ import {
 type Props = {
   onEdit: (activity: Activity) => void;
 };
+function formatActivityDate(value: string) {
+  if (!value) return "Date not set";
+
+  const date = new Date(`${value}T00:00:00`);
+  if (Number.isNaN(date.getTime())) return value;
+
+  return new Intl.DateTimeFormat(undefined, {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  }).format(date);
+}
+
+function formatActivityTime(value: string) {
+  if (!value) return "—";
+
+  const [hours, minutes] = value.slice(0, 5).split(":").map(Number);
+  const date = new Date();
+  date.setHours(hours || 0, minutes || 0, 0, 0);
+
+  return new Intl.DateTimeFormat(undefined, {
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(date);
+}
+
 
 export function ActivitiesList({ onEdit }: Props) {
   const {
@@ -98,11 +124,11 @@ export function ActivitiesList({ onEdit }: Props) {
               <div className="mt-auto grid grid-cols-2 gap-2 pt-4">
                 <span className="flex items-center gap-2 rounded-[12px] bg-muted/[0.28] px-3 py-2 text-[10.5px] text-muted-foreground">
                   <CalendarDays className="h-3.5 w-3.5 text-info" />
-                  {activity.activity_date}
+                  {formatActivityDate(activity.activity_date)}
                 </span>
                 <span className="flex items-center gap-2 rounded-[12px] bg-muted/[0.28] px-3 py-2 text-[10.5px] text-muted-foreground">
                   <Clock3 className="h-3.5 w-3.5 text-warning" />
-                  {activity.start_time}–{activity.end_time}
+                  {formatActivityTime(activity.start_time)}–{formatActivityTime(activity.end_time)}
                 </span>
               </div>
 

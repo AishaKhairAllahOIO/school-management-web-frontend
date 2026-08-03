@@ -120,7 +120,7 @@ export function Topbar() {
             flex
             shrink-0
             items-center
-            gap-2.5
+            gap-2 lg:gap-2.5
           "
         >
           <NotificationsMenu

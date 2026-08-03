@@ -75,7 +75,7 @@ export function MobileSidebar() {
         className={[
           "sidebar-gradient sidebar-shell",
           "absolute top-0 z-10",
-          "flex h-full w-[248px] max-w-[82vw] flex-col",
+          "flex h-full w-[248px] max-w-[86vw] flex-col",
           "overflow-hidden text-sidebar-foreground",
           sidebarPositionClass,
         ].join(" ")}
@@ -89,7 +89,7 @@ export function MobileSidebar() {
         </div>
 
         <div className="relative z-10 flex h-full min-h-0 flex-col">
-          <header className="relative h-[136px] shrink-0 px-4 pt-5">
+          <header className="relative h-[132px] shrink-0 px-4 pt-4">
             <div className="relative h-full overflow-hidden rounded-[22px] border border-sidebar-foreground/[0.075] bg-sidebar-foreground/[0.045] px-4 pb-4 pt-4 shadow-[0_14px_34px_rgb(0_0_0_/_0.12)] backdrop-blur-xl">
               <div
                 aria-hidden="true"

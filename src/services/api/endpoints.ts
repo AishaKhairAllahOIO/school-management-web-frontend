@@ -266,105 +266,126 @@ export const API_ENDPOINTS = {
       `/admin/finance/contracts/payments/${paymentId}`,
   },
 
-  COMMUNICATIONS: {
+COMMUNICATIONS: {
+ 
+  // Activities
+  // =========================
 
-    CREATE_ACTIVITY: "/auth/activity",
+  CREATE_ACTIVITY: "/auth/activity/create",
 
-    UPDATE_ACTIVITY: (activityId: ApiId) =>
-      `/auth/activity/update/${activityId}`,
+  UPDATE_ACTIVITY: (activityId: ApiId) =>
+    `/auth/activity/update/${activityId}`,
 
-    DELETE_ACTIVITY: (activityId: ApiId) =>
-      `/auth/activity/${activityId}`,
+  DELETE_ACTIVITY: (activityId: ApiId) =>
+    `/auth/activity/delete/${activityId}`,
 
-    ACTIVITY: (activityId: ApiId) =>
-      `/auth/activity/${activityId}`,
+  ACTIVITY: (activityId: ApiId) =>
+    `/auth/activity/show/one/${activityId}`,
 
-    // 🌟 تم التعديل هنا ليتطابق مع route:list الصحيح
-    ALL_ACTIVITIES: "/auth/activities/all",
+  ALL_ACTIVITIES:
+    "/auth/activity/show/all",
 
-    CREATE_ANNOUNCEMENT:
-      "/auth/announcements",
 
-    UPDATE_ANNOUNCEMENT: (
-      announcementId: ApiId,
-    ) =>
-      `/auth/announcement/update/${announcementId}`,
 
-    DELETE_ANNOUNCEMENT: (
-      announcementId: ApiId,
-    ) =>
-      `/auth/announcements/${announcementId}`,
+  CREATE_ANNOUNCEMENT:
+    "/auth/announcements",
 
-    STAFF_ANNOUNCEMENTS:
-      "/auth/staff-announcements",
+  UPDATE_ANNOUNCEMENT: (
+    announcementId: ApiId,
+  ) =>
+    `/auth/announcement/update/${announcementId}`,
 
-    CREATOR_ANNOUNCEMENTS:
-      "/auth/creater/show/announcements",
+  DELETE_ANNOUNCEMENT: (
+    announcementId: ApiId,
+  ) =>
+    `/auth/announcements/${announcementId}`,
 
-    MY_ANNOUNCEMENTS:
-      "/user/my-announcements",
+  STAFF_ANNOUNCEMENTS:
+    "/auth/staff-announcements",
 
-    CHILD_ANNOUNCEMENTS:
-      "/user/child-announcements",
+  CREATOR_ANNOUNCEMENTS:
+    "/auth/creater/show/announcements",
 
-    ANNOUNCEMENTS_UNREAD_COUNT:
-      "/auth/announcements/unread-count",
+  MY_ANNOUNCEMENTS:
+    "/user/my-announcements",
 
-    MARK_ALL_ANNOUNCEMENTS_READ:
-      "/auth/announcements/mark-all-read",
+  CHILD_ANNOUNCEMENTS:
+    "/user/child-announcements",
 
-    USER_ANNOUNCEMENTS_UNREAD_COUNT:
-      "/user/announcements/unread-count",
+  ANNOUNCEMENTS_UNREAD_COUNT:
+    "/auth/announcements/unread-count",
 
-    MARK_ALL_USER_ANNOUNCEMENTS_READ:
-      "/user/announcements/mark-all-read",
+  MARK_ALL_ANNOUNCEMENTS_READ:
+    "/auth/announcements/mark-all-read",
+
+  USER_ANNOUNCEMENTS_UNREAD_COUNT:
+    "/user/announcements/unread-count",
+
+  MARK_ALL_USER_ANNOUNCEMENTS_READ:
+    "/user/announcements/mark-all-read",
+
   
-    ALERTS: "/auth/alerts",
+  ALERTS: "/auth/alerts",
 
-    ALERTS_UNREAD_COUNT:
-      "/auth/alerts/unread-count",
+  STAFF_ALERTS:
+    "/auth/alerts/show/general/staff",
 
-    MARK_ALL_ALERTS_READ:
-      "/auth/alerts/mark-all-read",
+  PAYMENT_ALERTS:
+    "/auth/alerts/show/payments/staff",
 
-    DELETE_ALERT: (alertId: ApiId) =>
-      `/auth/alerts/${alertId}`,
+  ALERTS_UNREAD_COUNT:
+    "/auth/alerts/unread-count",
 
-    PAYMENT_ALERTS:
-      "/auth/payment-alerts",
+  MARK_ALL_ALERTS_READ:
+    "/auth/alerts/mark-all-read",
 
-    ADVISOR_ALERTS:
-      "/auth/advisor-alerts",
+  DELETE_ALERT: (alertId: ApiId) =>
+    `/auth/delete/alert/${alertId}`,
 
-    STAFF_ALERTS:
-      "/auth/staff-alerts",
+  ADVISOR_ALERTS:
+    "/auth/alerts/for-student/send",
 
-    TEACHER_ALERTS:
-      "/auth/teacher/teacher-alerts",
+  TEACHER_ALERTS:
+    "/auth/teacher/teacher-alerts",
 
-    MY_ALERTS:
-      "/user/my-alerts",
+  MY_ALERTS:
+    "/user/my-alerts",
 
-    CHILD_ALERTS: (studentId: ApiId) =>
-      `/user/child-alerts/${studentId}`,
+  CHILD_ALERTS: (studentId: ApiId) =>
+    `/user/child-alerts/${studentId}`,
 
-    CHILD_PAYMENT_ALERTS: (studentId: ApiId) =>
-      `/user/payment-alerts/${studentId}`,
+  CHILD_PAYMENT_ALERTS: (studentId: ApiId) =>
+    `/user/payment-alerts/${studentId}`,
 
-    USER_ALERTS_UNREAD_COUNT:
-      "/user/alerts/unread-count",
+  USER_ALERTS_UNREAD_COUNT:
+    "/user/alerts/unread-count",
 
-    MARK_ALL_USER_ALERTS_READ:
-      "/user/alerts/mark-all-read",
-  },
+  MARK_ALL_USER_ALERTS_READ:
+    "/user/alerts/mark-all-read",
 
-  USER_PORTAL: {
-    MY_ACTIVITIES: "/user/my-activities",
-    CHILD_ACTIVITIES: "/user/child-activities",
-    ACTIVITY_UNREAD_COUNT: "/user/activity-unread-count",
-    MARK_ALL_ACTIVITIES_READ: "/user/activity-mark-all-read",
-  }, 
   
+  CREATED_ALERTS:
+    "/auth/created/alerts/show/by/role",
+
+  UPDATE_CREATED_ALERT: (id: ApiId) =>
+    `/auth/created/alerts/update/${id}`,
+
+  DELETE_CREATED_ALERT: (id: ApiId) =>
+    `/auth/created/alerts/delete/group/${id}`,
+},
+
+SYSTEM_NOTICES: {
+  LIST:
+    "/auth/system-notices/show/alerts",
+
+  UNREAD_COUNT:
+    "/auth/system-notices/unread-count",
+
+  MARK_ALL_READ:
+    "/auth/system-notices/mark-all-read",
+},
+
+
   SCHOOL_LAWS: {
     GET_ALL: "/auth/school/laws/all/show",
 
@@ -380,13 +401,5 @@ export const API_ENDPOINTS = {
       `/auth/school/law/delete/${lawId}`,
   },
 
-  SYSTEM_NOTICES: {
-    LIST: "/auth/system/notices",
-
-    UNREAD_COUNT:
-      "/auth/system/notices/unread-count",
-
-    MARK_ALL_READ:
-      "/auth/system/notices/mark-all-read",
-  },
+  
 } as const;

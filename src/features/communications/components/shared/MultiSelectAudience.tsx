@@ -1,11 +1,27 @@
-import { useState, useMemo } from "react";
-import { Check, ChevronsUpDown, X, Search, Users } from "lucide-react";
-import { Button } from "@/shared/ui/button";
+import {
+  Check,
+  Search,
+  Users,
+  X,
+} from "lucide-react";
+import {
+  useMemo,
+  useState,
+} from "react";
+
+import { Checkbox } from "@/shared/ui/checkbox";
+import { Input } from "@/shared/ui/input";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/shared/ui/popover";
 
 export type OptionItem = {
   id: string | number;
   name: string;
   subtitle?: string;
+  parentId?: string | number;
 };
 
 type Props = {
@@ -15,195 +31,194 @@ type Props = {
   selectedIds: (string | number)[];
   onChange: (ids: (string | number)[]) => void;
   isLoading?: boolean;
+  tone?: "primary" | "info" | "warning" | "success";
 };
 
+const toneClasses = {
+  primary: {
+    badge: "bg-primary/[0.09] text-primary",
+    active: "border-primary/20 bg-primary/[0.055]",
+  },
+  info: {
+    badge: "bg-info/[0.10] text-info",
+    active: "border-info/20 bg-info/[0.055]",
+  },
+  warning: {
+    badge: "bg-warning/[0.11] text-warning",
+    active: "border-warning/20 bg-warning/[0.055]",
+  },
+  success: {
+    badge: "bg-success/[0.10] text-success",
+    active: "border-success/20 bg-success/[0.055]",
+  },
+} as const;
+
 export function MultiSelectAudience({
-  label = "Select Audience",
-  placeholder = "Search and select...",
+  label = "Recipients",
+  placeholder = "Search by name",
   options = [],
   selectedIds = [],
   onChange,
   isLoading = false,
+  tone = "primary",
 }: Props) {
-  const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const styles = toneClasses[tone];
 
   const filteredOptions = useMemo(() => {
-    if (!searchQuery.trim()) return options;
+    const query = searchQuery.trim().toLowerCase();
+    if (!query) return options;
+
     return options.filter(
-      (opt) =>
-        opt.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (opt.subtitle && opt.subtitle.toLowerCase().includes(searchQuery.toLowerCase()))
+      (option) =>
+        option.name.toLowerCase().includes(query) ||
+        option.subtitle?.toLowerCase().includes(query),
     );
   }, [options, searchQuery]);
 
-  const isSelected = (id: string | number) => selectedIds.includes(id);
+  function isSelected(id: string | number) {
+    return selectedIds.some((selectedId) => String(selectedId) === String(id));
+  }
 
-  const toggleSelection = (id: string | number) => {
+  function toggleSelection(id: string | number) {
     if (isSelected(id)) {
-      onChange(selectedIds.filter((item) => item !== id));
-    } else {
-      onChange([...selectedIds, id]);
+      onChange(
+        selectedIds.filter(
+          (selectedId) => String(selectedId) !== String(id),
+        ),
+      );
+      return;
     }
-  };
 
-  const handleSelectAll = () => {
-    const allFilteredIds = filteredOptions.map((opt) => opt.id);
-    const newSelected = Array.from(new Set([...selectedIds, ...allFilteredIds]));
-    onChange(newSelected);
-  };
+    onChange([...selectedIds, id]);
+  }
 
-  const handleDeselectAll = () => {
-    onChange([]);
-  };
+  function selectVisible() {
+    onChange(
+      Array.from(
+        new Map(
+          [...selectedIds, ...filteredOptions.map((option) => option.id)].map(
+            (id) => [String(id), id],
+          ),
+        ).values(),
+      ),
+    );
+  }
+
+  const selectedOptions = options.filter((option) => isSelected(option.id));
 
   return (
-    <div className="space-y-2 w-full">
-
-      <div className="flex items-center justify-between">
-        <label className="text-sm font-semibold text-foreground flex items-center gap-1.5">
-          <Users className="w-4 h-4 text-primary" />
+    <div className="space-y-2.5">
+      <div className="flex items-center justify-between gap-3">
+        <label className="flex items-center gap-2 text-[11px] font-medium text-foreground">
+          <span className={`flex h-7 w-7 items-center justify-center rounded-[9px] ${styles.badge}`}>
+            <Users className="h-3.5 w-3.5" />
+          </span>
           {label}
-          {selectedIds.length > 0 && (
-            <span className="ml-1 rounded-full bg-primary/15 px-2 py-0.5 text-xs font-bold text-primary">
-              {selectedIds.length}
-            </span>
-          )}
         </label>
 
-        {options.length > 0 && (
-          <div className="flex gap-2 text-xs">
-            <button
-              type="button"
-              onClick={handleSelectAll}
-              className="text-primary hover:underline font-medium"
-            >
-              Select All
-            </button>
-            <span className="text-border">|</span>
-            <button
-              type="button"
-              onClick={handleDeselectAll}
-              className="text-muted-foreground hover:text-destructive hover:underline"
-            >
-              Clear
-            </button>
-          </div>
-        )}
+        <div className="flex items-center gap-2 text-[10.5px]">
+          <button type="button" onClick={selectVisible} className="font-medium text-primary hover:underline">
+            Select visible
+          </button>
+          <span className="text-border">/</span>
+          <button type="button" onClick={() => onChange([])} className="text-muted-foreground hover:text-foreground">
+            Clear
+          </button>
+        </div>
       </div>
 
+      <Popover>
+        <PopoverTrigger asChild>
+          <button
+            type="button"
+            className="flex min-h-11 w-full items-center justify-between gap-3 rounded-[13px] border border-border/70 bg-background px-3.5 py-2 text-start outline-none transition hover:border-border focus-visible:ring-4 focus-visible:ring-primary/10"
+          >
+            <span className="min-w-0 flex-1 truncate text-[12px] text-foreground">
+              {selectedIds.length
+                ? `${selectedIds.length} recipient${selectedIds.length === 1 ? "" : "s"} selected`
+                : "Choose recipients"}
+            </span>
+            <span className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${styles.badge}`}>
+              {selectedIds.length}
+            </span>
+          </button>
+        </PopoverTrigger>
 
-      <div className="min-h-[42px] p-1.5 rounded-xl border border-input bg-card text-card-foreground flex flex-wrap gap-1.5 items-center focus-within:border-primary focus-within:ring-1 focus-within:ring-ring transition-all">
-        {selectedIds.length === 0 ? (
-          <span className="text-sm text-muted-foreground px-2 select-none">
-            No items selected
-          </span>
-        ) : (
-          selectedIds.map((id) => {
-            const item = options.find((opt) => opt.id === id);
-            if (!item) return null;
-            return (
-              <span
-                key={id}
-                className="inline-flex items-center gap-1 bg-secondary text-secondary-foreground border border-border rounded-lg px-2.5 py-1 text-xs font-medium animate-in fade-in zoom-in duration-150"
-              >
-                {item.name}
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    toggleSelection(id);
-                  }}
-                  className="text-muted-foreground hover:text-destructive hover:bg-muted rounded-full p-0.5 transition-colors"
-                >
-                  <X className="w-3 h-3" />
-                </button>
-              </span>
-            );
-          })
-        )}
-
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={() => setIsOpen(!isOpen)}
-          className="ml-auto text-muted-foreground hover:text-foreground h-7 px-2"
-        >
-          <ChevronsUpDown className="w-4 h-4" />
-        </Button>
-      </div>
-
-
-      {isOpen && (
-        <div className="relative z-50 mt-1 w-full rounded-xl border border-border bg-popover text-popover-foreground shadow-lg animate-in fade-in slide-in-from-top-2 duration-200 overflow-hidden">
-
-          <div className="p-2 border-b border-border flex items-center gap-2 bg-muted/40">
-            <Search className="w-4 h-4 text-muted-foreground ml-1" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder={placeholder}
-              className="w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground text-foreground"
-              autoFocus
-            />
-            {searchQuery && (
-              <button
-                type="button"
-                onClick={() => setSearchQuery("")}
-                className="text-muted-foreground hover:text-foreground text-xs"
-              >
-                <X className="w-3.5 h-3.5" />
-              </button>
-            )}
+        <PopoverContent align="start" className="w-[min(520px,calc(100vw-2rem))] overflow-hidden p-0">
+          <div className="border-b border-border/55 p-3">
+            <div className="relative">
+              <Search className="absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                value={searchQuery}
+                onChange={(event) => setSearchQuery(event.target.value)}
+                placeholder={placeholder}
+                className="h-10 rounded-[12px] ps-9 text-[12px]"
+              />
+            </div>
           </div>
 
-          {/* Options List */}
-          <div className="max-h-60 overflow-y-auto p-1.5 space-y-0.5">
+          <div className="max-h-72 space-y-1 overflow-y-auto p-2">
             {isLoading ? (
-              <div className="p-4 text-center text-sm text-muted-foreground">
-                Loading audience...
+              <div className="space-y-2 p-2">
+                {Array.from({ length: 5 }).map((_, index) => (
+                  <div key={index} className="h-12 animate-pulse rounded-[12px] bg-muted/60" />
+                ))}
               </div>
             ) : filteredOptions.length === 0 ? (
-              <div className="p-4 text-center text-sm text-muted-foreground">
-                No results found.
-              </div>
+              <p className="px-3 py-8 text-center text-[11px] text-muted-foreground">
+                No matching recipients were found.
+              </p>
             ) : (
-              filteredOptions.map((opt) => {
-                const selected = isSelected(opt.id);
+              filteredOptions.map((option) => {
+                const selected = isSelected(option.id);
+
                 return (
-                  <div
-                    key={opt.id}
-                    onClick={() => toggleSelection(opt.id)}
-                    className={`flex items-center justify-between px-3 py-2 rounded-lg text-sm cursor-pointer transition-colors ${
+                  <button
+                    key={option.id}
+                    type="button"
+                    onClick={() => toggleSelection(option.id)}
+                    className={`flex w-full items-center gap-3 rounded-[12px] border px-3 py-2.5 text-start transition ${
                       selected
-                        ? "bg-primary/10 text-primary font-medium"
-                        : "hover:bg-accent hover:text-accent-foreground text-foreground"
+                        ? styles.active
+                        : "border-transparent hover:border-border/55 hover:bg-muted/25"
                     }`}
                   >
-                    <div className="flex flex-col">
-                      <span>{opt.name}</span>
-                      {opt.subtitle && (
-                        <span className="text-xs text-muted-foreground">{opt.subtitle}</span>
-                      )}
-                    </div>
-                    <div
-                      className={`w-4 h-4 rounded flex items-center justify-center border transition-colors ${
-                        selected
-                          ? "bg-primary border-primary text-primary-foreground"
-                          : "border-input bg-card"
-                      }`}
-                    >
-                      {selected && <Check className="w-3 h-3 stroke-[3]" />}
-                    </div>
-                  </div>
+                    <Checkbox checked={selected} className="pointer-events-none" />
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate text-[12px] font-medium text-foreground">
+                        {option.name}
+                      </span>
+                      {option.subtitle ? (
+                        <span className="mt-0.5 block truncate text-[10.5px] text-muted-foreground">
+                          {option.subtitle}
+                        </span>
+                      ) : null}
+                    </span>
+                    {selected ? <Check className="h-4 w-4 text-primary" /> : null}
+                  </button>
                 );
               })
             )}
           </div>
+        </PopoverContent>
+      </Popover>
+
+      {selectedOptions.length ? (
+        <div className="flex max-h-24 flex-wrap gap-1.5 overflow-y-auto rounded-[13px] border border-border/55 bg-muted/[0.12] p-2.5">
+          {selectedOptions.map((option) => (
+            <span
+              key={option.id}
+              className="inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-background px-2.5 py-1 text-[10.5px] text-foreground"
+            >
+              {option.name}
+              <button type="button" onClick={() => toggleSelection(option.id)} aria-label={`Remove ${option.name}`}>
+                <X className="h-3 w-3 text-muted-foreground hover:text-destructive" />
+              </button>
+            </span>
+          ))}
         </div>
-      )}
+      ) : null}
     </div>
   );
 }

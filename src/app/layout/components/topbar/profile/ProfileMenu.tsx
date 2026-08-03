@@ -209,7 +209,7 @@ export function ProfileMenu({
             "topbar-menu-shadow",
             "absolute end-0 top-full",
             "z-[100] mt-3",
-            "w-[min(278px,calc(100vw-24px))]",
+            "w-[min(250px,calc(100vw-24px))]",
             "overflow-hidden",
             "rounded-[22px]",
             "border border-topbar-border/80",

@@ -1,120 +1,247 @@
 import { AlertTriangle } from "lucide-react";
+import type { ReactNode } from "react";
 
-export type AlertCategory = "payment" | "payed" | "behavior" | "escape" | "late" | "absence" | "salary" | "homework";
+import { DatePicker } from "@/shared/ui/date-picker";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/shared/ui/select";
+
+export type AlertCategory =
+  | "payment"
+  | "payed"
+  | "behavior"
+  | "escape"
+  | "late"
+  | "absence"
+  | "salary"
+  | "homework";
 
 type Props = {
   audience: "student" | "staff";
   alertType: AlertCategory;
   onAlertTypeChange: (value: AlertCategory) => void;
-  amount: string; onAmountChange: (v: string) => void;
-  dueDate: string; onDueDateChange: (v: string) => void;
-  severity: "low" | "medium" | "high"; onSeverityChange: (v: "low" | "medium" | "high") => void;
-  sessionName: string; onSessionNameChange: (v: string) => void;
-  minutesLate: string; onMinutesLateChange: (v: string) => void;
-  monthName: string; onMonthNameChange: (v: string) => void;
-  subjectName: string; onSubjectNameChange: (v: string) => void;
+  amount: string;
+  onAmountChange: (value: string) => void;
+  dueDate: string;
+  onDueDateChange: (value: string) => void;
+  severity: "low" | "medium" | "high";
+  onSeverityChange: (value: "low" | "medium" | "high") => void;
+  sessionName: string;
+  onSessionNameChange: (value: string) => void;
+  minutesLate: string;
+  onMinutesLateChange: (value: string) => void;
+  monthName: string;
+  onMonthNameChange: (value: string) => void;
+  subjectName: string;
+  onSubjectNameChange: (value: string) => void;
+  tone?: "student" | "staff";
 };
 
+const inputClassName =
+  "h-11 w-full rounded-[13px] border border-input bg-background px-3.5 text-[12px] outline-none transition focus:border-primary/35 focus:ring-4 focus:ring-primary/[0.07]";
+
 export function AlertTypeForm({
-  audience, alertType, onAlertTypeChange, amount, onAmountChange, dueDate, onDueDateChange, severity, onSeverityChange,
-  sessionName, onSessionNameChange, minutesLate, onMinutesLateChange, monthName, onMonthNameChange, subjectName, onSubjectNameChange
+  audience,
+  alertType,
+  onAlertTypeChange,
+  amount,
+  onAmountChange,
+  dueDate,
+  onDueDateChange,
+  severity,
+  onSeverityChange,
+  sessionName,
+  onSessionNameChange,
+  minutesLate,
+  onMinutesLateChange,
+  monthName,
+  onMonthNameChange,
+  subjectName,
+  onSubjectNameChange,
+  tone = audience,
 }: Props) {
   const isStudent = audience === "student";
+  const surface =
+    tone === "student"
+      ? "border-info/[0.14] bg-info/[0.035]"
+      : "border-warning/[0.16] bg-warning/[0.035]";
 
   return (
     <div className="space-y-4">
-      <div className="space-y-1.5">
-        <label className="text-sm font-semibold text-foreground">Alert Type</label>
-        <select value={alertType} onChange={(e) => onAlertTypeChange(e.target.value as AlertCategory)} className="w-full rounded-xl border border-input bg-card text-foreground p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring">
-          {isStudent ? (
-            <>
-              <option value="absence">Absence Alert</option>
-              <option value="late">Late Arrival</option>
-              <option value="escape">Class Escape</option>
-              <option value="behavior">Behavioral Issue</option>
-              <option value="homework">Missing Homework</option>
-              <option value="payment">Payment Due</option>
-              <option value="payed">Payment Received</option>
-            </>
-          ) : (
-            <>
-              <option value="salary">Salary Deposited</option>
-              <option value="absence">Staff Absence</option>
-              <option value="late">Staff Late Arrival</option>
-            </>
-          )}
-        </select>
+      <div className="space-y-2">
+        <label className="text-[11px] font-medium text-foreground">
+          Alert category
+        </label>
+
+        <Select
+          value={alertType}
+          onValueChange={(value) =>
+            onAlertTypeChange(value as AlertCategory)
+          }
+        >
+          <SelectTrigger className="h-11 rounded-[13px] border-border/70 bg-background text-[12px] shadow-none">
+            <SelectValue placeholder="Choose an alert category" />
+          </SelectTrigger>
+          <SelectContent>
+            {isStudent ? (
+              <>
+                <SelectItem value="absence">Absence</SelectItem>
+                <SelectItem value="late">Late arrival</SelectItem>
+                <SelectItem value="escape">Left class</SelectItem>
+                <SelectItem value="behavior">Behavior note</SelectItem>
+                <SelectItem value="homework">Missing homework</SelectItem>
+                <SelectItem value="payment">Payment due</SelectItem>
+                <SelectItem value="payed">Payment received</SelectItem>
+              </>
+            ) : (
+              <>
+                <SelectItem value="salary">Salary deposited</SelectItem>
+                <SelectItem value="absence">Staff absence</SelectItem>
+                <SelectItem value="late">Late arrival</SelectItem>
+              </>
+            )}
+          </SelectContent>
+        </Select>
       </div>
 
-      <div className="p-3.5 bg-muted/30 rounded-xl border border-border space-y-3">
-        {/* Dynamic Fields Based on Selection */}
-        {(alertType === "payment" || alertType === "payed" || alertType === "salary") && (
-          <div className="space-y-3">
-            <div>
-              <label className="text-xs font-semibold text-muted-foreground block mb-1">Amount</label>
-              <input type="number" value={amount} onChange={(e) => onAmountChange(e.target.value)} placeholder="0.00" required className="w-full rounded-lg border border-input p-2 text-sm bg-card" />
-            </div>
-            {alertType === "salary" && (
-              <div>
-                <label className="text-xs font-semibold text-muted-foreground block mb-1">Month</label>
-                <input type="text" value={monthName} onChange={(e) => onMonthNameChange(e.target.value)} required className="w-full rounded-lg border border-input p-2 text-sm bg-card" />
-              </div>
-            )}
-            {alertType === "payment" && (
-              <div>
-                <label className="text-xs font-semibold text-muted-foreground block mb-1">Due Date</label>
-                <input type="date" value={dueDate} onChange={(e) => onDueDateChange(e.target.value)} required className="w-full rounded-lg border border-input p-2 text-sm bg-card" />
-              </div>
-            )}
+      <div className={`space-y-4 rounded-[18px] border p-4 ${surface}`}>
+        {(alertType === "payment" ||
+          alertType === "payed" ||
+          alertType === "salary") && (
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Field label="Amount">
+              <input
+                type="number"
+                min="0"
+                step="0.01"
+                value={amount}
+                onChange={(event) => onAmountChange(event.target.value)}
+                placeholder="0.00"
+                required
+                className={inputClassName}
+              />
+            </Field>
+
+            {alertType === "salary" ? (
+              <Field label="Salary month">
+                <input
+                  type="month"
+                  value={monthName}
+                  onChange={(event) => onMonthNameChange(event.target.value)}
+                  required
+                  className={inputClassName}
+                />
+              </Field>
+            ) : null}
+
+            {alertType === "payment" ? (
+              <DatePicker
+                label="Due date"
+                value={dueDate}
+                onChange={onDueDateChange}
+                required
+                className="sm:col-span-1"
+              />
+            ) : null}
           </div>
         )}
 
-        {alertType === "behavior" && (
-          <div>
-            <label className="text-xs font-semibold text-muted-foreground block mb-1">Severity</label>
-            <select value={severity} onChange={(e) => onSeverityChange(e.target.value as any)} className="w-full rounded-lg border border-input p-2 text-sm bg-card">
-              <option value="low">Low</option>
-              <option value="medium">Medium</option>
-              <option value="high">High</option>
-            </select>
-          </div>
-        )}
+        {alertType === "behavior" ? (
+          <Field label="Severity">
+            <Select
+              value={severity}
+              onValueChange={(value) =>
+                onSeverityChange(value as "low" | "medium" | "high")
+              }
+            >
+              <SelectTrigger className="h-11 rounded-[13px] border-border/70 bg-background text-[12px] shadow-none">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="low">Low</SelectItem>
+                <SelectItem value="medium">Medium</SelectItem>
+                <SelectItem value="high">High</SelectItem>
+              </SelectContent>
+            </Select>
+          </Field>
+        ) : null}
 
-        {(alertType === "escape" || alertType === "late") && (
-          <div className="space-y-3">
-            <div>
-              <label className="text-xs font-semibold text-muted-foreground block mb-1">Session / Class</label>
-              <input type="text" value={sessionName} onChange={(e) => onSessionNameChange(e.target.value)} required className="w-full rounded-lg border border-input p-2 text-sm bg-card" />
-            </div>
-            {alertType === "late" && (
-              <div>
-                <label className="text-xs font-semibold text-muted-foreground block mb-1">Minutes Late</label>
-                <input type="number" value={minutesLate} onChange={(e) => onMinutesLateChange(e.target.value)} required className="w-full rounded-lg border border-input p-2 text-sm bg-card" />
-              </div>
-            )}
-          </div>
-        )}
+        {(alertType === "escape" || alertType === "late") ? (
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Field label="Session or class">
+              <input
+                value={sessionName}
+                onChange={(event) => onSessionNameChange(event.target.value)}
+                placeholder="Example: Period 3"
+                required
+                className={inputClassName}
+              />
+            </Field>
 
-        {alertType === "homework" && (
-          <div className="space-y-3">
-            <div>
-              <label className="text-xs font-semibold text-muted-foreground block mb-1">Subject</label>
-              <input type="text" value={subjectName} onChange={(e) => onSubjectNameChange(e.target.value)} required className="w-full rounded-lg border border-input p-2 text-sm bg-card" />
-            </div>
-            <div>
-              <label className="text-xs font-semibold text-muted-foreground block mb-1">Due Date</label>
-              <input type="date" value={dueDate} onChange={(e) => onDueDateChange(e.target.value)} required className="w-full rounded-lg border border-input p-2 text-sm bg-card" />
-            </div>
+            {alertType === "late" ? (
+              <Field label="Minutes late">
+                <input
+                  type="number"
+                  min="1"
+                  value={minutesLate}
+                  onChange={(event) => onMinutesLateChange(event.target.value)}
+                  required
+                  className={inputClassName}
+                />
+              </Field>
+            ) : null}
           </div>
-        )}
+        ) : null}
 
-        {alertType === "absence" && (
-          <div className="rounded-lg border border-dashed border-border bg-card/60 p-3 text-sm text-muted-foreground flex items-start gap-2">
-            <AlertTriangle className="w-4 h-4 mt-0.5 text-warning" />
-            <span>No additional details required for this alert type.</span>
+        {alertType === "homework" ? (
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Field label="Subject">
+              <input
+                value={subjectName}
+                onChange={(event) => onSubjectNameChange(event.target.value)}
+                placeholder="Subject name"
+                required
+                className={inputClassName}
+              />
+            </Field>
+
+            <DatePicker
+              label="Homework date"
+              value={dueDate}
+              onChange={onDueDateChange}
+              required
+            />
           </div>
-        )}
+        ) : null}
+
+        {alertType === "absence" ? (
+          <div className="flex items-start gap-2.5 rounded-[13px] border border-border/55 bg-background/80 p-3 text-[11px] leading-5 text-muted-foreground">
+            <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-warning" />
+            No additional details are required. Select recipients and send the alert.
+          </div>
+        ) : null}
       </div>
+    </div>
+  );
+}
+
+function Field({
+  label,
+  children,
+}: {
+  label: string;
+  children: ReactNode;
+}) {
+  return (
+    <div className="space-y-2">
+      <label className="text-[11px] font-medium text-foreground">
+        {label}
+      </label>
+      {children}
     </div>
   );
 }
