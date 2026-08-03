@@ -1,3 +1,4 @@
+
 import {
   AlertTriangle,
   BookOpen,
@@ -23,42 +24,55 @@ const icons = {
   calls: Phone,
   cases: ShieldCheck,
   warnings: AlertTriangle,
-  meetings: Users,
   wallet: Wallet,
   revenue: CircleDollarSign,
 };
+
+const tones = [
+  "bg-sky-50 text-sky-600 dark:bg-sky-500/10",
+  "bg-violet-50 text-violet-600 dark:bg-violet-500/10",
+  "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10",
+  "bg-amber-50 text-amber-600 dark:bg-amber-500/10",
+];
 
 export function DashboardMetricCard({
   metric,
 }: {
   metric: DashboardMetric;
 }) {
-  const Icon =
-    icons[metric.icon as keyof typeof icons];
+  const Icon = icons[metric.icon as keyof typeof icons];
+
+  const tone =
+    tones[
+      Math.abs(
+        metric.id
+          .split("")
+          .reduce((a, c) => a + c.charCodeAt(0), 0),
+      ) % tones.length
+    ];
 
   return (
-    <article className="rounded-[22px] border border-border/45 bg-card p-4 shadow-[0_10px_30px_rgba(30,20,70,0.035)] transition duration-200 hover:border-border/65 hover:shadow-[0_14px_34px_rgba(30,20,70,0.05)]">
-      <div className="flex items-center gap-3.5">
-        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[14px] bg-primary/[0.08] text-primary">
-          <Icon size={19} strokeWidth={1.8} />
+    <article className="group rounded-[26px] border border-border/50 bg-card p-5 shadow-[0_12px_35px_rgba(40,25,90,0.05)] transition hover:-translate-y-1">
+      <div className="flex items-start justify-between gap-3">
+        <div className={`flex h-12 w-12 items-center justify-center rounded-[18px] ${tone}`}>
+          <Icon size={21} strokeWidth={1.8} />
         </div>
 
-        <div className="min-w-0">
-          <p className="truncate text-[11px] font-medium text-muted-foreground">
-            {metric.label}
-          </p>
+        <span className="rounded-full bg-success/10 px-2.5 py-1 text-[10px] font-semibold text-success">
+          {metric.change}
+        </span>
+      </div>
 
-          <h3 className="mt-1 text-[25px] font-semibold leading-none tracking-[-0.035em] text-foreground">
-            {metric.value}
-          </h3>
+      <p className="mt-5 text-xs text-muted-foreground">
+        {metric.label}
+      </p>
 
-          <p className="mt-2 text-[10px] text-muted-foreground">
-            <span className="font-medium text-success">
-              {metric.change}
-            </span>{" "}
-            from last month
-          </p>
-        </div>
+      <h3 className="mt-1 text-3xl font-semibold tracking-[-0.05em] text-foreground">
+        {metric.value}
+      </h3>
+
+      <div className="mt-4 h-1.5 overflow-hidden rounded-full bg-muted">
+        <div className="h-full w-3/4 rounded-full bg-primary/60 transition-all group-hover:w-5/6" />
       </div>
     </article>
   );

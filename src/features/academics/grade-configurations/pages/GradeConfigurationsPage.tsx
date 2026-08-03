@@ -265,112 +265,58 @@ export function GradeConfigurationsPage() {
         {
           key: "year",
           header: "Academic Year",
-          render: (row) => {
-            const yearName =
-              yearNameById.get(
-                String(row.academicYearId),
-              ) ?? "Unknown academic year";
-
-            return (
-              <TextCell
-                value={yearName}
-                caption="Academic cycle"
-              />
-            );
-          },
+          render: (row) => (
+            <TextCell
+              value={yearNameById.get(String(row.academicYearId)) ?? "Unknown year"}
+              caption="Academic cycle"
+            />
+          ),
           searchableText: (row) =>
-            yearNameById.get(
-              String(row.academicYearId),
-            ) ?? "",
+            yearNameById.get(String(row.academicYearId)) ?? "",
         },
         {
           key: "grade",
           header: "Grade",
-          render: (row) => {
-            const gradeName =
-              gradeNameById.get(
-                String(row.gradeId),
-              ) ?? "Unknown grade";
-
-            return (
-              <TextCell
-                value={gradeName}
-                caption="Configured grade"
-              />
-            );
-          },
+          render: (row) => (
+            <TextCell
+              value={gradeNameById.get(String(row.gradeId)) ?? "Unknown grade"}
+              caption="Configured grade"
+            />
+          ),
           searchableText: (row) =>
-            gradeNameById.get(
-              String(row.gradeId),
-            ) ?? "",
+            gradeNameById.get(String(row.gradeId)) ?? "",
         },
         {
           key: "supervisor",
           header: "Supervisor",
-          render: (row) => {
-            const supervisorName =
-              adviserNameById.get(
-                String(row.supervisorId),
-              ) ?? "Unavailable supervisor";
-
-            return (
-              <TextCell
-                value={supervisorName}
-                caption="Grade supervisor"
-                emphasis="secondary"
-              />
-            );
-          },
+          render: (row) => (
+            <TextCell
+              value={adviserNameById.get(String(row.supervisorId)) ?? "Unavailable"}
+              caption="Responsible adviser"
+              emphasis="secondary"
+            />
+          ),
           searchableText: (row) =>
-            adviserNameById.get(
-              String(row.supervisorId),
-            ) ?? "",
+            adviserNameById.get(String(row.supervisorId)) ?? "",
         },
         {
-          key: "plannedClassrooms",
-          header: "Planned Classrooms",
+          key: "classrooms",
+          header: "Classrooms",
           render: (row) => (
             <MetricCell
-              value={
-                row.plannedClassroomsCount
-              }
-              caption="Classrooms planned"
+              value={row.actualClassroomsCount}
+              caption={`${row.plannedClassroomsCount} planned`}
               tone="accent"
             />
           ),
         },
         {
-          key: "plannedCapacity",
-          header: "Planned Capacity",
-          render: (row) => (
-            <MetricCell
-              value={
-                row.plannedStudentsCapacity
-              }
-              caption="Student capacity"
-            />
-          ),
-        },
-        {
-          key: "actualClassrooms",
-          header: "Actual Classrooms",
-          render: (row) => (
-            <MetricCell
-              value={
-                row.actualClassroomsCount
-              }
-              caption="Current classrooms"
-              tone="accent"
-            />
-          ),
-        },
-        {
-          key: "actualStudents",
-          header: "Actual Students",
+          key: "students",
+          header: "Students",
           render: (row) => (
             <MetricCell
               value={row.actualStudentsCount}
-              caption="Enrolled students"
+              caption={`${row.plannedStudentsCapacity} capacity`}
             />
           ),
         },
