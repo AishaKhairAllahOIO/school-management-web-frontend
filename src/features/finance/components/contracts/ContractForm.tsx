@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CalendarDays, Loader2 } from "lucide-react";
+import { CalendarDays } from "lucide-react";
 
 import { Button } from "@/shared/ui/button";
 import {
@@ -188,18 +188,16 @@ export function ContractForm({
                 : "border-border/45 bg-muted/18 text-foreground/75",
             ].join(" ")}
           >
+            <CalendarDays className="h-4 w-4 text-primary" strokeWidth={1.8} />
             {isLoadingStudentProfile ? (
-              <Loader2 className="h-4 w-4 animate-spin text-primary" />
+              <span className="h-3.5 w-40 animate-pulse rounded-full bg-muted/75" />
             ) : (
-              <CalendarDays className="h-4 w-4 text-primary" strokeWidth={1.8} />
-            )}
-            <span className="truncate font-normal">
-              {isLoadingStudentProfile
-                ? "Loading academic year..."
-                : isStudentProfileError
+              <span className="truncate font-normal">
+                {isStudentProfileError
                   ? "Could not load the student's academic year"
                   : academicYearLabel}
-            </span>
+              </span>
+            )}
           </div>
           <p className="text-[11.5px] font-normal text-muted-foreground/75">
             Filled automatically from the student’s active enrollment.

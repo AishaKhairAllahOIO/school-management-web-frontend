@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { useQueries } from "@tanstack/react-query";
-import { CircleDollarSign, FileText, Loader2, Plus, ReceiptText, RefreshCw, WalletCards } from "lucide-react";
+import { CircleDollarSign, FileText, Plus, ReceiptText, RefreshCw, WalletCards } from "lucide-react";
 
 import { Button } from "@/shared/ui/button";
 import { useStudents } from "../../../users/students/hooks/useStudents";
@@ -189,7 +189,7 @@ export function ContractsSection() {
           disabled={isFetchingAccounts}
         >
           {isFetchingAccounts ? (
-            <Loader2 size={16} className="mr-2 animate-spin" />
+            <RefreshCw size={16} className="mr-2" />
           ) : (
             <RefreshCw size={16} className="mr-2" />
           )}

@@ -1,11 +1,10 @@
 import { useState } from "react";
 import { Banknote, CircleDollarSign, CreditCard, Plus, ReceiptText } from "lucide-react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"; 
+import { useQuery } from "@tanstack/react-query";
 
 import { Button } from "@/shared/ui/button";
 import { axiosClient } from "@/services/axios/axiosClient";
 import { API_ENDPOINTS } from "@/services/api/endpoints";
-import { financeOperationsService } from "../../services/finance-operations.service"; 
 
 import { PaymentsTable } from "./PaymentsTable";
 import { ProcessPaymentDialog } from "./ProcessPaymentDialog";
@@ -28,10 +27,9 @@ export function CashierSection() {
     isFetching,
     refetch,
     processPayment,
+    updatePayment,
     deletePayment,
   } = usePayments();
-
-  const queryClient = useQueryClient();
 
   const [createOpen, setCreateOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
@@ -53,7 +51,17 @@ export function CashierSection() {
         const rawData = response.data?.data?.data ?? response.data?.data ?? response.data?.items ?? [];
         return rawData.map((student: any) => ({
           id: student.studentId || student.id,
-          name: student.fullName, 
+          name:
+            student.fullName ||
+            student.full_name ||
+            [
+              student.firstName || student.first_name,
+              student.fatherName || student.father_name,
+              student.lastName || student.last_name,
+            ]
+              .filter(Boolean)
+              .join(" ") ||
+            "Unnamed student",
         }));
       } catch (error) {
         return [];
@@ -74,19 +82,6 @@ export function CashierSection() {
       },
     });
   }
-
-  const updatePayment = useMutation({
-    mutationFn: ({ id, payload }: { id: string; payload: any }) => 
-      financeOperationsService.updatePayment(id, payload),
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["payments-ledger"] });
-      setEditOpen(false);
-      setSelectedPayment(null);
-    },
-    onError: (error: any) => {
-      alert("Update failed: " + (error.response?.data?.message || "Unknown error"));
-    }
-  });
 
   function handleDelete(id: string | number) {
     setSelectedPaymentIdToDelete(id);
@@ -208,7 +203,17 @@ export function CashierSection() {
         }}
         payment={selectedPayment}
         isLoading={updatePayment.isPending}
-        onSubmit={(id, payload) => updatePayment.mutate({ id, payload })}
+        onSubmit={(id, payload) =>
+          updatePayment.mutate(
+            { id, payload },
+            {
+              onSuccess: () => {
+                setEditOpen(false);
+                setSelectedPayment(null);
+              },
+            },
+          )
+        }
       />
 
 

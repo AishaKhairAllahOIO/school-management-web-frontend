@@ -86,8 +86,12 @@ export function PaymentsTable({
                     <ReceiptText className="h-4 w-4" strokeWidth={1.8} />
                   </span>
                   <div>
-                    <p className="text-[13px] font-semibold text-foreground/86">Student payment</p>
-                    <p className="mt-0.5 text-[10.5px] text-muted-foreground/65">Official receipt</p>
+                    <p className="text-[13px] font-semibold text-foreground/86">
+                      {payment.studentName || "Student payment"}
+                    </p>
+                    <p className="mt-0.5 text-[10.5px] text-muted-foreground/65">
+                      Official receipt
+                    </p>
                   </div>
                 </div>
               </TableCell>

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { AlertCircle, CalendarClock, CircleDollarSign, Loader2, RefreshCw, WalletCards } from "lucide-react";
+import { AlertCircle, CalendarClock, CircleDollarSign, RefreshCw, WalletCards } from "lucide-react";
 import { Button } from "@/shared/ui/button";
 
 import { InstallmentsTable } from "./InstallmentsTable";
@@ -30,7 +30,7 @@ export function InstallmentsSection() {
     return (
       <div className="flex flex-col items-center justify-center rounded-[18px] border border-destructive/20 bg-destructive/[0.045] py-12 text-center">
         <Button variant="outline" onClick={() => refetch()} disabled={isFetching}>
-          {isFetching ? <Loader2 size={16} className="mr-2 animate-spin" /> : <RefreshCw size={16} className="mr-2" />}
+          <RefreshCw size={16} className="mr-2" />
           {isFetching ? "Retrying..." : "Retry Loading Installments"}
         </Button>
       </div>
