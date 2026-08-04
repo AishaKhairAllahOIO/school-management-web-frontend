@@ -11,7 +11,10 @@ import type {
   UpdateContractPayload,
 } from "../types/finance.payloads";
 
-const queryKey = ["financial-accounts"] as const;
+export const financialAccountsQueryKey = ["financial-accounts"] as const;
+export const studentFinancialAccountQueryKey = (
+  studentId: string | number,
+) => ["financial-account", studentId] as const;
 
 function errorMessage(error: unknown, fallback: string) {
   const candidate = error as {
@@ -20,19 +23,35 @@ function errorMessage(error: unknown, fallback: string) {
   return candidate.response?.data?.message || fallback;
 }
 
+async function invalidateStudentFinance(
+  queryClient: ReturnType<typeof useQueryClient>,
+  studentId?: string | number,
+) {
+  await Promise.all([
+    queryClient.invalidateQueries({ queryKey: financialAccountsQueryKey }),
+    queryClient.invalidateQueries({ queryKey: ["installments-list"] }),
+    queryClient.invalidateQueries({ queryKey: ["payments-ledger"] }),
+    studentId !== undefined
+      ? queryClient.invalidateQueries({
+          queryKey: studentFinancialAccountQueryKey(studentId),
+        })
+      : queryClient.invalidateQueries({ queryKey: ["financial-account"] }),
+  ]);
+}
+
 export function useFinancialAccounts() {
   const queryClient = useQueryClient();
 
   const accountsQuery = useQuery({
-    queryKey,
+    queryKey: financialAccountsQueryKey,
     queryFn: financeOperationsService.getAllAccounts,
   });
 
   const finalizeContract = useMutation({
     mutationFn: (payload: FinalizeContractPayload) =>
       financeOperationsService.finalizeContract(payload),
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey });
+    onSuccess: async (_, payload) => {
+      await invalidateStudentFinance(queryClient, payload.studentId);
       toast.success("Student contract created successfully.");
     },
     onError: (error) => {
@@ -42,14 +61,16 @@ export function useFinancialAccounts() {
 
   const updateContract = useMutation({
     mutationFn: ({
-      studentId,
+      accountId,
+      studentId: _studentId,
       payload,
     }: {
+      accountId: number | string;
       studentId: number | string;
       payload: UpdateContractPayload;
-    }) => financeOperationsService.updateContract(studentId, payload),
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey });
+    }) => financeOperationsService.updateContract(accountId, payload),
+    onSuccess: async (_, variables) => {
+      await invalidateStudentFinance(queryClient, variables.studentId);
       toast.success("Contract updated successfully.");
     },
     onError: (error) => {
@@ -71,10 +92,16 @@ export function useFinancialAccounts() {
 
 export function useStudentFinancialAccount(
   studentId: string | number | undefined,
+  enabled = true,
 ) {
   return useQuery({
-    queryKey: ["financial-account", studentId],
+    queryKey:
+      studentId === undefined
+        ? ["financial-account", "missing"]
+        : studentFinancialAccountQueryKey(studentId),
     queryFn: () => financeOperationsService.getAccountByStudentId(studentId!),
-    enabled: studentId !== undefined && studentId !== null,
+    enabled:
+      enabled && studentId !== undefined && studentId !== null,
+    retry: false,
   });
 }

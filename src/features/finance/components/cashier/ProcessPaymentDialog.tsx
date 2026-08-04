@@ -15,6 +15,7 @@ type Props = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   students: Option[];
+  initialStudentId?: string | number;
   isLoading?: boolean;
   onSubmit: (values: PaymentFormValues) => void;
 };
@@ -23,6 +24,7 @@ export function ProcessPaymentDialog({
   open,
   onOpenChange,
   students,
+  initialStudentId,
   isLoading,
   onSubmit,
 }: Props) {
@@ -43,6 +45,7 @@ export function ProcessPaymentDialog({
         <div className="mt-4">
           <PaymentForm
             students={students}
+            initialStudentId={initialStudentId}
             isLoading={isLoading}
             onSubmit={handleSubmit}
           />

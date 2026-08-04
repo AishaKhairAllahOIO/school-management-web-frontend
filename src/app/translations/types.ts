@@ -75,11 +75,10 @@ export type TranslationDictionary = {
       exams: string;
       quizzes: string;
       holidays: string;
-      studentContracts: string;
-      studentInstallments: string;
-      studentPayments: string;
+      studentFinance: string;
       staffPayroll: string;
       announcements: string;
+      alerts: string;
       activities: string;
       schoolLaws: string;
       general: string;
@@ -88,7 +87,6 @@ export type TranslationDictionary = {
       attendance: string;
       roles: string;
       permissions: string;
-      alerts: string;
     };
 
     breadcrumb: {

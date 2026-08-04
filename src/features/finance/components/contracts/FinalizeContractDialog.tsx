@@ -48,13 +48,21 @@ export function FinalizeContractDialog({
             New Financial Contract
           </DialogTitle>
           <DialogDescription className="font-normal">
-            Select a student. The academic year is filled automatically from
-            the active enrollment.
+            Choose the fee plan, installment policy, and optional services.
+            The student and academic year are sent automatically from the active enrollment.
           </DialogDescription>
         </DialogHeader>
 
         <ContractForm
           students={students}
+          lockStudent={students.length === 1}
+          defaultValues={students.length === 1 ? {
+            studentId: Number(students[0].id),
+            academicYearId: 0,
+            feePlanId: 0,
+            installmentPolicyId: 0,
+            selectedExtraServiceIds: [],
+          } : undefined}
           feePlans={feePlans}
           installmentPolicies={installmentPolicies}
           isLoading={isLoading}

@@ -1,8 +1,5 @@
 import type { PaymentMethod } from "./finance.types";
 
-// ==========================================
-// Contracts Payloads
-// ==========================================
 export type FinalizeContractPayload = {
   studentId: number;
   academicYearId: number;
@@ -13,9 +10,6 @@ export type FinalizeContractPayload = {
 
 export type UpdateContractPayload = Partial<FinalizeContractPayload>;
 
-// ==========================================
-// Payments Payloads
-// ==========================================
 export type ProcessPaymentPayload = {
   studentId: number;
   paidAmount: number;

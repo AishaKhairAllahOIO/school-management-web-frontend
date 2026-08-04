@@ -40,6 +40,7 @@ type Props = {
   isLoading?: boolean;
   defaultValues?: ContractFormValues;
   onSubmit: (values: ContractFormValues) => void;
+  lockStudent?: boolean;
 };
 
 export function ContractForm({
@@ -49,6 +50,7 @@ export function ContractForm({
   onSubmit,
   defaultValues,
   isLoading = false,
+  lockStudent = false,
 }: Props) {
   const {
     control,
@@ -126,7 +128,7 @@ export function ContractForm({
     ? academicYear.name
     : resolvedAcademicYearId
       ? `Academic year #${resolvedAcademicYearId}`
-      : "Select a student first";
+      : "Loading academic year";
 
   return (
     <form
@@ -136,6 +138,8 @@ export function ContractForm({
       className="space-y-6"
     >
       <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+        {!lockStudent ? (
+          <>
         <div className="space-y-2">
           <label className="text-sm font-medium text-foreground/85">
             Student
@@ -145,6 +149,7 @@ export function ContractForm({
             name="studentId"
             render={({ field }) => (
               <Select
+                disabled={lockStudent}
                 value={field.value ? String(field.value) : ""}
                 onValueChange={(value) => {
                   field.onChange(Number(value));
@@ -208,6 +213,9 @@ export function ContractForm({
             </p>
           ) : null}
         </div>
+
+          </>
+        ) : null}
 
         <div className="space-y-2">
           <label className="text-sm font-medium text-foreground/85">

@@ -1,6 +1,12 @@
 import { useMemo, useState } from "react";
 import { useQueries } from "@tanstack/react-query";
-import { CircleDollarSign, FileText, Plus, ReceiptText, RefreshCw, WalletCards } from "lucide-react";
+import {
+  CircleDollarSign,
+  FileText,
+  ReceiptText,
+  RefreshCw,
+  WalletCards,
+} from "lucide-react";
 
 import { Button } from "@/shared/ui/button";
 import { useStudents } from "../../../users/students/hooks/useStudents";
@@ -8,17 +14,40 @@ import { studentKeys } from "../../../users/students/hooks/student.keys";
 import { studentApi } from "../../../users/students/api/student.api";
 import type { ContractStudentOption } from "./ContractForm";
 import { UpdateContractDialog } from "./UpdateContractDialog";
-import { ContractsTable } from "./ContractsTable";
 import { FinalizeContractDialog } from "./FinalizeContractDialog";
 import { useFinancialAccounts } from "../../hooks/useFinancialAccounts";
 import { AccountDetailsDialog } from "./AccountDetailsDialog";
 import { useFeePlans } from "@/features/settings/financial/hooks/useFeePlans";
 import { useInstallmentPolicies } from "@/features/settings/financial/hooks/useInstallmentPolicies";
 import { FinanceSectionShell } from "../shared/FinanceSectionShell";
-import { FinanceSummarySkeleton, FinanceTableSkeleton } from "../shared/FinanceTableSkeleton";
+import {
+  FinanceSummarySkeleton,
+  FinanceTableSkeleton,
+} from "../shared/FinanceTableSkeleton";
 import { FinanceSummaryGrid } from "../shared/FinanceSummaryGrid";
+import {
+  StudentAccountsTable,
+  type StudentFinanceRow,
+} from "./StudentAccountsTable";
+import type { FinancialAccount } from "../../types/finance.types";
 
-export function ContractsSection() {
+ type ContractsSectionProps = {
+  studentId?: string | number;
+  title?: string;
+  description?: string;
+  showCreateAction?: boolean;
+  showViewAction?: boolean;
+  onOpenStudentAccount?: (studentId: string | number) => void;
+};
+
+export function ContractsSection({
+  studentId,
+  title = "Student Financial Accounts",
+  description = "Review every student's financial position and open one profile to manage its contract, installments, and payments.",
+  showCreateAction = true,
+  showViewAction = true,
+  onOpenStudentAccount,
+}: ContractsSectionProps = {}) {
   const {
     data: accounts = [],
     isLoading: isLoadingAccounts,
@@ -29,122 +58,206 @@ export function ContractsSection() {
     updateContract,
   } = useFinancialAccounts();
 
-  const [selectedStudentId, setSelectedStudentId] = useState<
-    string | number | null
-  >(null);
-  const [detailsOpen, setDetailsOpen] = useState(false);
-  const [editOpen, setEditOpen] = useState(false);
-  const [selectedAccountToEdit, setSelectedAccountToEdit] =
-    useState<any>(null);
-  const [createOpen, setCreateOpen] = useState(false);
-
-  const { data: feePlans = [], isLoading: isLoadingFeePlans } =
-    useFeePlans();
-  const {
-    data: installmentPolicies = [],
-    isLoading: isLoadingPolicies,
-  } = useInstallmentPolicies();
-
-  /*
-   * Reuses the Students feature query instead of duplicating its endpoint.
-   * studentId is used by Finance, while enrollmentId is retained so the
-   * contract form can load the student's active academic year on demand.
-   */
   const {
     data: studentsResponse,
     isLoading: isLoadingStudents,
     isError: isStudentsError,
     refetch: refetchStudents,
-  } = useStudents({
-    status: "enrolled",
-    per_page: 100,
-  });
+  } = useStudents({ per_page: 100 });
 
   const studentItems = studentsResponse?.data ?? [];
 
-  const students = useMemo<ContractStudentOption[]>(
+  const listedStudentById = useMemo(
     () =>
-      studentItems.map((student) => ({
-        id: student.studentId,
-        enrollmentId: student.enrollmentId,
-        name: student.fullName,
-      })),
+      new Map(
+        studentItems.map((student) => [String(student.studentId), student] as const),
+      ),
     [studentItems],
   );
 
-  const contractStudentItems = useMemo(
-    () => {
-      const accountStudentIds = new Set(
-        accounts.map((account) => String(account.studentId)),
-      );
+  // The finance table must never be driven only by the currently returned
+  // student page. A fully-paid account is still a valid financial profile.
+  // Build a union of enrolled students and financial accounts so a student
+  // remains visible even if one endpoint is paginated or temporarily omits it.
+  const unionStudentIds = useMemo(() => {
+    const ids = new Set<string>();
 
-      return studentItems.filter((student) =>
-        accountStudentIds.has(String(student.studentId)),
-      );
-    },
-    [accounts, studentItems],
-  );
+    studentItems.forEach((student) => ids.add(String(student.studentId)));
+    accounts.forEach((account) => ids.add(String(account.studentId)));
 
-  const contractStudentProfiles = useQueries({
-    queries: contractStudentItems.map((student) => ({
-      queryKey: studentKeys.fullProfile(student.enrollmentId),
-      queryFn: () => studentApi.getFullProfile(student.enrollmentId),
+    if (studentId !== undefined) {
+      return [...ids].filter((id) => id === String(studentId));
+    }
+
+    return [...ids];
+  }, [accounts, studentId, studentItems]);
+
+  const studentDetailQueries = useQueries({
+    queries: unionStudentIds.map((id) => ({
+      queryKey: studentKeys.detail(id),
+      queryFn: () => studentApi.getDetails(id),
+      enabled: !listedStudentById.has(id),
       staleTime: 5 * 60 * 1000,
+      retry: false,
     })),
   });
 
-  const studentsById = useMemo(() => {
-    const directory = new Map<
-      string,
-      { fullName: string; academicYearName?: string | null }
-    >();
+  const listedProfiles = useQueries({
+    queries: studentItems
+      .filter((student) => unionStudentIds.includes(String(student.studentId)))
+      .map((student) => ({
+        queryKey: studentKeys.fullProfile(student.enrollmentId),
+        queryFn: () => studentApi.getFullProfile(student.enrollmentId),
+        staleTime: 5 * 60 * 1000,
+      })),
+  });
 
-    studentItems.forEach((student) => {
-      directory.set(String(student.studentId), {
-        fullName: student.fullName,
-      });
-    });
+  const listedProfileByStudentId = useMemo(() => {
+    const visibleListedStudents = studentItems.filter((student) =>
+      unionStudentIds.includes(String(student.studentId)),
+    );
 
-    contractStudentItems.forEach((student, index) => {
-      const profile = contractStudentProfiles[index]?.data;
+    return new Map(
+      visibleListedStudents.map((student, index) => [
+        String(student.studentId),
+        listedProfiles[index]?.data,
+      ] as const),
+    );
+  }, [listedProfiles, studentItems, unionStudentIds]);
 
-      directory.set(String(student.studentId), {
-        fullName: profile?.student.fullName ?? student.fullName,
-        academicYearName:
-          profile?.enrollment.academicYear?.name ?? null,
-      });
-    });
+  const detailByStudentId = useMemo(
+    () =>
+      new Map(
+        unionStudentIds.map((id, index) => [id, studentDetailQueries[index]?.data] as const),
+      ),
+    [studentDetailQueries, unionStudentIds],
+  );
 
-    return directory;
-  }, [contractStudentItems, contractStudentProfiles, studentItems]);
+  const accountByStudentId = useMemo(
+    () =>
+      new Map(
+        accounts.map((account) => [String(account.studentId), account] as const),
+      ),
+    [accounts],
+  );
+
+  const rows = useMemo<StudentFinanceRow[]>(
+    () =>
+      unionStudentIds.map((id) => {
+        const listedStudent = listedStudentById.get(id);
+        const profile = listedProfileByStudentId.get(id);
+        const details = detailByStudentId.get(id);
+        const account = accountByStudentId.get(id);
+
+        return {
+          studentId: listedStudent?.studentId ?? account?.studentId ?? id,
+          enrollmentId: listedStudent?.enrollmentId ?? id,
+          fullName:
+            profile?.student.fullName ??
+            details?.student.fullName ??
+            listedStudent?.fullName ??
+            account?.studentName ??
+            "Student",
+          academicYearName:
+            profile?.enrollment.academicYear?.name ??
+            account?.academicYearName ??
+            null,
+          account,
+        };
+      }),
+    [
+      accountByStudentId,
+      detailByStudentId,
+      listedProfileByStudentId,
+      listedStudentById,
+      unionStudentIds,
+    ],
+  );
+
+  const students = useMemo<ContractStudentOption[]>(
+    () =>
+      rows.map((row) => ({
+        id: row.studentId,
+        enrollmentId: row.enrollmentId,
+        name: row.fullName,
+      })),
+    [rows],
+  );
+
+  const visibleAccounts = useMemo(
+    () => rows.flatMap((row) => (row.account ? [row.account] : [])),
+    [rows],
+  );
+
+  const [createOpen, setCreateOpen] = useState(false);
+  const [createStudent, setCreateStudent] = useState<StudentFinanceRow | null>(
+    null,
+  );
+  const [editOpen, setEditOpen] = useState(false);
+  const [selectedAccountToEdit, setSelectedAccountToEdit] =
+    useState<FinancialAccount | null>(null);
+  const [detailsOpen, setDetailsOpen] = useState(false);
+  const [selectedStudentId, setSelectedStudentId] = useState<
+    string | number | null
+  >(null);
+
+  const { data: feePlans = [], isLoading: isLoadingFeePlans } = useFeePlans();
+  const {
+    data: installmentPolicies = [],
+    isLoading: isLoadingPolicies,
+  } = useInstallmentPolicies();
 
   const isLoadingDependencies =
     isLoadingAccounts ||
+    isLoadingStudents ||
     isLoadingFeePlans ||
-    isLoadingPolicies ||
-    isLoadingStudents;
+    isLoadingPolicies;
+
+  function openCreate(row?: StudentFinanceRow) {
+    setCreateStudent(row ?? null);
+    setCreateOpen(true);
+  }
 
   function handleFinalize(values: any) {
-    const payload = {
-      studentId: values.studentId,
-      academicYearId: values.academicYearId,
-      feePlanId: values.feePlanId,
-      installmentPolicyId: values.installmentPolicyId,
-      extraServiceIds: values.selectedExtraServiceIds,
-      selectedExtraServiceIds: values.selectedExtraServiceIds,
-    };
-
-    finalizeContract.mutate(payload as any, {
-      onSuccess: () => setCreateOpen(false),
-    });
+    finalizeContract.mutate(
+      {
+        studentId: Number(values.studentId),
+        academicYearId: Number(values.academicYearId),
+        feePlanId: Number(values.feePlanId),
+        installmentPolicyId: Number(values.installmentPolicyId),
+        selectedExtraServiceIds:
+          values.selectedExtraServiceIds?.length > 0
+            ? values.selectedExtraServiceIds.map(Number)
+            : null,
+      },
+      {
+        onSuccess: () => {
+          setCreateOpen(false);
+          setCreateStudent(null);
+        },
+      },
+    );
   }
 
   function handleUpdateContract(
-    studentId: string | number,
+    accountId: string | number,
+    targetStudentId: string | number,
     values: any,
   ) {
     updateContract.mutate(
-      { studentId, payload: values },
+      {
+        accountId,
+        studentId: targetStudentId,
+        payload: {
+          academicYearId: Number(values.academicYearId),
+          feePlanId: Number(values.feePlanId),
+          installmentPolicyId: Number(values.installmentPolicyId),
+          selectedExtraServiceIds:
+            values.selectedExtraServiceIds?.length > 0
+              ? values.selectedExtraServiceIds.map(Number)
+              : null,
+        },
+      },
       {
         onSuccess: () => {
           setEditOpen(false);
@@ -156,11 +269,7 @@ export function ContractsSection() {
 
   if (isLoadingDependencies) {
     return (
-      <FinanceSectionShell
-        title="Student Contracts"
-        description="Create and manage student financial agreements."
-        icon={FileText}
-      >
+      <FinanceSectionShell title={title} description={description} icon={FileText}>
         <FinanceSummarySkeleton />
         <FinanceTableSkeleton />
       </FinanceSectionShell>
@@ -170,14 +279,12 @@ export function ContractsSection() {
   if (isAccountsError || isStudentsError) {
     return (
       <div className="flex flex-col items-center justify-center rounded-[18px] border border-destructive/20 bg-destructive/[0.035] py-12 text-center">
-        <div className="mb-4 rounded-full bg-destructive/10 p-3 text-destructive">
-          <RefreshCw
-            size={24}
-            className={isFetchingAccounts ? "animate-spin" : ""}
-          />
-        </div>
-        <h3 className="text-[15px] font-medium text-foreground/85">
-          Failed to load contracts
+        <RefreshCw
+          size={24}
+          className={isFetchingAccounts ? "animate-spin text-destructive" : "text-destructive"}
+        />
+        <h3 className="mt-4 text-[15px] font-medium text-foreground/85">
+          Failed to load student finance
         </h3>
         <Button
           variant="outline"
@@ -188,86 +295,98 @@ export function ContractsSection() {
           }}
           disabled={isFetchingAccounts}
         >
-          {isFetchingAccounts ? (
-            <RefreshCw size={16} className="mr-2" />
-          ) : (
-            <RefreshCw size={16} className="mr-2" />
-          )}
+          <RefreshCw size={16} className="mr-2" />
           Try Again
         </Button>
       </div>
     );
   }
 
+  const dialogStudents = createStudent
+    ? students.filter(
+        (student) => String(student.id) === String(createStudent.studentId),
+      )
+    : students.filter(
+        (student) => !accountByStudentId.has(String(student.id)),
+      );
+
   return (
-    <FinanceSectionShell
-      title="Student Contracts"
-      description="Create and manage student financial agreements."
-      icon={FileText}
-    >
+    <FinanceSectionShell title={title} description={description} icon={FileText}>
       <FinanceSummaryGrid
         items={[
           {
-            label: "Active contracts",
-            value: new Intl.NumberFormat().format(accounts.length),
-            hint: "Current student agreements",
+            label: "Enrolled students",
+            value: new Intl.NumberFormat().format(rows.length),
+            hint: "Available financial profiles",
             icon: WalletCards,
             tone: "primary",
           },
           {
-            label: "Total contracted",
-            value: `${accounts.reduce((sum, item) => sum + Number(item.totalRequiredAmount ?? 0), 0).toLocaleString()} $`,
-            hint: "Required amount",
-            icon: CircleDollarSign,
+            label: "Configured accounts",
+            value: new Intl.NumberFormat().format(visibleAccounts.length),
+            hint: `${Math.max(0, rows.length - visibleAccounts.length)} awaiting setup`,
+            icon: FileText,
             tone: "info",
           },
           {
             label: "Collected",
-            value: `${accounts.reduce((sum, item) => sum + Math.max(0, Number(item.totalRequiredAmount ?? 0) - Number(item.remainingBalance ?? 0)), 0).toLocaleString()} $`,
+            value: `${visibleAccounts
+              .reduce(
+                (sum, item) =>
+                  sum +
+                  Math.max(
+                    0,
+                    Number(item.totalRequiredAmount) -
+                      Number(item.remainingBalance),
+                  ),
+                0,
+              )
+              .toLocaleString()} $`,
             hint: "Recorded through payments",
             icon: ReceiptText,
             tone: "success",
           },
           {
             label: "Outstanding",
-            value: `${accounts.reduce((sum, item) => sum + Number(item.remainingBalance ?? 0), 0).toLocaleString()} $`,
+            value: `${visibleAccounts
+              .reduce((sum, item) => sum + Number(item.remainingBalance), 0)
+              .toLocaleString()} $`,
             hint: "Remaining student balance",
-            icon: FileText,
+            icon: CircleDollarSign,
             tone: "warning",
           },
         ]}
       />
 
-      <ContractsTable
-        accounts={accounts}
-        headerAction={
-          <Button
-            type="button"
-            variant="outline"
-            size="icon"
-            onClick={() => setCreateOpen(true)}
-            aria-label="Create new contract"
-            title="New contract"
-            className="h-8 w-8 rounded-[11px] border-primary/25 bg-transparent text-primary shadow-none hover:border-primary/45 hover:bg-primary/[0.045] hover:text-primary"
-          >
-            <Plus className="h-4 w-4" strokeWidth={1.9} />
-          </Button>
-        }
-        studentsById={studentsById}
-        onViewDetails={(account) => {
-          setSelectedStudentId(account.studentId);
-          setDetailsOpen(true);
+      <StudentAccountsTable
+        rows={rows}
+        onView={(row) => {
+          if (onOpenStudentAccount) {
+            onOpenStudentAccount(row.studentId);
+            return;
+          }
+          if (showViewAction && row.account) {
+            setSelectedStudentId(row.studentId);
+            setDetailsOpen(true);
+          }
         }}
-        onEdit={(account) => {
-          setSelectedAccountToEdit(account);
+        onCreate={(row) => {
+          if (showCreateAction) openCreate(row);
+        }}
+        onEdit={(row) => {
+          if (!row.account) return;
+          setSelectedAccountToEdit(row.account);
           setEditOpen(true);
         }}
       />
 
       <FinalizeContractDialog
         open={createOpen}
-        onOpenChange={setCreateOpen}
-        students={students}
+        onOpenChange={(open) => {
+          setCreateOpen(open);
+          if (!open) setCreateStudent(null);
+        }}
+        students={dialogStudents}
         feePlans={feePlans}
         installmentPolicies={installmentPolicies}
         isLoading={finalizeContract.isPending}

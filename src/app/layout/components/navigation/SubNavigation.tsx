@@ -8,7 +8,6 @@ import {
   FileText,
   LockKeyhole,
   Megaphone,
-  ReceiptText,
   Scale,
   ShieldCheck,
   UserCheck,
@@ -95,30 +94,19 @@ const subNavigationSections: SubNavigationSection[] = [
   {
     basePath: "/finance",
     items: [
-      {
-        titleKey: "studentContracts",
-        path: "/finance/contracts",
-        icon: FileText,
-        group: "student",
-      },
-      {
-        titleKey: "studentInstallments",
-        path: "/finance/installments",
-        icon: CalendarDays,
-        group: "student",
-      },
-      {
-        titleKey: "studentPayments",
-        path: "/finance/payments",
-        icon: ReceiptText,
-        group: "student",
-      },
-      {
-        titleKey: "staffPayroll",
-        path: "/finance/payroll",
-        icon: Banknote,
-        group: "staff",
-      },
+     {
+      titleKey: "studentFinance",
+      path: "/finance/students",
+      icon: Wallet,
+      group: "student",
+    },
+    {
+      titleKey: "staffPayroll",
+      path: "/finance/payroll",
+      icon: Banknote,
+      group: "staff",
+    },
+
     ],
   },
   {

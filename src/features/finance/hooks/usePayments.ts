@@ -21,6 +21,22 @@ function errorMessage(error: unknown, fallback: string) {
   return candidate.response?.data?.message || fallback;
 }
 
+async function invalidatePaymentDependencies(
+  queryClient: ReturnType<typeof useQueryClient>,
+  studentId?: string | number,
+) {
+  await Promise.all([
+    queryClient.invalidateQueries({ queryKey: paymentsQueryKey }),
+    queryClient.invalidateQueries({ queryKey: accountsQueryKey }),
+    queryClient.invalidateQueries({ queryKey: ["installments-list"] }),
+    studentId !== undefined
+      ? queryClient.invalidateQueries({
+          queryKey: ["financial-account", studentId],
+        })
+      : queryClient.invalidateQueries({ queryKey: ["financial-account"] }),
+  ]);
+}
+
 export function usePayments() {
   const queryClient = useQueryClient();
 
@@ -32,12 +48,8 @@ export function usePayments() {
   const processPayment = useMutation({
     mutationFn: (payload: ProcessPaymentPayload) =>
       financeOperationsService.processPayment(payload),
-    onSuccess: async () => {
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: paymentsQueryKey }),
-        queryClient.invalidateQueries({ queryKey: accountsQueryKey }),
-        queryClient.invalidateQueries({ queryKey: ["installments-list"] }),
-      ]);
+    onSuccess: async (_, payload) => {
+      await invalidatePaymentDependencies(queryClient, payload.studentId);
       toast.success("Payment recorded successfully.");
     },
     onError: (error) => {
@@ -48,14 +60,16 @@ export function usePayments() {
   const updatePayment = useMutation({
     mutationFn: ({
       id,
+      studentId,
       payload,
     }: {
       id: string | number;
+      studentId?: string | number;
       payload: UpdatePaymentPayload;
     }) => financeOperationsService.updatePayment(id, payload),
     onSuccess: async (_, variables) => {
       await Promise.all([
-        queryClient.invalidateQueries({ queryKey: paymentsQueryKey }),
+        invalidatePaymentDependencies(queryClient, variables.studentId),
         queryClient.invalidateQueries({
           queryKey: ["payment-receipt", variables.id],
         }),
@@ -68,14 +82,15 @@ export function usePayments() {
   });
 
   const deletePayment = useMutation({
-    mutationFn: (id: string | number) =>
-      financeOperationsService.deletePayment(id),
-    onSuccess: async () => {
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: paymentsQueryKey }),
-        queryClient.invalidateQueries({ queryKey: accountsQueryKey }),
-        queryClient.invalidateQueries({ queryKey: ["installments-list"] }),
-      ]);
+    mutationFn: ({
+      id,
+      studentId,
+    }: {
+      id: string | number;
+      studentId?: string | number;
+    }) => financeOperationsService.deletePayment(id),
+    onSuccess: async (_, variables) => {
+      await invalidatePaymentDependencies(queryClient, variables.studentId);
       toast.success("Payment deleted successfully.");
     },
     onError: (error) => {

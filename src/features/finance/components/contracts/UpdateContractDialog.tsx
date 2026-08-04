@@ -31,6 +31,7 @@ type Props = {
   installmentPolicies: Option[];
   isLoading?: boolean;
   onSubmit: (
+    accountId: string | number,
     studentId: string | number,
     values: ContractFormValues,
   ) => void;
@@ -76,7 +77,7 @@ export function UpdateContractDialog({
             installmentPolicies={installmentPolicies}
             defaultValues={defaultValues}
             isLoading={isLoading}
-            onSubmit={(values) => onSubmit(account.studentId, values)}
+            onSubmit={(values) => onSubmit(account.id, account.studentId, values)}
           />
         ) : null}
       </DialogContent>

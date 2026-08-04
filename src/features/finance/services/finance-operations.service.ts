@@ -48,6 +48,106 @@ function fullName(source: any): string | undefined {
   return composed || undefined;
 }
 
+
+function normalizeAccount(raw: any): FinancialAccount {
+  const feePlan = raw?.feePlan ?? raw?.fee_plan ?? {};
+  const policy = raw?.installmentPolicy ?? raw?.installment_policy ?? {};
+
+  return {
+    id: String(value(raw?.id, raw?.accountId, raw?.account_id) ?? ""),
+    studentId: String(
+      value(raw?.studentId, raw?.student_id, raw?.student?.id) ?? "",
+    ),
+    studentName: fullName(raw),
+    academicYearId: String(
+      value(
+        raw?.academicYearId,
+        raw?.academic_year_id,
+        raw?.academicYear?.id,
+        raw?.academic_year?.id,
+      ) ?? "",
+    ),
+    academicYearName: value(
+      raw?.academicYearName,
+      raw?.academic_year_name,
+      raw?.academicYear?.name,
+      raw?.academic_year?.name,
+    ) as string | undefined,
+    totalRequiredAmount: Number(
+      value(raw?.totalRequiredAmount, raw?.total_required_amount, raw?.total) ?? 0,
+    ),
+    remainingBalance: Number(
+      value(raw?.remainingBalance, raw?.remaining_balance, raw?.balance) ?? 0,
+    ),
+    paymentStatus: (() => {
+      const remaining = Number(
+        value(raw?.remainingBalance, raw?.remaining_balance, raw?.balance) ?? 0,
+      );
+      const status = String(
+        value(raw?.paymentStatus, raw?.payment_status, raw?.status) ?? "unpaid",
+      ).toLowerCase();
+
+      if (remaining <= 0 || ["paid", "fully_paid", "fully-paid"].includes(status)) {
+        return "paid";
+      }
+
+      if (["partially_paid", "partial", "partially-paid"].includes(status)) {
+        return "partially_paid";
+      }
+
+      return status as FinancialAccount["paymentStatus"];
+    })(),
+    contractActivationSnapshot:
+      (value(
+        raw?.contractActivationSnapshot,
+        raw?.contract_activation_snapshot,
+      ) as string | null | undefined) ?? null,
+    feePlan: {
+      id: String(value(feePlan?.id, raw?.feePlanId, raw?.fee_plan_id) ?? ""),
+      academicYearId: String(
+        value(feePlan?.academicYearId, feePlan?.academic_year_id) ?? "",
+      ),
+      gradeLevelId: String(
+        value(feePlan?.gradeLevelId, feePlan?.grade_level_id) ?? "",
+      ),
+      name: String(value(feePlan?.name, raw?.feePlanName, raw?.fee_plan_name) ?? ""),
+      baseAmount: Number(value(feePlan?.baseAmount, feePlan?.base_amount) ?? 0),
+    },
+    installmentPolicy: {
+      id: String(value(policy?.id, raw?.installmentPolicyId, raw?.installment_policy_id) ?? ""),
+      name: String(value(policy?.name, raw?.installmentPolicyName, raw?.installment_policy_name) ?? ""),
+      installmentsCount: Number(
+        value(policy?.installmentsCount, policy?.installments_count) ?? 0,
+      ),
+    },
+    installments: normalizeListPayload(
+      value(raw?.installments, raw?.scheduledInstallments, raw?.scheduled_installments) ?? [],
+    ).map(normalizeInstallment),
+    createdAt: String(value(raw?.createdAt, raw?.created_at) ?? ""),
+    updatedAt: String(value(raw?.updatedAt, raw?.updated_at) ?? ""),
+  };
+}
+
+function normalizeInstallment(raw: any): Installment {
+  return {
+    id: String(value(raw?.id, raw?.installmentId, raw?.installment_id) ?? ""),
+    studentId: value(raw?.studentId, raw?.student_id, raw?.student?.id)
+      ? String(value(raw?.studentId, raw?.student_id, raw?.student?.id))
+      : undefined,
+    studentName: fullName(raw),
+    installmentNumber: Number(
+      value(raw?.installmentNumber, raw?.installment_number, raw?.number) ?? 0,
+    ),
+    title: String(value(raw?.title, raw?.name) ?? "Installment"),
+    amountDue: Number(value(raw?.amountDue, raw?.amount_due, raw?.amount) ?? 0),
+    amountPaid: Number(value(raw?.amountPaid, raw?.amount_paid, raw?.paid_amount) ?? 0),
+    dueDate: String(value(raw?.dueDate, raw?.due_date) ?? ""),
+    status: String(value(raw?.status) ?? "pending") as Installment["status"],
+    createdAt: String(value(raw?.createdAt, raw?.created_at) ?? ""),
+    updatedAt: String(value(raw?.updatedAt, raw?.updated_at) ?? ""),
+  };
+}
+
 function normalizePayment(raw: any): PaymentReceipt {
   return {
     id: String(value(raw?.id, raw?.paymentId, raw?.payment_id) ?? ""),
@@ -107,14 +207,14 @@ export const financeOperationsService = {
     const response = await axiosClient.get<ApiResponse<FinancialAccount[]>>(
       API_ENDPOINTS.FINANCE_OPERATIONS.ACCOUNTS,
     );
-    return response.data.data ?? [];
+    return normalizeListPayload(response.data?.data).map(normalizeAccount);
   },
 
   getAccountByStudentId: async (studentId: string | number) => {
     const response = await axiosClient.get<ApiResponse<FinancialAccount>>(
       API_ENDPOINTS.FINANCE_OPERATIONS.ACCOUNT(studentId),
     );
-    return response.data.data;
+    return normalizeAccount(response.data.data);
   },
 
   finalizeContract: async (payload: FinalizeContractPayload) => {
@@ -140,21 +240,21 @@ export const financeOperationsService = {
     const response = await axiosClient.get<ApiResponse<Installment[]>>(
       API_ENDPOINTS.FINANCE_OPERATIONS.INSTALLMENTS,
     );
-    return response.data.data ?? [];
+    return normalizeListPayload(response.data?.data).map(normalizeInstallment);
   },
 
   getInstallmentDetails: async (id: string | number) => {
     const response = await axiosClient.get<ApiResponse<Installment>>(
       API_ENDPOINTS.FINANCE_OPERATIONS.INSTALLMENT(id),
     );
-    return response.data?.data;
+    return normalizeInstallment(response.data?.data);
   },
 
   getInstallmentById: async (id: string | number) => {
     const response = await axiosClient.get<ApiResponse<Installment>>(
       API_ENDPOINTS.FINANCE_OPERATIONS.INSTALLMENT(id),
     );
-    return response.data.data;
+    return normalizeInstallment(response.data.data);
   },
 
   getAllPayments: async () => {

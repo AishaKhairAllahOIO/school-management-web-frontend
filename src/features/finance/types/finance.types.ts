@@ -22,6 +22,7 @@ export type FinancialAccount = {
     name: string;
     installmentsCount: number;
   };
+  installments: Installment[];
   createdAt: string;
   updatedAt: string;
 };

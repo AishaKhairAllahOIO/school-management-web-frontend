@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Banknote, CircleDollarSign, CreditCard, Plus, ReceiptText } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 
@@ -19,7 +19,23 @@ import { FinanceSectionShell } from "../shared/FinanceSectionShell";
 import { FinanceSummarySkeleton, FinanceTableSkeleton } from "../shared/FinanceTableSkeleton";
 import { FinanceSummaryGrid } from "../shared/FinanceSummaryGrid";
 
-export function CashierSection() {
+type CashierSectionProps = {
+  studentId?: string | number;
+  studentName?: string;
+  accountId?: string | number;
+  title?: string;
+  description?: string;
+  canProcessPayment?: boolean;
+};
+
+export function CashierSection({
+  studentId,
+  studentName,
+  accountId,
+  title = "Student Payments",
+  description = "Record collections and manage student receipts.",
+  canProcessPayment = true,
+}: CashierSectionProps = {}) {
   const {
     data: payments = [],
     isLoading: isLoadingPayments,
@@ -30,6 +46,19 @@ export function CashierSection() {
     updatePayment,
     deletePayment,
   } = usePayments();
+
+  const visiblePayments = useMemo(
+    () =>
+      studentId === undefined
+        ? payments
+        : payments.filter(
+            (payment) =>
+              String(payment.studentId) === String(studentId) ||
+              (accountId !== undefined &&
+                String(payment.accountId) === String(accountId)),
+          ),
+    [accountId, payments, studentId],
+  );
 
   const [createOpen, setCreateOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
@@ -46,7 +75,7 @@ export function CashierSection() {
     queryFn: async () => {
       try {
         const response = await axiosClient.get(API_ENDPOINTS.STUDENTS.FILTER, {
-          params: { status: 'enrolled', per_page: 100 }
+          params: { per_page: 100 }
         }); 
         const rawData = response.data?.data?.data ?? response.data?.data ?? response.data?.items ?? [];
         return rawData.map((student: any) => ({
@@ -69,6 +98,19 @@ export function CashierSection() {
     },
   });
 
+  const paymentStudents = useMemo(
+    () =>
+      studentId === undefined
+        ? students
+        : [
+            {
+              id: studentId,
+              name: studentName || "Selected student",
+            },
+          ],
+    [studentId, studentName, students],
+  );
+
   function handleProcessPayment(values: PaymentFormValues) {
     const payload = {
       ...values,
@@ -90,7 +132,7 @@ export function CashierSection() {
 
   function confirmDelete() {
     if (selectedPaymentIdToDelete == null) return;
-    deletePayment.mutate(selectedPaymentIdToDelete, {
+    deletePayment.mutate({ id: selectedPaymentIdToDelete, studentId }, {
       onSuccess: () => {
         setDeleteOpen(false);
         setSelectedPaymentIdToDelete(null);
@@ -102,8 +144,8 @@ export function CashierSection() {
   if (isLoadingPayments || isLoadingStudents) {
     return (
       <FinanceSectionShell
-        title="Student Payments"
-        description="Record collections and manage student receipts."
+        title={title}
+        description={description}
         icon={ReceiptText}
       >
         <FinanceSummarySkeleton />
@@ -124,36 +166,36 @@ export function CashierSection() {
 
   return (
     <FinanceSectionShell
-      title="Student Payments"
-      description="Record collections and manage student receipts."
+      title={title}
+      description={description}
       icon={ReceiptText}
     >
       <FinanceSummaryGrid
         items={[
           {
             label: "Recorded payments",
-            value: new Intl.NumberFormat().format(payments.length),
+            value: new Intl.NumberFormat().format(visiblePayments.length),
             hint: "Official receipts",
             icon: ReceiptText,
             tone: "primary",
           },
           {
             label: "Total collected",
-            value: `${payments.reduce((sum, item) => sum + Number(item.paidAmount ?? 0), 0).toLocaleString()} $`,
+            value: `${visiblePayments.reduce((sum, item) => sum + Number(item.paidAmount ?? 0), 0).toLocaleString()} $`,
             hint: "Across all methods",
             icon: CircleDollarSign,
             tone: "success",
           },
           {
             label: "Cash receipts",
-            value: new Intl.NumberFormat().format(payments.filter((item) => item.paymentMethod === "cash").length),
+            value: new Intl.NumberFormat().format(visiblePayments.filter((item) => item.paymentMethod === "cash").length),
             hint: "Processed in cash",
             icon: Banknote,
             tone: "warning",
           },
           {
             label: "Digital payments",
-            value: new Intl.NumberFormat().format(payments.filter((item) => item.paymentMethod !== "cash").length),
+            value: new Intl.NumberFormat().format(visiblePayments.filter((item) => item.paymentMethod !== "cash").length),
             hint: "Transfer, cheque or wallet",
             icon: CreditCard,
             tone: "info",
@@ -162,9 +204,9 @@ export function CashierSection() {
       />
 
       <PaymentsTable
-        payments={payments}
+        payments={visiblePayments}
         headerAction={
-          <Button
+          canProcessPayment ? <Button
             type="button"
             variant="outline"
             size="icon"
@@ -174,7 +216,7 @@ export function CashierSection() {
             className="h-8 w-8 rounded-[11px] border-primary/25 bg-transparent text-primary shadow-none hover:border-primary/45 hover:bg-primary/[0.045] hover:text-primary"
           >
             <Plus className="h-4 w-4" strokeWidth={1.9} />
-          </Button>
+          </Button> : undefined
         } 
         onView={(id) => {
           setSelectedPaymentIdToView(id);
@@ -190,7 +232,8 @@ export function CashierSection() {
       <ProcessPaymentDialog
         open={createOpen}
         onOpenChange={setCreateOpen}
-        students={students}
+        students={paymentStudents}
+        initialStudentId={studentId}
         isLoading={processPayment.isPending}
         onSubmit={handleProcessPayment}
       />
@@ -205,7 +248,7 @@ export function CashierSection() {
         isLoading={updatePayment.isPending}
         onSubmit={(id, payload) =>
           updatePayment.mutate(
-            { id, payload },
+            { id, studentId: selectedPayment?.studentId ?? studentId, payload },
             {
               onSuccess: () => {
                 setEditOpen(false);

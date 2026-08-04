@@ -16,11 +16,12 @@ type Option = { id: number | string; name: string };
 
 type Props = {
   students: Option[];
+  initialStudentId?: string | number;
   isLoading?: boolean;
   onSubmit: (values: PaymentFormValues) => void;
 };
 
-export function PaymentForm({ students, onSubmit, isLoading = false }: Props) {
+export function PaymentForm({ students, initialStudentId, onSubmit, isLoading = false }: Props) {
   const {
     control,
     handleSubmit,
@@ -30,7 +31,7 @@ export function PaymentForm({ students, onSubmit, isLoading = false }: Props) {
   } = useForm<PaymentFormValues>({
     resolver: zodResolver(paymentSchema) as any,
     defaultValues: {
-      studentId: 0,
+      studentId: initialStudentId ? Number(initialStudentId) : 0,
       paidAmount: 0,
       paymentMethod: "cash",
       paperReceiptNo: "",

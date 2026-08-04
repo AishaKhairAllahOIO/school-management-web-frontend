@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { AlertCircle, CalendarClock, CircleDollarSign, RefreshCw, WalletCards } from "lucide-react";
 import { Button } from "@/shared/ui/button";
 
@@ -9,9 +9,21 @@ import { FinanceSectionShell } from "../shared/FinanceSectionShell";
 import { FinanceTableSkeleton } from "../shared/FinanceTableSkeleton";
 import { FinanceSummaryGrid } from "../shared/FinanceSummaryGrid";
 
-export function InstallmentsSection() {
+type InstallmentsSectionProps = {
+  studentId?: string | number;
+  installments?: import("../../types/finance.types").Installment[];
+  title?: string;
+  description?: string;
+};
+
+export function InstallmentsSection({
+  studentId,
+  installments: providedInstallments,
+  title = "Student Installments",
+  description = "Track upcoming, paid, and overdue student installments.",
+}: InstallmentsSectionProps = {}) {
   const {
-    data: installments = [],
+    data: queriedInstallments = [],
     isLoading,
     isError,
     isFetching,
@@ -19,14 +31,24 @@ export function InstallmentsSection() {
   } = useInstallments();
 
 
+  const visibleInstallments = useMemo(() => {
+    if (providedInstallments) return providedInstallments;
+
+    return studentId === undefined
+      ? queriedInstallments
+      : queriedInstallments.filter(
+          (installment) => String(installment.studentId) === String(studentId),
+        );
+  }, [providedInstallments, queriedInstallments, studentId]);
+
   const [viewInstallmentOpen, setViewInstallmentOpen] = useState(false);
   const [selectedInstallmentId, setSelectedInstallmentId] = useState<string | number | null>(null);
 
-  if (isLoading) {
-    return <FinanceSectionShell title="Student Installments" description="Track upcoming, paid, and overdue student installments." icon={CalendarClock}><FinanceTableSkeleton /></FinanceSectionShell>;
+  if (!providedInstallments && isLoading) {
+    return <FinanceSectionShell title={title} description={description} icon={CalendarClock}><FinanceTableSkeleton /></FinanceSectionShell>;
   }
 
-  if (isError) {
+  if (!providedInstallments && isError) {
     return (
       <div className="flex flex-col items-center justify-center rounded-[18px] border border-destructive/20 bg-destructive/[0.045] py-12 text-center">
         <Button variant="outline" onClick={() => refetch()} disabled={isFetching}>
@@ -39,36 +61,36 @@ export function InstallmentsSection() {
 
   return (
     <FinanceSectionShell
-      title="Student Installments"
-      description="Track upcoming, paid, and overdue student installments."
+      title={title}
+      description={description}
       icon={CalendarClock}
     >
       <FinanceSummaryGrid
         items={[
           {
             label: "Installments",
-            value: new Intl.NumberFormat().format(installments.length),
+            value: new Intl.NumberFormat().format(visibleInstallments.length),
             hint: "Across active contracts",
             icon: CalendarClock,
             tone: "primary",
           },
           {
             label: "Amount due",
-            value: `${installments.reduce((sum, item) => sum + Number(item.amountDue ?? 0), 0).toLocaleString()} $`,
+            value: `${visibleInstallments.reduce((sum, item) => sum + Number(item.amountDue ?? 0), 0).toLocaleString()} $`,
             hint: "Scheduled total",
             icon: CircleDollarSign,
             tone: "info",
           },
           {
             label: "Amount paid",
-            value: `${installments.reduce((sum, item) => sum + Number(item.amountPaid ?? 0), 0).toLocaleString()} $`,
+            value: `${visibleInstallments.reduce((sum, item) => sum + Number(item.amountPaid ?? 0), 0).toLocaleString()} $`,
             hint: "Collected against installments",
             icon: WalletCards,
             tone: "success",
           },
           {
             label: "Overdue",
-            value: new Intl.NumberFormat().format(installments.filter((item) => item.status === "overdue" || (item.status !== "paid" && new Date(item.dueDate) < new Date())).length),
+            value: new Intl.NumberFormat().format(visibleInstallments.filter((item) => item.status === "overdue" || (item.status !== "paid" && new Date(item.dueDate) < new Date())).length),
             hint: "Requires follow-up",
             icon: AlertCircle,
             tone: "destructive",
@@ -77,7 +99,7 @@ export function InstallmentsSection() {
       />
 
       <InstallmentsTable 
-        installments={installments} 
+        installments={visibleInstallments} 
         onView={(id) => {
           setSelectedInstallmentId(id);
           setViewInstallmentOpen(true);

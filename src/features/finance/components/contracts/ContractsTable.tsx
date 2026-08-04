@@ -155,14 +155,16 @@ export function ContractsTable({
 
                 <TableCell className="px-5 py-4 text-right">
                   <div className="inline-flex items-center gap-1.5">
-                    <button
-                      type="button"
-                      onClick={() => onViewDetails?.(account)}
-                      className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-primary/15 bg-primary/[0.055] text-primary transition-all hover:-translate-y-0.5 hover:bg-primary/[0.09]"
-                      aria-label="View contract"
-                    >
-                      <Eye className="h-4 w-4" strokeWidth={1.8} />
-                    </button>
+                    {onViewDetails ? (
+                      <button
+                        type="button"
+                        onClick={() => onViewDetails(account)}
+                        className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-primary/15 bg-primary/[0.055] text-primary transition-all hover:-translate-y-0.5 hover:bg-primary/[0.09]"
+                        aria-label="Open student financial profile"
+                      >
+                        <Eye className="h-4 w-4" strokeWidth={1.8} />
+                      </button>
+                    ) : null}
                     <button
                       type="button"
                       onClick={() => onEdit?.(account)}
