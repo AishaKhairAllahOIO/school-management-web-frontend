@@ -85,7 +85,7 @@ export function LawsTable({
 
               <TableCell className="px-5 py-4 align-top">
                 <div className="flex items-center justify-end gap-1.5">
-                  <Button type="button" variant="outline" size="sm" onClick={() => onEdit(law)} className="h-9 rounded-[11px] border-border/65 bg-transparent px-3 text-[11px] font-medium text-info hover:bg-info/[0.06] hover:text-info">
+                  <Button type="button" variant="outline" size="sm" onClick={() => onEdit(law)} className="h-9 rounded-[11px] border-border/65 bg-transparent px-3 text-[11px] font-medium text-success hover:bg-success/[0.08] hover:text-success">
                     <Edit2 className="h-3.5 w-3.5" /> Edit
                   </Button>
                   <Button type="button" variant="outline" size="sm" onClick={() => onDelete(law)} className="h-9 rounded-[11px] border-border/65 bg-transparent px-3 text-[11px] font-medium text-destructive hover:bg-destructive/[0.06] hover:text-destructive">

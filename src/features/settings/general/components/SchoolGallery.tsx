@@ -13,6 +13,7 @@ import {
   useRef,
   useState,
   type ChangeEvent,
+  type DragEvent,
 } from "react";
 
 import {
@@ -76,6 +77,9 @@ export function SchoolGallery({
 
   const [selectionError, setSelectionError] =
     useState<string | null>(null);
+
+  const [isDragging, setIsDragging] =
+    useState(false);
 
   const [deletingImage, setDeletingImage] =
     useState<SchoolImage | null>(null);
@@ -153,28 +157,17 @@ export function SchoolGallery({
     return null;
   }
 
-  function handleFilesChange(
-    event: ChangeEvent<HTMLInputElement>,
-  ) {
-    const files = Array.from(
-      event.target.files ?? [],
-    );
-
-    event.target.value = "";
-
+  function addFiles(files: File[]) {
     if (files.length === 0) {
       return;
     }
 
     const invalidFile = files.find(
-      (file) =>
-        validateImageFile(file) !== null,
+      (file) => validateImageFile(file) !== null,
     );
 
     if (invalidFile) {
-      setSelectionError(
-        validateImageFile(invalidFile),
-      );
+      setSelectionError(validateImageFile(invalidFile));
       return;
     }
 
@@ -183,19 +176,42 @@ export function SchoolGallery({
     const nextImages = files.map(
       (file): PendingImage => ({
         file,
-        name: file.name.replace(
-          /\.[^/.]+$/,
-          "",
-        ),
-        previewUrl:
-          URL.createObjectURL(file),
+        name: file.name.replace(/\.[^/.]+$/, ""),
+        previewUrl: URL.createObjectURL(file),
       }),
     );
 
-    setPendingImages((current) => [
-      ...current,
-      ...nextImages,
-    ]);
+    setPendingImages((current) => [...current, ...nextImages]);
+  }
+
+  function handleFilesChange(
+    event: ChangeEvent<HTMLInputElement>,
+  ) {
+    const files = Array.from(event.target.files ?? []);
+    event.target.value = "";
+    addFiles(files);
+  }
+
+  function handleDragOver(event: DragEvent<HTMLDivElement>) {
+    event.preventDefault();
+    if (!isPending) {
+      setIsDragging(true);
+    }
+  }
+
+  function handleDragLeave(event: DragEvent<HTMLDivElement>) {
+    event.preventDefault();
+    if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
+      setIsDragging(false);
+    }
+  }
+
+  function handleDrop(event: DragEvent<HTMLDivElement>) {
+    event.preventDefault();
+    setIsDragging(false);
+    if (!isPending) {
+      addFiles(Array.from(event.dataTransfer.files ?? []));
+    }
   }
 
   function removePendingImage(
@@ -333,13 +349,30 @@ export function SchoolGallery({
           />
         </div>
         <div
+          onDragEnter={handleDragOver}
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
           className={[
-            "mt-4 grid content-start items-start",
-            "grid-cols-[repeat(auto-fill,100px)]",
-            "auto-rows-[100px]",
-            "gap-2",
+            "relative mt-4 grid content-start items-start",
+            "grid-cols-[repeat(auto-fill,minmax(88px,100px))]",
+            "auto-rows-[100px] gap-2 rounded-[16px]",
+            "transition-colors duration-200",
+            isDragging
+              ? "bg-primary/[0.05] ring-2 ring-primary/20 ring-offset-4 ring-offset-card"
+              : "",
           ].join(" ")}
         >
+          {isDragging ? (
+            <div className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center rounded-[16px] bg-card/88 backdrop-blur-sm">
+              <div className="rounded-[15px] border border-primary/20 bg-primary/[0.07] px-5 py-4 text-center">
+                <Upload className="mx-auto h-5 w-5 text-primary" />
+                <p className="mt-2 text-[13px] font-semibold text-foreground">
+                  Drop images to add them
+                </p>
+              </div>
+            </div>
+          ) : null}
           {mediaItems.map(
             (item, index) => {
               const isFeatured =

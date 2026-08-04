@@ -11,6 +11,7 @@ import {
   useRef,
   useState,
   type ChangeEvent,
+  type DragEvent,
 } from "react";
 
 type SchoolLogoUploadProps = {
@@ -50,6 +51,9 @@ export function SchoolLogoUpload({
   const [localError, setLocalError] =
     useState<string | null>(null);
 
+  const [isDragging, setIsDragging] =
+    useState(false);
+
   const [previewUrl, setPreviewUrl] =
     useState<string | null>(
       currentLogoUrl,
@@ -82,43 +86,60 @@ export function SchoolLogoUpload({
     inputRef.current?.click();
   }
 
-  function handleFileChange(
-    event: ChangeEvent<HTMLInputElement>,
-  ) {
-    const file =
-      event.target.files?.[0] ??
-      null;
-
-    event.target.value = "";
-
+  function processFile(file: File | null) {
     if (!file) {
       return;
     }
 
-    if (
-      !ACCEPTED_IMAGE_TYPES.includes(
-        file.type,
-      )
-    ) {
+    if (!ACCEPTED_IMAGE_TYPES.includes(file.type)) {
       setLocalError(
         "Choose a JPG, PNG, SVG or WebP image.",
       );
-
       return;
     }
 
-    if (
-      file.size > MAX_LOGO_SIZE
-    ) {
+    if (file.size > MAX_LOGO_SIZE) {
       setLocalError(
         "The logo must be smaller than 5 MB.",
       );
-
       return;
     }
 
     setLocalError(null);
     onFileChange(file);
+  }
+
+  function handleFileChange(
+    event: ChangeEvent<HTMLInputElement>,
+  ) {
+    const file = event.target.files?.[0] ?? null;
+    event.target.value = "";
+    processFile(file);
+  }
+
+  function handleDragOver(event: DragEvent<HTMLButtonElement>) {
+    event.preventDefault();
+    if (!disabled) {
+      setIsDragging(true);
+    }
+  }
+
+  function handleDragLeave(event: DragEvent<HTMLButtonElement>) {
+    event.preventDefault();
+    if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
+      setIsDragging(false);
+    }
+  }
+
+  function handleDrop(event: DragEvent<HTMLButtonElement>) {
+    event.preventDefault();
+    setIsDragging(false);
+
+    if (disabled) {
+      return;
+    }
+
+    processFile(event.dataTransfer.files?.[0] ?? null);
   }
 
   function undoSelection() {
@@ -214,6 +235,10 @@ export function SchoolLogoUpload({
           type="button"
           disabled={disabled}
           onClick={openFilePicker}
+          onDragEnter={handleDragOver}
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
           style={{
             width:
               FEATURED_MEDIA_SIZE,
@@ -236,7 +261,9 @@ export function SchoolLogoUpload({
             "disabled:opacity-60",
             displayedError
               ? "border-destructive/45"
-              : "border-border/80",
+              : isDragging
+                ? "border-primary bg-primary/[0.06] ring-4 ring-primary/[0.08]"
+                : "border-border/80",
           ].join(" ")}
         >
           {previewUrl ? (
@@ -326,7 +353,7 @@ export function SchoolLogoUpload({
                   "text-foreground",
                 ].join(" ")}
               >
-                Add logo
+                {isDragging ? "Drop image here" : "Add logo"}
               </p>
 
               <p
@@ -336,7 +363,7 @@ export function SchoolLogoUpload({
                   "text-muted-foreground",
                 ].join(" ")}
               >
-                JPG, PNG, SVG or WebP
+                Drag an image here or click to browse
               </p>
             </div>
           )}

@@ -249,9 +249,9 @@ export function FeePlanForm({
           {fields.map((field, index) => (
             <div
               key={field.id}
-              className="grid gap-3 rounded-[16px] border border-border/50 bg-card p-4 md:grid-cols-[150px_minmax(0,1fr)_150px_auto] md:items-end"
+              className="grid min-w-0 gap-3 rounded-[16px] border border-border/50 bg-card p-3.5 sm:grid-cols-2"
             >
-              <div className="space-y-2">
+              <div className="min-w-0 space-y-2">
                 <label className="text-[12px] font-medium text-muted-foreground">
                   Type
                 </label>
@@ -278,7 +278,7 @@ export function FeePlanForm({
                 />
               </div>
 
-              <div className="space-y-2">
+              <div className="min-w-0 space-y-2 sm:col-span-2">
                 <label className="text-[12px] font-medium text-muted-foreground">
                   Service Name
                 </label>
@@ -289,7 +289,7 @@ export function FeePlanForm({
                 />
               </div>
 
-              <div className="space-y-2">
+              <div className="min-w-0 space-y-2">
                 <label className="text-[12px] font-medium text-muted-foreground">
                   Amount
                 </label>
@@ -307,7 +307,7 @@ export function FeePlanForm({
                 type="button"
                 variant="outline"
                 onClick={() => remove(index)}
-                className="h-11 rounded-[14px] border-destructive/15 bg-destructive/[0.025] px-3 text-destructive shadow-none hover:bg-destructive/[0.06] hover:text-destructive"
+                className="h-10 w-full rounded-[13px] border-destructive/15 bg-destructive/[0.025] px-3 text-destructive shadow-none hover:bg-destructive/[0.06] hover:text-destructive sm:col-span-2"
                 aria-label={`Remove extra service ${index + 1}`}
               >
                 <Trash2 className="h-4 w-4" />

@@ -155,8 +155,8 @@ export function RolesPage() {
     ];
 
   return (
-    <div className="space-y-5">
-      <div className="grid items-start gap-5 xl:grid-cols-[300px_minmax(0,1fr)]">
+    <div className="min-w-0 space-y-5">
+      <div className="grid items-start gap-5 2xl:grid-cols-[300px_minmax(0,1fr)]">
         <aside className="space-y-3">
           <section className="rounded-[24px] border border-border/45 bg-card p-3 shadow-[0_10px_35px_rgba(30,20,70,0.035)]">
             <div className="space-y-2">
@@ -293,7 +293,7 @@ export function RolesPage() {
             </div>
           </div>
 
-          <div className="mt-5 grid gap-4 xl:grid-cols-[minmax(0,1.2fr)_minmax(260px,0.8fr)]">
+          <div className="mt-5 grid gap-4 2xl:grid-cols-[minmax(0,1.2fr)_minmax(260px,0.8fr)]">
             <article className="rounded-[20px] border border-border/50 bg-muted/[0.12] p-4.5">
               <h3 className="text-[14px] font-semibold text-foreground">
                 Role Information
@@ -352,7 +352,7 @@ export function RolesPage() {
                 Permissions Summary
               </h3>
 
-              <div className="mt-4 grid gap-2.5 sm:grid-cols-2 xl:grid-cols-1">
+              <div className="mt-4 grid gap-2.5 sm:grid-cols-2 2xl:grid-cols-1">
                 {permissionsSummary.map((item) => {
                   const Icon = item.icon;
 

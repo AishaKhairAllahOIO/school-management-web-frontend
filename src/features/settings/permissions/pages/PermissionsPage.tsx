@@ -144,7 +144,7 @@ function AccessBadge({
 
 export function PermissionsPage() {
   return (
-    <div className="space-y-5">
+    <div className="min-w-0 space-y-5">
       <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         {stats.map((item) => {
           const Icon = item.icon;
@@ -192,7 +192,7 @@ export function PermissionsPage() {
         })}
       </section>
 
-      <section className="grid items-start gap-5 2xl:grid-cols-[minmax(0,1.12fr)_minmax(430px,0.88fr)]">
+      <section className="grid items-start gap-5 [min-width:1536px]:grid-cols-[minmax(0,1.12fr)_minmax(430px,0.88fr)]">
         <article className="overflow-hidden rounded-[24px] border border-border/45 bg-card shadow-[0_10px_35px_rgba(30,20,70,0.035)]">
           <header className="border-b border-border/45 px-5 py-4">
             <h2 className="text-[15px] font-semibold text-foreground">
@@ -204,7 +204,7 @@ export function PermissionsPage() {
             </p>
           </header>
 
-          <div className="hidden lg:block">
+          <div className="hidden 2xl:block">
             <table className="w-full table-fixed text-left">
               <colgroup>
                 <col className="w-[25%]" />
@@ -284,7 +284,7 @@ export function PermissionsPage() {
             </table>
           </div>
 
-          <div className="grid gap-2 p-3 lg:hidden">
+          <div className="grid gap-2 p-3 2xl:hidden">
             {modules.map((item) => {
               const Icon = item.icon;
 
@@ -358,7 +358,7 @@ export function PermissionsPage() {
             </p>
           </header>
 
-          <div className="hidden xl:block">
+          <div className="hidden 2xl:block">
             <table className="w-full table-fixed text-left">
               <colgroup>
                 <col className="w-[25%]" />
@@ -403,7 +403,7 @@ export function PermissionsPage() {
             </table>
           </div>
 
-          <div className="grid gap-2 p-3 xl:hidden">
+          <div className="grid gap-2 p-3 2xl:hidden">
             {matrix.map((row) => (
               <article
                 key={row[0]}

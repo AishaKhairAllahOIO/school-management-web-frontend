@@ -106,6 +106,13 @@ export function SendBulkAlertDialog({
         resetState();
         onOpenChange(false);
       },
+      onError: (error: unknown) => {
+        const message =
+          (error as any)?.response?.data?.message ??
+          (error as Error)?.message ??
+          "The alert could not be sent.";
+        setFormError(String(message));
+      },
     };
 
     if (targetAudience === "staff") {
@@ -181,11 +188,12 @@ export function SendBulkAlertDialog({
     <Dialog
       open={open}
       onOpenChange={(nextOpen) => {
+        if (isSending) return;
         if (!nextOpen) resetState();
         onOpenChange(nextOpen);
       }}
     >
-      <DialogContent className="max-h-[92vh] overflow-hidden rounded-[26px] border border-border/70 bg-card p-0 shadow-[0_30px_100px_rgba(20,14,54,0.24)] sm:max-w-2xl">
+      <DialogContent className="max-h-[92dvh] overflow-hidden rounded-[26px] border border-border/70 bg-card p-0 shadow-[0_30px_100px_rgba(20,14,54,0.24)] sm:max-w-2xl">
         <div className={`border-b border-border/50 px-5 py-5 sm:px-6 ${headerSurface}`}>
           <DialogHeader className="text-start">
             <div className="flex items-start gap-3.5">
@@ -206,11 +214,11 @@ export function SendBulkAlertDialog({
           </DialogHeader>
         </div>
 
-        <div className="max-h-[calc(92vh-96px)] overflow-y-auto px-5 py-5 sm:px-6">
+        <div className="max-h-[calc(92dvh-96px)] overflow-y-auto px-5 py-5 sm:px-6">
           {isLoadingAudience ? (
             <DialogFormSkeleton rows={4} />
           ) : (
-            <form onSubmit={handleSubmit} className="space-y-5">
+            <form onSubmit={handleSubmit} noValidate className="space-y-5">
               <div className={`rounded-[19px] border p-4 ${isStudent ? "border-info/[0.13] bg-info/[0.025]" : "border-warning/[0.14] bg-warning/[0.025]"}`}>
                 <MultiSelectAudience
                   label={isStudent ? "Student recipients" : "Staff recipients"}
@@ -249,7 +257,7 @@ export function SendBulkAlertDialog({
                 </p>
               ) : null}
 
-              <div className="flex flex-col-reverse gap-2 border-t border-border/50 pt-4 sm:flex-row sm:justify-end">
+              <div className="sticky bottom-0 z-10 -mx-5 flex flex-col-reverse gap-2 border-t border-border/50 bg-card/95 px-5 pb-1 pt-4 backdrop-blur sm:-mx-6 sm:flex-row sm:justify-end sm:px-6">
                 <Button
                   type="button"
                   variant="outline"

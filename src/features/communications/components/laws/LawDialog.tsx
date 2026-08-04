@@ -84,8 +84,13 @@ export function LawDialog({
   const isLoadingDetails = isEditing && detailsQuery.isLoading;
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[92vh] overflow-hidden rounded-[24px] border border-border/70 bg-card p-0 shadow-[0_28px_90px_rgba(27,19,66,0.20)] sm:max-w-xl">
+    <Dialog
+      open={open}
+      onOpenChange={(nextOpen) => {
+        if (!isLoading) onOpenChange(nextOpen);
+      }}
+    >
+      <DialogContent className="max-h-[92dvh] overflow-hidden rounded-[24px] border border-border/70 bg-card p-0 shadow-[0_28px_90px_rgba(27,19,66,0.20)] sm:max-w-xl">
         <div className="border-b border-border/50 bg-success/[0.025] px-5 py-5 sm:px-6">
           <DialogHeader className="text-start">
             <div className="flex items-start gap-3.5">
@@ -104,7 +109,7 @@ export function LawDialog({
           </DialogHeader>
         </div>
 
-        <div className="max-h-[calc(92vh-96px)] overflow-y-auto px-5 py-5 sm:px-6">
+        <div className="max-h-[calc(92dvh-96px)] overflow-y-auto px-5 py-5 sm:px-6">
           {isLoadingDetails ? (
             <DialogFormSkeleton rows={2} />
           ) : detailsQuery.isError ? (
@@ -115,7 +120,7 @@ export function LawDialog({
               </Button>
             </div>
           ) : (
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-4">
               <div className="space-y-1.5">
                 <label className="text-[11px] font-medium text-foreground">Law title</label>
                 <input
@@ -137,7 +142,7 @@ export function LawDialog({
                 />
               </div>
 
-              <div className="flex flex-col-reverse gap-2 border-t border-border/50 pt-4 sm:flex-row sm:justify-end">
+              <div className="sticky bottom-0 z-10 -mx-5 flex flex-col-reverse gap-2 border-t border-border/50 bg-card/95 px-5 pb-1 pt-4 backdrop-blur sm:-mx-6 sm:flex-row sm:justify-end sm:px-6">
                 <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={isLoading} className="h-10 rounded-[12px] border-border/70 bg-transparent px-4 text-[12px]">
                   Cancel
                 </Button>

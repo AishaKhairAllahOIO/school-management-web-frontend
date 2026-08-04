@@ -213,6 +213,13 @@ export function CreateActivityDialog({
 
     const options = {
       onSuccess: () => onOpenChange(false),
+      onError: (error: unknown) => {
+        const message =
+          (error as any)?.response?.data?.message ??
+          (error as Error)?.message ??
+          "The activity could not be saved.";
+        setFormError(String(message));
+      },
     };
 
     if (isEditing && activityToEdit) {
@@ -241,7 +248,7 @@ export function CreateActivityDialog({
         }
       }}
     >
-      <DialogContent className="max-h-[92vh] overflow-hidden rounded-[24px] border border-border/70 bg-card p-0 shadow-[0_28px_90px_rgba(27,19,66,0.20)] sm:max-w-3xl">
+      <DialogContent className="max-h-[92dvh] overflow-hidden rounded-[24px] border border-border/70 bg-card p-0 shadow-[0_28px_90px_rgba(27,19,66,0.20)] sm:max-w-3xl">
         <div className="border-b border-border/50 bg-info/[0.025] px-5 py-5 sm:px-6">
           <DialogHeader className="text-start">
             <div className="flex items-start gap-3.5">
@@ -263,7 +270,7 @@ export function CreateActivityDialog({
           </DialogHeader>
         </div>
 
-        <div className="max-h-[calc(92vh-96px)] overflow-y-auto px-5 py-5 sm:px-6">
+        <div className="max-h-[calc(92dvh-96px)] overflow-y-auto px-5 py-5 sm:px-6">
           {isLoadingEdit ? (
             <DialogFormSkeleton rows={5} />
           ) : detailsQuery.isError ? (
@@ -284,7 +291,7 @@ export function CreateActivityDialog({
               </Button>
             </div>
           ) : (
-            <form onSubmit={submit} className="space-y-5">
+            <form onSubmit={submit} noValidate className="space-y-5">
               <div className="grid gap-4 sm:grid-cols-2">
                 <Field label="Activity name">
                   <input
@@ -388,7 +395,7 @@ export function CreateActivityDialog({
                 </p>
               ) : null}
 
-              <div className="flex flex-col-reverse gap-2 border-t border-border/50 pt-4 sm:flex-row sm:justify-end">
+              <div className="sticky bottom-0 z-10 -mx-5 flex flex-col-reverse gap-2 border-t border-border/50 bg-card/95 px-5 pb-1 pt-4 backdrop-blur sm:-mx-6 sm:flex-row sm:justify-end sm:px-6">
                 <Button
                   type="button"
                   variant="outline"

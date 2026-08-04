@@ -46,10 +46,10 @@ export function BaseDialog({
     <div
       className={[
         "fixed inset-0 z-[100]",
-        "flex items-center justify-center",
-        "overflow-y-auto",
+        "flex items-start justify-center sm:items-center",
+        "overflow-y-auto overscroll-contain",
         "bg-slate-950/30",
-        "p-4 sm:p-6",
+        "p-2.5 sm:p-6",
         "backdrop-blur-[5px]",
       ].join(" ")}
       onMouseDown={(event) => {
@@ -66,7 +66,7 @@ export function BaseDialog({
         aria-modal="true"
         aria-labelledby="settings-dialog-title"
         className={[
-          "my-auto w-full max-w-[460px]",
+          "my-2 w-full max-w-[460px] sm:my-auto",
           "overflow-visible",
           "rounded-[24px]",
           "border border-border/55",
@@ -127,8 +127,8 @@ export function BaseDialog({
 
         <div
           className={[
-            "max-h-[min(70vh,620px)]",
-            "overflow-y-auto",
+            "max-h-[calc(100dvh-9rem)] sm:max-h-[min(70vh,620px)]",
+            "overflow-y-auto overscroll-contain",
             "px-5 py-5",
             "[scrollbar-width:thin]",
             "[scrollbar-color:color-mix(in_oklab,var(--border)_75%,transparent)_transparent]",

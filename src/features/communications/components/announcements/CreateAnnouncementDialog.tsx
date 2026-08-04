@@ -124,7 +124,16 @@ export function CreateAnnouncementDialog({
       }
     }
 
-    const options = { onSuccess: () => onOpenChange(false) };
+    const options = {
+      onSuccess: () => onOpenChange(false),
+      onError: (error: unknown) => {
+        const message =
+          (error as any)?.response?.data?.message ??
+          (error as Error)?.message ??
+          "The announcement could not be saved.";
+        setFormError(String(message));
+      },
+    };
 
     if (isEditing && announcementToEdit) {
       updateAnnouncement.mutate(
@@ -159,7 +168,12 @@ export function CreateAnnouncementDialog({
   ];
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog
+      open={open}
+      onOpenChange={(nextOpen) => {
+        if (!isPending) onOpenChange(nextOpen);
+      }}
+    >
       <DialogContent className="max-h-[92vh] overflow-hidden rounded-[24px] border border-border/70 bg-card p-0 shadow-[0_28px_90px_rgba(27,19,66,0.20)] sm:max-w-2xl">
         <div className="border-b border-border/50 bg-primary/[0.025] px-5 py-5 sm:px-6">
           <DialogHeader className="text-start">
@@ -181,7 +195,8 @@ export function CreateAnnouncementDialog({
 
         <form
           onSubmit={submit}
-          className="max-h-[calc(92vh-96px)] space-y-5 overflow-y-auto px-5 py-5 sm:px-6"
+          noValidate
+          className="max-h-[calc(92dvh-96px)] space-y-5 overflow-y-auto px-5 py-5 sm:px-6"
         >
           <div className="grid gap-2 sm:grid-cols-3">
             {audienceOptions.map((option) => {
@@ -276,7 +291,7 @@ export function CreateAnnouncementDialog({
             </p>
           ) : null}
 
-          <div className="flex flex-col-reverse gap-2 border-t border-border/50 pt-4 sm:flex-row sm:justify-end">
+          <div className="sticky bottom-0 z-10 -mx-5 flex flex-col-reverse gap-2 border-t border-border/50 bg-card/95 px-5 pb-1 pt-4 backdrop-blur sm:-mx-6 sm:flex-row sm:justify-end sm:px-6">
             <Button
               type="button"
               variant="outline"

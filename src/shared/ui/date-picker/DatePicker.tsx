@@ -57,26 +57,16 @@ export function DatePicker({
   const maxDate = parseApiDate(max);
   const today = startOfDay(new Date());
 
-  const calendarBounds = useMemo(() => {
-    const fallbackStart = subYears(today, 100);
-    const fallbackEnd = addYears(today, 20);
-
-    return {
-      startMonth: minDate ?? fallbackStart,
-      endMonth: maxDate ?? fallbackEnd,
-    };
-  }, [minDate, maxDate, today]);
+  const calendarBounds = useMemo(() => ({
+    startMonth: minDate ?? subYears(today, 100),
+    endMonth: maxDate ?? addYears(today, 20),
+  }), [minDate, maxDate, today]);
 
   const disabledMatchers = useMemo(() => {
     const matchers = [];
 
-    if (minDate) {
-      matchers.push({ before: startOfDay(minDate) });
-    }
-
-    if (maxDate) {
-      matchers.push({ after: endOfDay(maxDate) });
-    }
+    if (minDate) matchers.push({ before: startOfDay(minDate) });
+    if (maxDate) matchers.push({ after: endOfDay(maxDate) });
 
     return matchers.length ? matchers : undefined;
   }, [minDate, maxDate]);
@@ -87,7 +77,6 @@ export function DatePicker({
 
   function selectDate(date?: Date) {
     if (!date) return;
-
     onChange(formatDateForApi(date));
     setOpen(false);
   }
@@ -105,9 +94,7 @@ export function DatePicker({
           className="mb-2 block text-xs font-medium text-foreground"
         >
           {label}
-          {required ? (
-            <span className="ms-1 text-destructive">*</span>
-          ) : null}
+          {required ? <span className="ms-1 text-destructive">*</span> : null}
         </label>
       ) : null}
 
@@ -129,24 +116,21 @@ export function DatePicker({
             aria-expanded={open}
             aria-invalid={Boolean(error)}
             className={cn(
-              "flex h-11 w-full min-w-0 items-center gap-3 rounded-[13px] border bg-background px-3.5 text-left text-sm outline-none transition-all",
+              "flex h-11 w-full min-w-0 items-center gap-3 rounded-[13px] border bg-background px-3.5 text-start text-sm outline-none transition-all",
               "border-border/70 hover:border-primary/30",
               "focus-visible:border-primary/45 focus-visible:ring-4 focus-visible:ring-primary/10",
               "disabled:cursor-not-allowed disabled:opacity-50",
-              error &&
-                "border-destructive/55 focus-visible:border-destructive/70 focus-visible:ring-destructive/10",
+              error && "border-destructive/55 focus-visible:border-destructive/70 focus-visible:ring-destructive/10",
             )}
           >
             <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-primary/[0.07] text-primary">
               {icon ?? <CalendarDays size={15} strokeWidth={1.8} />}
             </span>
 
-            <span
-              className={cn(
-                "min-w-0 flex-1 truncate font-normal",
-                selected ? "text-foreground" : "text-muted-foreground",
-              )}
-            >
+            <span className={cn(
+              "min-w-0 flex-1 truncate font-normal",
+              selected ? "text-foreground" : "text-muted-foreground",
+            )}>
               {selected ? formatDateForDisplay(value) : placeholder}
             </span>
 
@@ -193,24 +177,12 @@ export function DatePicker({
           align="start"
           side="bottom"
           sideOffset={8}
-          collisionPadding={12}
-          avoidCollisions
+          collisionPadding={16}
           sticky="always"
-          className={cn(
-            "z-[150] w-[min(22.5rem,calc(100vw-1.5rem))] overflow-hidden rounded-[20px] border border-border/70 bg-popover p-0 text-popover-foreground",
-            "shadow-[0_22px_64px_rgba(15,10,40,0.16)]",
-          )}
+          hideWhenDetached
+          className="school-date-popover w-[min(18.5rem,calc(100vw-1rem))] overflow-hidden rounded-[18px] border-border/70 p-0 shadow-[0_18px_55px_rgba(20,15,60,0.16)]"
         >
-          <div className="border-b border-border/55 px-4 py-3">
-            <p className="text-sm font-semibold text-foreground">
-              {label ?? "Choose date"}
-            </p>
-            <p className="mt-0.5 text-[11px] text-muted-foreground">
-              Use the month and year menus for faster navigation.
-            </p>
-          </div>
-
-          <div className="p-3">
+          <div className="p-2.5 sm:p-3">
             <Calendar
               mode="single"
               selected={selected}
@@ -222,7 +194,7 @@ export function DatePicker({
             />
           </div>
 
-          <div className="flex items-center justify-between gap-2 border-t border-border/55 bg-muted/[0.18] px-3 py-2.5">
+          <div className="flex items-center justify-between gap-2 border-t border-border/55 bg-muted/[0.14] px-2.5 py-2">
             <button
               type="button"
               disabled={!todayIsAllowed}
@@ -250,9 +222,7 @@ export function DatePicker({
       {error ? (
         <p className="mt-1.5 text-[11px] text-destructive">{error}</p>
       ) : helperText ? (
-        <p className="mt-1.5 text-[11px] text-muted-foreground">
-          {helperText}
-        </p>
+        <p className="mt-1.5 text-[11px] text-muted-foreground">{helperText}</p>
       ) : null}
     </div>
   );
