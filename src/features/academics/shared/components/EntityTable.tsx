@@ -49,7 +49,7 @@ export function EntityTable<T>({
   return (
     <div className="space-y-3">
       <div
-        className="hidden items-center gap-4 px-5 pb-1.5 md:grid"
+        className="hidden items-center gap-4 px-5 pb-1.5 lg:grid"
         style={gridStyle}
       >
         {columns.map((column) => (
@@ -90,19 +90,21 @@ export function EntityTable<T>({
             />
 
             <div
-              className="grid gap-4 px-5 py-4 md:items-center"
-              style={gridStyle}
+              className="grid grid-cols-1 gap-4 px-4 py-4 sm:grid-cols-2 sm:px-5 lg:[grid-template-columns:var(--entity-grid)] lg:items-center"
+              style={{
+                ["--entity-grid" as string]: gridStyle.gridTemplateColumns,
+              } as CSSProperties}
             >
               {columns.map((column, columnIndex) => (
                 <div
                   key={column.key}
                   className={[
                     "min-w-0",
-                    columnIndex === 0 ? "md:pr-4" : "",
+                    columnIndex === 0 ? "lg:pr-4" : "",
                     column.className,
                   ].join(" ")}
                 >
-                  <span className="mb-1 block text-[9px] font-semibold uppercase tracking-[0.11em] text-muted-foreground/65 md:hidden">
+                  <span className="mb-1 block text-[9px] font-semibold uppercase tracking-[0.11em] text-muted-foreground/65 lg:hidden">
                     {column.header}
                   </span>
 
@@ -120,7 +122,7 @@ export function EntityTable<T>({
               ))}
 
               {actions ? (
-                <div className="flex flex-wrap items-center justify-end gap-2 border-t border-border/50 pt-3 md:border-0 md:pt-0">
+                <div className="flex flex-wrap items-center justify-end gap-2 border-t border-border/50 pt-3 lg:border-0 lg:pt-0">
                   {actions(row)}
                 </div>
               ) : null}

@@ -17,6 +17,7 @@ import {
   useRef,
   useState,
   type ReactNode,
+  type CSSProperties,
 } from "react";
 import { createPortal } from "react-dom";
 
@@ -59,10 +60,15 @@ export type CrudField<
   name: keyof TCreate & string;
   label: string;
   type: FieldType;
-  options?: Array<{
-    label: string;
-    value: string;
-  }>;
+  options?:
+    | Array<{
+        label: string;
+        value: string;
+      }>
+    | ((values: FormValues, isEdit: boolean) => Array<{
+        label: string;
+        value: string;
+      }>);
   defaultValue: FormValue;
   required?: boolean;
   full?: boolean;
@@ -70,6 +76,8 @@ export type CrudField<
   max?: number;
   disabledOnEdit?: boolean;
   helperText?: string;
+  disabled?: boolean | ((values: FormValues, isEdit: boolean) => boolean);
+  resetFieldsOnChange?: string[];
 };
 
 export type CrudColumn<
@@ -556,7 +564,7 @@ pageSizeOptions = [6, 10, 15, 25],
           <>
             <div className="px-4 py-4 sm:px-5">
               <div
-                className="hidden items-center gap-4 px-5 pb-2 md:grid"
+                className="hidden items-center gap-4 px-5 pb-2 lg:grid"
                 style={{
                   gridTemplateColumns: [
                     ...columns.map((_, index) =>
@@ -594,26 +602,28 @@ pageSizeOptions = [6, 10, 15, 25],
                     />
 
                     <div
-                      className="grid gap-4 px-5 py-4 md:items-center"
+                      className="grid grid-cols-1 gap-4 px-4 py-4 sm:grid-cols-2 sm:px-5 lg:[grid-template-columns:var(--crud-grid)] lg:items-center"
                       style={{
-                        gridTemplateColumns: [
+                        ["--crud-grid" as string]: [
                           ...columns.map((_, index) =>
-                            index === 0 ? "minmax(0, 1.35fr)" : "minmax(0, 1fr)",
+                            index === 0
+                              ? "minmax(0, 1.35fr)"
+                              : "minmax(0, 1fr)",
                           ),
                           "132px",
                         ].join(" "),
-                      }}
+                      } as CSSProperties}
                     >
                       {columns.map((column, columnIndex) => (
                         <div
                           key={column.key}
                           className={[
                             "min-w-0",
-                            columnIndex === 0 ? "md:pr-4" : "",
-                            column.align === "center" ? "md:text-center" : column.align === "right" ? "md:text-right" : "md:text-left",
+                            columnIndex === 0 ? "lg:pr-4" : "",
+                            column.align === "center" ? "lg:text-center" : column.align === "right" ? "lg:text-right" : "lg:text-left",
                           ].join(" ")}
                         >
-                          <span className="mb-1 block text-[9px] font-medium uppercase tracking-[0.11em] text-muted-foreground/65 md:hidden">
+                          <span className="mb-1 block text-[9px] font-medium uppercase tracking-[0.11em] text-muted-foreground/65 lg:hidden">
                             {column.header}
                           </span>
                           <div className={columnIndex === 0 ? "text-sm font-medium text-foreground" : "text-sm font-normal text-foreground/80"}>
@@ -622,7 +632,7 @@ pageSizeOptions = [6, 10, 15, 25],
                         </div>
                       ))}
 
-                      <div className="flex items-center justify-end border-t border-border/50 pt-3 md:border-0 md:pt-0">
+                      <div className="flex items-center justify-end border-t border-border/50 pt-3 sm:col-span-2 lg:col-span-1 lg:border-0 lg:pt-0">
                         <RowActions
                           disabled={Boolean(deleteMutation.isPending)}
                           onView={() => void openView(row)}
@@ -722,7 +732,7 @@ function TableSkeleton({
   return (
     <div className="px-4 py-4 sm:px-5">
       <div
-        className="hidden items-center gap-4 px-5 pb-2 md:grid"
+        className="hidden items-center gap-4 px-5 pb-2 lg:grid"
         style={{ gridTemplateColumns }}
       >
         {Array.from({ length: columns + 1 }).map((_, index) => (
@@ -740,8 +750,10 @@ function TableSkeleton({
             className="rounded-[22px] border border-border/65 bg-card px-5 py-4 shadow-[var(--shadow-card)]"
           >
             <div
-              className="grid animate-pulse gap-4 md:items-center"
-              style={{ gridTemplateColumns }}
+              className="grid animate-pulse grid-cols-1 gap-4 sm:grid-cols-2 lg:[grid-template-columns:var(--skeleton-grid)] lg:items-center"
+              style={{
+                ["--skeleton-grid" as string]: gridTemplateColumns,
+              } as CSSProperties}
             >
               {Array.from({ length: columns + 1 }).map((__, columnIndex) => (
                 <div key={columnIndex} className="flex min-w-0 items-center gap-3">
@@ -1028,7 +1040,7 @@ function DetailsDrawer<
     >
       <section
         className={[
-          "flex max-h-[90vh] w-full max-w-[720px] flex-col overflow-hidden",
+          "flex max-h-[calc(100dvh-1rem)] w-full max-w-[720px] flex-col overflow-hidden sm:max-h-[90vh]",
           "rounded-[24px] border border-border/60 bg-card",
           "shadow-[0_28px_90px_rgba(15,10,40,0.22)]",
           "animate-in zoom-in-95 fade-in duration-200",
@@ -1220,7 +1232,7 @@ function EditorDialog<
       aria-modal="true"
       className={[
         "fixed inset-0 z-50 flex items-center justify-center",
-        "bg-slate-950/30 p-4 backdrop-blur-[5px]",
+        "bg-slate-950/30 p-2 sm:p-4 backdrop-blur-[5px]",
       ].join(" ")}
       onMouseDown={(event) => {
         if (
@@ -1234,7 +1246,7 @@ function EditorDialog<
     >
       <div
         className={[
-          "flex max-h-[90vh] w-full max-w-[720px] flex-col overflow-hidden",
+          "flex max-h-[calc(100dvh-1rem)] w-full max-w-[720px] flex-col overflow-hidden sm:max-h-[90vh]",
           "rounded-[24px] border border-border/55 bg-card",
           "shadow-[0_28px_90px_rgba(15,10,40,0.22)]",
           "animate-in zoom-in-95 fade-in duration-200",
@@ -1304,17 +1316,7 @@ function EditorDialog<
 
         <div className="min-h-0 flex-1 overflow-y-auto px-5 py-5 sm:px-6 [scrollbar-width:thin]">
           {isLoading ? (
-            <div className="mb-6 grid animate-pulse gap-3 sm:grid-cols-2">
-              {Array.from({ length: 4 }).map((_, index) => (
-                <div
-                  key={index}
-                  className="space-y-2 rounded-[14px] border border-border/50 bg-muted/[0.12] p-4"
-                >
-                  <span className="block h-2.5 w-20 rounded-full bg-muted" />
-                  <span className="block h-10 w-full rounded-xl bg-muted/70" />
-                </div>
-              ))}
-            </div>
+            <EditorFieldsSkeleton fields={fields} />
           ) : null}
 
           {error ? (
@@ -1338,13 +1340,18 @@ function EditorDialog<
             </div>
           ) : null}
 
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className={["grid gap-4 sm:grid-cols-2", isLoading ? "hidden" : ""].join(" ")}>
             {fields.map((field) => {
+              const fieldDisabled =
+                typeof field.disabled === "function"
+                  ? field.disabled(values, isEdit)
+                  : Boolean(field.disabled);
+
               const disabled = Boolean(
                 isSubmitting ||
                 isLoading ||
-                (isEdit &&
-                  field.disabledOnEdit)
+                fieldDisabled ||
+                (isEdit && field.disabledOnEdit)
               );
 
               return (
@@ -1353,7 +1360,7 @@ function EditorDialog<
                   className={[
                     "block rounded-[14px]",
                     field.full
-                      ? "md:col-span-2"
+                      ? "sm:col-span-2"
                       : "",
                   ].join(" ")}
                 >
@@ -1377,16 +1384,20 @@ function EditorDialog<
                   <FieldControl
                     field={field}
                     value={values[field.name]}
+                    values={values}
+                    isEdit={isEdit}
                     disabled={disabled}
                     hasError={Boolean(
                       errors[field.name],
                     )}
-                    onChange={(value) =>
-                      onChange(
-                        field.name,
-                        value,
-                      )
-                    }
+                    onChange={(value) => {
+                      onChange(field.name, value);
+
+                      for (const dependentField of
+                        field.resetFieldsOnChange ?? []) {
+                        onChange(dependentField, "");
+                      }
+                    }}
                   />
 
                   {field.helperText ? (
@@ -1467,17 +1478,69 @@ function EditorDialog<
   );
 }
 
+function EditorFieldsSkeleton<
+  TCreate extends object,
+>({
+  fields,
+}: {
+  fields: Array<CrudField<TCreate>>;
+}) {
+  return (
+    <div className="grid animate-pulse gap-4 sm:grid-cols-2">
+      {fields.map((field) => (
+        <div
+          key={field.name}
+          className={field.full ? "sm:col-span-2" : ""}
+        >
+          <div className="mb-1.5 flex items-center justify-between gap-3">
+            <span className="block h-3 w-24 rounded-full bg-muted" />
+            {field.disabledOnEdit ? (
+              <span className="block h-4 w-12 rounded-full bg-muted/70" />
+            ) : null}
+          </div>
+
+          {field.type === "checkbox" ? (
+            <div className="flex min-h-11 items-center gap-3 rounded-xl border border-border bg-muted/10 px-4">
+              <span className="h-4 w-4 rounded bg-muted" />
+              <span className="h-3 w-20 rounded-full bg-muted" />
+            </div>
+          ) : field.type === "array" ? (
+            <div className="space-y-2 rounded-xl border border-border bg-muted/10 p-3">
+              {Array.from({ length: 3 }).map((_, index) => (
+                <div key={index} className="flex h-9 items-center gap-3 rounded-xl px-3">
+                  <span className="h-4 w-4 rounded bg-muted" />
+                  <span className="h-3 w-2/5 rounded-full bg-muted" />
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="h-11 w-full rounded-xl border border-border bg-muted/55" />
+          )}
+
+          {field.helperText ? (
+            <span className="mt-2 block h-2.5 w-4/5 rounded-full bg-muted/65" />
+          ) : null}
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function FieldControl<
   TCreate extends object,
 >({
   field,
   value,
+  values,
+  isEdit,
   disabled,
   hasError,
   onChange,
 }: {
   field: CrudField<TCreate>;
   value: FormValue;
+  values: FormValues;
+  isEdit: boolean;
   disabled: boolean;
   hasError: boolean;
   onChange: (
@@ -1492,6 +1555,11 @@ function FieldControl<
       ? "border-destructive/60"
       : "border-border",
   ].join(" ");
+
+  const resolvedOptions =
+    typeof field.options === "function"
+      ? field.options(values, isEdit)
+      : field.options ?? [];
 
   if (
     field.type === "checkbox"
@@ -1524,7 +1592,7 @@ function FieldControl<
 
     return (
       <div className="max-h-56 space-y-2 overflow-y-auto rounded-xl border border-border bg-background p-3">
-        {field.options?.map(
+        {resolvedOptions.map(
           (option) => {
             const checked =
               selectedValues.includes(
@@ -1622,7 +1690,7 @@ function FieldControl<
             "shadow-[0_18px_55px_rgba(24,16,55,0.18)]",
           ].join(" ")}
         >
-          {field.options?.map((option) => (
+          {resolvedOptions.map((option) => (
             <SelectItem
               key={option.value}
               value={option.value}
@@ -1687,7 +1755,7 @@ function DeleteDialog({
       aria-modal="true"
       className={[
         "fixed inset-0 z-50 flex items-center justify-center",
-        "bg-slate-950/30 p-4 backdrop-blur-[5px]",
+        "bg-slate-950/30 p-2 sm:p-4 backdrop-blur-[5px]",
       ].join(" ")}
       onMouseDown={(event) => {
         if (

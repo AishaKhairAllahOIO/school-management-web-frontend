@@ -12,9 +12,22 @@ import type {
   CreateGradePayload,
   Grade,
   UpdateGradePayload,
+  AcademicStageWithGrades,
 } from "../types/grade.types";
 
 export const gradeQueryKey = ["academics", "grades"] as const;
+export const academicStagesWithGradesQueryKey =
+  ["academics", "academic-stages", "with-grades"] as const;
+
+export function useAcademicStagesWithGrades() {
+  return useQuery<AcademicStageWithGrades[], Error>({
+    queryKey: academicStagesWithGradesQueryKey,
+    queryFn: gradeApi.listStagesWithGrades,
+    staleTime: 60_000,
+    retry: 1,
+  });
+}
+
 
 export function useGrades() {
   return useQuery<Grade[], Error>({
@@ -33,9 +46,12 @@ export function useCreateGrade() {
       gradeApi.create(payload),
 
     onSuccess: async () => {
-      await queryClient.invalidateQueries({
-        queryKey: gradeQueryKey,
-      });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: gradeQueryKey }),
+        queryClient.invalidateQueries({
+          queryKey: academicStagesWithGradesQueryKey,
+        }),
+      ]);
 
       toast.success("Grade created successfully.");
     },
@@ -59,9 +75,12 @@ export function useUpdateGrade() {
     }) => gradeApi.update(id, payload),
 
     onSuccess: async () => {
-      await queryClient.invalidateQueries({
-        queryKey: gradeQueryKey,
-      });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: gradeQueryKey }),
+        queryClient.invalidateQueries({
+          queryKey: academicStagesWithGradesQueryKey,
+        }),
+      ]);
 
       toast.success("Grade updated successfully.");
     },
@@ -79,9 +98,12 @@ export function useDeleteGrade() {
     mutationFn: (id: string) => gradeApi.delete(id),
 
     onSuccess: async () => {
-      await queryClient.invalidateQueries({
-        queryKey: gradeQueryKey,
-      });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: gradeQueryKey }),
+        queryClient.invalidateQueries({
+          queryKey: academicStagesWithGradesQueryKey,
+        }),
+      ]);
 
       toast.success("Grade deleted successfully.");
     },

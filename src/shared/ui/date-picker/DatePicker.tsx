@@ -1,12 +1,20 @@
 import {
   CalendarDays,
   ChevronDown,
+  RotateCcw,
   X,
 } from "lucide-react";
 import {
   useId,
+  useMemo,
   useState,
 } from "react";
+import {
+  addYears,
+  endOfDay,
+  startOfDay,
+  subYears,
+} from "date-fns";
 
 import { cn } from "@/shared/lib/utils";
 import {
@@ -42,26 +50,52 @@ export function DatePicker({
 }: DatePickerProps) {
   const generatedId = useId();
   const inputId = id ?? generatedId;
+  const [open, setOpen] = useState(false);
 
-  const [open, setOpen] =
-    useState(false);
+  const selected = parseApiDate(value);
+  const minDate = parseApiDate(min);
+  const maxDate = parseApiDate(max);
+  const today = startOfDay(new Date());
 
-  const selected =
-    parseApiDate(value);
+  const calendarBounds = useMemo(() => {
+    const fallbackStart = subYears(today, 100);
+    const fallbackEnd = addYears(today, 20);
 
-  const minDate =
-    parseApiDate(min);
+    return {
+      startMonth: minDate ?? fallbackStart,
+      endMonth: maxDate ?? fallbackEnd,
+    };
+  }, [minDate, maxDate, today]);
 
-  const maxDate =
-    parseApiDate(max);
+  const disabledMatchers = useMemo(() => {
+    const matchers = [];
 
-  const disabledMatcher =
-    minDate || maxDate
-      ? {
-          before: minDate,
-          after: maxDate,
-        }
-      : undefined;
+    if (minDate) {
+      matchers.push({ before: startOfDay(minDate) });
+    }
+
+    if (maxDate) {
+      matchers.push({ after: endOfDay(maxDate) });
+    }
+
+    return matchers.length ? matchers : undefined;
+  }, [minDate, maxDate]);
+
+  const todayIsAllowed =
+    (!minDate || today >= startOfDay(minDate)) &&
+    (!maxDate || today <= endOfDay(maxDate));
+
+  function selectDate(date?: Date) {
+    if (!date) return;
+
+    onChange(formatDateForApi(date));
+    setOpen(false);
+  }
+
+  function clearDate() {
+    onChange("");
+    setOpen(false);
+  }
 
   return (
     <div className={cn("min-w-0", className)}>
@@ -71,31 +105,18 @@ export function DatePicker({
           className="mb-2 block text-xs font-medium text-foreground"
         >
           {label}
-
           {required ? (
-            <span className="ml-1 text-destructive">
-              *
-            </span>
+            <span className="ms-1 text-destructive">*</span>
           ) : null}
         </label>
       ) : null}
 
-      <input
-        type="hidden"
-        name={name}
-        value={value ?? ""}
-      />
+      <input type="hidden" name={name} value={value ?? ""} />
 
       <Popover
         open={open}
         onOpenChange={(nextOpen) => {
-          if (
-            disabled ||
-            readOnly
-          ) {
-            return;
-          }
-
+          if (disabled || readOnly) return;
           setOpen(nextOpen);
         }}
       >
@@ -109,7 +130,7 @@ export function DatePicker({
             aria-invalid={Boolean(error)}
             className={cn(
               "flex h-11 w-full min-w-0 items-center gap-3 rounded-[13px] border bg-background px-3.5 text-left text-sm outline-none transition-all",
-              "border-border/70 hover:border-border",
+              "border-border/70 hover:border-primary/30",
               "focus-visible:border-primary/45 focus-visible:ring-4 focus-visible:ring-primary/10",
               "disabled:cursor-not-allowed disabled:opacity-50",
               error &&
@@ -117,60 +138,37 @@ export function DatePicker({
             )}
           >
             <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-primary/[0.07] text-primary">
-              {icon ?? (
-                <CalendarDays
-                  size={15}
-                  strokeWidth={1.8}
-                />
-              )}
+              {icon ?? <CalendarDays size={15} strokeWidth={1.8} />}
             </span>
 
             <span
               className={cn(
                 "min-w-0 flex-1 truncate font-normal",
-                selected
-                  ? "text-foreground"
-                  : "text-muted-foreground",
+                selected ? "text-foreground" : "text-muted-foreground",
               )}
             >
-              {selected
-                ? formatDateForDisplay(
-                    value,
-                  )
-                : placeholder}
+              {selected ? formatDateForDisplay(value) : placeholder}
             </span>
 
-            {selected &&
-            !readOnly &&
-            !disabled ? (
+            {selected && !readOnly && !disabled ? (
               <span
                 role="button"
                 tabIndex={0}
                 aria-label="Clear date"
-                onPointerDown={(
-                  event,
-                ) => {
+                onPointerDown={(event) => {
                   event.preventDefault();
                   event.stopPropagation();
                 }}
                 onClick={(event) => {
                   event.preventDefault();
                   event.stopPropagation();
-                  onChange("");
-                  setOpen(false);
+                  clearDate();
                 }}
-                onKeyDown={(
-                  event,
-                ) => {
-                  if (
-                    event.key ===
-                      "Enter" ||
-                    event.key === " "
-                  ) {
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
                     event.preventDefault();
                     event.stopPropagation();
-                    onChange("");
-                    setOpen(false);
+                    clearDate();
                   }
                 }}
                 className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
@@ -191,64 +189,69 @@ export function DatePicker({
 
         <PopoverContent
           role="dialog"
-          aria-label={
-            label ?? "Choose date"
-          }
+          aria-label={label ?? "Choose date"}
           align="start"
           side="bottom"
           sideOffset={8}
-          alignOffset={0}
-          collisionPadding={16}
+          collisionPadding={12}
           avoidCollisions
           sticky="always"
-          className={[
-            "z-[150] w-auto",
-            "max-w-[calc(100vw-2rem)]",
-            "rounded-[20px]",
-            "border border-border/70",
-            "bg-popover p-3",
-            "text-popover-foreground",
-            "shadow-[0_24px_70px_rgba(15,10,40,0.20)]",
-          ].join(" ")}
+          className={cn(
+            "z-[150] w-[min(22.5rem,calc(100vw-1.5rem))] overflow-hidden rounded-[20px] border border-border/70 bg-popover p-0 text-popover-foreground",
+            "shadow-[0_22px_64px_rgba(15,10,40,0.16)]",
+          )}
         >
-          <Calendar
-            mode="single"
-            selected={selected}
-            defaultMonth={
-              selected ??
-              minDate ??
-              new Date()
-            }
-            disabled={
-              disabledMatcher
-            }
-            onSelect={(date) => {
-              if (!date) {
-                return;
-              }
+          <div className="border-b border-border/55 px-4 py-3">
+            <p className="text-sm font-semibold text-foreground">
+              {label ?? "Choose date"}
+            </p>
+            <p className="mt-0.5 text-[11px] text-muted-foreground">
+              Use the month and year menus for faster navigation.
+            </p>
+          </div>
 
-              onChange(
-                formatDateForApi(
-                  date,
-                ),
-              );
+          <div className="p-3">
+            <Calendar
+              mode="single"
+              selected={selected}
+              defaultMonth={selected ?? minDate ?? today}
+              startMonth={calendarBounds.startMonth}
+              endMonth={calendarBounds.endMonth}
+              disabled={disabledMatchers}
+              onSelect={selectDate}
+            />
+          </div>
 
-              setOpen(false);
-            }}
-          />
+          <div className="flex items-center justify-between gap-2 border-t border-border/55 bg-muted/[0.18] px-3 py-2.5">
+            <button
+              type="button"
+              disabled={!todayIsAllowed}
+              onClick={() => selectDate(today)}
+              className="inline-flex h-9 items-center gap-2 rounded-[11px] px-3 text-xs font-medium text-primary transition-colors hover:bg-primary/[0.07] disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              <CalendarDays size={14} />
+              Today
+            </button>
+
+            {selected ? (
+              <button
+                type="button"
+                onClick={clearDate}
+                className="inline-flex h-9 items-center gap-2 rounded-[11px] px-3 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+              >
+                <RotateCcw size={14} />
+                Clear
+              </button>
+            ) : null}
+          </div>
         </PopoverContent>
       </Popover>
 
-      {error || helperText ? (
-        <p
-          className={cn(
-            "mt-1.5 text-xs",
-            error
-              ? "text-destructive"
-              : "text-muted-foreground",
-          )}
-        >
-          {error ?? helperText}
+      {error ? (
+        <p className="mt-1.5 text-[11px] text-destructive">{error}</p>
+      ) : helperText ? (
+        <p className="mt-1.5 text-[11px] text-muted-foreground">
+          {helperText}
         </p>
       ) : null}
     </div>

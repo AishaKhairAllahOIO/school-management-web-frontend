@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 
 export function FormField({ label, children, full }: { label: string; children: ReactNode; full?: boolean }) {
   return (
-    <label className={full ? "md:col-span-2" : ""}>
+    <label className={full ? "sm:col-span-2" : ""}>
       <span className="mb-2 block text-xs font-black uppercase tracking-wide text-slate-500">{label}</span>
       {children}
     </label>

@@ -7,27 +7,39 @@ import {
 } from "lucide-react";
 
 import { SidebarMenu } from "@/app/layout/components/sidebar/SidebarMenu";
+import { SidebarSectionSeparator } from "@/app/layout/components/sidebar/SidebarSectionSeparator";
 import { useLayoutStore } from "@/app/layout/store/layoutStore";
 import { useLocale } from "@/app/providers/locale";
 
 const WEBSITE_URL =
   "https://your-school-website.com";
 
-function formatSidebarDate(locale: string) {
+function formatSidebarDate(
+  locale: string,
+) {
   const today = new Date();
 
   return {
-    day: new Intl.DateTimeFormat(locale, {
-      day: "2-digit",
-    }).format(today),
+    day: new Intl.DateTimeFormat(
+      locale,
+      {
+        day: "2-digit",
+      },
+    ).format(today),
 
-    month: new Intl.DateTimeFormat(locale, {
-      month: "short",
-    }).format(today),
+    month: new Intl.DateTimeFormat(
+      locale,
+      {
+        month: "short",
+      },
+    ).format(today),
 
-    weekday: new Intl.DateTimeFormat(locale, {
-      weekday: "long",
-    }).format(today),
+    weekday: new Intl.DateTimeFormat(
+      locale,
+      {
+        weekday: "long",
+      },
+    ).format(today),
   };
 }
 
@@ -46,33 +58,49 @@ function getGreetingKey() {
 }
 
 export function Sidebar() {
-  const isCollapsed = useLayoutStore(
-    (state) => state.isSidebarCollapsed,
-  );
+  const isCollapsed =
+    useLayoutStore(
+      (state) =>
+        state.isSidebarCollapsed,
+    );
 
-  const toggleSidebar = useLayoutStore(
-    (state) => state.toggleSidebar,
-  );
+  const toggleSidebar =
+    useLayoutStore(
+      (state) =>
+        state.toggleSidebar,
+    );
 
-  const { direction, locale, t } =
-    useLocale();
+  const {
+    direction,
+    locale,
+    t,
+  } = useLocale();
 
-  const isRtl = direction === "rtl";
+  const isRtl =
+    direction === "rtl";
 
-  const date = formatSidebarDate(locale);
-  const greeting = t.layout.sidebar[getGreetingKey()];
+  const date =
+    formatSidebarDate(locale);
 
-  const sidebarPositionClass = isRtl
-    ? "right-0 rounded-l-[28px]"
-    : "left-0 rounded-r-[28px]";
+  const greeting =
+    t.layout.sidebar[
+      getGreetingKey()
+    ];
 
-  /*
-   * تحريك كتلة الهيدر قليلًا نحو بداية السايد بار،
-   * مع إبقاء المحتوى الداخلي متمركزًا حول العنوان.
-   */
-  const workspacePositionClass = isRtl
-    ? "translate-x-[14px]"
-    : "-translate-x-[14px]";
+  const sidebarPositionClass =
+    isRtl
+      ? "right-0 rounded-l-[28px]"
+      : "left-0 rounded-r-[28px]";
+
+  const workspacePositionClass =
+    isRtl
+      ? "translate-x-[14px]"
+      : "-translate-x-[14px]";
+
+  const separatorVariant =
+    isCollapsed
+      ? "icons"
+      : "labels";
 
   return (
     <aside
@@ -160,32 +188,39 @@ export function Sidebar() {
               type="button"
               onClick={toggleSidebar}
               aria-label={
-                t.layout.sidebar.expandSidebar
+                t.layout.sidebar
+                  .expandSidebar
               }
               title={
-                t.layout.sidebar.expandSidebar
+                t.layout.sidebar
+                  .expandSidebar
               }
-              className={[
-                "flex h-[42px] w-[42px]",
-                "items-center justify-center",
-                "text-sidebar-foreground/90",
-                "transition-colors duration-200",
-                "hover:text-sidebar-foreground",
-                "focus-visible:outline-none",
-                "focus-visible:ring-2",
-                "focus-visible:ring-sidebar-foreground/25",
-              ].join(" ")}
+              className="
+                flex
+                h-[42px]
+                w-[42px]
+                items-center
+                justify-center
+                text-sidebar-foreground/90
+                transition-colors
+                duration-200
+                hover:text-sidebar-foreground
+                focus-visible:outline-none
+                focus-visible:ring-2
+                focus-visible:ring-sidebar-foreground/25
+              "
             >
               <PanelLeftOpen
                 aria-hidden="true"
                 size={18}
                 strokeWidth={1.9}
                 className={
-                  isRtl ? "rotate-180" : ""
+                  isRtl
+                    ? "rotate-180"
+                    : ""
                 }
               />
             </button>
-
           </header>
         ) : (
           <header
@@ -213,19 +248,18 @@ export function Sidebar() {
               "
             />
 
-           <div
-  aria-hidden="true"
-  className="
-    pointer-events-none
-    absolute
-    inset-x-3.5
-    inset-y-[11px]
-    rounded-[18px]
-    bg-sidebar-foreground/[0.075]
-  "
-/>
+            <div
+              aria-hidden="true"
+              className="
+                pointer-events-none
+                absolute
+                inset-x-3.5
+                inset-y-[11px]
+                rounded-[18px]
+                bg-sidebar-foreground/[0.075]
+              "
+            />
 
-            {/* Workspace information */}
             <div
               className={[
                 "flex min-w-0 flex-col",
@@ -233,7 +267,6 @@ export function Sidebar() {
                 workspacePositionClass,
               ].join(" ")}
             >
-              {/* Greeting centered above title */}
               <div
                 className="
                   flex
@@ -268,10 +301,12 @@ export function Sidebar() {
                   text-sidebar-foreground
                 "
               >
-                {t.layout.sidebar.schoolName}
+                {
+                  t.layout.sidebar
+                    .schoolName
+                }
               </h1>
 
-              {/* Date centered below title */}
               <div
                 className="
                   mt-[6px]
@@ -291,53 +326,58 @@ export function Sidebar() {
                 />
 
                 <span className="whitespace-nowrap">
-                  {date.weekday} · {date.month}{" "}
+                  {date.weekday}
+                  {" · "}
+                  {date.month}
+                  {" "}
                   {date.day}
                 </span>
               </div>
             </div>
 
-            {/* Collapse control */}
             <button
               type="button"
               onClick={toggleSidebar}
               aria-label={
-                t.layout.sidebar.collapseSidebar
+                t.layout.sidebar
+                  .collapseSidebar
               }
               title={
-                t.layout.sidebar.collapseSidebar
+                t.layout.sidebar
+                  .collapseSidebar
               }
-              className={[
-                "absolute end-4 top-1/2",
-                "-translate-y-1/2",
-                "flex h-[38px] w-[38px]",
-                "items-center justify-center",
-                "text-sidebar-muted",
-                "transition-colors duration-200",
-                "hover:text-sidebar-foreground",
-                "focus-visible:outline-none",
-                "focus-visible:ring-2",
-                "focus-visible:ring-sidebar-foreground/25",
-              ].join(" ")}
+              className="
+                absolute
+                end-4
+                top-1/2
+                flex
+                h-[38px]
+                w-[38px]
+                -translate-y-1/2
+                items-center
+                justify-center
+                text-sidebar-muted
+                transition-colors
+                duration-200
+                hover:text-sidebar-foreground
+                focus-visible:outline-none
+                focus-visible:ring-2
+                focus-visible:ring-sidebar-foreground/25
+              "
             >
               <PanelLeftClose
                 aria-hidden="true"
                 size={17}
                 strokeWidth={1.9}
                 className={
-                  isRtl ? "rotate-180" : ""
+                  isRtl
+                    ? "rotate-180"
+                    : ""
                 }
               />
             </button>
           </header>
         )}
-
-        {isCollapsed ? (
-          <div
-            aria-hidden="true"
-            className="mx-auto mb-3 h-px w-8 shrink-0 bg-sidebar-foreground/[0.09]"
-          />
-        ) : null}
 
         <div
           className={[
@@ -348,104 +388,111 @@ export function Sidebar() {
               : "px-3.5",
           ].join(" ")}
         >
-          {!isCollapsed && (
-            <div
-              className="
-                -mt-[7px]
-                mb-[5px]
-                flex
-                h-6
-                shrink-0
-                items-center
-                gap-3
-                px-2
-              "
-            >
-              <span
-                className="
-                  shrink-0
-                  text-[9px]
-                  font-semibold
-                  uppercase
-                  leading-none
-                  tracking-[0.15em]
-                  text-sidebar-muted/58
-                "
-              >
-                {t.layout.sidebar.mainMenu}
-              </span>
-
-              <span
-                className="
-                  relative
-                  -top-[3px]
-                  h-px
-                  flex-1
-                  bg-sidebar-foreground/[0.055]
-                "
-              />
-            </div>
-          )}
+          <SidebarSectionSeparator
+            variant={
+              separatorVariant
+            }
+            label={
+              t.layout.sidebar
+                .mainMenu
+            }
+            className={
+              isCollapsed
+                ? "mb-1"
+                : "-mt-[7px] mb-[5px]"
+            }
+          />
 
           <div className="shrink-0">
             <SidebarMenu
               variant={
-                isCollapsed
-                  ? "icons"
-                  : "labels"
+                separatorVariant
               }
             />
           </div>
 
-          {/* Push View Website to the bottom */}
           <div className="min-h-4 flex-1" />
 
-          {/* Website separator */}
           <div
             className={[
               "shrink-0",
-              isCollapsed ? "px-0" : "px-0.5",
+              isCollapsed
+                ? "px-0"
+                : "px-0.5",
             ].join(" ")}
           >
-            {isCollapsed ? (
-              <div aria-hidden="true" className="mb-3 flex justify-center">
-                <span className="h-px w-8 bg-sidebar-foreground/[0.09]" />
-              </div>
-            ) : (
-              <div className="mb-2 flex h-6 items-center gap-3 px-2">
-                <span className="shrink-0 text-[9px] font-semibold uppercase leading-none tracking-[0.15em] text-sidebar-muted/58">
-                  {t.layout.sidebar.viewWebsite}
-                </span>
-                <span className="relative -top-[2px] h-px flex-1 bg-sidebar-foreground/[0.07]" />
-              </div>
-            )}
+            <SidebarSectionSeparator
+              variant={
+                separatorVariant
+              }
+              label={
+                t.layout.sidebar
+                  .viewWebsite
+              }
+              className="mb-1 mt-1"
+            />
 
             <a
               href={WEBSITE_URL}
               target="_blank"
               rel="noopener noreferrer"
-              aria-label={t.layout.sidebar.viewWebsite}
-              title={t.layout.sidebar.viewWebsite}
+              aria-label={
+                t.layout.sidebar
+                  .viewWebsite
+              }
+              title={
+                t.layout.sidebar
+                  .viewWebsite
+              }
               className={[
-                "group flex items-center text-sidebar-muted",
+                "group flex items-center",
+                "text-sidebar-muted",
                 "transition-colors duration-200",
-                "hover:bg-sidebar-foreground/[0.045] hover:text-sidebar-foreground",
-                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sidebar-foreground/25",
+                "hover:bg-sidebar-foreground/[0.045]",
+                "hover:text-sidebar-foreground",
+                "focus-visible:outline-none",
+                "focus-visible:ring-2",
+                "focus-visible:ring-sidebar-foreground/25",
                 isCollapsed
                   ? "h-[46px] w-[46px] justify-center rounded-[17px]"
                   : "h-[48px] w-full justify-start rounded-[17px] px-3",
               ].join(" ")}
             >
-              <span className={[
-                "flex shrink-0 items-center justify-center text-current",
-                isCollapsed ? "h-8 w-8" : "h-8 w-8",
-              ].join(" ")}>
-                <Globe2 aria-hidden="true" size={18} strokeWidth={1.8} />
+              <span
+                className="
+                  flex
+                  h-8
+                  w-8
+                  shrink-0
+                  items-center
+                  justify-center
+                  text-current
+                "
+              >
+                <Globe2
+                  aria-hidden="true"
+                  size={18}
+                  strokeWidth={1.8}
+                />
               </span>
 
               {!isCollapsed ? (
-                <span className="ms-3 min-w-0 flex-1 truncate text-start text-[13px] font-medium tracking-[-0.004em]">
-                  {t.layout.sidebar.viewWebsite}
+                <span
+                  className="
+                    ms-3
+                    min-w-0
+                    flex-1
+                    truncate
+                    text-start
+                    text-[13px]
+                    font-medium
+                    tracking-[-0.004em]
+                  "
+                >
+                  {
+                    t.layout.sidebar
+                      .viewWebsite
+                  }
                 </span>
               ) : null}
             </a>

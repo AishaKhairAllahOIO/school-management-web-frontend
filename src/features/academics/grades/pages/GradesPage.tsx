@@ -1,10 +1,10 @@
 import { useMemo } from "react";
 import { Check, GraduationCap, Minus } from "lucide-react";
-import { useAcademicStages } from "@/features/settings/academic/hooks/useAcademicSettings";
 
 import { CrudPage } from "../../shared/components/CrudPage";
 import { gradeApi } from "../api/grade.api";
 import {
+  useAcademicStagesWithGrades,
   useCreateGrade,
   useDeleteGrade,
   useGrades,
@@ -16,47 +16,84 @@ import type {
   UpdateGradePayload,
 } from "../types/grade.types";
 
-const stageLabels = {
-  primary: "Primary",
-  middle: "Middle",
-  secondary: "Secondary",
-} as const;
+const gradeLabels: Record<string, string> = {
+  first: "First Grade",
+  second: "Second Grade",
+  third: "Third Grade",
+  fourth: "Fourth Grade",
+  fifth: "Fifth Grade",
+  sixth: "Sixth Grade",
+  seventh: "Seventh Grade",
+  eighth: "Eighth Grade",
+  ninth: "Ninth Grade",
+  tenth: "Tenth Grade",
+  eleventh: "Eleventh Grade",
+  twelfth: "Twelfth Grade",
+};
+
+function formatGradeLabel(key: string) {
+  return gradeLabels[key] ?? key;
+}
 
 export function GradesPage() {
   const gradesQuery = useGrades();
-  const stagesQuery = useAcademicStages();
+  const stagesQuery = useAcademicStagesWithGrades();
 
   const createMutation = useCreateGrade();
   const updateMutation = useUpdateGrade();
   const deleteMutation = useDeleteGrade();
 
+  const grades = gradesQuery.data ?? [];
+  const stages = stagesQuery.data ?? [];
+
   const stageOptions = useMemo(
     () =>
-      (stagesQuery.data ?? []).map((stage) => ({
-        value: String(stage.id),
-        label: stageLabels[stage.type],
+      stages.map((stage) => ({
+        value: stage.id,
+        label: stage.displayLabel,
       })),
-    [stagesQuery.data],
+    [stages],
   );
 
   const stageNameById = useMemo(
     () =>
       new Map(
-        stageOptions.map((option) => [option.value, option.label]),
+        stages.map((stage) => [stage.id, stage.displayLabel]),
       ),
-    [stageOptions],
+    [stages],
   );
+
+  const stageById = useMemo(
+    () => new Map(stages.map((stage) => [stage.id, stage])),
+    [stages],
+  );
+
+  const usedGradeNamesByStage = useMemo(() => {
+    const map = new Map<string, Set<string>>();
+
+    for (const grade of grades) {
+      const stageId = String(grade.academicStageId);
+      const usedNames = map.get(stageId) ?? new Set<string>();
+      usedNames.add(grade.name);
+      map.set(stageId, usedNames);
+    }
+
+    return map;
+  }, [grades]);
 
   return (
     <CrudPage<Grade, CreateGradePayload, UpdateGradePayload>
       title="Grades"
-      description="Manage school grades and connect each grade to an academic stage."
+      description="Add only the grades supported by each academic stage configured for this school."
       addLabel="Add Grade"
-      rows={gradesQuery.data ?? []}
+      rows={grades}
       isLoading={gradesQuery.isLoading || stagesQuery.isLoading}
       isError={gradesQuery.isError || stagesQuery.isError}
       onRetry={() => {
-        void Promise.all([gradesQuery.refetch(), stagesQuery.refetch()]);
+        void Promise.all([
+          gradesQuery.refetch(),
+          stagesQuery.refetch(),
+        ]);
       }}
       loadEntity={gradeApi.getById}
       createMutation={createMutation}
@@ -68,30 +105,49 @@ export function GradesPage() {
           label: "Academic Stage",
           type: "select",
           options: stageOptions,
-          defaultValue: stageOptions[0]?.value ?? "",
+          defaultValue: "",
           required: true,
+          resetFieldsOnChange: ["name"],
         },
         {
           name: "name",
-          label: "Grade Name",
-          type: "text",
+          label: "Grade",
+          type: "select",
           defaultValue: "",
           required: true,
-          helperText:
-            "Do not enter the level separately; the backend calculates it from the grade name.",
+          disabled: (values) => !String(values.academicStageId ?? ""),
+          options: (values) => {
+            const stageId = String(values.academicStageId ?? "");
+            const selectedStage = stageById.get(stageId);
+            const currentName = String(values.name ?? "");
+            const usedNames = usedGradeNamesByStage.get(stageId) ?? new Set();
+
+            return (selectedStage?.grades ?? [])
+              .filter(
+                (grade) =>
+                  grade.key === currentName ||
+                  !usedNames.has(grade.key),
+              )
+              .map((grade) => ({
+                value: grade.key,
+                label: formatGradeLabel(grade.key),
+              }));
+          },
         },
         {
           name: "isGraduationGrade",
           label: "Graduation Grade",
           type: "checkbox",
           defaultValue: false,
+          full: true,
         },
       ]}
       columns={[
         {
           key: "name",
           header: "Grade",
-          searchableText: (row) => row.name,
+          searchableText: (row) =>
+            `${row.name} ${gradeLabels[row.name] ?? ""}`,
           render: (row) => (
             <div className="flex items-center gap-3.5">
               <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[16px] border border-[var(--academic-border)] bg-[var(--academic-soft)] text-[var(--academic-accent)] shadow-[var(--shadow-soft)]">
@@ -100,10 +156,10 @@ export function GradesPage() {
 
               <div className="min-w-0">
                 <p className="truncate text-sm font-semibold tracking-[-0.01em] text-foreground">
-                  {row.name}
+                  {gradeLabels[row.name] ?? row.name}
                 </p>
                 <p className="mt-0.5 text-[11px] font-normal text-muted-foreground">
-                  Grade record
+                  {row.name}
                 </p>
               </div>
             </div>
@@ -117,7 +173,7 @@ export function GradesPage() {
           render: (row) => {
             const stageName =
               stageNameById.get(String(row.academicStageId)) ??
-              `Stage ${row.academicStageId}`;
+              "Unknown stage";
 
             return (
               <div className="flex items-center gap-2.5">
@@ -125,9 +181,6 @@ export function GradesPage() {
                 <div className="min-w-0">
                   <p className="truncate text-sm font-medium text-foreground/85">
                     {stageName}
-                  </p>
-                  <p className="mt-0.5 text-[10px] font-normal text-muted-foreground/80">
-                    Academic stage
                   </p>
                 </div>
               </div>
@@ -142,9 +195,6 @@ export function GradesPage() {
             <div>
               <p className="text-[15px] font-semibold text-[var(--academic-accent)]">
                 {row.level}
-              </p>
-              <p className="mt-0.5 text-[10px] font-normal text-muted-foreground/80">
-                Grade level
               </p>
             </div>
           ),
@@ -182,9 +232,6 @@ export function GradesPage() {
                 >
                   {row.isGraduationGrade ? "Graduating" : "Not graduating"}
                 </p>
-                <p className="mt-0.5 text-[10px] font-normal text-muted-foreground/80">
-                  Graduation status
-                </p>
               </div>
             </div>
           ),
@@ -209,9 +256,7 @@ export function GradesPage() {
         if (academicStageId !== Number(row.academicStageId)) {
           payload.academicStageId = academicStageId;
         }
-        if (name !== row.name) {
-          payload.name = name;
-        }
+        if (name !== row.name) payload.name = name;
         if (isGraduationGrade !== row.isGraduationGrade) {
           payload.isGraduationGrade = isGraduationGrade;
         }
@@ -219,10 +264,10 @@ export function GradesPage() {
         return payload;
       }}
       emptyTitle="No grades found"
-      emptyDescription="Create the first grade and connect it to an existing academic stage."
+      emptyDescription="Add a grade from one of the academic stages enabled for this school."
       deleteTitle="Delete grade?"
       deleteDescription={(row) =>
-        `The grade "${row.name}" will be permanently deleted.`
+        `The grade "${gradeLabels[row.name] ?? row.name}" will be permanently deleted.`
       }
     />
   );

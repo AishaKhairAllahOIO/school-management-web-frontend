@@ -19,3 +19,14 @@ export type UpdateGradePayload = {
   name?: string;
   isGraduationGrade?: boolean;
 };
+
+export type AvailableGradeOption = {
+  key: string;
+};
+
+export type AcademicStageWithGrades = {
+  id: string;
+  stage: string;
+  displayLabel: string;
+  grades: AvailableGradeOption[];
+};

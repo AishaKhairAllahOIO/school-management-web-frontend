@@ -25,14 +25,14 @@ export function EntityDialog({
     <div
       role="dialog"
       aria-modal="true"
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-foreground/35 p-4 backdrop-blur-[5px]"
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-foreground/35 p-2 backdrop-blur-[5px] sm:p-4"
       onMouseDown={(event) => {
         if (event.target === event.currentTarget) {
           onClose();
         }
       }}
     >
-      <section className="flex max-h-[90vh] w-full max-w-[720px] flex-col overflow-hidden rounded-[24px] border border-border/60 bg-card shadow-[0_28px_90px_rgba(15,10,40,0.22)] animate-in zoom-in-95 fade-in duration-200">
+      <section className="flex max-h-[calc(100dvh-1rem)] w-full max-w-[720px] flex-col overflow-hidden sm:max-h-[90vh] rounded-[24px] border border-border/60 bg-card shadow-[0_28px_90px_rgba(15,10,40,0.22)] animate-in zoom-in-95 fade-in duration-200">
         <header className="relative overflow-hidden border-b border-border/60 bg-card px-5 py-4 sm:px-6">
           <div className="absolute -right-16 -top-20 h-48 w-48 rounded-full bg-primary/[0.055] blur-3xl" />
 
@@ -63,7 +63,7 @@ export function EntityDialog({
         </header>
 
         <div className="min-h-0 flex-1 overflow-y-auto px-5 py-5 sm:px-6 [scrollbar-width:thin]">
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid gap-4 sm:grid-cols-2">
             {children}
           </div>
         </div>

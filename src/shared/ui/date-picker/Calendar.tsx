@@ -9,6 +9,8 @@ export function Calendar({ className, ...props }: DayPickerProps) {
     <DayPicker
       className={cn("school-calendar-picker", className)}
       showOutsideDays
+      fixedWeeks
+      captionLayout="dropdown"
       {...props}
     />
   );
