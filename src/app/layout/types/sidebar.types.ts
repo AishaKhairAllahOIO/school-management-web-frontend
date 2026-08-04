@@ -13,4 +13,5 @@ export type SidebarItem = {
   hidden?: boolean;
   disabled?: boolean;
   badge?: string;
+
 };

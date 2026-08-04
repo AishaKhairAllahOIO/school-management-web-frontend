@@ -71,16 +71,21 @@ export function MobileSidebar() {
 
   const {
     direction,
-    locale,
+    language,
     t,
   } = useLocale();
+
+  const dateLocale =
+  language === "ar"
+    ? "ar-SA"
+    : "en-US";
 
   const isRtl =
     direction === "rtl";
 
   const date =
     formatMobileSidebarDate(
-      locale,
+      dateLocale,
     );
 
   const greeting =

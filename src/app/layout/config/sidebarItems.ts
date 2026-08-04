@@ -12,7 +12,7 @@ import {
 
 import type { SidebarItem } from "@/app/layout/types/sidebar.types";
 
-export const sidebarItems = [
+export const sidebarItems: readonly SidebarItem[] = [
   {
     titleKey: "dashboard",
     path: "/",
@@ -59,4 +59,4 @@ export const sidebarItems = [
     path: "/settings/general",
     icon: Settings,
   },
-] as const satisfies readonly SidebarItem[];
+];

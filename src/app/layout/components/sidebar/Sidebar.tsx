@@ -72,15 +72,20 @@ export function Sidebar() {
 
   const {
     direction,
-    locale,
+    language,
     t,
   } = useLocale();
+
+  const dateLocale =
+  language === "ar"
+    ? "ar-SA"
+    : "en-US";
 
   const isRtl =
     direction === "rtl";
 
   const date =
-    formatSidebarDate(locale);
+    formatSidebarDate(dateLocale);
 
   const greeting =
     t.layout.sidebar[
@@ -116,7 +121,6 @@ export function Sidebar() {
           : "w-[248px]",
       ].join(" ")}
     >
-      {/* Decorative background */}
       <div
         aria-hidden="true"
         className="

@@ -346,19 +346,11 @@ function TabItem({
         "font-medium leading-[1.2]",
         "tracking-[-0.005em]",
 
-        /*
-         * حجم مناسب للموبايل،
-         * مع زيادة طفيفة على الشاشات الأكبر.
-         */
+    
         "min-h-11",
         "sm:min-h-[46px]",
         "sm:px-3",
         "sm:text-[13px]",
-
-        /*
-         * يمنع أي عنصر من دفع
-         * الحاوية خارج الشاشة.
-         */
         "max-w-full",
 
         "transition-[background-color,border-color,color]",
@@ -493,12 +485,7 @@ function NavigationGroup({
               "border-border/55",
               "pt-1.5",
 
-              /*
-               * في الديسكتوب عندما نحتاج
-               * فصل مجموعة الموظفين،
-               * يبقى الفصل رأسيًا إن كانت
-               * المساحة تسمح.
-               */
+           
               "lg:mt-0",
               "lg:border-t-0",
               "lg:pt-0",
@@ -617,10 +604,6 @@ export function SubNavigation() {
   const { pathname } =
     useLocation();
 
-  /*
-   * قسم Users وAcademics يستخدمان
-   * تنقلًا داخليًا مختلفًا.
-   */
   if (
     pathname === "/users" ||
     pathname.startsWith(

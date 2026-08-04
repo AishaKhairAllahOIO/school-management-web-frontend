@@ -3,7 +3,6 @@ import {
 } from "@/app/providers/locale";
 
 import {
-  formatPathSegment,
   getCurrentPageTitle,
   getSectionKey,
 } from "./topbar.helpers";

@@ -1,10 +1,5 @@
 import { PanelLeftOpen } from "lucide-react";
-
-import {
-  useEffect,
-  useState,
-} from "react";
-
+import { useState } from "react";
 import { useLocation } from "react-router-dom";
 
 import { useLayoutStore } from "@/app/layout/store/layoutStore";
@@ -21,6 +16,16 @@ import {
   TOPBAR_ICON_BUTTON_CLASS_NAME,
 } from "./topbar.constants";
 
+type OpenTopbarMenu =
+  | "notifications"
+  | "profile"
+  | null;
+
+type TopbarMenuState = {
+  pathname: string;
+  openMenu: OpenTopbarMenu;
+};
+
 export function Topbar() {
   const location = useLocation();
   const { t } = useLocale();
@@ -29,52 +34,124 @@ export function Topbar() {
     (state) => state.openMobileSidebar,
   );
 
-  const [isNotificationsOpen, setIsNotificationsOpen] =
-    useState(false);
-  const [isProfileMenuOpen, setIsProfileMenuOpen] =
-    useState(false);
+  const [menuState, setMenuState] =
+    useState<TopbarMenuState>({
+      pathname: location.pathname,
+      openMenu: null,
+    });
 
-  useEffect(() => {
-    setIsNotificationsOpen(false);
-    setIsProfileMenuOpen(false);
-  }, [location.pathname]);
+  const isCurrentPath =
+    menuState.pathname === location.pathname;
+
+  const isNotificationsOpen =
+    isCurrentPath &&
+    menuState.openMenu === "notifications";
+
+  const isProfileMenuOpen =
+    isCurrentPath &&
+    menuState.openMenu === "profile";
 
   function toggleNotifications() {
-    setIsNotificationsOpen((current) => !current);
-    setIsProfileMenuOpen(false);
+    setMenuState((current) => {
+      const isAlreadyOpen =
+        current.pathname === location.pathname &&
+        current.openMenu === "notifications";
+
+      return {
+        pathname: location.pathname,
+        openMenu: isAlreadyOpen
+          ? null
+          : "notifications",
+      };
+    });
   }
 
   function toggleProfileMenu() {
-    setIsProfileMenuOpen((current) => !current);
-    setIsNotificationsOpen(false);
+    setMenuState((current) => {
+      const isAlreadyOpen =
+        current.pathname === location.pathname &&
+        current.openMenu === "profile";
+
+      return {
+        pathname: location.pathname,
+        openMenu: isAlreadyOpen
+          ? null
+          : "profile",
+      };
+    });
+  }
+
+  function closeNotifications() {
+    setMenuState({
+      pathname: location.pathname,
+      openMenu: null,
+    });
+  }
+
+  function closeProfileMenu() {
+    setMenuState({
+      pathname: location.pathname,
+      openMenu: null,
+    });
   }
 
   return (
     <header className="sticky top-0 z-40 pb-2 pt-2.5 sm:pb-3 sm:pt-4 lg:pt-6">
-      <div className="flex min-h-[46px] w-full items-center justify-between gap-1.5 sm:h-[56px] sm:gap-3">
+      <div className="flex min-h-11 w-full items-center justify-between gap-1.5 sm:h-14 sm:gap-3">
         <div className="flex min-w-0 flex-1 items-center gap-1.5 overflow-hidden">
           <button
             type="button"
             onClick={openMobileSidebar}
             aria-label={t.layout.topbar.openSidebar}
-            className="me-0.5 flex h-[42px] w-[42px] shrink-0 items-center justify-center border-0 bg-transparent p-0 text-topbar-foreground shadow-none transition-colors duration-200 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/15 sm:me-2 sm:h-[48px] sm:w-[48px] lg:hidden"
+            className="
+              me-0.5
+              flex
+              h-[42px]
+              w-[42px]
+              shrink-0
+              items-center
+              justify-center
+              border-0
+              bg-transparent
+              p-0
+              text-topbar-foreground
+              shadow-none
+              transition-colors
+              duration-200
+              hover:text-primary
+              focus-visible:outline-none
+              focus-visible:ring-2
+              focus-visible:ring-primary/15
+              sm:me-2
+              sm:h-12
+              sm:w-12
+              lg:hidden
+            "
           >
-            <PanelLeftOpen aria-hidden="true" size={19} strokeWidth={1.9} />
+            <PanelLeftOpen
+              aria-hidden="true"
+              size={19}
+              strokeWidth={1.9}
+            />
           </button>
 
-          <TopbarBreadcrumb pathname={location.pathname} />
+          <TopbarBreadcrumb
+            pathname={location.pathname}
+          />
         </div>
 
         <div className="flex shrink-0 items-center gap-1 sm:gap-1.5 lg:gap-2.5">
           <NotificationsMenu
             isOpen={isNotificationsOpen}
             onToggle={toggleNotifications}
-            onClose={() => setIsNotificationsOpen(false)}
+            onClose={closeNotifications}
           />
 
           <div className="block shrink-0">
             <LanguageToggle
-              className={TOPBAR_ICON_BUTTON_CLASS_NAME}
+              className={
+                TOPBAR_ICON_BUTTON_CLASS_NAME
+              }
             />
           </div>
 
@@ -85,7 +162,7 @@ export function Topbar() {
           <ProfileMenu
             isOpen={isProfileMenuOpen}
             onToggle={toggleProfileMenu}
-            onClose={() => setIsProfileMenuOpen(false)}
+            onClose={closeProfileMenu}
           />
         </div>
       </div>
