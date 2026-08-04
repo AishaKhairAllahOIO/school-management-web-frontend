@@ -63,6 +63,35 @@ export const API_ENDPOINTS = {
 
     ACADEMIC_CLASSROOM: (classroomId: ApiId) =>
       `/admin/settings/classrooms/${classroomId}`,
+
+        ATTENDANCE: {
+      STUDENT_SETTINGS: {
+        LIST: "/attendance-settings",
+
+        CREATE: "/attendance-settings",
+
+        BY_SEMESTER: (semesterId: ApiId) =>
+          `/attendance-settings/semester/${semesterId}`,
+
+        UPDATE: (settingId: ApiId) =>
+          `/attendance-settings/${settingId}`,
+
+        DELETE: (settingId: ApiId) =>
+          `/attendance-settings/${settingId}`,
+      },
+
+      STAFF_SETTINGS: {
+        LIST: "/staff-attendance-settings",
+
+        CREATE: "/staff-attendance-settings",
+
+        UPDATE: (settingId: ApiId) =>
+          `/staff-attendance-settings/${settingId}`,
+
+        DELETE: (settingId: ApiId) =>
+          `/staff-attendance-settings/${settingId}`,
+      },
+    },
   },
 
   STUDENTS: {

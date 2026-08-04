@@ -6,6 +6,7 @@ import { GeneralSettingsPage } from "@/features/settings/general/pages/GeneralSe
 import { PermissionsPage } from "@/features/settings/permissions/pages/PermissionsPage";
 import { RolesPage } from "@/features/settings/roles/pages/RolesPage";
 import { FinancialSettingsPage } from "@/features/settings/financial/pages/FinancialSettingsPage";
+import { StudentAttendanceSettingsPage } from "@/features/settings/attendance/pages/StudentAttendanceSettingsPage";
 
 export const settingsRoutes = [
   {
@@ -24,6 +25,14 @@ export const settingsRoutes = [
         element: <AcademicSettingsPage />,
       },
       {
+        path: "financial",
+        element: <FinancialSettingsPage />
+      },
+      {
+        path: "attendance",
+        element: <StudentAttendanceSettingsPage />
+      },
+      {
         path: "roles",
         element: <RolesPage />,
       },
@@ -31,10 +40,7 @@ export const settingsRoutes = [
         path: "permissions",
         element: <PermissionsPage />,
       },
-      {
-        path: "financial",
-        element: <FinancialSettingsPage />
-      },
+      
     ],
   },
 ] satisfies RouteObject[];
