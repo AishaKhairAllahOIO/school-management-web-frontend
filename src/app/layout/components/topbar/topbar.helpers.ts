@@ -26,6 +26,14 @@ export function getSectionKey(
   pathname: string,
 ): NavigationKey {
   if (pathname === "/") return "dashboard";
+
+  if (
+    pathname.startsWith("/view/notifications") ||
+    pathname.startsWith("/notification/view")
+  ) {
+    return "notifications";
+  }
+
   if (pathname.startsWith("/users")) return "users";
   if (pathname.startsWith("/academics")) return "academics";
   if (pathname.startsWith("/attendance")) return "attendance";
@@ -47,6 +55,13 @@ export function getCurrentPageTitle(
   pathname: string,
   overviewLabel: string,
 ): string {
+  if (
+    pathname.startsWith("/view/notifications") ||
+    pathname.startsWith("/notification/view")
+  ) {
+    return "View";
+  }
+
   const segments = pathname
     .split("/")
     .filter(Boolean);

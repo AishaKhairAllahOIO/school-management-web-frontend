@@ -30,43 +30,26 @@ import {
 } from "../shared/DeleteConfirmationDialog";
 
 type Props = {
-  activeTab: "created" | "staff";
   onEdit: (announcement: Announcement) => void;
 };
 
 export function AnnouncementsList({
-  activeTab,
   onEdit,
 }: Props) {
   const {
     myAnnouncements,
-    staffAnnouncements,
     isLoadingMy,
-    isLoadingStaff,
     isErrorMy,
-    isErrorStaff,
     refetchMy,
-    refetchStaff,
     deleteAnnouncement,
   } = useAnnouncements();
 
   const [pendingDelete, setPendingDelete] =
     useState<Announcement | null>(null);
 
-  const announcements =
-    activeTab === "created"
-      ? myAnnouncements
-      : staffAnnouncements;
-
-  const isLoading =
-    activeTab === "created"
-      ? isLoadingMy
-      : isLoadingStaff;
-
-  const isError =
-    activeTab === "created"
-      ? isErrorMy
-      : isErrorStaff;
+  const announcements = myAnnouncements;
+  const isLoading = isLoadingMy;
+  const isError = isErrorMy;
 
   if (isLoading) {
     return <CommunicationLoading cards={4} variant="rows" />;
@@ -78,8 +61,7 @@ export function AnnouncementsList({
         title="Announcements could not be loaded"
         description="The announcement feed is temporarily unavailable. Check the connection and try again."
         onRetry={() => {
-          if (activeTab === "created") void refetchMy();
-          else void refetchStaff();
+          void refetchMy();
         }}
       />
     );
@@ -90,9 +72,7 @@ export function AnnouncementsList({
       <CommunicationEmpty
         icon={Megaphone}
         title="No announcements yet"
-        description={activeTab === "created"
-          ? "Create the first announcement to share a clear update with the school community."
-          : "No staff announcements are available in the current feed."}
+        description="Create the first announcement to share a clear update with the school community."
       />
     );
   }
@@ -154,8 +134,7 @@ export function AnnouncementsList({
                 ) : null}
               </div>
 
-              {activeTab === "created" ? (
-                <div className="flex shrink-0 items-center gap-1.5">
+              <div className="flex shrink-0 items-center gap-1.5">
                   <Button
                     type="button"
                     variant="outline"
@@ -178,7 +157,6 @@ export function AnnouncementsList({
                     Delete
                   </Button>
                 </div>
-              ) : null}
             </article>
           );
         })}

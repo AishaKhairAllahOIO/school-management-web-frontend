@@ -27,6 +27,7 @@ export const ar: TranslationDictionary = {
     reports: "التقارير",
     settings: "الإعدادات",
     profile: "الملف الشخصي",
+    notifications: "الإشعارات"
   },
 
   auth: {
@@ -52,6 +53,11 @@ export const ar: TranslationDictionary = {
     forbidden: "ليس لديك صلاحية الوصول",
     notFound: "العنصر غير موجود",
     pageNotFound: "الصفحة التي تبحث عنها غير موجودة.",
+    offlineCode: "انقطع الاتصال",
+    offlineTitle: "لا يوجد اتصال بالإنترنت",
+    offlineDescription: "يتعذر على نظام المدرسة الوصول إلى الشبكة حاليًا. تحقق من شبكة Wi-Fi أو الكابل ثم أعد المحاولة.",
+    connectionRestored: "يبدو أن الاتصال عاد. أعد المحاولة للمتابعة من حيث توقفت.",
+    retryConnection: "إعادة فحص الاتصال",
   },
 
   layout: {
@@ -80,7 +86,6 @@ export const ar: TranslationDictionary = {
       studentFinance: "مالية الطلاب",
       staffPayroll: "رواتب الموظفين",
       announcements: "الإعلانات",
-      alerts: "التنبيهات",
       activities: "الأنشطة",
       schoolLaws: "قوانين المدرسة",
       general: "العامة",
@@ -88,6 +93,7 @@ export const ar: TranslationDictionary = {
       financial: "المالية",
       attendance: "الحضور",
       roles: "الأدوار",
+      alerts: "التنبيهات",
       permissions: "الصلاحيات",
     },
 
@@ -117,6 +123,8 @@ export const ar: TranslationDictionary = {
         administrators: "المديرون",
         new: "إضافة",
         edit: "تعديل",
+        notifications: "الإشعارات",
+        view: "عرض",
       },
     },
 
@@ -127,6 +135,7 @@ export const ar: TranslationDictionary = {
       notificationsTitle: "الإشعارات",
       unreadUpdates: "لديك {{count}} تحديثات غير مقروءة",
       markAllRead: "تحديد الكل كمقروء",
+      viewAllNotifications: "عرض كل الإشعارات",
       notificationsLoadErrorTitle: "تعذر تحميل الإشعارات",
       notificationsLoadErrorDescription: "تحقق من الاتصال ثم أعد المحاولة.",
       noSystemNotificationsTitle: "لا توجد إشعارات نظام",

@@ -70,9 +70,6 @@ export function CommunicationsPage() {
       return "announcements";
     }, [location.pathname]);
 
-  const [announcementTab, setAnnouncementTab] =
-    useState<"created" | "staff">("created");
-
   const [alertDialogOpen, setAlertDialogOpen] =
     useState(false);
   const [alertTarget, setAlertTarget] =
@@ -115,8 +112,6 @@ export function CommunicationsPage() {
     <section className="min-w-0 space-y-4 pb-8">
       {activeSection === "announcements" ? (
         <AnnouncementsWorkspace
-          activeTab={announcementTab}
-          onTabChange={setAnnouncementTab}
           onCreate={() => openAnnouncement()}
           onEdit={openAnnouncement}
         />
@@ -168,47 +163,26 @@ export function CommunicationsPage() {
 }
 
 function AnnouncementsWorkspace({
-  activeTab,
-  onTabChange,
   onCreate,
   onEdit,
 }: {
-  activeTab: "created" | "staff";
-  onTabChange: (tab: "created" | "staff") => void;
   onCreate: () => void;
   onEdit: (announcement: Announcement) => void;
 }) {
   return (
     <>
-      <div className="flex flex-col gap-3 rounded-[22px] border border-primary/[0.10] bg-card p-2 shadow-[0_10px_30px_rgba(38,24,84,0.045)] sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex min-w-0 flex-1 items-center overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          <div className="flex min-w-max items-center gap-1">
-            {([
-              ["created", "Published"],
-              ["staff", "Received"],
-            ] as const).map(([value, label]) => (
-              <button
-                key={value}
-                type="button"
-                onClick={() => onTabChange(value)}
-                className={[
-                  "group relative inline-flex h-11 min-w-max items-center justify-center rounded-[14px] px-4 text-[12px] font-medium transition-all duration-200 ease-out",
-                  "focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/10",
-                  activeTab === value
-                    ? "bg-primary/[0.07] text-primary"
-                    : "text-muted-foreground hover:bg-primary/[0.04] hover:text-foreground",
-                ].join(" ")}
-              >
-                <span className="whitespace-nowrap">{label}</span>
-                <span
-                  aria-hidden
-                  className={[
-                    "absolute bottom-0 left-4 right-4 h-[2px] origin-center rounded-full bg-primary transition-transform duration-200",
-                    activeTab === value ? "scale-x-100" : "scale-x-0",
-                  ].join(" ")}
-                />
-              </button>
-            ))}
+      <div className="flex flex-col gap-3 rounded-[22px] border border-primary/[0.10] bg-card p-3 shadow-[0_10px_30px_rgba(38,24,84,0.045)] sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex min-w-0 items-center gap-3">
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px] bg-primary/[0.08] text-primary">
+            <Megaphone className="h-[18px] w-[18px]" strokeWidth={1.8} />
+          </span>
+          <div className="min-w-0">
+            <h2 className="text-[13px] font-semibold text-foreground">
+              Published announcements
+            </h2>
+            <p className="mt-0.5 text-[11.5px] leading-5 text-muted-foreground">
+              Create and manage announcements sent to students and staff. Received announcements are available from the notification bell.
+            </p>
           </div>
         </div>
 
@@ -218,14 +192,11 @@ function AnnouncementsWorkspace({
           className="h-11 w-full rounded-[14px] bg-primary px-5 text-[12px] font-semibold text-white shadow-[0_10px_24px_rgba(91,62,220,0.18)] hover:bg-primary/90 sm:w-auto"
         >
           <Plus className="h-4 w-4" />
-          New announcement
+          Publish announcement
         </Button>
       </div>
 
-      <AnnouncementsList
-        activeTab={activeTab}
-        onEdit={onEdit}
-      />
+      <AnnouncementsList onEdit={onEdit} />
     </>
   );
 }

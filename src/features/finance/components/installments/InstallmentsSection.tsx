@@ -1,13 +1,12 @@
 import { useMemo, useState } from "react";
-import { AlertCircle, CalendarClock, CircleDollarSign, RefreshCw, WalletCards } from "lucide-react";
+import { CalendarClock, RefreshCw } from "lucide-react";
 import { Button } from "@/shared/ui/button";
 
 import { InstallmentsTable } from "./InstallmentsTable";
-import { InstallmentDetailsDialog } from "./InstallmentDetailsDialog"; // 👈 استيراد النافذة
+import { InstallmentDetailsDialog } from "./InstallmentDetailsDialog";
 import { useInstallments } from "../../hooks/useInstallments";
 import { FinanceSectionShell } from "../shared/FinanceSectionShell";
 import { FinanceTableSkeleton } from "../shared/FinanceTableSkeleton";
-import { FinanceSummaryGrid } from "../shared/FinanceSummaryGrid";
 
 type InstallmentsSectionProps = {
   studentId?: string | number;
@@ -19,8 +18,8 @@ type InstallmentsSectionProps = {
 export function InstallmentsSection({
   studentId,
   installments: providedInstallments,
-  title = "Student Installments",
-  description = "Track upcoming, paid, and overdue student installments.",
+  title = "Installment Schedule",
+  description = "Review due dates, paid amounts, and installment status.",
 }: InstallmentsSectionProps = {}) {
   const {
     data: queriedInstallments = [],
@@ -30,10 +29,8 @@ export function InstallmentsSection({
     refetch,
   } = useInstallments();
 
-
   const visibleInstallments = useMemo(() => {
     if (providedInstallments) return providedInstallments;
-
     return studentId === undefined
       ? queriedInstallments
       : queriedInstallments.filter(
@@ -45,7 +42,11 @@ export function InstallmentsSection({
   const [selectedInstallmentId, setSelectedInstallmentId] = useState<string | number | null>(null);
 
   if (!providedInstallments && isLoading) {
-    return <FinanceSectionShell title={title} description={description} icon={CalendarClock}><FinanceTableSkeleton /></FinanceSectionShell>;
+    return (
+      <FinanceSectionShell title={title} description={description} icon={CalendarClock}>
+        <FinanceTableSkeleton />
+      </FinanceSectionShell>
+    );
   }
 
   if (!providedInstallments && isError) {
@@ -53,60 +54,21 @@ export function InstallmentsSection({
       <div className="flex flex-col items-center justify-center rounded-[18px] border border-destructive/20 bg-destructive/[0.045] py-12 text-center">
         <Button variant="outline" onClick={() => refetch()} disabled={isFetching}>
           <RefreshCw size={16} className="mr-2" />
-          {isFetching ? "Retrying..." : "Retry Loading Installments"}
+          {isFetching ? "Retrying..." : "Retry loading installments"}
         </Button>
       </div>
     );
   }
 
   return (
-    <FinanceSectionShell
-      title={title}
-      description={description}
-      icon={CalendarClock}
-    >
-      <FinanceSummaryGrid
-        items={[
-          {
-            label: "Installments",
-            value: new Intl.NumberFormat().format(visibleInstallments.length),
-            hint: "Across active contracts",
-            icon: CalendarClock,
-            tone: "primary",
-          },
-          {
-            label: "Amount due",
-            value: `${visibleInstallments.reduce((sum, item) => sum + Number(item.amountDue ?? 0), 0).toLocaleString()} $`,
-            hint: "Scheduled total",
-            icon: CircleDollarSign,
-            tone: "info",
-          },
-          {
-            label: "Amount paid",
-            value: `${visibleInstallments.reduce((sum, item) => sum + Number(item.amountPaid ?? 0), 0).toLocaleString()} $`,
-            hint: "Collected against installments",
-            icon: WalletCards,
-            tone: "success",
-          },
-          {
-            label: "Overdue",
-            value: new Intl.NumberFormat().format(visibleInstallments.filter((item) => item.status === "overdue" || (item.status !== "paid" && new Date(item.dueDate) < new Date())).length),
-            hint: "Requires follow-up",
-            icon: AlertCircle,
-            tone: "destructive",
-          },
-        ]}
-      />
-
-      <InstallmentsTable 
-        installments={visibleInstallments} 
+    <FinanceSectionShell title={title} description={description} icon={CalendarClock}>
+      <InstallmentsTable
+        installments={visibleInstallments}
         onView={(id) => {
           setSelectedInstallmentId(id);
           setViewInstallmentOpen(true);
         }}
       />
-
-
       <InstallmentDetailsDialog
         open={viewInstallmentOpen}
         onOpenChange={(open) => {

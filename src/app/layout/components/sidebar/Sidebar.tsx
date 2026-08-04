@@ -168,15 +168,9 @@ export function Sidebar() {
               className={[
                 "flex h-[42px] w-[42px]",
                 "items-center justify-center",
-                "rounded-[14px]",
-                "border border-sidebar-foreground/[0.10]",
-                "bg-sidebar-foreground/[0.07]",
-                "text-sidebar-foreground",
-                "shadow-[0_8px_22px_rgb(0_0_0_/_0.14)]",
-                "backdrop-blur-xl",
-                "transition-all duration-200",
-                "hover:-translate-y-0.5",
-                "hover:bg-sidebar-foreground/[0.12]",
+                "text-sidebar-foreground/90",
+                "transition-colors duration-200",
+                "hover:text-sidebar-foreground",
                 "focus-visible:outline-none",
                 "focus-visible:ring-2",
                 "focus-visible:ring-sidebar-foreground/25",
@@ -191,6 +185,7 @@ export function Sidebar() {
                 }
               />
             </button>
+
           </header>
         ) : (
           <header
@@ -226,8 +221,7 @@ export function Sidebar() {
     inset-x-3.5
     inset-y-[11px]
     rounded-[18px]
-    bg-sidebar-foreground/[0.105]
-    shadow-[0_10px_26px_rgb(0_0_0_/_0.14)]
+    bg-sidebar-foreground/[0.075]
   "
 />
 
@@ -318,10 +312,8 @@ export function Sidebar() {
                 "-translate-y-1/2",
                 "flex h-[38px] w-[38px]",
                 "items-center justify-center",
-                "rounded-[13px]",
                 "text-sidebar-muted",
-                "transition-all duration-200",
-                "hover:bg-sidebar-foreground/[0.055]",
+                "transition-colors duration-200",
                 "hover:text-sidebar-foreground",
                 "focus-visible:outline-none",
                 "focus-visible:ring-2",
@@ -339,6 +331,13 @@ export function Sidebar() {
             </button>
           </header>
         )}
+
+        {isCollapsed ? (
+          <div
+            aria-hidden="true"
+            className="mx-auto mb-3 h-px w-8 shrink-0 bg-sidebar-foreground/[0.09]"
+          />
+        ) : null}
 
         <div
           className={[
@@ -401,82 +400,58 @@ export function Sidebar() {
           {/* Push View Website to the bottom */}
           <div className="min-h-4 flex-1" />
 
-          {/* School website */}
+          {/* Website separator */}
           <div
             className={[
               "shrink-0",
-              "pb-8",
               isCollapsed ? "px-0" : "px-0.5",
             ].join(" ")}
           >
+            {isCollapsed ? (
+              <div aria-hidden="true" className="mb-3 flex justify-center">
+                <span className="h-px w-8 bg-sidebar-foreground/[0.09]" />
+              </div>
+            ) : (
+              <div className="mb-2 flex h-6 items-center gap-3 px-2">
+                <span className="shrink-0 text-[9px] font-semibold uppercase leading-none tracking-[0.15em] text-sidebar-muted/58">
+                  {t.layout.sidebar.viewWebsite}
+                </span>
+                <span className="relative -top-[2px] h-px flex-1 bg-sidebar-foreground/[0.07]" />
+              </div>
+            )}
+
             <a
               href={WEBSITE_URL}
               target="_blank"
               rel="noopener noreferrer"
-              aria-label={
-                t.layout.sidebar.viewWebsite
-              }
-              title={
-                t.layout.sidebar.viewWebsite
-              }
+              aria-label={t.layout.sidebar.viewWebsite}
+              title={t.layout.sidebar.viewWebsite}
               className={[
-                "group flex items-center",
-                "bg-sidebar-foreground/[0.105]",
-                "text-sidebar-foreground",
-                "shadow-[0_10px_26px_rgb(0_0_0_/_0.14)]",
-                "transition-all duration-200",
-                "hover:bg-sidebar-foreground/[0.13]",
-                "focus-visible:outline-none",
-                "focus-visible:ring-2",
-                "focus-visible:ring-sidebar-foreground/25",
+                "group flex items-center text-sidebar-muted",
+                "transition-colors duration-200",
+                "hover:bg-sidebar-foreground/[0.045] hover:text-sidebar-foreground",
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sidebar-foreground/25",
                 isCollapsed
-                  ? [
-                      "h-[46px] w-[46px]",
-                      "justify-center",
-                      "rounded-[15px]",
-                    ].join(" ")
-                  : [
-                      "h-[52px] w-full",
-                      "justify-start",
-                      "rounded-[17px]",
-                      "px-3",
-                    ].join(" "),
+                  ? "h-[46px] w-[46px] justify-center rounded-[17px]"
+                  : "h-[48px] w-full justify-start rounded-[17px] px-3",
               ].join(" ")}
             >
-              <span
-                className={[
-                  "flex shrink-0 items-center justify-center",
-                  "text-sidebar-foreground/90",
-                  isCollapsed
-                    ? "h-8 w-8"
-                    : "h-[34px] w-[34px]",
-                ].join(" ")}
-              >
-                <Globe2
-                  aria-hidden="true"
-                  size={17}
-                  strokeWidth={1.85}
-                />
+              <span className={[
+                "flex shrink-0 items-center justify-center text-current",
+                isCollapsed ? "h-8 w-8" : "h-8 w-8",
+              ].join(" ")}>
+                <Globe2 aria-hidden="true" size={18} strokeWidth={1.8} />
               </span>
 
-              {!isCollapsed && (
-                <span
-                  className="
-                    ms-3
-                    min-w-0
-                    flex-1
-                    truncate
-                    text-start
-                    text-[13px]
-                    font-medium
-                    tracking-[-0.01em]
-                  "
-                >
+              {!isCollapsed ? (
+                <span className="ms-3 min-w-0 flex-1 truncate text-start text-[13px] font-medium tracking-[-0.004em]">
                   {t.layout.sidebar.viewWebsite}
                 </span>
-              )}
+              ) : null}
             </a>
           </div>
+
+          <div className="h-8 shrink-0" />
         </div>
       </div>
     </aside>

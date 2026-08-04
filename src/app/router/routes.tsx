@@ -10,6 +10,7 @@ import { reportsRoutes } from "@/features/reports/routes";
 import { schedulingRoutes } from "@/features/scheduling/routes";
 import { settingsRoutes } from "@/features/settings/routes";
 import { usersRoutes } from "@/features/users/routes";
+import { notificationCenterRoutes } from "@/features/unified-notifications/routes";
 
 export const appRoutes = [
   ...dashboardRoutes,
@@ -22,4 +23,5 @@ export const appRoutes = [
   ...financeRoutes,
   ...settingsRoutes,
   ...profileRoutes,
+  ...notificationCenterRoutes,
 ] satisfies RouteObject[];

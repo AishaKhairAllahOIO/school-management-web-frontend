@@ -4,6 +4,7 @@ import {
 
 import {
   formatPathSegment,
+  getCurrentPageTitle,
   getSectionKey,
 } from "./topbar.helpers";
 
@@ -16,64 +17,32 @@ export function TopbarBreadcrumb({
 }: TopbarBreadcrumbProps) {
   const { t } = useLocale();
 
-  const sectionKey =
-    getSectionKey(pathname);
+  const sectionKey = getSectionKey(pathname);
+  const sectionTitle = t.navigation[sectionKey];
 
-  const sectionTitle =
-    t.navigation[sectionKey];
+  const currentPageTitle = getCurrentPageTitle(
+    pathname,
+    t.layout.breadcrumb.pages.overview ??
+      t.layout.topbar.overview,
+  );
 
-  const segments = pathname
-    .split("/")
-    .filter(Boolean);
-
-  const pageSegment =
-    segments.length > 1
-      ? segments[1]
-      : "overview";
-
-  const currentPageTitle =
+  const translatedPageTitle =
     t.layout.breadcrumb.pages[
-      pageSegment
-    ] ??
-    formatPathSegment(
-      pageSegment,
-    );
+      currentPageTitle.toLowerCase()
+    ] ?? currentPageTitle;
 
   const isSameTitle =
     sectionTitle.trim().toLowerCase() ===
-    currentPageTitle
-      .trim()
-      .toLowerCase();
+    translatedPageTitle.trim().toLowerCase();
 
   return (
     <nav
-      aria-label={
-        t.layout.breadcrumb.label
-      }
-      className="
-        hidden
-        min-w-0
-        translate-y-[2px]
-        items-center
-        lg:flex
-      "
+      aria-label={t.layout.breadcrumb.label}
+      className="min-w-0 translate-y-[1px]"
     >
-      <ol
-        className="
-          flex
-          items-center
-          gap-3
-          text-[15px]
-          tracking-[-0.015em]
-        "
-      >
-        <li className="max-w-[180px] truncate">
-          <span
-            className="
-              font-semibold
-              text-topbar-title
-            "
-          >
+      <ol className="flex min-w-0 items-center gap-2 text-[13px] tracking-[-0.015em] sm:gap-3 sm:text-[14px] lg:text-[15px]">
+        <li className="max-w-[110px] truncate sm:max-w-[160px] lg:max-w-[210px]">
+          <span className="font-semibold text-topbar-title">
             {sectionTitle}
           </span>
         </li>
@@ -82,19 +51,14 @@ export function TopbarBreadcrumb({
           <>
             <li
               aria-hidden="true"
-              className="text-topbar-muted/40"
+              className="shrink-0 text-topbar-muted/40"
             >
               /
             </li>
 
-            <li className="max-w-[180px] truncate">
-              <span
-                className="
-                  font-medium
-                  text-topbar-muted
-                "
-              >
-                {currentPageTitle}
+            <li className="max-w-[105px] truncate sm:max-w-[160px] lg:max-w-[210px]">
+              <span className="font-medium text-topbar-muted">
+                {translatedPageTitle}
               </span>
             </li>
           </>

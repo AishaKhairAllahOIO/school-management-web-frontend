@@ -1,11 +1,8 @@
 import { useMemo, useState } from "react";
 import { useQueries } from "@tanstack/react-query";
 import {
-  CircleDollarSign,
   FileText,
-  ReceiptText,
   RefreshCw,
-  WalletCards,
 } from "lucide-react";
 
 import { Button } from "@/shared/ui/button";
@@ -21,10 +18,8 @@ import { useFeePlans } from "@/features/settings/financial/hooks/useFeePlans";
 import { useInstallmentPolicies } from "@/features/settings/financial/hooks/useInstallmentPolicies";
 import { FinanceSectionShell } from "../shared/FinanceSectionShell";
 import {
-  FinanceSummarySkeleton,
   FinanceTableSkeleton,
 } from "../shared/FinanceTableSkeleton";
-import { FinanceSummaryGrid } from "../shared/FinanceSummaryGrid";
 import {
   StudentAccountsTable,
   type StudentFinanceRow,
@@ -270,7 +265,6 @@ export function ContractsSection({
   if (isLoadingDependencies) {
     return (
       <FinanceSectionShell title={title} description={description} icon={FileText}>
-        <FinanceSummarySkeleton />
         <FinanceTableSkeleton />
       </FinanceSectionShell>
     );
@@ -312,52 +306,6 @@ export function ContractsSection({
 
   return (
     <FinanceSectionShell title={title} description={description} icon={FileText}>
-      <FinanceSummaryGrid
-        items={[
-          {
-            label: "Enrolled students",
-            value: new Intl.NumberFormat().format(rows.length),
-            hint: "Available financial profiles",
-            icon: WalletCards,
-            tone: "primary",
-          },
-          {
-            label: "Configured accounts",
-            value: new Intl.NumberFormat().format(visibleAccounts.length),
-            hint: `${Math.max(0, rows.length - visibleAccounts.length)} awaiting setup`,
-            icon: FileText,
-            tone: "info",
-          },
-          {
-            label: "Collected",
-            value: `${visibleAccounts
-              .reduce(
-                (sum, item) =>
-                  sum +
-                  Math.max(
-                    0,
-                    Number(item.totalRequiredAmount) -
-                      Number(item.remainingBalance),
-                  ),
-                0,
-              )
-              .toLocaleString()} $`,
-            hint: "Recorded through payments",
-            icon: ReceiptText,
-            tone: "success",
-          },
-          {
-            label: "Outstanding",
-            value: `${visibleAccounts
-              .reduce((sum, item) => sum + Number(item.remainingBalance), 0)
-              .toLocaleString()} $`,
-            hint: "Remaining student balance",
-            icon: CircleDollarSign,
-            tone: "warning",
-          },
-        ]}
-      />
-
       <StudentAccountsTable
         rows={rows}
         onView={(row) => {

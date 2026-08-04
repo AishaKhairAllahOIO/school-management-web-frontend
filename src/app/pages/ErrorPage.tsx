@@ -1,10 +1,23 @@
 import { AlertTriangle } from "lucide-react";
 import { isRouteErrorResponse, useRouteError } from "react-router-dom";
+
 import { useLocale } from "@/app/providers/locale";
+import { OfflinePage } from "@/app/pages/OfflinePage";
 
 export function ErrorPage() {
   const error = useRouteError();
   const { t } = useLocale();
+
+  const isOffline =
+    typeof navigator !== "undefined" && !navigator.onLine;
+
+  const isNetworkFailure =
+    error instanceof TypeError &&
+    /fetch|network|failed/i.test(error.message);
+
+  if (isOffline || isNetworkFailure) {
+    return <OfflinePage />;
+  }
 
   let title = t.errors.somethingWentWrong;
   let message = t.errors.unexpectedError;

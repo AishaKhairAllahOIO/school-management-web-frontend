@@ -17,6 +17,7 @@ import { useAuthenticatedImage } from "@/shared/hooks/useAuthenticatedImage";
 import { useDismissibleLayer } from "@/shared/hooks/use-dismissible-layer";
 
 import type { TopbarMenuProps } from "../topbar.types";
+import { useAnchoredTopbarMenu } from "../useAnchoredTopbarMenu";
 import { ProfileMenuItem } from "./ProfileMenuItem";
 
 export function ProfileMenu({
@@ -26,6 +27,8 @@ export function ProfileMenu({
 }: TopbarMenuProps) {
   const containerRef =
     useRef<HTMLDivElement>(null);
+  const triggerRef =
+    useRef<HTMLButtonElement>(null);
 
   const navigate = useNavigate();
 
@@ -39,6 +42,13 @@ export function ProfileMenu({
     ref: containerRef,
     enabled: isOpen,
     onDismiss: onClose,
+  });
+
+  const menuStyle = useAnchoredTopbarMenu({
+    isOpen,
+    triggerRef,
+    desktopMatchTrigger: true,
+    preferredWidth: 320,
   });
 
   const displayName = user
@@ -103,9 +113,10 @@ export function ProfileMenu({
   return (
     <div
       ref={containerRef}
-      className="relative block"
+      className="relative block shrink-0"
     >
       <button
+        ref={triggerRef}
         type="button"
         onClick={onToggle}
         aria-label={
@@ -114,12 +125,12 @@ export function ProfileMenu({
         aria-expanded={isOpen}
         aria-haspopup="menu"
         className={[
-          "flex h-[56px] w-[56px]",
+          "flex h-[42px] w-[42px] sm:h-[48px] sm:w-[48px] lg:h-[56px] lg:w-[56px]",
           "items-center justify-center",
-          "rounded-[18px]",
+          "rounded-[14px] sm:rounded-[16px] lg:rounded-[18px]",
           "border border-topbar-border/75",
           "bg-topbar-surface/92",
-          "p-[5px]",
+          "p-[4px] sm:p-[5px]",
           "shadow-[0_8px_24px_rgb(46_38_108_/_0.07)]",
           "backdrop-blur-xl",
           "transition-all duration-200 ease-out",
@@ -130,7 +141,7 @@ export function ProfileMenu({
           "focus-visible:outline-none",
           "focus-visible:ring-4",
           "focus-visible:ring-primary/10",
-          "w-[48px] sm:w-[56px] lg:w-[278px]",
+          "w-[42px] sm:w-[48px] lg:w-[278px]",
           "lg:justify-start",
           "lg:gap-3",
           "lg:rounded-[20px]",
@@ -141,7 +152,7 @@ export function ProfileMenu({
           src={photoUrl}
           alt={displayName}
           className={[
-            "h-[46px] w-[46px]",
+            "h-[34px] w-[34px] sm:h-[38px] sm:w-[38px] lg:h-[46px] lg:w-[46px]",
             "shrink-0 rounded-full",
             "object-cover",
             "ring-2 ring-topbar-surface",
@@ -205,11 +216,11 @@ export function ProfileMenu({
       {isOpen && (
         <div
           role="menu"
+          style={menuStyle}
           className={[
             "topbar-menu-shadow",
-            "absolute end-0 top-full",
-            "z-[100] mt-3",
-            "w-[min(250px,calc(100vw-24px))]",
+            "z-[100]",
+            "max-h-[calc(100dvh-24px)] overflow-y-auto",
             "overflow-hidden",
             "rounded-[22px]",
             "border border-topbar-border/80",

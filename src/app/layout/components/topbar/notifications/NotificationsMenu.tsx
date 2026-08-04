@@ -3,67 +3,42 @@ import {
   CheckCheck,
   RefreshCw,
 } from "lucide-react";
-import {
-  useRef,
-} from "react";
+import { useRef } from "react";
+import { useNavigate } from "react-router-dom";
 
+import { TOPBAR_ICON_BUTTON_CLASS_NAME } from "@/app/layout/components/topbar/topbar.constants";
+import type { TopbarMenuProps } from "@/app/layout/components/topbar/topbar.types";
+import { useLocale } from "@/app/providers/locale";
 import {
-  TOPBAR_ICON_BUTTON_CLASS_NAME,
-} from "@/app/layout/components/topbar/topbar.constants";
-import type {
-  TopbarMenuProps,
-} from "@/app/layout/components/topbar/topbar.types";
-import {
-  useLocale,
-} from "@/app/providers/locale";
-import {
-  useMarkAllSystemNoticesRead,
-  useSystemNotices,
-  useUnreadSystemNoticesCount,
-} from "@/features/system-notices";
-import {
-  useDismissibleLayer,
-} from "@/shared/hooks/use-dismissible-layer";
+  useMarkAllUnifiedNotificationsRead,
+  useUnifiedNotifications,
+  useUnifiedUnreadCount,
+} from "@/features/unified-notifications";
+import { UnifiedNotificationCard } from "@/features/unified-notifications/components/UnifiedNotificationCard";
+import { useDismissibleLayer } from "@/shared/hooks/use-dismissible-layer";
 
-import {
-  NotificationItem,
-} from "./NotificationItem";
-import {
-  NotificationsEmptyState,
-} from "./NotificationsEmptyState";
-import {
-  NotificationsSkeleton,
-} from "./NotificationsSkeleton";
+import { NotificationsEmptyState } from "./NotificationsEmptyState";
+import { NotificationsSkeleton } from "./NotificationsSkeleton";
+import { useAnchoredTopbarMenu } from "../useAnchoredTopbarMenu";
 
 export function NotificationsMenu({
   isOpen,
   onToggle,
   onClose,
 }: TopbarMenuProps) {
-  const containerRef =
-    useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const navigate = useNavigate();
+  const { t } = useLocale();
 
-  const {
-    locale,
-    t,
-  } = useLocale();
+  const notificationsQuery = useUnifiedNotifications({
+    enabled: isOpen,
+  });
+  const unreadQuery = useUnifiedUnreadCount();
+  const markAllMutation = useMarkAllUnifiedNotificationsRead();
 
-  const noticesQuery =
-    useSystemNotices({
-      enabled: isOpen,
-    });
-
-  const unreadQuery =
-    useUnreadSystemNoticesCount();
-
-  const markAllMutation =
-    useMarkAllSystemNoticesRead();
-
-  const notices =
-    noticesQuery.data?.data ?? [];
-
-  const unreadCount =
-    unreadQuery.data ?? 0;
+  const notifications = (notificationsQuery.data ?? []).slice(0, 6);
+  const unreadCount = unreadQuery.data ?? 0;
 
   useDismissibleLayer({
     ref: containerRef,
@@ -71,34 +46,33 @@ export function NotificationsMenu({
     onDismiss: onClose,
   });
 
+  const menuStyle = useAnchoredTopbarMenu({
+    isOpen,
+    triggerRef,
+    preferredWidth: 320,
+  });
+
+  function openNotificationCenter() {
+    onClose();
+    navigate("/view/notifications");
+  }
+
   return (
-    <div
-      ref={containerRef}
-      className="relative"
-    >
+    <div ref={containerRef} className="relative shrink-0">
       <button
+        ref={triggerRef}
         type="button"
         onClick={onToggle}
-        aria-label={
-          t.layout.topbar.notifications
-        }
+        aria-label={t.layout.topbar.notifications}
         aria-expanded={isOpen}
         aria-haspopup="menu"
-        className={
-          TOPBAR_ICON_BUTTON_CLASS_NAME
-        }
+        className={TOPBAR_ICON_BUTTON_CLASS_NAME}
       >
-        <Bell
-          aria-hidden="true"
-          size={17}
-          strokeWidth={2.1}
-        />
+        <Bell aria-hidden="true" size={17} strokeWidth={2.1} />
 
         {unreadCount > 0 ? (
           <span className="absolute -end-[7px] -top-[5px] flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-primary px-[4px] text-[10px] font-semibold leading-none text-primary-foreground shadow-[0_4px_10px_rgb(99_102_241_/_0.22)]">
-            {unreadCount > 99
-              ? "99+"
-              : unreadCount}
+            {unreadCount > 99 ? "99+" : unreadCount}
           </span>
         ) : null}
       </button>
@@ -106,17 +80,14 @@ export function NotificationsMenu({
       {isOpen ? (
         <div
           role="menu"
-          className="topbar-menu-shadow absolute end-0 top-full z-50 mt-3 w-[min(320px,calc(100vw-24px))] overflow-hidden rounded-[18px] border border-topbar-border/80 bg-topbar-surface/95 backdrop-blur-2xl"
+          style={menuStyle}
+          className="topbar-menu-shadow z-[100] max-h-[calc(100dvh-24px)] overflow-hidden rounded-[18px] border border-topbar-border/80 bg-topbar-surface/95 backdrop-blur-2xl"
         >
-          <div className="flex items-start justify-between gap-3 border-b border-topbar-divider px-3 py-3">
+          <div className="flex items-start justify-between gap-3 border-b border-topbar-divider px-4 py-3">
             <div className="min-w-0">
               <h2 className="text-[14px] font-semibold text-topbar-title">
-                {
-                  t.layout.topbar
-                    .notificationsTitle
-                }
+                {t.layout.topbar.notificationsTitle}
               </h2>
-
               <p className="mt-1 text-[12px] text-topbar-subtle">
                 {t.layout.topbar.unreadUpdates.replace(
                   "{{count}}",
@@ -128,73 +99,59 @@ export function NotificationsMenu({
             {unreadCount > 0 ? (
               <button
                 type="button"
-                onClick={() =>
-                  markAllMutation.mutate()
-                }
-                disabled={
-                  markAllMutation.isPending
-                }
+                onClick={() => markAllMutation.mutate()}
+                disabled={markAllMutation.isPending}
                 className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-[11px] px-2.5 text-[11px] font-medium text-primary transition-colors hover:bg-primary/[0.07] disabled:cursor-not-allowed disabled:opacity-55"
               >
-                <CheckCheck
-                  aria-hidden="true"
-                  size={14}
-                  strokeWidth={1.9}
-                />
-
+                <CheckCheck aria-hidden="true" size={14} strokeWidth={1.9} />
                 {t.layout.topbar.markAllRead}
               </button>
             ) : null}
           </div>
 
-          <div className="max-h-[330px] overflow-y-auto p-2 pe-1 sm:p-3 sm:pe-2">
-            {noticesQuery.isLoading ? (
+          <div className="max-h-[calc(100dvh-220px)] overflow-y-auto p-2.5 sm:max-h-[390px] sm:p-3">
+            {notificationsQuery.isLoading ? (
               <NotificationsSkeleton />
-            ) : noticesQuery.isError ? (
+            ) : notificationsQuery.isError ? (
               <div className="flex flex-col items-center justify-center px-5 py-8 text-center">
                 <p className="text-[12px] font-medium text-topbar-text">
-                  {
-                    t.layout.topbar
-                      .notificationsLoadErrorTitle
-                  }
+                  {t.layout.topbar.notificationsLoadErrorTitle}
                 </p>
-
                 <p className="mt-1 text-[11px] leading-5 text-topbar-subtle">
-                  {
-                    t.layout.topbar
-                      .notificationsLoadErrorDescription
-                  }
+                  {t.layout.topbar.notificationsLoadErrorDescription}
                 </p>
-
                 <button
                   type="button"
-                  onClick={() => {
-                    void noticesQuery.refetch();
-                  }}
+                  onClick={() => void notificationsQuery.refetch()}
                   className="mt-3 inline-flex h-8 items-center gap-1.5 rounded-[11px] bg-topbar-soft px-3 text-[11px] font-medium text-topbar-text transition hover:bg-topbar-soft-hover"
                 >
-                  <RefreshCw
-                    aria-hidden="true"
-                    size={13}
-                    strokeWidth={1.9}
-                  />
-
+                  <RefreshCw aria-hidden="true" size={13} strokeWidth={1.9} />
                   {t.common.tryAgain}
                 </button>
               </div>
-            ) : notices.length > 0 ? (
+            ) : notifications.length > 0 ? (
               <div className="space-y-2">
-                {notices.map((notice) => (
-                  <NotificationItem
-                    key={notice.id}
-                    notice={notice}
-                    locale={locale}
+                {notifications.map((notification) => (
+                  <UnifiedNotificationCard
+                    key={notification.id}
+                    notification={notification}
+                    compact
                   />
                 ))}
               </div>
             ) : (
               <NotificationsEmptyState />
             )}
+          </div>
+
+          <div className="border-t border-topbar-divider p-2">
+            <button
+              type="button"
+              onClick={openNotificationCenter}
+              className="flex h-10 w-full items-center justify-center rounded-[12px] text-[11px] font-semibold text-primary transition-colors hover:bg-primary/[0.07]"
+            >
+              {t.layout.topbar.viewAllNotifications}
+            </button>
           </div>
         </div>
       ) : null}

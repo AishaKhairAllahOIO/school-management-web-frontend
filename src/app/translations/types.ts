@@ -25,6 +25,7 @@ export type TranslationDictionary = {
     reports: string;
     settings: string;
     profile: string;
+    notifications: string;
   };
 
   auth: {
@@ -50,6 +51,11 @@ export type TranslationDictionary = {
     forbidden: string;
     notFound: string;
     pageNotFound: string;
+    offlineCode: string;
+    offlineTitle: string;
+    offlineDescription: string;
+    connectionRestored: string;
+    retryConnection: string;
   };
 
   layout: {
@@ -101,6 +107,7 @@ export type TranslationDictionary = {
       notificationsTitle: string;
       unreadUpdates: string;
       markAllRead: string;
+      viewAllNotifications: string;
       notificationsLoadErrorTitle: string;
       notificationsLoadErrorDescription: string;
       noSystemNotificationsTitle: string;

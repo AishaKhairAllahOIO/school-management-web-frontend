@@ -27,6 +27,7 @@ export const en: TranslationDictionary = {
     reports: "Reports",
     settings: "Settings",
     profile: "Profile",
+    notifications: "Notifications"
   },
 
   auth: {
@@ -52,6 +53,11 @@ export const en: TranslationDictionary = {
     forbidden: "Access denied",
     notFound: "Resource not found",
     pageNotFound: "The page you are looking for does not exist.",
+    offlineCode: "Connection lost",
+    offlineTitle: "No internet connection",
+    offlineDescription: "The school system cannot reach the network right now. Check your Wi-Fi or cable, then try again.",
+    connectionRestored: "Your connection appears to be back. Retry to continue where you left off.",
+    retryConnection: "Retry connection",
   },
 
   layout: {
@@ -77,10 +83,9 @@ export const en: TranslationDictionary = {
       exams: "Exams",
       quizzes: "Quizzes",
       holidays: "Holidays",
-      studentFinance: "Student Finance",
+     studentFinance: "Student Finance",
       staffPayroll: "Staff Payroll",
       announcements: "Announcements",
-      alerts: "Alerts",
       activities: "Activities",
       schoolLaws: "School Laws",
       general: "General",
@@ -88,6 +93,7 @@ export const en: TranslationDictionary = {
       financial: "Financial",
       attendance: "Attendance",
       roles: "Roles",
+      alerts: "Alerts",
       permissions: "Permissions",
     },
 
@@ -117,6 +123,8 @@ export const en: TranslationDictionary = {
         administrators: "Administrators",
         new: "New",
         edit: "Edit",
+        notifications: "Notifications",
+        view: "View",
       },
     },
 
@@ -127,6 +135,7 @@ export const en: TranslationDictionary = {
       notificationsTitle: "Notifications",
       unreadUpdates: "You have {{count}} unread updates",
       markAllRead: "Mark all read",
+      viewAllNotifications: "View all notifications",
       notificationsLoadErrorTitle: "Notifications could not be loaded",
       notificationsLoadErrorDescription: "Check the connection and try again.",
       noSystemNotificationsTitle: "No system notifications",

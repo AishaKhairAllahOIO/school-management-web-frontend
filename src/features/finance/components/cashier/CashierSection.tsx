@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Banknote, CircleDollarSign, CreditCard, Plus, ReceiptText } from "lucide-react";
+import { Plus, ReceiptText } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 
 import { Button } from "@/shared/ui/button";
@@ -16,8 +16,7 @@ import { usePayments } from "../../hooks/usePayments";
 import type { PaymentReceipt } from "../../types/finance.types";
 import type { PaymentFormValues } from "../../schemas/payment.schema";
 import { FinanceSectionShell } from "../shared/FinanceSectionShell";
-import { FinanceSummarySkeleton, FinanceTableSkeleton } from "../shared/FinanceTableSkeleton";
-import { FinanceSummaryGrid } from "../shared/FinanceSummaryGrid";
+import { FinanceTableSkeleton } from "../shared/FinanceTableSkeleton";
 
 type CashierSectionProps = {
   studentId?: string | number;
@@ -148,7 +147,6 @@ export function CashierSection({
         description={description}
         icon={ReceiptText}
       >
-        <FinanceSummarySkeleton />
         <FinanceTableSkeleton />
       </FinanceSectionShell>
     );
@@ -170,39 +168,6 @@ export function CashierSection({
       description={description}
       icon={ReceiptText}
     >
-      <FinanceSummaryGrid
-        items={[
-          {
-            label: "Recorded payments",
-            value: new Intl.NumberFormat().format(visiblePayments.length),
-            hint: "Official receipts",
-            icon: ReceiptText,
-            tone: "primary",
-          },
-          {
-            label: "Total collected",
-            value: `${visiblePayments.reduce((sum, item) => sum + Number(item.paidAmount ?? 0), 0).toLocaleString()} $`,
-            hint: "Across all methods",
-            icon: CircleDollarSign,
-            tone: "success",
-          },
-          {
-            label: "Cash receipts",
-            value: new Intl.NumberFormat().format(visiblePayments.filter((item) => item.paymentMethod === "cash").length),
-            hint: "Processed in cash",
-            icon: Banknote,
-            tone: "warning",
-          },
-          {
-            label: "Digital payments",
-            value: new Intl.NumberFormat().format(visiblePayments.filter((item) => item.paymentMethod !== "cash").length),
-            hint: "Transfer, cheque or wallet",
-            icon: CreditCard,
-            tone: "info",
-          },
-        ]}
-      />
-
       <PaymentsTable
         payments={visiblePayments}
         headerAction={

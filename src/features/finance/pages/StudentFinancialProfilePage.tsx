@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, GraduationCap } from "lucide-react";
+import { ArrowLeft, GraduationCap, Printer } from "lucide-react";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
 
 import { Button } from "@/shared/ui/button";
@@ -10,6 +10,8 @@ import { ContractsSection } from "../components/contracts/ContractsSection";
 import { InstallmentsSection } from "../components/installments/InstallmentsSection";
 import { CashierSection } from "../components/cashier/CashierSection";
 import { FinanceTableSkeleton } from "../components/shared/FinanceTableSkeleton";
+import { FullFinancialStatementDialog } from "../components/cashier/FullFinancialStatementDialog";
+import { useState } from "react";
 
 function isNotFound(error: unknown) {
   return (error as { response?: { status?: number } })?.response?.status === 404;
@@ -18,6 +20,7 @@ function isNotFound(error: unknown) {
 export function StudentFinancialProfilePage() {
   const { studentId } = useParams<{ studentId: string }>();
   const navigate = useNavigate();
+  const [statementOpen, setStatementOpen] = useState(false);
 
   const studentQuery = useQuery({
     queryKey: studentId ? studentKeys.detail(studentId) : ["student-details", "missing"],
@@ -81,9 +84,20 @@ export function StudentFinancialProfilePage() {
               </p>
             </div>
           </div>
-          <Button variant="outline" className="rounded-xl" onClick={() => navigate("/finance/students")}>
-            <ArrowLeft className="mr-2 h-4 w-4" /> Student accounts
-          </Button>
+          <div className="flex flex-wrap items-center gap-2">
+            {account && Number(account.remainingBalance) <= 0 ? (
+              <Button
+                variant="outline"
+                className="rounded-xl border-success/20 text-success hover:bg-success/[0.05]"
+                onClick={() => setStatementOpen(true)}
+              >
+                <Printer className="mr-2 h-4 w-4" /> Print complete statement
+              </Button>
+            ) : null}
+            <Button variant="outline" className="rounded-xl" onClick={() => navigate("/finance/students")}>
+              <ArrowLeft className="mr-2 h-4 w-4" /> Student accounts
+            </Button>
+          </div>
         </div>
       </section>
 
@@ -127,6 +141,16 @@ export function StudentFinancialProfilePage() {
           </p>
         </section>
       )}
+
+      {account ? (
+        <FullFinancialStatementDialog
+          open={statementOpen}
+          onOpenChange={setStatementOpen}
+          studentName={student.fullName}
+          academicYearName={account.academicYearName}
+          account={account}
+        />
+      ) : null}
     </div>
   );
 }

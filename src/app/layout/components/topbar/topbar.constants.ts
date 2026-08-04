@@ -1,6 +1,7 @@
 export const TOPBAR_ICON_BUTTON_CLASS_NAME = [
-  "relative flex h-[56px] w-[56px] items-center justify-center",
-  "rounded-[18px]",
+  "relative flex h-[42px] w-[42px] items-center justify-center",
+  "sm:h-[48px] sm:w-[48px] lg:h-[56px] lg:w-[56px]",
+  "rounded-[14px] sm:rounded-[16px] lg:rounded-[18px]",
   "border border-topbar-border/75",
   "bg-topbar-surface/92",
   "text-topbar-foreground",

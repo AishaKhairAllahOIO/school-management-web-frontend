@@ -296,6 +296,9 @@ export const API_ENDPOINTS = {
   },
 
 COMMUNICATIONS: {
+  BELL_UNREAD_COUNT: "/auth/bell/count/unread",
+  BELL_MARK_ALL_READ: "/auth/bell/mark/all/read",
+
  
   // Activities
   // =========================
