@@ -15,7 +15,7 @@ export function EditInstallmentPolicyDialog({ open, onOpenChange, defaultValues,
   return (
     <FinancialBaseDialog
       title="Edit Installment Policy"
-      description="Update payment percentages and due dates for this policy."
+      description="Adjust how student invoices are divided and when each installment becomes due."
       onClose={() => onOpenChange(false)}
     >
       <InstallmentPolicyForm

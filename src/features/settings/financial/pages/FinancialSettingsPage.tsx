@@ -1,22 +1,31 @@
 import { useState } from "react";
-import { CalendarRange, ReceiptText } from "lucide-react";
+import {
+  Banknote,
+  CalendarRange,
+  CircleDollarSign,
+  ReceiptText,
+  UsersRound,
+} from "lucide-react";
+
+import { SectionHeader } from "@/features/settings/academic/components/shared/SectionHeader";
 
 import { FinancialDashboard } from "./FinancialDashboard";
 import { FinancialWorkspace } from "../shared/FinancialWorkspace";
 
+export type FinancialAudience = "students" | "staff";
 export type FinancialSection = "fee-plans" | "policies";
 
-const workspaceItems = [
+const studentWorkspaceItems = [
   {
     id: "fee-plans",
     title: "Fee Plans",
-    description: "Tuition and service pricing",
+    description: "Set tuition by year and grade",
     icon: <ReceiptText size={18} strokeWidth={1.75} />,
   },
   {
     id: "policies",
     title: "Installment Policies",
-    description: "Payment dates and percentages",
+    description: "Control payment stages and due dates",
     icon: <CalendarRange size={18} strokeWidth={1.75} />,
   },
 ] satisfies Array<{
@@ -27,19 +36,116 @@ const workspaceItems = [
 }>;
 
 export function FinancialSettingsPage() {
+  const [audience, setAudience] = useState<FinancialAudience>("students");
   const [activeSection, setActiveSection] =
     useState<FinancialSection>("fee-plans");
 
   return (
-    <div className="mx-auto w-full max-w-[1500px] space-y-6">
-      <FinancialWorkspace
-        items={workspaceItems}
-        activeId={activeSection}
-        onChange={(id) => setActiveSection(id as FinancialSection)}
-        hint="Financial settings are used during enrollment, invoicing and student payment tracking."
-      >
-        <FinancialDashboard activeSection={activeSection} />
-      </FinancialWorkspace>
+    <div className="mx-auto w-full max-w-[1500px] space-y-4">
+      <FinancialAudienceSwitch value={audience} onChange={setAudience} />
+
+      {audience === "students" ? (
+        <FinancialWorkspace
+          items={studentWorkspaceItems}
+          activeId={activeSection}
+          onChange={(id) => setActiveSection(id as FinancialSection)}
+          hint="Student financial settings determine which charges and payment schedules are available during enrollment and invoicing."
+        >
+          <FinancialDashboard activeSection={activeSection} />
+        </FinancialWorkspace>
+      ) : (
+        <StaffFinancialSettings />
+      )}
     </div>
+  );
+}
+
+function FinancialAudienceSwitch({
+  value,
+  onChange,
+}: {
+  value: FinancialAudience;
+  onChange: (value: FinancialAudience) => void;
+}) {
+  const options = [
+    {
+      id: "students" as const,
+      title: "Student Finance",
+      description: "Tuition, services and family payment schedules",
+      icon: CircleDollarSign,
+    },
+    {
+      id: "staff" as const,
+      title: "Staff Finance",
+      description: "Payroll rules, allowances and deductions",
+      icon: UsersRound,
+    },
+  ];
+
+  return (
+    <div className="grid gap-2 rounded-[20px] border border-border/55 bg-card p-2 shadow-[0_8px_26px_rgba(30,20,70,0.04)] sm:grid-cols-2">
+      {options.map((option) => {
+        const active = option.id === value;
+        const Icon = option.icon;
+
+        return (
+          <button
+            key={option.id}
+            type="button"
+            onClick={() => onChange(option.id)}
+            aria-pressed={active}
+            className={[
+              "flex min-w-0 items-center gap-3 rounded-[15px] px-4 py-3 text-left",
+              "transition-all duration-200 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/10",
+              active
+                ? "bg-primary/[0.07] text-primary"
+                : "text-muted-foreground hover:bg-muted/30 hover:text-foreground",
+            ].join(" ")}
+          >
+            <span
+              className={[
+                "flex h-10 w-10 shrink-0 items-center justify-center rounded-[13px]",
+                active ? "bg-primary/10 text-primary" : "bg-muted/45",
+              ].join(" ")}
+            >
+              <Icon size={19} strokeWidth={1.75} />
+            </span>
+            <span className="min-w-0">
+              <span className="block text-[14px] font-medium text-foreground">
+                {option.title}
+              </span>
+              <span className="mt-0.5 block truncate text-[12px] leading-5 text-muted-foreground">
+                {option.description}
+              </span>
+            </span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+function StaffFinancialSettings() {
+  return (
+    <section className="rounded-[20px] border border-border/55 bg-card p-5 shadow-[0_8px_26px_rgba(30,20,70,0.04)] sm:p-6">
+      <SectionHeader
+        title="Staff Financial Configuration"
+        description="Manage the rules that shape staff payroll, including salary structures, recurring allowances and deductions."
+      />
+
+      <div className="rounded-[20px] border border-dashed border-primary/20 bg-primary/[0.025] px-6 py-14 text-center">
+        <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-[18px] bg-primary/[0.08] text-primary">
+          <Banknote size={24} strokeWidth={1.7} />
+        </span>
+        <h3 className="mt-5 text-[17px] font-medium text-foreground">
+          Staff finance endpoints are not included in this package
+        </h3>
+        <p className="mx-auto mt-2 max-w-xl text-[13px] leading-6 text-muted-foreground">
+          The student and staff areas are now clearly separated. Connect the staff
+          salary, allowance and deduction services here once their API files are
+          available; no temporary records or mock data have been added.
+        </p>
+      </div>
+    </section>
   );
 }

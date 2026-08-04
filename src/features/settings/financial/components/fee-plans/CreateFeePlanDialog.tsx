@@ -17,7 +17,7 @@ export function CreateFeePlanDialog({ open, onOpenChange, academicYears, gradeLe
   return (
     <FinancialBaseDialog
       title="Create Fee Plan"
-      description="Create a tuition fee configuration for an academic year and grade level."
+      description="Choose the academic year and grade, then define the tuition amount and any optional services offered to students."
       onClose={() => onOpenChange(false)}
     >
       <FeePlanForm

@@ -14,7 +14,7 @@ export function CreateInstallmentPolicyDialog({ open, onOpenChange, onSubmit, is
   return (
     <FinancialBaseDialog
       title="Create Installment Policy"
-      description="Define payment percentages and due dates for a new installment policy."
+      description="Build a reusable student payment schedule by setting each installment percentage and due date."
       onClose={() => onOpenChange(false)}
     >
       <InstallmentPolicyForm

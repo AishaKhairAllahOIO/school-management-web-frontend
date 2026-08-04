@@ -1,8 +1,6 @@
 import { useState } from "react";
 import {
   Loader2,
-  Plus,
-  ReceiptText,
   RefreshCw,
 } from "lucide-react";
 
@@ -153,22 +151,14 @@ export function FeePlansSection({
 
   return (
     <div>
-      <FinancialSectionHeader
-        title="Fee Plans"
-        description="Configure tuition amounts and optional services for each academic level."
-        icon={ReceiptText}
-      >
-        <Button
-          type="button"
-          onClick={() => setCreateOpen(true)}
-          className="h-10 rounded-[14px] px-4 text-[13px] font-medium shadow-none"
-        >
-          <Plus className="mr-2 h-4 w-4" />
-          Create Fee Plan
-        </Button>
-      </FinancialSectionHeader>
+      <div className="p-5 sm:p-6">
+        <FinancialSectionHeader
+          title="Student Fee Plans"
+          description="Set the tuition and optional service charges that will be applied when a student is enrolled in a specific academic year and grade level."
+          actionLabel="Add Fee Plan"
+          onAction={() => setCreateOpen(true)}
+        />
 
-      <div className="p-4 sm:p-5">
         <FeePlansTable
           feePlans={feePlans}
           onEdit={(plan) => {
@@ -226,7 +216,7 @@ export function FeePlansSection({
           if (!open) setSelectedPlan(null);
         }}
         title="Delete fee plan?"
-        description="This action cannot be undone."
+        description="Students already assigned to this plan may keep existing invoices, but the plan will no longer be available for future enrollment. This action cannot be undone."
         itemName={selectedPlan?.name}
         isPending={deleteFeePlan.isPending}
         onConfirm={handleDelete}

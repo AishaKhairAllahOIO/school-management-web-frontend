@@ -25,7 +25,7 @@ const workspaceItems = [
   {
     id: "years",
     title: "Academic Years",
-    description: "Define yearly periods",
+    description: "Create school years and choose the active one",
     icon: (
       <CalendarDays
         size={18}
@@ -37,7 +37,7 @@ const workspaceItems = [
   {
     id: "terms",
     title: "Academic Terms",
-    description: "Arrange terms and breaks",
+    description: "Divide each school year into teaching periods",
     icon: (
       <Layers3
         size={18}
@@ -49,7 +49,7 @@ const workspaceItems = [
   {
     id: "stages",
     title: "Academic Stages",
-    description: "Organize grade levels",
+    description: "Group grades into clear educational stages",
     icon: (
       <GraduationCap
         size={18}
@@ -61,7 +61,7 @@ const workspaceItems = [
   {
     id: "schedule",
     title: "School Calendar",
-    description: "Set days and lesson timing",
+    description: "Define working days, lessons and breaks",
     icon: (
       <Clock
         size={18}
@@ -116,7 +116,7 @@ export function AcademicSettingsPage() {
             id as ActiveSection,
           );
         }}
-        hint="The active academic year connects attendance, grades and reporting across the system."
+        hint="Changes here affect enrollment, attendance, scheduling, grades and reports, so confirm dates before saving."
       >
         {activeSection === "years" ? (
           <AcademicYearsSection

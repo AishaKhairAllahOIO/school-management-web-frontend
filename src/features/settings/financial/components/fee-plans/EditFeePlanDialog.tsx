@@ -18,7 +18,7 @@ export function EditFeePlanDialog({ open, onOpenChange, defaultValues, academicY
   return (
     <FinancialBaseDialog
       title="Edit Fee Plan"
-      description="Update the selected fee plan and its optional services."
+      description="Update the tuition or optional service charges used for this academic year and grade level."
       onClose={() => onOpenChange(false)}
     >
       <FeePlanForm

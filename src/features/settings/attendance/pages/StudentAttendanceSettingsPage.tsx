@@ -29,13 +29,13 @@ const workspaceItems = [
   {
     id: "students",
     title: "Students",
-    description: "Semester attendance rules",
+    description: "Set working days and required attendance",
     icon: <UserRoundCheck size={18} strokeWidth={1.75} />,
   },
   {
     id: "staff",
     title: "Staff",
-    description: "Prepared for future API",
+    description: "Define employee attendance and work rules",
     icon: <UsersRound size={18} strokeWidth={1.75} />,
   },
 ] satisfies Array<{
@@ -91,13 +91,13 @@ export function StudentAttendanceSettingsPage() {
         items={workspaceItems}
         activeId={activeSection}
         onChange={(id) => setActiveSection(id as ActiveSection)}
-        hint="Attendance settings define the rules used by the dedicated attendance feature."
+        hint="Attendance rules are used to calculate eligibility, absence rates and semester attendance summaries."
       >
         {activeSection === "students" ? (
           <>
             <SectionHeader
               title="Student Attendance"
-              description="Configure working days and minimum attendance requirements for each semester."
+              description="Set the expected working days and minimum attendance percentage used to evaluate students in each academic term."
               actionLabel="Add Setting"
               onAction={() => setDialogValue("new")}
             />
@@ -209,7 +209,7 @@ function StaffAttendancePlaceholder() {
     <div>
       <SectionHeader
         title="Staff Attendance"
-        description="The interface is prepared for staff attendance settings and can be connected when the backend endpoints are available."
+        description="Configure the workday and attendance rules used to evaluate employee presence, absence and payroll-related attendance."
       />
 
       <div className="rounded-[22px] border border-dashed border-primary/20 bg-primary/[0.025] px-6 py-14 text-center">
@@ -217,16 +217,14 @@ function StaffAttendancePlaceholder() {
           <UsersRound size={24} strokeWidth={1.7} />
         </span>
         <h3 className="mt-5 text-[17px] font-medium text-foreground">
-          Staff attendance integration is pending
+          Staff attendance configuration is not connected yet
         </h3>
         <p className="mx-auto mt-2 max-w-lg text-[13px] leading-6 text-muted-foreground">
-          This section intentionally contains no mock data. It is visually ready
-          and will use the same table, dialogs, loading states and actions once the
-          staff attendance API is provided.
+          No temporary data has been added. Once the staff attendance endpoints are available, this area will use the same clear tables, forms and confirmation dialogs as student attendance.
         </p>
         <span className="mt-5 inline-flex items-center gap-2 rounded-full border border-primary/15 bg-card px-3.5 py-2 text-[12px] font-medium text-primary">
           <CalendarCheck2 size={15} />
-          Ready for API connection
+          Waiting for staff attendance API
         </span>
       </div>
     </div>
