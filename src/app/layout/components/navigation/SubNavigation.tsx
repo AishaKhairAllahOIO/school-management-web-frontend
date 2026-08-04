@@ -30,6 +30,16 @@ import type {
 type SubNavigationLabelKey =
   keyof TranslationDictionary["layout"]["subNavigation"];
 
+type SubNavigationTone =
+  | "primary"
+  | "info"
+  | "warning"
+  | "success";
+
+type SubNavigationGroup =
+  | "student"
+  | "staff";
+
 type SubNavigationItem = {
   titleKey: Exclude<
     SubNavigationLabelKey,
@@ -37,12 +47,8 @@ type SubNavigationItem = {
   >;
   path: string;
   icon: LucideIcon;
-  group?: "student" | "staff";
-  tone?:
-    | "primary"
-    | "info"
-    | "warning"
-    | "success";
+  group?: SubNavigationGroup;
+  tone?: SubNavigationTone;
 };
 
 type SubNavigationSection = {
@@ -94,19 +100,18 @@ const subNavigationSections: SubNavigationSection[] = [
   {
     basePath: "/finance",
     items: [
-     {
-      titleKey: "studentFinance",
-      path: "/finance/students",
-      icon: Wallet,
-      group: "student",
-    },
-    {
-      titleKey: "staffPayroll",
-      path: "/finance/payroll",
-      icon: Banknote,
-      group: "staff",
-    },
-
+      {
+        titleKey: "studentFinance",
+        path: "/finance/students",
+        icon: Wallet,
+        group: "student",
+      },
+      {
+        titleKey: "staffPayroll",
+        path: "/finance/payroll",
+        icon: Banknote,
+        group: "staff",
+      },
     ],
   },
   {
@@ -175,56 +180,117 @@ const subNavigationSections: SubNavigationSection[] = [
   },
 ];
 
+function isNavigationItemActive(
+  pathname: string,
+  itemPath: string,
+): boolean {
+  if (pathname === itemPath) {
+    return true;
+  }
+
+  return pathname.startsWith(
+    `${itemPath}/`,
+  );
+}
+
 function getToneClasses(
-  tone: SubNavigationItem["tone"],
+  tone: SubNavigationTone | undefined,
   isActive: boolean,
 ) {
   if (!isActive) {
     return {
-      shell:
-        "text-muted-foreground hover:bg-muted/40 hover:text-foreground",
-      icon:
-        "text-muted-foreground transition-colors group-hover:text-foreground",
-      indicator: "bg-primary",
-      ring: "focus-visible:ring-primary/10",
+      shell: [
+        "border-transparent",
+        "bg-transparent",
+        "text-muted-foreground",
+        "hover:border-border/60",
+        "hover:bg-muted/45",
+        "hover:text-foreground",
+      ].join(" "),
+
+      icon: [
+        "text-muted-foreground",
+        "transition-colors duration-200",
+        "group-hover:text-foreground",
+      ].join(" "),
+
+      indicator:
+        "bg-primary",
+
+      ring:
+        "focus-visible:ring-primary/10",
     };
   }
 
   switch (tone) {
     case "info":
       return {
-        shell: "bg-info/[0.09] text-info",
-        icon: "text-info",
-        indicator: "bg-info",
-        ring: "focus-visible:ring-info/10",
+        shell: [
+          "border-info/20",
+          "bg-info/[0.09]",
+          "text-info",
+        ].join(" "),
+
+        icon:
+          "text-info",
+
+        indicator:
+          "bg-info",
+
+        ring:
+          "focus-visible:ring-info/10",
       };
 
     case "warning":
       return {
-        shell:
-          "bg-warning/[0.10] text-warning",
-        icon: "text-warning",
-        indicator: "bg-warning",
+        shell: [
+          "border-warning/25",
+          "bg-warning/[0.10]",
+          "text-warning",
+        ].join(" "),
+
+        icon:
+          "text-warning",
+
+        indicator:
+          "bg-warning",
+
         ring:
           "focus-visible:ring-warning/10",
       };
 
     case "success":
       return {
-        shell:
-          "bg-success/[0.09] text-success",
-        icon: "text-success",
-        indicator: "bg-success",
+        shell: [
+          "border-success/20",
+          "bg-success/[0.09]",
+          "text-success",
+        ].join(" "),
+
+        icon:
+          "text-success",
+
+        indicator:
+          "bg-success",
+
         ring:
           "focus-visible:ring-success/10",
       };
 
     default:
       return {
-        shell:
-          "bg-primary/[0.07] text-primary",
-        icon: "text-primary",
-        indicator: "bg-primary",
+        shell: [
+          "border-primary/20",
+          "bg-primary/[0.07]",
+          "text-primary",
+        ].join(" "),
+
+        icon:
+          "text-primary",
+
+        indicator:
+          "bg-primary",
+
         ring:
           "focus-visible:ring-primary/10",
       };
@@ -237,64 +303,218 @@ function TabItem({
   icon: Icon,
   tone,
 }: SubNavigationItem) {
-  const { t } = useLocale();
+  const { t } =
+    useLocale();
+
+  const { pathname } =
+    useLocation();
 
   const title =
-    t.layout.subNavigation[titleKey];
+    t.layout.subNavigation[
+      titleKey
+    ];
+
+  const isActive =
+    isNavigationItemActive(
+      pathname,
+      path,
+    );
+
+  const classes =
+    getToneClasses(
+      tone,
+      isActive,
+    );
 
   return (
     <NavLink
       to={path}
-      className={({ isActive }) => {
-        const classes = getToneClasses(
-          tone,
-          isActive,
-        );
+      aria-label={title}
+      aria-current={
+        isActive
+          ? "page"
+          : undefined
+      }
+      className={[
+        "group relative",
+        "flex min-w-0 w-full",
+        "items-center justify-center",
+        "gap-2 overflow-hidden",
+        "rounded-[14px] border",
+        "px-2.5 py-2.5",
+        "text-center text-[12px]",
+        "font-medium leading-[1.2]",
+        "tracking-[-0.005em]",
 
-        return [
-          "group relative inline-flex h-11 min-w-max items-center justify-center gap-2 rounded-[14px] px-4 text-[13px] font-medium transition-all duration-200 ease-out",
-          "focus-visible:outline-none focus-visible:ring-4",
-          classes.ring,
-          classes.shell,
-        ].join(" ");
-      }}
+        /*
+         * حجم مناسب للموبايل،
+         * مع زيادة طفيفة على الشاشات الأكبر.
+         */
+        "min-h-11",
+        "sm:min-h-[46px]",
+        "sm:px-3",
+        "sm:text-[13px]",
+
+        /*
+         * يمنع أي عنصر من دفع
+         * الحاوية خارج الشاشة.
+         */
+        "max-w-full",
+
+        "transition-[background-color,border-color,color]",
+        "duration-200 ease-out",
+
+        "focus-visible:outline-none",
+        "focus-visible:ring-4",
+
+        classes.ring,
+        classes.shell,
+      ].join(" ")}
     >
-      {({ isActive }) => {
-        const classes = getToneClasses(
-          tone,
-          isActive,
-        );
+      <Icon
+        aria-hidden="true"
+        size={17}
+        strokeWidth={
+          isActive
+            ? 2
+            : 1.8
+        }
+        className={[
+          "shrink-0",
+          classes.icon,
+        ].join(" ")}
+      />
 
-        return (
-          <>
-            <Icon
-              aria-hidden
-              size={17}
-              strokeWidth={1.8}
-              className={[
-                "shrink-0",
-                classes.icon,
-              ].join(" ")}
-            />
+      <span
+        className="
+          min-w-0
+          overflow-hidden
+          text-ellipsis
+          whitespace-normal
+          break-words
+        "
+      >
+        {title}
+      </span>
 
-            <span className="whitespace-nowrap">
-              {title}
-            </span>
-
-            <span
-              aria-hidden
-              className={[
-                "absolute bottom-0 left-4 right-4 h-[2px] origin-center rounded-full transition-transform duration-200",
-                classes.indicator,
-                isActive
-                  ? "scale-x-100"
-                  : "scale-x-0",
-              ].join(" ")}
-            />
-          </>
-        );
-      }}
+      <span
+        aria-hidden="true"
+        className={[
+          "absolute bottom-0",
+          "left-3 right-3",
+          "h-[2px]",
+          "origin-center rounded-full",
+          "transition-transform duration-200",
+          classes.indicator,
+          isActive
+            ? "scale-x-100"
+            : "scale-x-0",
+        ].join(" ")}
+      />
     </NavLink>
+  );
+}
+
+function getGridClasses(
+  itemCount: number,
+) {
+  if (itemCount <= 1) {
+    return [
+      "grid-cols-1",
+      "sm:grid-cols-1",
+    ].join(" ");
+  }
+
+  if (itemCount === 2) {
+    return [
+      "grid-cols-1",
+      "min-[380px]:grid-cols-2",
+    ].join(" ");
+  }
+
+  if (itemCount === 3) {
+    return [
+      "grid-cols-1",
+      "min-[380px]:grid-cols-2",
+      "md:grid-cols-3",
+    ].join(" ");
+  }
+
+  if (itemCount === 4) {
+    return [
+      "grid-cols-1",
+      "min-[380px]:grid-cols-2",
+      "md:grid-cols-4",
+    ].join(" ");
+  }
+
+  if (itemCount === 5) {
+    return [
+      "grid-cols-1",
+      "min-[380px]:grid-cols-2",
+      "sm:grid-cols-3",
+      "xl:grid-cols-5",
+    ].join(" ");
+  }
+
+  return [
+    "grid-cols-1",
+    "min-[380px]:grid-cols-2",
+    "sm:grid-cols-3",
+    "xl:grid-cols-6",
+  ].join(" ");
+}
+
+function NavigationGroup({
+  items,
+  separated = false,
+}: {
+  items: SubNavigationItem[];
+  separated?: boolean;
+}) {
+  if (!items.length) {
+    return null;
+  }
+
+  return (
+    <div
+      className={[
+        "grid w-full min-w-0",
+        "gap-1.5",
+
+        getGridClasses(
+          items.length,
+        ),
+
+        separated
+          ? [
+              "mt-1.5",
+              "border-t",
+              "border-border/55",
+              "pt-1.5",
+
+              /*
+               * في الديسكتوب عندما نحتاج
+               * فصل مجموعة الموظفين،
+               * يبقى الفصل رأسيًا إن كانت
+               * المساحة تسمح.
+               */
+              "lg:mt-0",
+              "lg:border-t-0",
+              "lg:pt-0",
+            ].join(" ")
+          : "",
+      ].join(" ")}
+    >
+      {items.map(
+        (item) => (
+          <TabItem
+            key={item.path}
+            {...item}
+          />
+        ),
+      )}
+    </div>
   );
 }
 
@@ -303,7 +523,7 @@ function DefaultSubNavigation({
 }: {
   items: SubNavigationItem[];
 }) {
-  const { direction, t } =
+  const { t } =
     useLocale();
 
   const hasFinanceGroups =
@@ -334,40 +554,61 @@ function DefaultSubNavigation({
         t.layout.subNavigation
           .sectionNavigation
       }
-      className="w-full min-w-0 overflow-hidden rounded-[22px] border border-border/60 bg-card/95 p-2 shadow-[0_8px_28px_rgba(38,24,84,0.045)] backdrop-blur-sm"
-    >
-      <div className="flex h-11 w-full min-w-0 items-center overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-        <div className="flex min-w-max items-center gap-1">
-          {studentItems.map(
-            (item) => (
-              <TabItem
-                key={item.path}
-                {...item}
-              />
-            ),
-          )}
-        </div>
+      className={[
+        "w-full min-w-0 max-w-full",
+        "overflow-hidden",
+        "rounded-[18px]",
+        "border border-border/60",
+        "bg-card/95",
+        "p-1.5",
+        "backdrop-blur-sm",
+        "shadow-[0_8px_28px_rgba(38,24,84,0.045)]",
 
-        {staffItems.length ? (
+        "sm:rounded-[22px]",
+        "sm:p-2",
+      ].join(" ")}
+    >
+      {hasFinanceGroups ? (
+        <div
+          className="
+            grid
+            w-full
+            min-w-0
+            grid-cols-1
+            gap-0
+            lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]
+            lg:gap-2
+          "
+        >
+          <NavigationGroup
+            items={studentItems}
+          />
+
           <div
-            className={[
-              "flex min-w-max items-center gap-1",
-              direction === "rtl"
-                ? "mr-2 border-r border-border/55 pr-3"
-                : "ml-2 border-l border-border/55 pl-3",
-            ].join(" ")}
+            className="
+              mt-1.5
+              min-w-0
+              border-t
+              border-border/55
+              pt-1.5
+
+              lg:mt-0
+              lg:border-s
+              lg:border-t-0
+              lg:ps-2
+              lg:pt-0
+            "
           >
-            {staffItems.map(
-              (item) => (
-                <TabItem
-                  key={item.path}
-                  {...item}
-                />
-              ),
-            )}
+            <NavigationGroup
+              items={staffItems}
+            />
           </div>
-        ) : null}
-      </div>
+        </div>
+      ) : (
+        <NavigationGroup
+          items={studentItems}
+        />
+      )}
     </nav>
   );
 }
@@ -376,6 +617,10 @@ export function SubNavigation() {
   const { pathname } =
     useLocation();
 
+  /*
+   * قسم Users وAcademics يستخدمان
+   * تنقلًا داخليًا مختلفًا.
+   */
   if (
     pathname === "/users" ||
     pathname.startsWith(
@@ -399,9 +644,15 @@ export function SubNavigation() {
         ),
     );
 
-  return currentSection ? (
+  if (!currentSection) {
+    return null;
+  }
+
+  return (
     <DefaultSubNavigation
-      items={currentSection.items}
+      items={
+        currentSection.items
+      }
     />
-  ) : null;
+  );
 }
