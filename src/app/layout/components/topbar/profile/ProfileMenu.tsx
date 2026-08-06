@@ -119,6 +119,7 @@ export function ProfileMenu({
     >
       <button
         ref={triggerRef}
+        data-onboarding-target="profile"
         type="button"
         onClick={onToggle}
         aria-label={

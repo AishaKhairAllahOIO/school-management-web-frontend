@@ -24,6 +24,7 @@ export function LanguageToggle({
   return (
     <button
       type="button"
+      data-onboarding-target="language"
       onClick={toggleLanguage}
       aria-label={
         language === "en"

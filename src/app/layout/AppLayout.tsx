@@ -46,7 +46,7 @@ export function AppLayout() {
           <SubNavigation />
         </div>
 
-        <main className="min-w-0 flex-1 px-3 pb-5 pt-3 sm:px-4 sm:pb-6 md:px-6 lg:px-8">
+        <main data-onboarding-target="page-content" className="min-w-0 flex-1 px-3 pb-5 pt-3 sm:px-4 sm:pb-6 md:px-6 lg:px-8">
           <Outlet />
         </main>
       </div>

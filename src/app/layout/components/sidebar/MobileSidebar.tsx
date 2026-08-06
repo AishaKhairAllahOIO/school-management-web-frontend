@@ -377,6 +377,7 @@ export function MobileSidebar() {
               />
 
               <a
+                data-onboarding-target="website"
                 href={WEBSITE_URL}
                 target="_blank"
                 rel="noopener noreferrer"

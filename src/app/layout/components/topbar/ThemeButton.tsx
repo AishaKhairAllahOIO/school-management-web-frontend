@@ -59,6 +59,7 @@ export function ThemeButton() {
     <button
 
       type="button"
+      data-onboarding-target="theme"
 
       onClick={() =>
         setTheme(

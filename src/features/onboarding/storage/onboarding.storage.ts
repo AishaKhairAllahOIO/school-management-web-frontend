@@ -1,4 +1,4 @@
-const STORAGE_PREFIX = "aisha:onboarding:v1";
+const STORAGE_PREFIX = "school-management:onboarding:v3";
 
 function key(userId: string | number | undefined) {
   return `${STORAGE_PREFIX}:${userId ?? "local-user"}`;
@@ -20,9 +20,9 @@ export const onboardingStorage = {
   get(userId?: string | number): StoredState {
     try {
       const raw = localStorage.getItem(key(userId));
-      return raw ? { ...emptyState, ...JSON.parse(raw) } : emptyState;
+      return raw ? { ...emptyState, ...JSON.parse(raw) } : { ...emptyState };
     } catch {
-      return emptyState;
+      return { ...emptyState };
     }
   },
 
@@ -35,4 +35,4 @@ export const onboardingStorage = {
   },
 };
 
-export const ONBOARDING_RESTART_EVENT = "aisha:onboarding:restart";
+export const ONBOARDING_RESTART_EVENT = "school-management:onboarding:restart";

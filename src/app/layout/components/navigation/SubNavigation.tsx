@@ -329,6 +329,7 @@ function TabItem({
   return (
     <NavLink
       to={path}
+      data-onboarding-path={path}
       aria-label={title}
       aria-current={
         isActive

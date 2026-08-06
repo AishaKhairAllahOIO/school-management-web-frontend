@@ -61,6 +61,7 @@ export function NotificationsMenu({
     <div ref={containerRef} className="relative shrink-0">
       <button
         ref={triggerRef}
+        data-onboarding-target="notifications"
         type="button"
         onClick={onToggle}
         aria-label={t.layout.topbar.notifications}

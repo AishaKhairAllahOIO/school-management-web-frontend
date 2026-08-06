@@ -78,6 +78,7 @@ function SidebarMenuItem({
     return (
       <NavLink
         to={item.path}
+        data-onboarding-path={item.path}
         end={item.exact}
         title={title}
         aria-label={title}
@@ -127,6 +128,7 @@ function SidebarMenuItem({
   return (
     <NavLink
       to={item.path}
+      data-onboarding-path={item.path}
       end={item.exact}
       aria-current={isActive ? "page" : undefined}
       aria-disabled={item.disabled || undefined}
