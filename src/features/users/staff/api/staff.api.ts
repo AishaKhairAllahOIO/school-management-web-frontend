@@ -1,0 +1,736 @@
+import {
+  API_ENDPOINTS,
+} from "@/services/api/endpoints";
+
+import {
+  axiosClient,
+} from "@/services/axios/axiosClient";
+
+import {
+  objectToFormData,
+} from "../../shared/api/form-data.utils";
+
+
+import {
+  normalizeApiDateOnly,
+  normalizeApiDateTime,
+} from "../../shared/utils/api-date";
+
+import type {
+  ApiResponse,
+} from "../../shared/types/api.types";
+
+import type {
+  ApiId,
+  RegisterStaffValues,
+  StaffAccountStatus,
+  StaffPaginator,
+  StaffImportBatchStatus,
+  StaffImportStartResponse,
+  StaffProfile,
+  StaffRole,
+  UpdateStaffEmploymentValues,
+  UpdateStaffPersonalValues,
+} from "../types/staff.types";
+
+type RawRole = {
+  id?: ApiId;
+  name?: string;
+};
+
+type RawUser = {
+  id?: ApiId;
+
+  first_name?: string;
+  father_name?: string;
+  mother_name?: string;
+  last_name?: string;
+
+  phone_number?: string;
+  email?: string | null;
+
+  birth_date?: string | null;
+  birth_place?: string | null;
+
+  gender?: StaffProfile["gender"];
+  nationality?:
+    StaffProfile["nationality"];
+
+  address?: string | null;
+  photo_url?: string | null;
+
+  account_status?: string;
+
+  roles?: RawRole[];
+};
+
+type RawStaff = {
+  id?: ApiId;
+
+  user_id?: ApiId;
+  userId?: ApiId;
+
+  first_name?: string;
+  firstName?: string;
+
+  father_name?: string;
+  fatherName?: string;
+
+  mother_name?: string;
+  motherName?: string;
+
+  last_name?: string;
+  lastName?: string;
+
+  full_name?: string;
+  fullName?: string;
+
+  phone_number?: string;
+  phoneNumber?: string;
+
+  email?: string | null;
+
+  birth_date?: string | null;
+  birthDate?: string | null;
+
+  birth_place?: string | null;
+  birthPlace?: string | null;
+
+  gender?: StaffProfile["gender"];
+  nationality?:
+    StaffProfile["nationality"];
+
+  address?: string | null;
+
+  photo_url?: string | null;
+  photoUrl?: string | null;
+
+  account_status?: string;
+  accountStatus?: string;
+
+  degree?: StaffProfile["degree"];
+  specialization?: string | null;
+  university?: string | null;
+
+  graduation_year?:
+    | number
+    | string
+    | null;
+
+  graduationYear?: number | null;
+
+  hire_date?: string | null;
+  hireDate?: string | null;
+
+  experience_years?:
+    | number
+    | string
+    | null;
+
+  experienceYears?: number | null;
+
+  service_type?:
+    StaffProfile["serviceType"];
+
+  serviceType?:
+    StaffProfile["serviceType"];
+
+  role?:
+    | StaffRole
+    | string
+    | string[]
+    | RawRole[]
+    | null;
+
+  is_deleted?: boolean;
+  isDeleted?: boolean;
+
+  deleted_at?: string | null;
+  deletedAt?: string | null;
+
+  created_at?: string | null;
+  createdAt?: string | null;
+
+  updated_at?: string | null;
+  updatedAt?: string | null;
+
+  user?: RawUser;
+};
+
+type RawPaginator = {
+  data: RawStaff[];
+
+  current_page?: number;
+  last_page?: number;
+  per_page?: number;
+  total?: number;
+
+  from?: number | null;
+  to?: number | null;
+
+  meta?: {
+    current_page?: number;
+    last_page?: number;
+    per_page?: number;
+    total?: number;
+
+    from?: number | null;
+    to?: number | null;
+  };
+};
+
+function unwrap<T>(
+  value:
+    | ApiResponse<T>
+    | T,
+): T {
+  if (
+    typeof value === "object" &&
+    value !== null &&
+    "data" in value
+  ) {
+    return (
+      value as ApiResponse<T>
+    ).data;
+  }
+
+  return value as T;
+}
+
+function nullableNumber(
+  value: unknown,
+): number | null {
+  if (
+    value === null ||
+    value === undefined ||
+    value === ""
+  ) {
+    return null;
+  }
+
+  const parsedValue =
+    Number(value);
+
+  return Number.isFinite(
+    parsedValue,
+  )
+    ? parsedValue
+    : null;
+}
+
+function normalizeRole(
+  value: unknown,
+): StaffRole | null {
+  const supportedRoles: StaffRole[] = [
+    "teacher",
+    "adviser",
+    "secretary",
+    "counselor",
+    "service_staff",
+    "super_admin",
+  ];
+
+  const roleValue = Array.isArray(value)
+    ? value
+        .map((item) =>
+          typeof item === "string"
+            ? item
+            : item && typeof item === "object" && "name" in item
+              ? String((item as RawRole).name ?? "")
+              : "",
+        )
+        .find((item) => supportedRoles.includes(item as StaffRole))
+    : value;
+
+  return supportedRoles.includes(roleValue as StaffRole)
+    ? (roleValue as StaffRole)
+    : null;
+}
+
+function normalizeAccountStatus(
+  value: unknown,
+): StaffAccountStatus {
+  return value === "active" || value === "enabled"
+    ? "active"
+    : "disabled";
+}
+
+function normalizeStaff(
+  raw: RawStaff,
+): StaffProfile {
+  const user = raw.user;
+
+  const firstName =
+    raw.firstName ??
+    raw.first_name ??
+    user?.first_name ??
+    "";
+
+  const fatherName =
+    raw.fatherName ??
+    raw.father_name ??
+    user?.father_name ??
+    "";
+
+  const motherName =
+    raw.motherName ??
+    raw.mother_name ??
+    user?.mother_name ??
+    "";
+
+  const lastName =
+    raw.lastName ??
+    raw.last_name ??
+    user?.last_name ??
+    "";
+
+  const roleFromUser =
+    user?.roles
+      ?.map((role) => role.name)
+      .find(Boolean) ??
+    null;
+
+  const deletedAt =
+    raw.deletedAt ??
+    raw.deleted_at ??
+    null;
+
+  return {
+    id: raw.id ?? "",
+
+    userId:
+      raw.userId ??
+      raw.user_id ??
+      user?.id ??
+      null,
+
+    firstName,
+    fatherName,
+    motherName,
+    lastName,
+
+    fullName:
+      raw.fullName ??
+      raw.full_name ??
+      [
+        firstName,
+        fatherName,
+        lastName,
+      ]
+        .filter(Boolean)
+        .join(" "),
+
+    phoneNumber:
+      raw.phoneNumber ??
+      raw.phone_number ??
+      user?.phone_number ??
+      "",
+
+    email:
+      raw.email ??
+      user?.email ??
+      null,
+
+    birthDate: normalizeApiDateOnly(
+      raw.birthDate ??
+      raw.birth_date ??
+      user?.birth_date ??
+      null,
+    ),
+
+    birthPlace:
+      raw.birthPlace ??
+      raw.birth_place ??
+      user?.birth_place ??
+      null,
+
+    gender:
+      raw.gender ??
+      user?.gender ??
+      null,
+
+    nationality:
+      raw.nationality ??
+      user?.nationality ??
+      null,
+
+    address:
+      raw.address ??
+      user?.address ??
+      null,
+
+    photoUrl:
+      raw.photoUrl ??
+      raw.photo_url ??
+      user?.photo_url ??
+      null,
+
+    accountStatus:
+      normalizeAccountStatus(
+        raw.accountStatus ??
+        raw.account_status ??
+        user?.account_status,
+      ),
+
+    degree:
+      raw.degree ??
+      null,
+
+    specialization:
+      raw.specialization ??
+      null,
+
+    university:
+      raw.university ??
+      null,
+
+    graduationYear:
+      raw.graduationYear ??
+      nullableNumber(
+        raw.graduation_year,
+      ),
+
+    hireDate: normalizeApiDateOnly(
+      raw.hireDate ??
+      raw.hire_date ??
+      null,
+    ),
+
+    experienceYears:
+      raw.experienceYears ??
+      nullableNumber(
+        raw.experience_years,
+      ),
+
+    serviceType:
+      raw.serviceType ??
+      raw.service_type ??
+      null,
+
+    role:
+      normalizeRole(
+        raw.role ??
+        roleFromUser,
+      ),
+
+    isDeleted:
+      raw.isDeleted ??
+      raw.is_deleted ??
+      Boolean(deletedAt),
+
+    deletedAt: normalizeApiDateTime(deletedAt),
+
+    createdAt: normalizeApiDateTime(
+      raw.createdAt ?? raw.created_at ?? null,
+    ),
+
+    updatedAt: normalizeApiDateTime(
+      raw.updatedAt ?? raw.updated_at ?? null,
+    ),
+  };
+}
+
+function normalizePaginator(
+  value: unknown,
+): StaffPaginator {
+  let raw = value as RawPaginator | RawStaff[];
+
+  // Laravel ResourceCollection may arrive as:
+  // data: [...], or data: { data: [...], meta: {...} }.
+  if (
+    raw &&
+    !Array.isArray(raw) &&
+    typeof raw === "object" &&
+    "data" in raw &&
+    !Array.isArray((raw as RawPaginator).data)
+  ) {
+    raw = (raw as { data: RawPaginator }).data;
+  }
+
+  if (Array.isArray(raw)) {
+    const data = raw.map(normalizeStaff);
+
+    return {
+      data,
+      currentPage: 1,
+      lastPage: 1,
+      perPage: data.length,
+      total: data.length,
+      from: data.length > 0 ? 1 : null,
+      to: data.length > 0 ? data.length : null,
+    };
+  }
+
+  const paginator = raw ?? { data: [] };
+  const meta = paginator.meta ?? {};
+  const items = Array.isArray(paginator.data) ? paginator.data : [];
+
+  return {
+    data: items.map(normalizeStaff),
+
+    currentPage:
+      paginator.current_page ??
+      meta.current_page ??
+      1,
+
+    lastPage:
+      paginator.last_page ??
+      meta.last_page ??
+      1,
+
+    perPage:
+      paginator.per_page ??
+      meta.per_page ??
+      items.length,
+
+    total:
+      paginator.total ??
+      meta.total ??
+      items.length,
+
+    from:
+      paginator.from ??
+      meta.from ??
+      (items.length > 0 ? 1 : null),
+
+    to:
+      paginator.to ??
+      meta.to ??
+      (items.length > 0 ? items.length : null),
+  };
+}
+
+export const staffApi = {
+  async getByRole(
+    role: StaffRole,
+    page = 1,
+    perPage = 15,
+  ): Promise<StaffPaginator> {
+    const response =
+      await axiosClient.get<
+        | ApiResponse<RawPaginator>
+        | RawPaginator
+      >(
+        API_ENDPOINTS.STAFF.BY_ROLE(
+          role,
+        ),
+        {
+          params: {
+            page,
+            per_page: perPage,
+          },
+        },
+      );
+
+    return normalizePaginator(
+      unwrap(response.data),
+    );
+  },
+
+  async searchByRole(
+    role: StaffRole,
+    name: string,
+    page = 1,
+    perPage = 15,
+  ): Promise<StaffPaginator> {
+    const response = await axiosClient.get<
+      ApiResponse<RawPaginator> | RawPaginator
+    >(API_ENDPOINTS.STAFF.ROLE_SEARCH(role), {
+      params: { name: name.trim(), page, per_page: perPage },
+    });
+
+    return normalizePaginator(unwrap(response.data));
+  },
+
+  async getDetails(
+    staffId: ApiId,
+  ): Promise<StaffProfile> {
+    const response =
+      await axiosClient.get<
+        | ApiResponse<RawStaff>
+        | RawStaff
+      >(
+        API_ENDPOINTS.STAFF.DETAILS(
+          staffId,
+        ),
+      );
+
+    return normalizeStaff(
+      unwrap(response.data),
+    );
+  },
+
+  async getProfile():
+    Promise<StaffProfile> {
+    const response =
+      await axiosClient.get<
+        | ApiResponse<RawStaff>
+        | RawStaff
+      >(
+        API_ENDPOINTS.STAFF.PROFILE,
+      );
+
+    return normalizeStaff(
+      unwrap(response.data),
+    );
+  },
+
+  async register(
+    role: StaffRole,
+    values: RegisterStaffValues,
+  ): Promise<StaffProfile> {
+    const payload = {
+      ...values,
+      role,
+    };
+
+    const response =
+      await axiosClient.post<
+        | ApiResponse<RawStaff>
+        | RawStaff
+      >(
+        API_ENDPOINTS.STAFF.REGISTER,
+        objectToFormData(
+          payload as Record<
+            string,
+            unknown
+          >,
+        ),
+      );
+
+    return normalizeStaff(
+      unwrap(response.data),
+    );
+  },
+
+  async updatePersonal(
+    staffId: ApiId,
+    values:
+      UpdateStaffPersonalValues,
+  ): Promise<StaffProfile> {
+    const response =
+      await axiosClient.post<
+        | ApiResponse<RawStaff>
+        | RawStaff
+      >(
+        API_ENDPOINTS.STAFF.PERSONAL(
+          staffId,
+        ),
+        objectToFormData(
+          values as Record<
+            string,
+            unknown
+          >,
+        ),
+      );
+
+    return normalizeStaff(
+      unwrap(response.data),
+    );
+  },
+
+  async updateEmployment(
+    staffId: ApiId,
+    values:
+      UpdateStaffEmploymentValues,
+  ): Promise<StaffProfile> {
+    const response =
+      await axiosClient.post<
+        | ApiResponse<RawStaff>
+        | RawStaff
+      >(
+        API_ENDPOINTS.STAFF.PERSONAL(
+          staffId,
+        ),
+        objectToFormData(
+          values as Record<
+            string,
+            unknown
+          >,
+        ),
+      );
+
+    return normalizeStaff(
+      unwrap(response.data),
+    );
+  },
+
+  async toggleStatus(
+    staffId: ApiId,
+  ): Promise<void> {
+    await axiosClient.post(
+      API_ENDPOINTS.STAFF.TOGGLE_STATUS(
+        staffId,
+      ),
+    );
+  },
+
+  async remove(
+    staffId: ApiId,
+  ): Promise<void> {
+    await axiosClient.delete(
+      API_ENDPOINTS.STAFF.DELETE(
+        staffId,
+      ),
+    );
+  },
+
+  async restore(
+    staffId: ApiId,
+  ): Promise<StaffProfile> {
+    const response =
+      await axiosClient.post<
+        | ApiResponse<RawStaff>
+        | RawStaff
+      >(
+        API_ENDPOINTS.STAFF.RESTORE(
+          staffId,
+        ),
+      );
+
+    return normalizeStaff(
+      unwrap(response.data),
+    );
+  },
+
+  async importFile(
+    role: StaffRole,
+    file: File,
+  ): Promise<StaffImportStartResponse> {
+    const formData = new FormData();
+    formData.append("excel_file", file);
+
+    const response = await axiosClient.post<
+      ApiResponse<StaffImportStartResponse>
+    >(
+      API_ENDPOINTS.STAFF.IMPORT(role),
+      formData,
+    );
+
+    return unwrap(response.data);
+  },
+
+  async getImportStatus(
+    batchId: ApiId,
+  ): Promise<StaffImportBatchStatus> {
+    const response = await axiosClient.get<
+      ApiResponse<StaffImportBatchStatus>
+    >(
+      API_ENDPOINTS.STAFF.IMPORT_STATUS(batchId),
+    );
+
+    return unwrap(response.data);
+  },
+
+  async exportImportErrors(
+    batchId: ApiId,
+  ): Promise<Blob> {
+    const response = await axiosClient.get<Blob>(
+      API_ENDPOINTS.STAFF.IMPORT_ERRORS(batchId),
+      { responseType: "blob" },
+    );
+
+    return response.data;
+  },
+
+};

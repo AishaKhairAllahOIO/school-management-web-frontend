@@ -1,0 +1,247 @@
+import type {
+  LucideIcon,
+} from "lucide-react";
+
+import type {
+  ApiId,
+} from "../../shared/types/api.types";
+
+export type {
+  ApiId,
+} from "../../shared/types/api.types";
+
+export type StaffRole =
+  | "teacher"
+  | "adviser"
+  | "secretary"
+  | "counselor"
+  | "service_staff"
+  | "super_admin";
+
+export type StaffGender =
+  | "male"
+  | "female";
+
+export type StaffNationality =
+  | "syrian"
+  | "lebanese"
+  | "palestinian"
+  | "jordanian"
+  | "other";
+
+export type StaffDegree =
+  | "diploma"
+  | "bachelor"
+  | "master"
+  | "phd"
+  | "student"
+  | "none"
+  | "other";
+
+export type StaffServiceType =
+  | "cleaner"
+  | "guard"
+  | "driver"
+  | "maintenance"
+  | "kitchen_staff";
+
+export type StaffAccountStatus =
+  | "active"
+  | "disabled";
+
+export type StaffTimestampFields = {
+  deletedAt: string | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+};
+
+export type StaffProfile =
+  StaffTimestampFields & {
+    id: ApiId;
+    userId: ApiId | null;
+
+    firstName: string;
+    fatherName: string;
+    motherName: string;
+    lastName: string;
+    fullName: string;
+
+    phoneNumber: string;
+    email: string | null;
+
+    birthDate: string | null;
+    birthPlace: string | null;
+
+    gender: StaffGender | null;
+
+    nationality:
+      StaffNationality | null;
+
+    address: string | null;
+    photoUrl: string | null;
+
+    accountStatus:
+      StaffAccountStatus;
+
+    degree: StaffDegree | null;
+    specialization: string | null;
+    university: string | null;
+    graduationYear: number | null;
+
+    hireDate: string | null;
+    experienceYears: number | null;
+
+    serviceType:
+      StaffServiceType | null;
+
+    role: StaffRole | null;
+
+    isDeleted: boolean;
+  };
+
+export type StaffPaginator = {
+  data: StaffProfile[];
+
+  currentPage: number;
+  lastPage: number;
+  perPage: number;
+  total: number;
+
+  from: number | null;
+  to: number | null;
+};
+
+export type RegisterStaffValues = {
+  phone_number: string;
+
+  first_name: string;
+  last_name: string;
+  father_name: string;
+  mother_name: string;
+
+  birth_date: string;
+  birth_place: string;
+
+  address: string;
+  gender: StaffGender;
+
+  nationality?:
+    | StaffNationality
+    | null;
+
+  photo_url?: File | null;
+  email?: string | null;
+
+  degree?: StaffDegree | null;
+  specialization?: string | null;
+  university?: string | null;
+  graduation_year?: number | null;
+
+  hire_date: string;
+  experience_years?: number | null;
+
+  password?: string | null;
+
+  service_type?:
+    | StaffServiceType
+    | null;
+};
+
+export type UpdateStaffPersonalValues = {
+  phone_number?: string;
+
+  first_name?: string;
+  last_name?: string;
+  father_name?: string;
+  mother_name?: string;
+
+  birth_date?: string;
+  birth_place?: string;
+
+  address?: string;
+  gender?: StaffGender;
+
+  nationality?:
+    | StaffNationality
+    | null;
+
+  photo_url?: File | null;
+  email?: string | null;
+};
+
+export type UpdateStaffEmploymentValues = {
+  degree?: StaffDegree | null;
+  specialization?: string | null;
+  university?: string | null;
+
+  graduation_year?: number | null;
+  hire_date?: string;
+  experience_years?: number | null;
+
+  service_type?:
+    | StaffServiceType
+    | null;
+};
+
+export type StaffSectionColor = {
+  background: string;
+  light: string;
+  text: string;
+
+  border: string;
+  hover: string;
+  ring: string;
+
+  button: string;
+  footer: string;
+
+  fieldHover: string;
+  fieldFocus: string;
+  fieldRing: string;
+  itemHover: string;
+};
+
+export type StaffSectionConfig = {
+  role: StaffRole;
+
+  title: string;
+  singularLabel: string;
+  pluralLabel: string;
+
+  listPath: string;
+  createPath: string;
+
+  icon: LucideIcon;
+
+  color: StaffSectionColor;
+};
+
+export type StaffImportBatchStatusValue =
+  | "pending"
+  | "processing"
+  | "completed"
+  | "failed";
+
+export type StaffImportStartResponse = {
+  batchId?: ApiId;
+  batch_id?: ApiId;
+  status: StaffImportBatchStatusValue;
+  totalRows?: number;
+  total_rows?: number;
+};
+
+export type StaffImportBatchStatus = {
+  batchId?: ApiId;
+  batch_id?: ApiId;
+  status: StaffImportBatchStatusValue;
+  successfulRows?: number;
+  successful_rows?: number;
+  failedRows?: number;
+  failed_rows?: number;
+  totalRows?: number;
+  total_rows?: number;
+  processedRows?: number;
+  processed_rows?: number;
+  message?: string | null;
+};
+
