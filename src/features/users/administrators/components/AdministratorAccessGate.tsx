@@ -35,7 +35,7 @@ export function AdministratorAccessGate({
           }).map((_, index) => (
             <div
               key={index}
-              className="h-[315px] animate-pulse rounded-[20px] border border-border/60 bg-card"
+              className="h-[280px] animate-pulse rounded-[20px] border border-border/60 bg-card"
             />
           ))}
         </div>
