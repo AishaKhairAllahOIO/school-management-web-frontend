@@ -5,9 +5,7 @@ import {
   ClipboardCheck,
   Globe2,
   GraduationCap,
-  Languages,
   MessageCircle,
-  MoonStar,
   Settings,
   UserCircle2,
   Users,
@@ -144,28 +142,7 @@ export const setupSteps: SetupStep[] = [
     icon: Globe2,
     targetSelectors: ["[data-onboarding-target=\"website\"]"],
   },
-  {
-    id: "theme",
-    sectionId: "system",
-    sectionTitle: "Adjust your view",
-    title: "Theme",
-    description:
-      "Switch between light and dark appearance. This changes only how the interface looks for your account.",
-    path: "/profile",
-    icon: MoonStar,
-    targetSelectors: ["[data-onboarding-target=\"theme\"]"],
-  },
-  {
-    id: "language",
-    sectionId: "system",
-    sectionTitle: "Choose the interface language",
-    title: "Language",
-    description:
-      "Switch between English and Arabic. The interface direction updates automatically with the selected language.",
-    path: "/profile",
-    icon: Languages,
-    targetSelectors: ["[data-onboarding-target=\"language\"]"],
-  },
+
 ];
 
 export const featureTips: FeatureTipDefinition[] = [
