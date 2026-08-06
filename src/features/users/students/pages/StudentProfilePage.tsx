@@ -85,7 +85,7 @@ export function StudentProfilePage() {
   const { student, guardian, enrollment } = profileQuery.data;
 
   return (
-    <div className="space-y-5 pb-8">
+    <div className="-mt-6 space-y-5 pb-8">
       <UserPageBackButton
         label="Back to students"
         onClick={() => navigate("/users/students")}
@@ -104,7 +104,7 @@ export function StudentProfilePage() {
         description="Identity, birth and contact information shown in the student form."
         icon={<UserRound size={18} strokeWidth={1.7} />}
       >
-        <div className="grid items-start gap-5 xl:grid-cols-[340px_minmax(0,1fr)]">
+        <div className="grid items-start gap-5 xl:grid-cols-[280px_minmax(0,1fr)]">
           <UserPhotoCard
             title="Student photo"
             description="Student profile image."
@@ -112,8 +112,8 @@ export function StudentProfilePage() {
             alt={student.fullName}
             authenticated
           />
-          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-          <ProfileInfoCard icon={<UserRound size={18} />} label="Full name" value={student.fullName} className="sm:col-span-2" />
+          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+          <ProfileInfoCard icon={<UserRound size={18} />} label="Full name" value={student.fullName} />
           <ProfileInfoCard icon={<UsersRound size={18} />} label="Father name" value={displayValue(student.fatherName)} />
           <ProfileInfoCard icon={<UsersRound size={18} />} label="Mother name" value={displayValue(student.motherName)} />
           <ProfileInfoCard icon={<CalendarDays size={18} />} label="Birth date" value={formatDateOnly(student.birthDate)} />
@@ -121,7 +121,7 @@ export function StudentProfilePage() {
           <ProfileInfoCard icon={<IdCard size={18} />} label="Gender" value={displayValue(student.gender)} />
           <ProfileInfoCard icon={<IdCard size={18} />} label="Nationality" value={formatUserNationality(student.nationality)} />
           <ProfileInfoCard icon={<Phone size={18} />} label="Phone number" value={<span dir="ltr">{displayValue(student.phoneNumber)}</span>} />
-          <ProfileInfoCard icon={<Home size={18} />} label="Address" value={displayValue(student.address)} className="sm:col-span-2 xl:col-span-4" />
+          <ProfileInfoCard icon={<Home size={18} />} label="Address" value={displayValue(student.address)} className="sm:col-span-2 xl:col-span-3" />
           </div>
         </div>
       </StudentProfileSection>
@@ -132,7 +132,7 @@ export function StudentProfilePage() {
         icon={<UsersRound size={18} strokeWidth={1.7} />}
       >
         {guardian ? (
-          <div className="grid items-start gap-5 xl:grid-cols-[340px_minmax(0,1fr)]">
+          <div className="grid items-start gap-5 xl:grid-cols-[280px_minmax(0,1fr)]">
             <UserPhotoCard
               title="Guardian photo"
               description="Guardian profile image."
@@ -140,8 +140,8 @@ export function StudentProfilePage() {
               alt={guardian.fullName}
               authenticated
             />
-            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-            <ProfileInfoCard icon={<UsersRound size={18} />} label="Full name" value={guardian.fullName} className="sm:col-span-2" />
+            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+            <ProfileInfoCard icon={<UsersRound size={18} />} label="Full name" value={guardian.fullName} />
             <ProfileInfoCard icon={<UsersRound size={18} />} label="Father name" value={displayValue(guardian.fatherName)} />
             <ProfileInfoCard icon={<UsersRound size={18} />} label="Mother name" value={displayValue(guardian.motherName)} />
             <ProfileInfoCard icon={<CalendarDays size={18} />} label="Birth date" value={formatDateOnly(guardian.birthDate)} />
@@ -149,7 +149,7 @@ export function StudentProfilePage() {
             <ProfileInfoCard icon={<IdCard size={18} />} label="Gender" value={displayValue(guardian.gender)} />
             <ProfileInfoCard icon={<IdCard size={18} />} label="Nationality" value={formatUserNationality(guardian.nationality)} />
             <ProfileInfoCard icon={<Phone size={18} />} label="Phone number" value={<span dir="ltr">{displayValue(guardian.phoneNumber)}</span>} />
-            <ProfileInfoCard icon={<Home size={18} />} label="Address" value={displayValue(guardian.address)} className="sm:col-span-2 xl:col-span-4" />
+            <ProfileInfoCard icon={<Home size={18} />} label="Address" value={displayValue(guardian.address)} className="sm:col-span-2 xl:col-span-3" />
             </div>
           </div>
         ) : (
@@ -164,7 +164,7 @@ export function StudentProfilePage() {
         description="Academic placement and current enrollment status."
         icon={<GraduationCap size={18} strokeWidth={1.7} />}
       >
-        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
           <ProfileInfoCard icon={<CalendarDays size={18} />} label="Academic year" value={referenceValue(enrollment.academicYear)} />
           <ProfileInfoCard icon={<BookOpen size={18} />} label="Grade" value={referenceValue(enrollment.grade)} />
           <ProfileInfoCard icon={<GraduationCap size={18} />} label="Classroom" value={referenceValue(enrollment.classroom)} />
@@ -178,16 +178,36 @@ export function StudentProfilePage() {
 
 function StudentProfileSkeleton() {
   return (
-    <main className="min-h-screen bg-background px-4 py-5 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-[1450px] space-y-6">
-        <div className="h-28 animate-pulse rounded-[22px] bg-muted/60" />
-        <div className="h-[360px] animate-pulse rounded-[24px] bg-muted/55" />
-        <div className="grid gap-6 xl:grid-cols-[1.15fr_.85fr]">
-          <div className="h-96 animate-pulse rounded-[24px] bg-muted/50" />
-          <div className="h-96 animate-pulse rounded-[24px] bg-muted/50" />
+    <div aria-busy="true" className="-mt-6 space-y-5 pb-8 animate-pulse">
+      <div className="h-10 w-40 rounded-xl bg-muted/70" />
+      <section className="rounded-[24px] border border-border/70 bg-card p-5">
+        <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
+          <div className="h-28 w-28 shrink-0 rounded-[24px] bg-muted" />
+          <div className="flex-1">
+            <div className="h-3 w-24 rounded bg-muted" />
+            <div className="mt-3 h-8 w-64 max-w-full rounded bg-muted" />
+            <div className="mt-3 h-4 w-full max-w-xl rounded bg-muted/75" />
+            <div className="mt-4 flex gap-2"><div className="h-8 w-24 rounded-full bg-muted"/><div className="h-8 w-28 rounded-full bg-muted"/></div>
+          </div>
         </div>
-      </div>
-    </main>
+      </section>
+      {[0, 1, 2].map((section) => (
+        <section key={section} className="overflow-hidden rounded-[22px] border border-border/70 bg-card">
+          <div className="border-b border-border/60 px-5 py-4">
+            <div className="h-4 w-36 rounded bg-muted" />
+            <div className="mt-2 h-3 w-full max-w-md rounded bg-muted/75" />
+          </div>
+          <div className="grid gap-3 p-5 sm:grid-cols-2 xl:grid-cols-4">
+            {Array.from({ length: 6 }).map((_, index) => (
+              <div key={index} className="rounded-[16px] border border-border/60 bg-card p-3.5">
+                <div className="h-3 w-20 rounded bg-muted/75" />
+                <div className="mt-3 h-4 w-32 max-w-full rounded bg-muted" />
+              </div>
+            ))}
+          </div>
+        </section>
+      ))}
+    </div>
   );
 }
 

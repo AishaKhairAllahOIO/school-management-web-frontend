@@ -250,8 +250,45 @@ export function StaffRolePage({
   }
 
   return (
-    <section className="space-y-5">
+    <section className="-mt-6 space-y-5">
       <UsersOverviewBackLink />
+
+      {query.isLoading ? (
+        <DirectoryStatsSkeleton color={config.color} />
+      ) : !query.isError ? (
+        <div className="flex flex-wrap items-center gap-2">
+          <span
+            className={[
+              "inline-flex items-center gap-2 rounded-full border",
+              "px-3 py-1.5 text-xs font-medium",
+              config.color.border,
+              config.color.light,
+              config.color.text,
+            ].join(" ")}
+          >
+            <UsersRound className="h-3.5 w-3.5" />
+
+            {total}{" "}
+            {total === 1
+              ? config.singularLabel.toLowerCase()
+              : config.pluralLabel.toLowerCase()}
+          </span>
+
+          <span
+            className={[
+              "inline-flex items-center gap-2 rounded-full border",
+              "px-3 py-1.5 text-xs font-medium",
+              config.color.border,
+              config.color.light,
+              config.color.text,
+            ].join(" ")}
+          >
+            <Sparkles className="h-3.5 w-3.5" />
+
+            Updated directory
+          </span>
+        </div>
+      ) : null}
 
       <header
         className={[
@@ -304,7 +341,7 @@ export function StaffRolePage({
         Staff directory
       </p>
 
-      <h1 className="mt-1 text-[27px] font-semibold tracking-[-0.04em] text-foreground">
+      <h1 className="mt-1 text-[24px] font-semibold tracking-[-0.04em] text-foreground">
         {config.title}
       </h1>
 
@@ -492,7 +529,7 @@ export function StaffRolePage({
                   "inline-flex h-10 items-center justify-center gap-2",
                   "rounded-xl px-3",
                   "text-xs font-semibold",
-                  "shadow-[var(--shadow-auth-button)]",
+                  "",
                   "transition-transform hover:-translate-y-0.5",
                   "focus-visible:outline-none focus-visible:ring-4",
                   config.color.ring,
@@ -528,7 +565,7 @@ export function StaffRolePage({
                   "inline-flex h-10 items-center justify-center gap-2",
                   "rounded-xl px-3",
                   "text-xs font-semibold",
-                  "shadow-[var(--shadow-auth-button)]",
+                  "",
                   "transition-transform hover:-translate-y-0.5",
                   "focus-visible:outline-none focus-visible:ring-4",
                   config.color.ring,
@@ -550,41 +587,7 @@ export function StaffRolePage({
         </div>
       </header>
 
-      {!query.isLoading &&
-      !query.isError ? (
-        <div className="flex flex-wrap items-center gap-2">
-          <span
-            className={[
-              "inline-flex items-center gap-2 rounded-full border",
-              "px-3 py-1.5 text-xs font-medium",
-              config.color.border,
-              config.color.light,
-              config.color.text,
-            ].join(" ")}
-          >
-            <UsersRound className="h-3.5 w-3.5" />
 
-            {total}{" "}
-            {total === 1
-              ? config.singularLabel.toLowerCase()
-              : config.pluralLabel.toLowerCase()}
-          </span>
-
-          <span
-            className={[
-              "inline-flex items-center gap-2 rounded-full border",
-              "px-3 py-1.5 text-xs font-medium",
-              config.color.border,
-              config.color.light,
-              config.color.text,
-            ].join(" ")}
-          >
-            <Sparkles className="h-3.5 w-3.5" />
-
-            Updated directory
-          </span>
-        </div>
-      ) : null}
 
       {query.isLoading ? (
         <StaffGridSkeleton
@@ -620,7 +623,7 @@ export function StaffRolePage({
           }
         />
       ) : (
-        <div className="grid gap-5 md:grid-cols-2 2xl:grid-cols-3">
+        <div className="grid gap-4 md:grid-cols-2 2xl:grid-cols-3">
           {staff.map(
             (item) => (
               <StaffCard
@@ -761,63 +764,78 @@ function StaffGridSkeleton({
   color: StaffSectionColor;
 }) {
   return (
-    <div className="grid gap-5 md:grid-cols-2 2xl:grid-cols-3">
-      {Array.from({
-        length: 6,
-      }).map(
-        (_, index) => (
-          <div
-            key={index}
-            className={[
-              "min-h-[315px] animate-pulse overflow-hidden",
-              "rounded-[24px] border bg-card",
-              color.border,
-            ].join(" ")}
-          >
-            <div
-              className={[
-                "h-[3px]",
-                color.background,
-              ].join(" ")}
-            />
+    <div
+      aria-busy="true"
+      aria-label="Loading staff directory"
+      className="grid gap-4 md:grid-cols-2 2xl:grid-cols-3"
+    >
+      {Array.from({ length: 6 }).map((_, index) => (
+        <article
+          key={index}
+          className={[
+            "relative flex h-[280px] flex-col overflow-hidden",
+            "rounded-[20px] border bg-card",
+            color.border,
+            "shadow-[var(--shadow-card)]",
+          ].join(" ")}
+        >
+          <div className={["h-[3px] animate-pulse", color.background].join(" ")} />
 
-            <div className="p-5">
-              <div className="flex items-center gap-4">
-                <div
-                  className={[
-                    "h-14 w-14 rounded-[18px]",
-                    color.light,
-                  ].join(" ")}
-                />
-
-                <div className="flex-1">
-                  <div className="h-5 w-2/3 rounded bg-muted" />
-
-                  <div className="mt-2 h-3 w-1/2 rounded bg-muted/70" />
+          <div className="flex flex-1 flex-col p-3">
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex min-w-0 flex-1 items-center gap-3.5">
+                <div className={["h-11 w-11 shrink-0 animate-pulse rounded-[14px]", color.light].join(" ")} />
+                <div className="min-w-0 flex-1">
+                  <div className="h-5 w-2/3 animate-pulse rounded-md bg-muted" />
+                  <div className="mt-2 h-3.5 w-1/2 animate-pulse rounded bg-muted/70" />
                 </div>
               </div>
+              <div className="h-9 w-9 shrink-0 animate-pulse rounded-full bg-muted/70" />
+            </div>
 
-              <div className="mt-5 space-y-2.5">
-                {Array.from({
-                  length: 5,
-                }).map(
-                  (
-                    __,
-                    row,
-                  ) => (
-                    <div
-                      key={
-                        row
-                      }
-                      className="h-[53px] rounded-2xl bg-muted/55"
-                    />
-                  ),
-                )}
-              </div>
+            <div className="mt-3 h-7 w-24 animate-pulse rounded-full bg-muted" />
+
+            <div className="mt-3 grid grid-cols-2 gap-2">
+              {Array.from({ length: 2 }).map((__, row) => (
+                <div key={row} className="flex min-w-0 items-center gap-2.5 rounded-2xl border border-border/55 bg-muted/25 px-3 py-2.5">
+                  <div className="h-8 w-8 shrink-0 animate-pulse rounded-xl bg-muted" />
+                  <div className="min-w-0 flex-1">
+                    <div className="h-2.5 w-12 animate-pulse rounded bg-muted/75" />
+                    <div className="mt-2 h-3.5 w-3/4 animate-pulse rounded bg-muted" />
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
-        ),
-      )}
+
+          <div className={[
+            "grid grid-cols-3 items-center gap-2",
+            "border-t px-3.5 py-2.5",
+            color.border,
+            color.footer,
+          ].join(" ")}>
+            <div className="h-10 animate-pulse rounded-xl bg-muted" />
+            <div className="h-10 animate-pulse rounded-xl bg-muted" />
+            <div className="h-10 animate-pulse rounded-xl bg-muted" />
+          </div>
+        </article>
+      ))}
+    </div>
+  );
+}
+
+function DirectoryStatsSkeleton({
+  color,
+}: {
+  color: StaffSectionColor;
+}) {
+  return (
+    <div
+      aria-hidden="true"
+      className="flex animate-pulse flex-wrap items-center gap-2"
+    >
+      <span className={["h-7 w-24 rounded-full border", color.border, color.light].join(" ")} />
+      <span className={["h-7 w-36 rounded-full border", color.border, color.light].join(" ")} />
     </div>
   );
 }
@@ -884,7 +902,7 @@ function EmptyState({
             "mt-6 inline-flex h-11 items-center gap-2",
             "rounded-xl px-5",
             "text-sm font-semibold",
-            "shadow-[var(--shadow-auth-button)]",
+            "",
             "transition-transform hover:-translate-y-0.5",
             "focus-visible:outline-none focus-visible:ring-4",
             color.ring,

@@ -625,20 +625,44 @@ export function StudentEditPage() {
       payload,
     });
 
-    navigate(
-      `/users/students/${enrollmentId}`,
-    );
+    navigate("/users/students");
   }
 
   if (profileQuery.isPending) {
     return (
-      <main className="min-h-screen bg-background px-4 py-5 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-[1450px] space-y-6">
-          <div className="h-28 animate-pulse rounded-[24px] bg-muted/65" />
-
-          <div className="h-[520px] animate-pulse rounded-[24px] bg-muted/50" />
-        </div>
-      </main>
+      <div aria-busy="true" className="-mt-6 space-y-5 pb-8 animate-pulse">
+        <div className="h-10 w-40 rounded-xl bg-muted/70" />
+        <section className="rounded-[22px] border border-border/70 bg-card p-5">
+          <div className="flex items-center gap-4">
+            <div className="h-12 w-12 rounded-[14px] bg-muted" />
+            <div className="flex-1">
+              <div className="h-3 w-24 rounded bg-muted" />
+              <div className="mt-3 h-7 w-52 rounded bg-muted" />
+              <div className="mt-3 h-3.5 w-full max-w-lg rounded bg-muted/75" />
+            </div>
+          </div>
+        </section>
+        {[0, 1].map((section) => (
+          <div key={section} className="grid items-start gap-5 xl:grid-cols-[280px_minmax(0,1fr)]">
+            <section className="rounded-[22px] border border-border/70 bg-card p-4">
+              <div className="h-5 w-32 rounded bg-muted" />
+              <div className="mt-4 aspect-square rounded-[18px] border border-border/60 bg-muted/25" />
+            </section>
+            <section className="rounded-[22px] border border-border/70 bg-card p-5">
+              <div className="h-4 w-28 rounded bg-muted" />
+              <div className="mt-3 h-6 w-52 rounded bg-muted" />
+              <div className="mt-5 grid gap-4 md:grid-cols-2">
+                {Array.from({ length: 6 }).map((_, index) => (
+                  <div key={index}>
+                    <div className="h-3 w-24 rounded bg-muted/75" />
+                    <div className="mt-2 h-11 rounded-xl border border-border/60 bg-muted/30" />
+                  </div>
+                ))}
+              </div>
+            </section>
+          </div>
+        ))}
+      </div>
     );
   }
 
@@ -702,11 +726,11 @@ export function StudentEditPage() {
   return (
     <form
       onSubmit={submit}
-      className="space-y-5 pb-8"
+      className="-mt-6 space-y-5 pb-8"
     >
       <UserPageBackButton
         label="Back to students"
-        onClick={() => navigate(`/users/students/${enrollmentId}`)}
+        onClick={() => navigate("/users/students")}
       />
 
       <StudentPageHeader
@@ -730,11 +754,7 @@ export function StudentEditPage() {
           <>
             <button
               type="button"
-              onClick={() =>
-                navigate(
-                  `/users/students/${enrollmentId}`,
-                )
-              }
+              onClick={() => navigate("/users/students")}
               className="inline-flex h-11 items-center rounded-xl border border-border/70 bg-card px-5 text-sm font-medium text-foreground transition hover:bg-muted/40"
             >
               Cancel
@@ -763,7 +783,7 @@ export function StudentEditPage() {
         }
       />
 
-      <div className="grid items-start gap-5 xl:grid-cols-[340px_minmax(0,1fr)]">
+      <div className="grid items-start gap-5 xl:grid-cols-[280px_minmax(0,1fr)]">
         <PersonPhotoSection
           title="Student photo"
           description="Update the student profile photo."
@@ -791,7 +811,7 @@ export function StudentEditPage() {
       </div>
 
       {guardianData ? (
-        <div className="grid items-start gap-5 xl:grid-cols-[340px_minmax(0,1fr)]">
+        <div className="grid items-start gap-5 xl:grid-cols-[280px_minmax(0,1fr)]">
           <PersonPhotoSection
             title="Guardian photo"
             description="Update the guardian profile photo."

@@ -73,7 +73,7 @@ export function StudentProfileHero({
             status={enrollment.enrollmentStatus}
           />
 
-          <h1 className="mt-4 text-3xl font-black tracking-[-0.04em] text-foreground sm:text-4xl lg:text-5xl">
+          <h1 className="mt-4 text-2xl font-semibold tracking-[-0.035em] text-foreground sm:text-3xl">
             {student.fullName}
           </h1>
 

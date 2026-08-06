@@ -77,7 +77,7 @@ export function StaffRegistrationPage({
   return (
     <form
       onSubmit={handleSubmit}
-      className="space-y-5 pb-8"
+      className="-mt-6 space-y-5 pb-8"
     >
       <UserPageBackButton
         label={
@@ -171,7 +171,7 @@ export function StaffRegistrationPage({
         </section>
       ) : null}
 
-      <div className="grid items-start gap-5 xl:grid-cols-[340px_minmax(0,1fr)]">
+      <div className="grid items-start gap-5 xl:grid-cols-[280px_minmax(0,1fr)]">
         <StaffPhotoFormSection
           color={config.color}
           mode="create"

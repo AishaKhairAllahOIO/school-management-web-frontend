@@ -224,7 +224,7 @@ export function StaffProfilePage({
   
 
   return (
-    <section className="space-y-4 pb-8">
+    <section className="-mt-6 space-y-4 pb-8">
       <UserPageBackButton
         label={`Back to ${config.pluralLabel}`}
         onClick={() => navigate(config.listPath)}
@@ -266,7 +266,7 @@ export function StaffProfilePage({
         />
       ) : null}
 
-      <div className="grid items-start gap-5 xl:grid-cols-[340px_minmax(0,1fr)]">
+      <div className="grid items-start gap-5 xl:grid-cols-[280px_minmax(0,1fr)]">
         <UserPhotoCard
           title={`${config.singularLabel} photo`}
           description="Profile image used across the staff directory."

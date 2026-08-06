@@ -67,7 +67,7 @@ export function StaffProfilePhoto({
           dimensions.container,
           "border border-card/80",
           "bg-card",
-          "shadow-[var(--shadow-floating)]",
+          "shadow-sm",
         ].join(" ")}
       >
         {photoUrl ? (

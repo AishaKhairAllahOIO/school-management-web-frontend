@@ -148,7 +148,7 @@ export function StaffPageHero({
         "border",
         color.border,
         "bg-card",
-        "shadow-[var(--shadow-floating)]",
+        "shadow-sm",
       ].join(" ")}
     >
       <div
@@ -337,7 +337,7 @@ export function StaffPageHero({
                 "self-start rounded-xl",
                 "px-4",
                 "text-sm font-semibold",
-                "shadow-[var(--shadow-auth-button)]",
+                "",
                 "transition",
                 color.button,
                 "hover:-translate-y-0.5",
@@ -401,7 +401,7 @@ export function StaffPageHero({
                   "items-center justify-center gap-2",
                   "rounded-xl px-4",
                   "text-sm font-semibold",
-                  "shadow-[var(--shadow-auth-button)]",
+                  "",
                   "transition",
                   color.button,
                   "hover:-translate-y-0.5",

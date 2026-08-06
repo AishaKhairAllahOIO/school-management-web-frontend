@@ -372,8 +372,115 @@ export function StudentsPage() {
   }
 
   return (
-    <section className="space-y-5">
+    <section className="-mt-6 space-y-4">
       <UsersOverviewBackLink />
+
+      {activeQuery.isPending ? (
+        <DirectoryStatsSkeleton />
+      ) : !activeQuery.isError ? (
+        <div className="flex flex-wrap items-center gap-2">
+          <span
+            className={[
+              "inline-flex items-center gap-2",
+              "rounded-full border",
+              "border-primary/20",
+              "bg-primary/[0.07]",
+              "px-3 py-1.5",
+              "text-xs font-medium",
+              "text-primary",
+            ].join(" ")}
+          >
+            <GraduationCap className="h-3.5 w-3.5" />
+
+            {totalStudents}{" "}
+            {totalStudents === 1
+              ? "student"
+              : "students"}
+          </span>
+
+          <span
+            className={[
+              "inline-flex items-center gap-2",
+              "rounded-full border",
+              "border-primary/20",
+              "bg-primary/[0.07]",
+              "px-3 py-1.5",
+              "text-xs font-medium",
+              "text-primary",
+            ].join(" ")}
+          >
+            <Sparkles className="h-3.5 w-3.5" />
+
+            Updated directory
+          </span>
+
+          {selectedGrade ? (
+            <span
+              className={[
+                "inline-flex items-center gap-1.5",
+                "rounded-full border",
+                "border-primary/20",
+                "bg-primary/[0.07]",
+                "px-3 py-1.5",
+                "text-xs font-medium text-primary",
+              ].join(" ")}
+            >
+              <BookOpen className="h-3.5 w-3.5" />
+              {selectedGrade.name}
+            </span>
+          ) : null}
+
+          {selectedClassroom ? (
+            <span
+              className={[
+                "inline-flex items-center gap-1.5",
+                "rounded-full border",
+                "border-primary/20",
+                "bg-primary/[0.07]",
+                "px-3 py-1.5",
+                "text-xs font-medium text-primary",
+              ].join(" ")}
+            >
+              <Building2 className="h-3.5 w-3.5" />
+              {selectedClassroom.name}
+            </span>
+          ) : null}
+
+          {filters.status ? (
+            <span
+              className={[
+                "inline-flex items-center",
+                "rounded-full border",
+                "border-primary/20",
+                "bg-primary/[0.07]",
+                "px-3 py-1.5",
+                "text-xs font-medium",
+                "capitalize text-primary",
+              ].join(" ")}
+            >
+              {filters.status}
+            </span>
+          ) : null}
+
+          {debouncedSearch ? (
+            <span
+              className={[
+                "inline-flex max-w-56",
+                "items-center truncate",
+                "rounded-full border",
+                "border-border/60",
+                "bg-muted/50",
+                "px-3 py-1.5",
+                "text-xs font-medium",
+                "text-muted-foreground",
+              ].join(" ")}
+            >
+              Search:{" "}
+              {debouncedSearch}
+            </span>
+          ) : null}
+        </div>
+      ) : null}
 
       <header
         className={[
@@ -416,7 +523,7 @@ export function StudentsPage() {
                   Student directory
                 </p>
 
-                <h1 className="mt-1 text-[27px] font-semibold tracking-[-0.04em] text-foreground">
+                <h1 className="mt-1 text-[24px] font-semibold tracking-[-0.04em] text-foreground">
                   Students
                 </h1>
 
@@ -828,111 +935,7 @@ export function StudentsPage() {
         </div>
       </header>
 
-      {!activeQuery.isPending &&
-      !activeQuery.isError ? (
-        <div className="flex flex-wrap items-center gap-2">
-          <span
-            className={[
-              "inline-flex items-center gap-2",
-              "rounded-full border",
-              "border-primary/20",
-              "bg-primary/[0.07]",
-              "px-3 py-1.5",
-              "text-xs font-medium",
-              "text-primary",
-            ].join(" ")}
-          >
-            <GraduationCap className="h-3.5 w-3.5" />
 
-            {totalStudents}{" "}
-            {totalStudents === 1
-              ? "student"
-              : "students"}
-          </span>
-
-          <span
-            className={[
-              "inline-flex items-center gap-2",
-              "rounded-full border",
-              "border-primary/20",
-              "bg-primary/[0.07]",
-              "px-3 py-1.5",
-              "text-xs font-medium",
-              "text-primary",
-            ].join(" ")}
-          >
-            <Sparkles className="h-3.5 w-3.5" />
-
-            Updated directory
-          </span>
-
-          {selectedGrade ? (
-            <span
-              className={[
-                "inline-flex items-center gap-1.5",
-                "rounded-full border",
-                "border-primary/20",
-                "bg-primary/[0.07]",
-                "px-3 py-1.5",
-                "text-xs font-medium text-primary",
-              ].join(" ")}
-            >
-              <BookOpen className="h-3.5 w-3.5" />
-              {selectedGrade.name}
-            </span>
-          ) : null}
-
-          {selectedClassroom ? (
-            <span
-              className={[
-                "inline-flex items-center gap-1.5",
-                "rounded-full border",
-                "border-primary/20",
-                "bg-primary/[0.07]",
-                "px-3 py-1.5",
-                "text-xs font-medium text-primary",
-              ].join(" ")}
-            >
-              <Building2 className="h-3.5 w-3.5" />
-              {selectedClassroom.name}
-            </span>
-          ) : null}
-
-          {filters.status ? (
-            <span
-              className={[
-                "inline-flex items-center",
-                "rounded-full border",
-                "border-primary/20",
-                "bg-primary/[0.07]",
-                "px-3 py-1.5",
-                "text-xs font-medium",
-                "capitalize text-primary",
-              ].join(" ")}
-            >
-              {filters.status}
-            </span>
-          ) : null}
-
-          {debouncedSearch ? (
-            <span
-              className={[
-                "inline-flex max-w-56",
-                "items-center truncate",
-                "rounded-full border",
-                "border-border/60",
-                "bg-muted/50",
-                "px-3 py-1.5",
-                "text-xs font-medium",
-                "text-muted-foreground",
-              ].join(" ")}
-            >
-              Search:{" "}
-              {debouncedSearch}
-            </span>
-          ) : null}
-        </div>
-      ) : null}
 
       {activeQuery.isPending ? (
         <StudentsLoadingGrid />
@@ -1145,3 +1148,15 @@ function StudentsErrorState({
     </section>
   );
 }
+function DirectoryStatsSkeleton() {
+  return (
+    <div
+      aria-hidden="true"
+      className="flex animate-pulse flex-wrap items-center gap-2"
+    >
+      <span className="h-7 w-24 rounded-full border border-primary/15 bg-primary/[0.06]" />
+      <span className="h-7 w-36 rounded-full border border-primary/15 bg-primary/[0.06]" />
+    </div>
+  );
+}
+

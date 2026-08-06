@@ -72,7 +72,7 @@ export function StaffEmptyState({
             "rounded-xl px-5",
             "text-sm font-semibold",
             "text-primary-foreground",
-            "shadow-[var(--shadow-auth-button)]",
+            "",
             "transition-transform",
             "hover:-translate-y-0.5",
           ].join(" ")}

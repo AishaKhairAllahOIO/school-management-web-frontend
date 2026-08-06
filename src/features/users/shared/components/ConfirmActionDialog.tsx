@@ -144,13 +144,13 @@ export function ConfirmActionDialog({
             onClick={onConfirm}
             className={[
               "inline-flex h-9 items-center justify-center gap-2 rounded-full px-4",
-              "text-[11px] font-medium text-white transition",
+              "border bg-transparent text-[11px] font-semibold transition",
               "disabled:cursor-not-allowed disabled:opacity-60",
               isRestore
-                ? "bg-emerald-600 hover:bg-emerald-600/90"
+                ? "!border-[#00b84a] !bg-transparent !text-[#00b84a] hover:!border-[#00b84a] hover:!bg-[#00b84a]/[0.08] hover:!text-[#00b84a]"
                 : tone === "danger"
-                  ? "bg-destructive hover:bg-destructive/90"
-                  : "bg-primary hover:bg-primary/90",
+                  ? "!border-[#ff2020] !bg-transparent !text-[#ff2020] hover:!border-[#ff2020] hover:!bg-[#ff2020]/[0.08] hover:!text-[#ff2020]"
+                  : "border-primary/55 text-primary hover:border-primary hover:bg-primary/[0.06]",
             ].join(" ")}
           >
             {isPending ? (

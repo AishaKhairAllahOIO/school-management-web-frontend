@@ -55,8 +55,8 @@ export function StaffImportPage({ role }: StaffImportPageProps) {
   const total = data?.totalRows ?? data?.total_rows ?? processed;
 
   return (
-    <main className="min-h-screen bg-background px-4 py-5 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-[1250px] space-y-6">
+    <main className="-mt-6">
+      <div className="space-y-5">
         <UserPageBackButton
           label={`Back to ${config.pluralLabel}`}
           onClick={() => navigate(config.listPath)}

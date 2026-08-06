@@ -1,4 +1,5 @@
-import type { ChangeEvent, ReactNode } from "react";
+import { useRef, useState } from "react";
+import type { ChangeEvent, DragEvent, ReactNode } from "react";
 import { Camera, ImagePlus } from "lucide-react";
 
 import { AuthenticatedUserImage } from "./AuthenticatedUserImage";
@@ -30,8 +31,30 @@ export function UserPhotoCard({
   icon,
   onChange,
 }: UserPhotoCardProps) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [isDragging, setIsDragging] = useState(false);
+
+  function handleDroppedFile(event: DragEvent<HTMLLabelElement>) {
+    event.preventDefault();
+    event.stopPropagation();
+    setIsDragging(false);
+
+    if (disabled) return;
+
+    const file = event.dataTransfer.files?.[0];
+    if (!file || !file.type.startsWith("image/")) return;
+
+    const transfer = new DataTransfer();
+    transfer.items.add(file);
+
+    if (inputRef.current) {
+      inputRef.current.files = transfer.files;
+      inputRef.current.dispatchEvent(new Event("change", { bubbles: true }));
+    }
+  }
+
   const content = (
-    <div className="flex min-h-[250px] w-full flex-col">
+    <div className="flex w-full flex-col">
       <div className="flex items-center gap-3 px-4 pb-3 pt-4">
         <span className={[
           "flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px]",
@@ -47,19 +70,19 @@ export function UserPhotoCard({
         </div>
       </div>
 
-      <div className="mx-4 mb-4 flex min-h-[174px] flex-1 items-center justify-center overflow-hidden rounded-[18px] border border-border/55 bg-muted/[0.16]">
+      <div className="mx-4 mb-4 flex aspect-square items-center justify-center overflow-hidden rounded-[18px] border border-border/55 bg-muted/[0.16]">
         {photoUrl ? (
           authenticated ? (
             <AuthenticatedUserImage
               src={photoUrl}
               alt={alt}
-              className="h-[174px] w-full object-contain p-3"
+              className="h-full w-full object-cover"
             />
           ) : (
             <img
               src={photoUrl}
               alt={alt}
-              className="h-[174px] w-full object-contain p-3"
+              className="h-full w-full object-cover"
             />
           )
         ) : (
@@ -71,7 +94,7 @@ export function UserPhotoCard({
               <Camera className="h-6 w-6" strokeWidth={1.7} />
             </span>
             <p className="text-[11px] leading-5">
-              {editable ? "Click this card to choose a profile image." : "No profile image available."}
+              {editable ? "Click or drag and drop a profile image here." : "No profile image available."}
             </p>
           </div>
         )}
@@ -88,12 +111,23 @@ export function UserPhotoCard({
   }
 
   return (
-    <label className={[
-      "block overflow-hidden rounded-[22px] border border-border/60 bg-card shadow-[var(--shadow-card)] transition",
-      disabled ? "cursor-not-allowed opacity-60" : "cursor-pointer hover:border-primary/20 hover:bg-primary/[0.012]",
-    ].join(" ")}>
+    <label
+      onDragEnter={(event) => { event.preventDefault(); if (!disabled) setIsDragging(true); }}
+      onDragOver={(event) => { event.preventDefault(); if (!disabled) setIsDragging(true); }}
+      onDragLeave={(event) => {
+        event.preventDefault();
+        if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setIsDragging(false);
+      }}
+      onDrop={handleDroppedFile}
+      className={[
+        "block overflow-hidden rounded-[22px] border bg-card transition-colors",
+        isDragging ? "border-primary bg-primary/[0.035] ring-4 ring-primary/10" : "border-border/60",
+        disabled ? "cursor-not-allowed opacity-60" : "cursor-pointer hover:border-primary/30 hover:bg-primary/[0.012]",
+      ].join(" ")}
+    >
       {content}
       <input
+        ref={inputRef}
         type="file"
         accept={accept}
         disabled={disabled}

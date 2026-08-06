@@ -161,16 +161,8 @@ export function StaffPagination({
     <nav
       aria-label={`${itemLabel} pagination`}
       className={[
-        "flex flex-col gap-4",
-        "rounded-[22px]",
-        "border border-border/70",
-        "bg-card/80",
-        "px-4 py-3.5",
-        "shadow-[var(--shadow-card)]",
-        "backdrop-blur",
-        "sm:flex-row",
-        "sm:items-center",
-        "sm:justify-between",
+        "flex flex-col gap-4 px-1 py-2",
+        "sm:flex-row sm:items-center sm:justify-between",
       ].join(" ")}
     >
       <p className="text-center text-[13px] font-normal text-muted-foreground sm:text-left">
@@ -256,9 +248,8 @@ export function StaffPagination({
                   buttonClassName,
                   isCurrent
                     ? [
-                        "primary-gradient",
+                        "bg-primary",
                         "text-primary-foreground",
-                        "shadow-[var(--shadow-auth-button)]",
                       ].join(" ")
                     : [
                         "border border-border",

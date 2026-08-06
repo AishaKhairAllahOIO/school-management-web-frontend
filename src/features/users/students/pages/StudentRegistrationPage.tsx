@@ -286,7 +286,7 @@ export function StudentRegistrationPage() {
   }
 
   return (
-    <form onSubmit={submit} className="space-y-5 pb-8">
+    <form onSubmit={submit} className="-mt-6 space-y-5 pb-8">
         <UserPageBackButton
           label="Back to students"
           onClick={() => navigate("/users/students")}
@@ -338,7 +338,7 @@ export function StudentRegistrationPage() {
         />
 
         <div className="space-y-5">
-            <div className="grid items-start gap-5 xl:grid-cols-[340px_minmax(0,1fr)]">
+            <div className="grid items-start gap-5 xl:grid-cols-[280px_minmax(0,1fr)]">
               <UserPhotoCard
                 title="Student photo"
                 description="Click the card to choose a clear student portrait."
@@ -366,7 +366,7 @@ export function StudentRegistrationPage() {
 
             </div>
 
-            <div className="grid items-start gap-5 xl:grid-cols-[340px_minmax(0,1fr)]">
+            <div className="grid items-start gap-5 xl:grid-cols-[280px_minmax(0,1fr)]">
               <UserPhotoCard
                 title="Guardian photo"
                 description="Click the card to choose a clear guardian portrait."

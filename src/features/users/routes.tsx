@@ -6,6 +6,8 @@ import {
   UsersOverviewPage,
 } from "@/features/users/pages/UsersOverviewPage";
 
+import { UsersRouteScrollRestoration } from "@/features/users/shared/components/UsersRouteScrollRestoration";
+
 import {
   StudentsPage,
 } from "@/features/users/students/pages/StudentsPage";
@@ -81,6 +83,7 @@ import {
 export const usersRoutes = [
   {
     path: "users",
+    element: <UsersRouteScrollRestoration />,
 
     children: [
       {

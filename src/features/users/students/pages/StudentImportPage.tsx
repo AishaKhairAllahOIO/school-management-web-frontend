@@ -198,8 +198,8 @@ export function StudentImportPage() {
     historyQuery.data?.meta;
 
   return (
-    <main className="min-h-screen bg-background px-4 py-5 text-foreground sm:px-6 lg:px-8">
-      <div className="mx-auto flex max-w-[1450px] flex-col gap-6">
+    <main className="-mt-6 text-foreground">
+      <div className="flex flex-col gap-5">
         <UserPageBackButton
         label="Back to students"
         onClick={() => navigate("/users/students")}
