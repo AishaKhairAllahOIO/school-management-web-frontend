@@ -9,6 +9,7 @@ import {
   UserRound,
 } from "lucide-react";
 
+import { PrintPreviewDialog, usePrintPreview } from "@/features/printing";
 import { Button } from "@/shared/ui/button";
 import {
   Dialog,
@@ -23,6 +24,7 @@ import type {
   PaymentMethod,
   PaymentReceipt,
 } from "../../types/finance.types";
+import { buildPaymentReceiptDocument } from "./financePrintDocuments";
 
 type Props = {
   open: boolean;
@@ -192,40 +194,20 @@ export function PaymentReceiptDialog({
 }: Props) {
   const paymentQuery = usePaymentDetails(paymentId, open);
 
+  const printPreview = usePrintPreview();
+
   function printReceipt() {
-    const receipt = document.getElementById("finance-payment-receipt");
-    if (!receipt) return;
-
-    const printWindow = window.open("", "_blank", "width=900,height=720");
-    if (!printWindow) return;
-
-    printWindow.document.write(`
-      <!doctype html>
-      <html>
-        <head>
-          <meta charset="utf-8" />
-          <title>Payment receipt</title>
-          <style>
-            * { box-sizing: border-box; }
-            body { margin: 0; padding: 36px; font-family: Arial, sans-serif; color: #17152b; background: #fff; }
-            .receipt-shell { max-width: 760px; margin: 0 auto; border: 1px solid #ddd9ef; border-radius: 18px; padding: 28px; }
-            h3, p { margin-top: 0; }
-            button { display: none !important; }
-            @media print { body { padding: 0; } .receipt-shell { border: 0; max-width: none; } }
-          </style>
-        </head>
-        <body>
-          <div class="receipt-shell">${receipt.innerHTML}</div>
-        </body>
-      </html>
-    `);
-    printWindow.document.close();
-    printWindow.focus();
-    printWindow.print();
-    printWindow.close();
+    if (!paymentQuery.data) return;
+    printPreview.openPreview({
+      title: "Official payment receipt",
+      html: buildPaymentReceiptDocument(paymentQuery.data),
+      kind: "official-document",
+      orientation: "portrait",
+    });
   }
 
   return (
+    <>
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-h-[92vh] overflow-y-auto rounded-[24px] border-border/55 p-0 sm:max-w-[720px]">
         <DialogHeader className="border-b border-border/40 px-5 py-5 text-start sm:px-6">
@@ -284,5 +266,12 @@ export function PaymentReceiptDialog({
         </div>
       </DialogContent>
     </Dialog>
+
+    <PrintPreviewDialog
+      open={printPreview.isOpen}
+      onOpenChange={printPreview.setOpen}
+      document={printPreview.document}
+    />
+  </>
   );
 }

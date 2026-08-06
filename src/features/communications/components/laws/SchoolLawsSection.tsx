@@ -8,6 +8,7 @@ import {
 } from "react";
 import { toast } from "sonner";
 
+import { PrintPreviewDialog, usePrintPreview } from "@/features/printing";
 import {
   Button,
 } from "@/shared/ui/button";
@@ -32,7 +33,7 @@ import {
 import {
   LawsTable,
 } from "./LawsTable";
-import { printSchoolLaws } from "./printSchoolLaws";
+import { buildSchoolLawsPosterDocument } from "./schoolLawsPrintDocument";
 
 export function SchoolLawsSection() {
   const {
@@ -48,6 +49,7 @@ export function SchoolLawsSection() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedLaw, setSelectedLaw] = useState<SchoolLaw | null>(null);
   const [pendingDelete, setPendingDelete] = useState<SchoolLaw | null>(null);
+  const printPreview = usePrintPreview();
 
   function openCreate() {
     setSelectedLaw(null);
@@ -74,15 +76,12 @@ export function SchoolLawsSection() {
       return;
     }
 
-    try {
-      printSchoolLaws(laws);
-    } catch (error) {
-      toast.error(
-        error instanceof Error
-          ? error.message
-          : "The laws poster could not be opened for printing.",
-      );
-    }
+    printPreview.openPreview({
+      title: "School laws poster",
+      html: buildSchoolLawsPosterDocument(laws),
+      kind: "poster",
+      orientation: "portrait",
+    });
   }
 
   const header = (
@@ -186,6 +185,12 @@ export function SchoolLawsSection() {
             onSuccess: () => setPendingDelete(null),
           });
         }}
+      />
+
+      <PrintPreviewDialog
+        open={printPreview.isOpen}
+        onOpenChange={printPreview.setOpen}
+        document={printPreview.document}
       />
     </div>
   );

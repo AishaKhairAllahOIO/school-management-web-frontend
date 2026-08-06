@@ -1,6 +1,7 @@
 import {
   ChevronDown,
   Eye,
+  HelpCircle,
   LogOut,
   Settings,
   UserPlus,
@@ -13,6 +14,7 @@ import { useNavigate } from "react-router-dom";
 import { useCurrentUser } from "@/app/layout/hooks/useCurrentUser";
 import { useLocale } from "@/app/providers/locale";
 import { useLogout } from "@/features/auth/hooks/use-logout";
+import { ONBOARDING_RESTART_EVENT } from "@/features/onboarding";
 import { useAuthenticatedImage } from "@/shared/hooks/useAuthenticatedImage";
 import { useDismissibleLayer } from "@/shared/hooks/use-dismissible-layer";
 
@@ -241,6 +243,7 @@ export function ProfileMenu({
               }
             />
 
+
             {isSuperAdmin && (
               <>
                 <ProfileMenuItem
@@ -289,6 +292,21 @@ export function ProfileMenu({
                 />
               </>
             )}
+          </div>
+
+          <div className="mt-2 border-t border-topbar-divider pt-2">
+            <p className="px-3 pb-1.5 text-[9px] font-semibold uppercase tracking-[0.13em] text-topbar-muted/70">
+              Help
+            </p>
+            <ProfileMenuItem
+              title="School setup guide"
+              description="Restart the onboarding checklist and feature tips."
+              icon={HelpCircle}
+              onClick={() => {
+                onClose();
+                window.dispatchEvent(new Event(ONBOARDING_RESTART_EVENT));
+              }}
+            />
           </div>
 
           <div

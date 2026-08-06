@@ -1,6 +1,7 @@
 import { useMemo } from "react";
-import { FileText, Printer, ReceiptText } from "lucide-react";
+import { FileText, Printer } from "lucide-react";
 
+import { PrintPreviewDialog, usePrintPreview } from "@/features/printing";
 import { Button } from "@/shared/ui/button";
 import {
   Dialog,
@@ -11,6 +12,7 @@ import {
 } from "@/shared/ui/dialog";
 import { usePayments } from "../../hooks/usePayments";
 import type { FinancialAccount, PaymentReceipt } from "../../types/finance.types";
+import { buildFinalStatementDocument } from "./financePrintDocuments";
 
 type Props = {
   open: boolean;
@@ -67,26 +69,24 @@ export function FullFinancialStatementDialog({
     Number(account.totalRequiredAmount) - Number(account.remainingBalance),
   );
 
+  const printPreview = usePrintPreview();
+
   function printStatement() {
-    const content = document.getElementById("student-financial-statement");
-    if (!content) return;
-    const printWindow = window.open("", "_blank", "width=1100,height=820");
-    if (!printWindow) return;
-    printWindow.document.write(`<!doctype html><html><head><meta charset="utf-8"/><title>Student financial statement</title><style>
-      *{box-sizing:border-box}body{font-family:Arial,sans-serif;margin:0;padding:28px;color:#17152b;background:#fff}
-      .sheet{max-width:980px;margin:auto}.no-print{display:none!important}table{width:100%;border-collapse:collapse;margin-top:12px}
-      th,td{border:1px solid #ddd9ef;padding:9px;text-align:left;font-size:12px}th{background:#f7f5fc}
-      h1,h2,h3,p{margin-top:0}.summary{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:18px 0}
-      .card{border:1px solid #ddd9ef;border-radius:12px;padding:14px}.muted{color:#77718f;font-size:12px}
-      @media print{body{padding:0}.sheet{max-width:none}}
-    </style></head><body><div class="sheet">${content.innerHTML}</div></body></html>`);
-    printWindow.document.close();
-    printWindow.focus();
-    printWindow.print();
-    printWindow.close();
+    printPreview.openPreview({
+      title: "Final financial statement",
+      html: buildFinalStatementDocument({
+        account,
+        studentName,
+        academicYearName,
+        payments: visiblePayments,
+      }),
+      kind: "official-document",
+      orientation: "portrait",
+    });
   }
 
   return (
+    <>
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-h-[92vh] overflow-y-auto rounded-[24px] border-border/55 p-0 sm:max-w-[900px]">
         <DialogHeader className="border-b border-border/40 px-5 py-5 text-start sm:px-6">
@@ -161,5 +161,12 @@ export function FullFinancialStatementDialog({
         </div>
       </DialogContent>
     </Dialog>
+
+    <PrintPreviewDialog
+      open={printPreview.isOpen}
+      onOpenChange={printPreview.setOpen}
+      document={printPreview.document}
+    />
+    </>
   );
 }
