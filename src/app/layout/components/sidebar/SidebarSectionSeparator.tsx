@@ -5,8 +5,8 @@ type SidebarSectionSeparatorProps = {
 };
 
 const SEPARATOR_LINE_CLASS_NAME = [
-  "block h-[4px] shrink-0 border-y border-solid",
-  "[border-color:color-mix(in_srgb,var(--sidebar-foreground)_10%,var(--sidebar)_90%)]",
+  "block h-[4px] shrink-0",
+  "border-y border-solid border-sidebar-muted",
 ].join(" ");
 
 function SeparatorLines({
@@ -19,7 +19,9 @@ function SeparatorLines({
       aria-hidden="true"
       className={[
         SEPARATOR_LINE_CLASS_NAME,
-        compact ? "w-8" : "min-w-0 flex-1",
+        compact
+          ? "w-8"
+          : "min-w-0 flex-1",
       ].join(" ")}
     />
   );
@@ -51,7 +53,17 @@ export function SidebarSectionSeparator({
         className,
       ].join(" ")}
     >
-      <span className="shrink-0 text-[9px] font-semibold uppercase leading-none tracking-[0.15em] text-sidebar-muted/58">
+      <span
+        className="
+          shrink-0
+          text-[9px]
+          font-semibold
+          uppercase
+          leading-none
+          tracking-[0.15em]
+          text-sidebar-muted
+        "
+      >
         {label}
       </span>
 
