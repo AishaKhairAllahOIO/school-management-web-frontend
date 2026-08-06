@@ -8,7 +8,7 @@ import {
 } from "react";
 import { toast } from "sonner";
 
-import { PrintPreviewDialog, usePrintPreview } from "@/features/printing";
+import { PrintPreviewDialog, usePrintIdentity, usePrintPreview } from "@/features/printing";
 import {
   Button,
 } from "@/shared/ui/button";
@@ -50,6 +50,7 @@ export function SchoolLawsSection() {
   const [selectedLaw, setSelectedLaw] = useState<SchoolLaw | null>(null);
   const [pendingDelete, setPendingDelete] = useState<SchoolLaw | null>(null);
   const printPreview = usePrintPreview();
+  const printIdentity = usePrintIdentity();
 
   function openCreate() {
     setSelectedLaw(null);
@@ -76,12 +77,7 @@ export function SchoolLawsSection() {
       return;
     }
 
-    printPreview.openPreview({
-      title: "School laws poster",
-      html: buildSchoolLawsPosterDocument(laws),
-      kind: "poster",
-      orientation: "portrait",
-    });
+    printPreview.openPreview(buildSchoolLawsPosterDocument(laws, printIdentity));
   }
 
   const header = (

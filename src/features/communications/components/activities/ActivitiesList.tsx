@@ -3,6 +3,7 @@ import {
   Clock3,
   Edit3,
   Sparkles,
+  Printer,
   Trash2,
   Users,
 } from "lucide-react";
@@ -10,6 +11,7 @@ import {
   useState,
 } from "react";
 
+import { PrintPreviewDialog, usePrintIdentity, usePrintPreview } from "@/features/printing";
 import {
   Button,
 } from "@/shared/ui/button";
@@ -28,6 +30,7 @@ import {
 import {
   DeleteConfirmationDialog,
 } from "../shared/DeleteConfirmationDialog";
+import { buildActivityPosterDocument } from "./activityPrintDocument";
 
 type Props = {
   onEdit: (activity: Activity) => void;
@@ -69,6 +72,8 @@ export function ActivitiesList({ onEdit }: Props) {
   } = useActivities();
 
   const [pendingDelete, setPendingDelete] = useState<Activity | null>(null);
+  const printPreview = usePrintPreview();
+  const printIdentity = usePrintIdentity();
 
   if (isLoading) return <CommunicationLoading />;
 
@@ -141,6 +146,9 @@ export function ActivitiesList({ onEdit }: Props) {
             </div>
 
             <footer className="flex h-11 items-center justify-end gap-1.5 border-t border-info/[0.10] bg-info/[0.035] px-4">
+              <Button type="button" variant="ghost" size="sm" onClick={() => printPreview.openPreview(buildActivityPosterDocument(activity, printIdentity))} className="h-8 rounded-[10px] px-2.5 text-[11px] font-medium text-primary hover:bg-primary/[0.08] hover:text-primary">
+                <Printer className="h-3.5 w-3.5" /> Poster
+              </Button>
               <Button type="button" variant="ghost" size="sm" onClick={() => onEdit(activity)} className="h-8 rounded-[10px] px-2.5 text-[11px] font-medium text-info hover:bg-info/[0.08] hover:text-info">
                 <Edit3 className="h-3.5 w-3.5" /> Edit
               </Button>
@@ -151,6 +159,12 @@ export function ActivitiesList({ onEdit }: Props) {
           </article>
         ))}
       </div>
+
+      <PrintPreviewDialog
+        open={printPreview.isOpen}
+        onOpenChange={printPreview.setOpen}
+        document={printPreview.document}
+      />
 
       <DeleteConfirmationDialog
         open={Boolean(pendingDelete)}

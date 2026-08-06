@@ -3,6 +3,7 @@ import {
   Edit3,
   Megaphone,
   School,
+  Printer,
   Trash2,
   Users,
 } from "lucide-react";
@@ -10,6 +11,7 @@ import {
   useState,
 } from "react";
 
+import { PrintPreviewDialog, usePrintIdentity, usePrintPreview } from "@/features/printing";
 import {
   Button,
 } from "@/shared/ui/button";
@@ -28,6 +30,7 @@ import {
 import {
   DeleteConfirmationDialog,
 } from "../shared/DeleteConfirmationDialog";
+import { buildAnnouncementPosterDocument } from "./announcementPrintDocument";
 
 type Props = {
   onEdit: (announcement: Announcement) => void;
@@ -46,6 +49,8 @@ export function AnnouncementsList({
 
   const [pendingDelete, setPendingDelete] =
     useState<Announcement | null>(null);
+  const printPreview = usePrintPreview();
+  const printIdentity = usePrintIdentity();
 
   const announcements = myAnnouncements;
   const isLoading = isLoadingMy;
@@ -139,6 +144,16 @@ export function AnnouncementsList({
                     type="button"
                     variant="outline"
                     size="sm"
+                    onClick={() => printPreview.openPreview(buildAnnouncementPosterDocument(item, printIdentity))}
+                    className="h-9 rounded-[11px] border-border/65 bg-transparent px-3 text-[11px] font-medium text-primary hover:bg-primary/[0.06] hover:text-primary"
+                  >
+                    <Printer className="h-3.5 w-3.5" />
+                    Poster
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
                     onClick={() => onEdit(item)}
                     className="h-9 rounded-[11px] border-border/65 bg-transparent px-3 text-[11px] font-medium text-info hover:bg-info/[0.06] hover:text-info"
                   >
@@ -161,6 +176,12 @@ export function AnnouncementsList({
           );
         })}
       </div>
+
+      <PrintPreviewDialog
+        open={printPreview.isOpen}
+        onOpenChange={printPreview.setOpen}
+        document={printPreview.document}
+      />
 
       <DeleteConfirmationDialog
         open={Boolean(pendingDelete)}

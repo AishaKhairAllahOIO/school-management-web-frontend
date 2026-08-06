@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { FileText, Printer } from "lucide-react";
 
-import { PrintPreviewDialog, usePrintPreview } from "@/features/printing";
+import { PrintPreviewDialog, usePrintIdentity, usePrintPreview } from "@/features/printing";
 import { Button } from "@/shared/ui/button";
 import {
   Dialog,
@@ -70,19 +70,18 @@ export function FullFinancialStatementDialog({
   );
 
   const printPreview = usePrintPreview();
+  const printIdentity = usePrintIdentity();
 
   function printStatement() {
-    printPreview.openPreview({
-      title: "Final financial statement",
-      html: buildFinalStatementDocument({
+    printPreview.openPreview(
+      buildFinalStatementDocument({
         account,
         studentName,
         academicYearName,
         payments: visiblePayments,
+        identity: printIdentity,
       }),
-      kind: "official-document",
-      orientation: "portrait",
-    });
+    );
   }
 
   return (

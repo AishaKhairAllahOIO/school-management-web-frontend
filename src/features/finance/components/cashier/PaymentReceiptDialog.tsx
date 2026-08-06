@@ -9,7 +9,7 @@ import {
   UserRound,
 } from "lucide-react";
 
-import { PrintPreviewDialog, usePrintPreview } from "@/features/printing";
+import { PrintPreviewDialog, usePrintIdentity, usePrintPreview } from "@/features/printing";
 import { Button } from "@/shared/ui/button";
 import {
   Dialog,
@@ -195,15 +195,11 @@ export function PaymentReceiptDialog({
   const paymentQuery = usePaymentDetails(paymentId, open);
 
   const printPreview = usePrintPreview();
+  const printIdentity = usePrintIdentity();
 
   function printReceipt() {
     if (!paymentQuery.data) return;
-    printPreview.openPreview({
-      title: "Official payment receipt",
-      html: buildPaymentReceiptDocument(paymentQuery.data),
-      kind: "official-document",
-      orientation: "portrait",
-    });
+    printPreview.openPreview(buildPaymentReceiptDocument(paymentQuery.data, printIdentity));
   }
 
   return (
