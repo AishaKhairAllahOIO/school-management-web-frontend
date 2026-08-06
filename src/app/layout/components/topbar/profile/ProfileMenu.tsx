@@ -14,12 +14,11 @@ import { useNavigate } from "react-router-dom";
 import { useCurrentUser } from "@/app/layout/hooks/useCurrentUser";
 import { useLocale } from "@/app/providers/locale";
 import { useLogout } from "@/features/auth/hooks/use-logout";
-import { ONBOARDING_RESTART_EVENT } from "@/features/onboarding";
+import { ONBOARDING_RESTART_EVENT } from "@/features/onboarding/storage/onboarding.storage";
 import { useAuthenticatedImage } from "@/shared/hooks/useAuthenticatedImage";
 import { useDismissibleLayer } from "@/shared/hooks/use-dismissible-layer";
 
 import type { TopbarMenuProps } from "../topbar.types";
-import { useAnchoredTopbarMenu } from "../useAnchoredTopbarMenu";
 import { ProfileMenuItem } from "./ProfileMenuItem";
 
 export function ProfileMenu({
@@ -44,13 +43,6 @@ export function ProfileMenu({
     ref: containerRef,
     enabled: isOpen,
     onDismiss: onClose,
-  });
-
-  const menuStyle = useAnchoredTopbarMenu({
-    isOpen,
-    triggerRef,
-    desktopMatchTrigger: true,
-    preferredWidth: 320,
   });
 
   const displayName = user
@@ -219,17 +211,20 @@ export function ProfileMenu({
       {isOpen && (
         <div
           role="menu"
-          style={menuStyle}
           className={[
             "topbar-menu-shadow",
-            "z-[100]",
-            "max-h-[calc(100dvh-24px)] overflow-y-auto",
-            "overflow-hidden",
+            "absolute end-0 top-full z-[100] mt-2",
+            "w-[min(320px,calc(100vw-24px))]",
+            "max-h-[calc(100dvh-88px)] overflow-y-auto",
+            "overflow-x-hidden",
             "rounded-[22px]",
             "border border-topbar-border/80",
             "bg-topbar-surface/98",
             "p-2.5",
             "backdrop-blur-2xl",
+            "lg:w-full lg:min-w-[278px]",
+            "origin-top-end animate-in fade-in-0 zoom-in-95 slide-in-from-top-1",
+            "duration-150",
           ].join(" ")}
         >
           <div className="space-y-1">

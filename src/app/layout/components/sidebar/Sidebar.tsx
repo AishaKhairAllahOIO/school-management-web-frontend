@@ -417,14 +417,7 @@ export function Sidebar() {
 
           <div className="min-h-4 flex-1" />
 
-          <div
-            className={[
-              "shrink-0",
-              isCollapsed
-                ? "px-0"
-                : "px-0.5",
-            ].join(" ")}
-          >
+          <div className="w-full shrink-0">
             <SidebarSectionSeparator
               variant={
                 separatorVariant
