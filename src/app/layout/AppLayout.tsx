@@ -6,7 +6,6 @@ import { SubNavigation } from "@/app/layout/components/navigation/SubNavigation"
 import { Topbar } from "@/app/layout/components/topbar/Topbar";
 import { useLayoutStore } from "@/app/layout/store/layoutStore";
 import { useLocale } from "@/app/providers/locale";
-import { OnboardingHost } from "@/features/onboarding";
 
 export function AppLayout() {
   const isSidebarCollapsed = useLayoutStore(
@@ -28,7 +27,7 @@ export function AppLayout() {
     <div className="app-shell-bg min-h-screen overflow-x-hidden">
       <Sidebar />
       <MobileSidebar />
-      <OnboardingHost />
+      
 
       <div
         className={[
@@ -46,7 +45,7 @@ export function AppLayout() {
           <SubNavigation />
         </div>
 
-        <main data-onboarding-target="page-content" className="min-w-0 flex-1 px-3 pb-5 pt-3 sm:px-4 sm:pb-6 md:px-6 lg:px-8">
+        <main className="min-w-0 flex-1 px-3 pb-5 pt-3 sm:px-4 sm:pb-6 md:px-6 lg:px-8">
           <Outlet />
         </main>
       </div>

@@ -1,13 +1,20 @@
 import { ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
 
+import { useLocale } from "@/app/providers/locale";
+
 type UsersOverviewBackLinkProps = {
   label?: string;
 };
 
 export function UsersOverviewBackLink({
-  label = "Back to Users Overview",
+  label,
 }: UsersOverviewBackLinkProps) {
+  const { t } = useLocale();
+
+  const resolvedLabel =
+    label ?? t.users.shared.backToOverview;
+
   return (
     <Link
       to="/users"
@@ -29,11 +36,13 @@ export function UsersOverviewBackLink({
           "h-4 w-4 shrink-0",
           "transition-transform duration-200",
           "group-hover:-translate-x-0.5",
+          "rtl:rotate-180",
+          "rtl:group-hover:translate-x-0.5",
         ].join(" ")}
         strokeWidth={1.8}
       />
 
-      <span>{label}</span>
+      <span>{resolvedLabel}</span>
     </Link>
   );
 }

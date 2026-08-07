@@ -315,18 +315,20 @@ export function StaffRolePage({
 
         <div className="relative flex flex-col gap-6 xl:flex-row xl:items-center xl:justify-between">
           <div className="relative min-w-0">
-  <div className="flex min-w-0 items-center gap-3.5">
+  <div className="flex min-w-0 items-center gap-3.5 ">
     <span
       className={[
         "flex h-10 w-10 shrink-0",
         "items-center justify-center",
         "rounded-[17px]",
+       
         config.color.light,
         config.color.text,
       ].join(" ")}
+      
     >
       <Icon
-        className="h-5 w-5"
+        className="h-5 w-5 "
         strokeWidth={1.8}
       />
     </span>
@@ -346,8 +348,7 @@ export function StaffRolePage({
       </h1>
 
       <p className="mt-1.5 max-w-2xl text-sm font-normal leading-6 text-muted-foreground">
-        Review profiles, employment details and
-        account access for{" "}
+        Review profiles for{" "}
         {config.pluralLabel.toLowerCase()}.
       </p>
     </div>

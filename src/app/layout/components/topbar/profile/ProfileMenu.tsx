@@ -14,7 +14,6 @@ import { useNavigate } from "react-router-dom";
 import { useCurrentUser } from "@/app/layout/hooks/useCurrentUser";
 import { useLocale } from "@/app/providers/locale";
 import { useLogout } from "@/features/auth/hooks/use-logout";
-import { ONBOARDING_RESTART_EVENT } from "@/features/onboarding/storage/onboarding.storage";
 import { useAuthenticatedImage } from "@/shared/hooks/useAuthenticatedImage";
 import { useDismissibleLayer } from "@/shared/hooks/use-dismissible-layer";
 
@@ -36,6 +35,7 @@ export function ProfileMenu({
   const { t } = useLocale();
 
   const { user } = useCurrentUser();
+
 
   const logoutMutation = useLogout();
 
@@ -111,7 +111,7 @@ export function ProfileMenu({
     >
       <button
         ref={triggerRef}
-        data-onboarding-target="profile"
+        data-onboarding="profile"
         type="button"
         onClick={onToggle}
         aria-label={
@@ -294,15 +294,15 @@ export function ProfileMenu({
             <p className="px-3 pb-1.5 text-[9px] font-semibold uppercase tracking-[0.13em] text-topbar-muted/70">
               Help
             </p>
-            <ProfileMenuItem
-              title="School setup guide"
-              description="Restart the onboarding checklist and feature tips."
-              icon={HelpCircle}
-              onClick={() => {
-                onClose();
-                window.dispatchEvent(new Event(ONBOARDING_RESTART_EVENT));
-              }}
-            />
+         <ProfileMenuItem
+  title="Take the tour"
+  description="Review the main features again."
+  icon={HelpCircle}
+  onClick={() => {
+    onClose();
+
+  }}
+/>
           </div>
 
           <div

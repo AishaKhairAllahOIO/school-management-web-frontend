@@ -1,4 +1,6 @@
 import type { TranslationDictionary } from "./types";
+import { usersTranslationAr } from "@/features/users/translations/users.translation.ar"
+
 
 export const ar: TranslationDictionary = {
   common: {
@@ -170,4 +172,5 @@ export const ar: TranslationDictionary = {
       },
     },
   },
+  users: usersTranslationAr,
 };

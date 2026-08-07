@@ -37,6 +37,7 @@ import { useRegisterStudent } from "../hooks/useStudents";
 import type {
   RegisterStudentPayload,
   UserGender,
+  UserNationality
 } from "../types/student.types";
 
 type PersonState = {
@@ -47,7 +48,7 @@ type PersonState = {
   birth_date: string;
   birth_place: string;
   gender: UserGender;
-  nationality: string;
+  nationality: UserNationality;
   address: string;
   phone_number: string;
   photo_url: File | null;
@@ -71,8 +72,8 @@ const emptyPerson: PersonState = {
   mother_name: "",
   birth_date: "",
   birth_place: "",
-  gender: "male",
-  nationality: "syrian",
+  gender: "",
+  nationality: "",
   address: "",
   phone_number: "",
   photo_url: null,
@@ -677,40 +678,5 @@ function PersonFormSection({
         </FormField>
       </div>
     </FormSection>
-  );
-}
-
-function _ReviewRow({
-  label,
-  completed,
-}: {
-  label: string;
-  completed: boolean;
-}) {
-  return (
-    <div className="flex items-center justify-between rounded-[14px] bg-muted/[0.25] px-3.5 py-3">
-      <span className="text-xs font-medium text-foreground">
-        {label}
-      </span>
-
-      <span
-        className={[
-          "inline-flex items-center gap-1.5",
-          "rounded-full px-2.5 py-1",
-          "text-[10px] font-medium",
-          completed
-            ? "bg-emerald-500/[0.09] text-emerald-600"
-            : "bg-muted text-muted-foreground",
-        ].join(" ")}
-      >
-        {completed ? (
-          <span className="text-emerald-600">✓</span>
-        ) : null}
-
-        {completed
-          ? "Ready"
-          : "Incomplete"}
-      </span>
-    </div>
   );
 }

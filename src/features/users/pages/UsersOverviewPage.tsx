@@ -8,34 +8,29 @@ import {
   UsersRound,
 } from "lucide-react";
 
+import { useLocale } from "@/app/providers/locale";
+
 import { UserCategoryCard } from "../components/UserCategoryCard";
 import { useUsersOverviewCounts } from "../shared/hooks/useUsersOverviewCounts";
 import type { UsersOverviewCounts } from "../shared/types/users-overview.types";
 
 const emptyCounts: UsersOverviewCounts = {};
-
 const categoriesCount = 6;
 
 export function UsersOverviewPage() {
-  const countsQuery =
-    useUsersOverviewCounts();
+  const { language, t } = useLocale();
+  const countsQuery = useUsersOverviewCounts();
 
   const counts: UsersOverviewCounts =
     countsQuery.data ?? emptyCounts;
 
-  /*
-   * نعرض Skeleton فقط في التحميل الأول،
-   * عندما لا توجد بيانات سابقة.
-   *
-   * لا نستخدم isFetching وحدها، لأن ذلك سيعيد
-   * إظهار Skeleton أثناء refetch رغم توفر البيانات.
-   */
   const isInitialCountsLoading =
     countsQuery.isLoading &&
     countsQuery.data === undefined;
 
-  const hasCountsError =
-    countsQuery.isError;
+  const hasCountsError = countsQuery.isError;
+
+  const copy = t.users.overview;
 
   function resolveCount(
     count?: number,
@@ -50,29 +45,22 @@ export function UsersOverviewPage() {
   return (
     <section className="-mt-3 space-y-6">
       <UsersOverviewHeading
-        totalUsers={resolveCount(
-          counts.total,
-        )}
-        isLoading={
-          isInitialCountsLoading
-        }
+        totalUsers={resolveCount(counts.total)}
+        isLoading={isInitialCountsLoading}
+        language={language}
       />
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         <UserCategoryCard
-          title="Students"
-          description="Student profiles, guardians, enrollment and academic records."
+          title={copy.students.title}
+          description={copy.students.description}
           path="/users/students"
           icon={GraduationCap}
-          count={resolveCount(
-            counts.students,
-          )}
-          isCountLoading={
-            isInitialCountsLoading
-          }
-          countLabel="Total students"
-          secondaryCountLabel="Parents"
-          viewLabel="View all students"
+          count={resolveCount(counts.students)}
+          isCountLoading={isInitialCountsLoading}
+          countLabel={copy.students.countLabel}
+          secondaryCountLabel={copy.students.secondaryCountLabel}
+          viewLabel={copy.students.viewLabel}
           accentClassName="bg-primary"
           iconClassName="bg-primary/[0.09] text-primary"
           footerClassName="bg-primary/[0.035] hover:bg-primary/[0.07]"
@@ -80,18 +68,14 @@ export function UsersOverviewPage() {
         />
 
         <UserCategoryCard
-          title="Teachers"
-          description="Teacher profiles, school information and academic assignments."
+          title={copy.teachers.title}
+          description={copy.teachers.description}
           path="/users/teachers"
           icon={BookOpen}
-          count={resolveCount(
-            counts.teachers,
-          )}
-          isCountLoading={
-            isInitialCountsLoading
-          }
-          countLabel="Total teachers"
-          viewLabel="View all teachers"
+          count={resolveCount(counts.teachers)}
+          isCountLoading={isInitialCountsLoading}
+          countLabel={copy.teachers.countLabel}
+          viewLabel={copy.teachers.viewLabel}
           accentClassName="bg-info"
           iconClassName="bg-info/[0.1] text-info"
           footerClassName="bg-info/[0.035] hover:bg-info/[0.075]"
@@ -99,18 +83,14 @@ export function UsersOverviewPage() {
         />
 
         <UserCategoryCard
-          title="Supervisors"
-          description="Educational supervisors and their assigned academic responsibilities."
+          title={copy.supervisors.title}
+          description={copy.supervisors.description}
           path="/users/supervisors"
           icon={ShieldCheck}
-          count={resolveCount(
-            counts.supervisors,
-          )}
-          isCountLoading={
-            isInitialCountsLoading
-          }
-          countLabel="Total supervisors"
-          viewLabel="View all supervisors"
+          count={resolveCount(counts.supervisors)}
+          isCountLoading={isInitialCountsLoading}
+          countLabel={copy.supervisors.countLabel}
+          viewLabel={copy.supervisors.viewLabel}
           accentClassName="bg-success"
           iconClassName="bg-success/[0.1] text-success"
           footerClassName="bg-success/[0.035] hover:bg-success/[0.075]"
@@ -118,18 +98,14 @@ export function UsersOverviewPage() {
         />
 
         <UserCategoryCard
-          title="Secretaries"
-          description="Administrative secretary profiles and school office information."
+          title={copy.secretaries.title}
+          description={copy.secretaries.description}
           path="/users/secretaries"
           icon={BriefcaseBusiness}
-          count={resolveCount(
-            counts.secretaries,
-          )}
-          isCountLoading={
-            isInitialCountsLoading
-          }
-          countLabel="Total secretaries"
-          viewLabel="View all secretaries"
+          count={resolveCount(counts.secretaries)}
+          isCountLoading={isInitialCountsLoading}
+          countLabel={copy.secretaries.countLabel}
+          viewLabel={copy.secretaries.viewLabel}
           accentClassName="bg-warning"
           iconClassName="bg-warning/[0.11] text-warning"
           footerClassName="bg-warning/[0.04] hover:bg-warning/[0.08]"
@@ -137,18 +113,14 @@ export function UsersOverviewPage() {
         />
 
         <UserCategoryCard
-          title="Counselors"
-          description="Student support counselors and psychological guidance records."
+          title={copy.counselors.title}
+          description={copy.counselors.description}
           path="/users/counselors"
           icon={HeartHandshake}
-          count={resolveCount(
-            counts.counselors,
-          )}
-          isCountLoading={
-            isInitialCountsLoading
-          }
-          countLabel="Total counselors"
-          viewLabel="View all counselors"
+          count={resolveCount(counts.counselors)}
+          isCountLoading={isInitialCountsLoading}
+          countLabel={copy.counselors.countLabel}
+          viewLabel={copy.counselors.viewLabel}
           accentClassName="bg-destructive"
           iconClassName="bg-destructive/[0.09] text-destructive"
           footerClassName="bg-destructive/[0.035] hover:bg-destructive/[0.075]"
@@ -156,18 +128,14 @@ export function UsersOverviewPage() {
         />
 
         <UserCategoryCard
-          title="Service Staff"
-          description="Service and operational staff working across the school."
+          title={copy.serviceStaff.title}
+          description={copy.serviceStaff.description}
           path="/users/service-staff"
           icon={UserCog}
-          count={resolveCount(
-            counts.serviceStaff,
-          )}
-          isCountLoading={
-            isInitialCountsLoading
-          }
-          countLabel="Total service staff"
-          viewLabel="View all service staff"
+          count={resolveCount(counts.serviceStaff)}
+          isCountLoading={isInitialCountsLoading}
+          countLabel={copy.serviceStaff.countLabel}
+          viewLabel={copy.serviceStaff.viewLabel}
           accentClassName="bg-secondary-foreground"
           iconClassName="bg-primary/[0.07] text-secondary-foreground"
           footerClassName="bg-secondary/[0.55] hover:bg-secondary"
@@ -181,10 +149,15 @@ export function UsersOverviewPage() {
 function UsersOverviewHeading({
   totalUsers,
   isLoading,
+  language,
 }: {
   totalUsers?: number;
   isLoading: boolean;
+  language: "ar" | "en";
 }) {
+  const { t } = useLocale();
+  const copy = t.users.overview.summary;
+
   return (
     <header>
       <div className="flex flex-wrap items-center gap-2">
@@ -204,7 +177,7 @@ function UsersOverviewHeading({
             strokeWidth={1.8}
           />
 
-          {categoriesCount} Categories
+          {formatCount(categoriesCount, language)} {copy.categories}
         </span>
 
         <span
@@ -225,7 +198,7 @@ function UsersOverviewHeading({
 
           {isLoading ? (
             <span
-              aria-label="Loading total users"
+              aria-label={copy.loadingTotalUsers}
               className={[
                 "h-[14px] w-7",
                 "animate-pulse",
@@ -235,11 +208,11 @@ function UsersOverviewHeading({
             />
           ) : (
             <strong className="font-semibold">
-              {formatCount(totalUsers)}
+              {formatCount(totalUsers, language)}
             </strong>
           )}
 
-          <span>Total User</span>
+          <span>{copy.totalUsers}</span>
         </span>
       </div>
     </header>
@@ -247,13 +220,14 @@ function UsersOverviewHeading({
 }
 
 function formatCount(
-  count?: number,
+  count: number | undefined,
+  language: "ar" | "en",
 ): string {
   if (typeof count !== "number") {
     return "—";
   }
 
-  return new Intl.NumberFormat().format(
-    count,
-  );
+  return new Intl.NumberFormat(
+    language === "ar" ? "ar-SA" : "en-US",
+  ).format(count);
 }

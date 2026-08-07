@@ -5,6 +5,8 @@ import {
 
 import { Link } from "react-router-dom";
 
+import { useLocale } from "@/app/providers/locale";
+
 type UserCategoryCardProps = {
   title: string;
   description: string;
@@ -76,6 +78,8 @@ export function UserCategoryCard({
   footerClassName,
   footerTextClassName,
 }: UserCategoryCardProps) {
+  const { t } = useLocale();
+
   const hasSecondaryCount =
     Boolean(secondaryCountLabel) &&
     (
@@ -130,7 +134,7 @@ export function UserCategoryCard({
 
           <Link
             to={path}
-            aria-label={`Open ${title}`}
+            aria-label={`${t.users.shared.openCategory}: ${title}`}
             className={[
               "flex h-8 w-8 shrink-0",
               "items-center justify-center",

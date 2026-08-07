@@ -20,10 +20,6 @@ import { studentKeys } from "./student.keys";
 
 export const studentsQueryKey = studentKeys.all;
 
-/* -------------------------------------------------------------------------- */
-/* Queries                                                                     */
-/* -------------------------------------------------------------------------- */
-
 export function useStudents(
   filters: StudentListFilters = {},
 ) {
@@ -82,10 +78,6 @@ export function useStudentFullProfile(
   });
 }
 
-/* -------------------------------------------------------------------------- */
-/* Registration                                                                */
-/* -------------------------------------------------------------------------- */
-
 export function useRegisterStudent() {
   const queryClient = useQueryClient();
 
@@ -108,10 +100,6 @@ export function useRegisterStudent() {
     },
   });
 }
-
-/* -------------------------------------------------------------------------- */
-/* Personal data                                                               */
-/* -------------------------------------------------------------------------- */
 
 export function useUpdateStudentPersonal(
   enrollmentId?: ApiId,
@@ -226,10 +214,6 @@ export function useUpdateStudentEnrollment() {
   });
 }
 
-/* -------------------------------------------------------------------------- */
-/* Account status                                                              */
-/* -------------------------------------------------------------------------- */
-
 export function useToggleStudentAccount() {
   const queryClient = useQueryClient();
 
@@ -267,10 +251,6 @@ export function useToggleStudentAccount() {
     },
   });
 }
-
-/* -------------------------------------------------------------------------- */
-/* Delete / withdraw                                                           */
-/* -------------------------------------------------------------------------- */
 
 export function useDeleteStudent() {
   const queryClient = useQueryClient();

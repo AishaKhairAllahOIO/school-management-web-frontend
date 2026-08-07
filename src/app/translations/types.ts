@@ -1,3 +1,5 @@
+import type { UsersTranslation } from "@/features/users/translations/users.translation.type"
+
 export type TranslationDictionary = {
   common: {
     save: string;
@@ -142,4 +144,5 @@ export type TranslationDictionary = {
       };
     };
   };
+  users: UsersTranslation;
 };

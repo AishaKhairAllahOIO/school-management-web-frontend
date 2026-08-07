@@ -8,7 +8,7 @@ import {
   useState,
 } from "react";
 import {
-  Camera,
+ 
   GraduationCap,
   Loader2,
   Save,
@@ -38,7 +38,6 @@ import {
 import { StudentAcademicFields } from "../components/form/StudentAcademicFields";
 import { StudentPageHeader } from "../components/shared/StudentPageHeader";
 import { UserPageBackButton } from "../../shared/components/UserPageBackButton";
-import { AuthenticatedUserImage } from "../../shared/components/AuthenticatedUserImage";
 import { UserPhotoCard } from "../../shared/components/UserPhotoCard";
 import { USER_NATIONALITIES } from "../../shared/constants/user-nationalities";
 import {
@@ -49,6 +48,7 @@ import type {
   EnrollmentStatus,
   UpdateStudentPersonalPayload,
   UserGender,
+  UserNationality
 } from "../types/student.types";
 
 type UnknownRecord = Record<string, unknown>;
@@ -61,7 +61,7 @@ type EditablePerson = {
   birth_date: string;
   birth_place: string;
   gender: UserGender;
-  nationality: string;
+  nationality: UserNationality;
   address: string;
   phone_number: string;
   photo_url: File | null;
@@ -92,7 +92,7 @@ const emptyEnrollment: EditableEnrollment = {
   academic_year_id: "",
   grade_level_id: "",
   class_room_id: "",
-  enrollment_status: "enrolled",
+  enrollment_status: "confirmed",
 };
 
 function isRecord(
@@ -210,22 +210,28 @@ function normalizeGender(
     : "male";
 }
 
+function normalizeNationality():
+ UserNationality {
+  const allowedStatuses: UserNationality[] = [
+    "syrian","lebanese","palestinian","jordanian","other",
+  ];
+}
+
 function normalizeEnrollmentStatus(
   value: unknown,
 ): EnrollmentStatus {
   const allowedStatuses: EnrollmentStatus[] = [
     "pending",
-    "enrolled",
     "suspended",
     "withdrawn",
-    "completed",
+    "confirmed",
   ];
 
   return allowedStatuses.includes(
     value as EnrollmentStatus,
   )
     ? (value as EnrollmentStatus)
-    : "enrolled";
+    : "confirmed";
 }
 
 function getNameParts(
@@ -327,9 +333,7 @@ function mapPersonToForm(
       getValue(person, ["gender"]),
     ),
 
-    nationality: getString(person, [
-      "nationality",
-    ]),
+    nationality: normalizeNationality(getValue( "nationality" ,["nationality"])),
 
     address: getString(person, [
       "address",
@@ -432,6 +436,7 @@ export function StudentEditPage() {
         "enrollment_data",
         "enrollmentData",
       ]);
+
 
     setStudent(
       mapPersonToForm(studentData),
@@ -681,10 +686,6 @@ export function StudentEditPage() {
       ["guardian"],
     );
 
-  const _enrollmentData = getProfileSection(
-    profileQuery.data,
-    ["enrollment"],
-  );
 
   const isSaving =
     studentMutation.isPending;

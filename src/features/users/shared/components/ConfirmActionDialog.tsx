@@ -10,6 +10,8 @@ import {
   type ReactNode,
 } from "react";
 
+import { useLocale } from "@/app/providers/locale";
+
 type ConfirmActionDialogProps = {
   open: boolean;
   title: string;
@@ -28,13 +30,18 @@ export function ConfirmActionDialog({
   title,
   description,
   confirmLabel,
-  pendingLabel = "Please wait...",
+  pendingLabel,
   tone = "danger",
   isPending = false,
   details,
   onClose,
   onConfirm,
 }: ConfirmActionDialogProps) {
+  const { t } = useLocale();
+  const copy = t.users.shared.confirmDialog;
+  const resolvedPendingLabel =
+    pendingLabel ?? copy.pleaseWait;
+
   useEffect(() => {
     if (!open) {
       return;
@@ -68,7 +75,10 @@ export function ConfirmActionDialog({
       aria-describedby="user-action-dialog-description"
       className="fixed inset-0 z-[160] flex items-center justify-center bg-slate-950/30 p-4 backdrop-blur-[5px]"
       onMouseDown={(event) => {
-        if (event.target === event.currentTarget && !isPending) {
+        if (
+          event.target === event.currentTarget &&
+          !isPending
+        ) {
           onClose();
         }
       }}
@@ -111,7 +121,7 @@ export function ConfirmActionDialog({
 
           <button
             type="button"
-            aria-label="Close dialog"
+            aria-label={copy.closeDialog}
             disabled={isPending}
             onClick={onClose}
             className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[11px] border border-border/60 bg-background text-muted-foreground transition hover:bg-muted/45 hover:text-foreground disabled:opacity-50"
@@ -135,7 +145,7 @@ export function ConfirmActionDialog({
             onClick={onClose}
             className="h-9 rounded-full border border-border/65 bg-background px-4 text-[11px] font-medium text-foreground/75 transition hover:bg-muted/45 hover:text-foreground disabled:opacity-50"
           >
-            Cancel
+            {copy.cancel}
           </button>
 
           <button
@@ -161,7 +171,7 @@ export function ConfirmActionDialog({
               <Trash2 size={14} />
             )}
 
-            {isPending ? pendingLabel : confirmLabel}
+            {isPending ? resolvedPendingLabel : confirmLabel}
           </button>
         </footer>
       </section>

@@ -63,10 +63,7 @@ const statusOptions: Array<{
   value: EnrollmentStatus;
   label: string;
 }> = [
-  {
-    value: "enrolled",
-    label: "Enrolled",
-  },
+ 
   {
     value: "pending",
     label: "Pending",
@@ -80,8 +77,8 @@ const statusOptions: Array<{
     label: "Withdrawn",
   },
   {
-    value: "completed",
-    label: "Completed",
+    value: "confirmed",
+    label: "Confirmed",
   },
 ];
 
@@ -501,41 +498,41 @@ export function StudentsPage() {
         />
 
         <div className="relative flex flex-col gap-6 xl:flex-row xl:items-center xl:justify-between">
-          <div className="relative min-w-0">
-            <div className="flex min-w-0 items-start gap-3.5">
-              <span
-                className={[
-                  "flex h-10 w-12 shrink-0",
-                  "items-center justify-center",
-                  "rounded-[17px]",
-                  "bg-primary/[0.08]",
-                  "text-primary",
-                ].join(" ")}
-              >
-                <GraduationCap
-                  className="h-5 w-5"
-                  strokeWidth={1.8}
-                />
-              </span>
+       <div className="relative min-w-0">
+  <div className="min-w-0">
+    {/* Student directory — يبدأ على نفس محاذاة Students */}
+    <p className="ml-[60px] text-[10px] font-semibold uppercase tracking-[0.14em] text-primary">
+      Student directory
+    </p>
 
-              <div className="min-w-0">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-primary">
-                  Student directory
-                </p>
+    {/* Icon + Students */}
+    <div className="mt-1 flex items-center gap-3">
+      <span
+        className={[
+          "flex h-10 w-12 shrink-0",
+          "items-center justify-center",
+          "rounded-[17px]",
+          "bg-primary/[0.08]",
+          "text-primary",
+        ].join(" ")}
+      >
+        <GraduationCap
+          className="h-5 w-5"
+          strokeWidth={1.8}
+        />
+      </span>
 
-                <h1 className="mt-1 text-[24px] font-semibold tracking-[-0.04em] text-foreground">
-                  Students
-                </h1>
+      <h1 className="text-[24px] font-semibold tracking-[-0.04em] text-foreground">
+        Students
+      </h1>
+    </div>
 
-                <p className="mt-1.5 max-w-2xl text-sm font-normal leading-6 text-muted-foreground">
-                  Review profiles,
-                  enrollment records and
-                  academic information for
-                  students.
-                </p>
-              </div>
-            </div>
-          </div>
+    {/* Description — يبدأ أيضًا على نفس محاذاة Students */}
+    <p className="mt-1.5 ml-[60px] max-w-2xl text-sm font-normal leading-6 text-muted-foreground">
+      Review profiles for students.
+    </p>
+  </div>
+</div>
 
           <div className="grid w-full gap-2.5 xl:w-[860px]">
             <div

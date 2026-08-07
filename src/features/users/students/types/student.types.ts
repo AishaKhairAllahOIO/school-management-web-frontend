@@ -3,15 +3,9 @@ import type {
   PaginatedData,
 } from "../../shared/types/api.types";
 
-/*
-|--------------------------------------------------------------------------
-| Common enums
-|--------------------------------------------------------------------------
-*/
+export type UserGender = "male" | "female" | "";
 
-export type UserGender = "male" | "female";
-
-export type UserNationality = "syrian" | string;
+export type UserNationality =  "syrian" | "lebanese" | "palestinian" | "jordanian" | "other" | "";
 
 export type AccountStatus =
   | "enabled"
@@ -26,16 +20,9 @@ export type RecordStatus =
 
 export type EnrollmentStatus =
   | "pending"
-  | "enrolled"
   | "suspended"
   | "withdrawn"
-  | "completed";
-
-/*
-|--------------------------------------------------------------------------
-| Shared API models
-|--------------------------------------------------------------------------
-*/
+  | "confirmed";
 
 export type NamedEntity = {
   id: ApiId;
@@ -81,12 +68,6 @@ export type PersonProfile = {
   recordStatus: RecordStatus;
 };
 
-/*
-|--------------------------------------------------------------------------
-| Student list
-|--------------------------------------------------------------------------
-*/
-
 export type StudentListItem = {
   studentId: ApiId;
   userId: ApiId;
@@ -122,12 +103,6 @@ export type StudentListFilters = {
 export type StudentListResponse =
   PaginatedData<StudentListItem>;
 
-/*
-|--------------------------------------------------------------------------
-| Student profile
-|--------------------------------------------------------------------------
-*/
-
 export type StudentEnrollment = {
   id: ApiId;
   studentId: ApiId;
@@ -162,12 +137,6 @@ export type StudentFullProfile = {
   guardian: PersonProfile | null;
   enrollment: StudentEnrollment;
 };
-
-/*
-|--------------------------------------------------------------------------
-| Register student
-|--------------------------------------------------------------------------
-*/
 
 export type StudentPersonalPayload = {
   first_name: string;
@@ -222,13 +191,6 @@ export type RegisterStudentPayload = {
   guardian: GuardianPersonalPayload;
   enrollment: StudentEnrollmentPayload;
 };
-
-/*
-|--------------------------------------------------------------------------
-| Update student
-|--------------------------------------------------------------------------
-*/
-
 export type UpdateGuardianPersonalPayload =
   Partial<GuardianPersonalPayload>;
 
@@ -239,10 +201,7 @@ export type UpdateStudentEnrollmentPayload = {
   enrollment_status?: EnrollmentStatus;
 };
 
-/**
- * The current backend updates the student, guardian, and enrollment through
- * one flat multipart request using the student personal-data endpoint.
- */
+
 export type UpdateStudentPersonalPayload =
   Partial<StudentPersonalPayload> & {
     guardian_first_name?: string;
@@ -272,23 +231,11 @@ export type UpdateStudentPersonalPayload =
     enrollment_status?: EnrollmentStatus;
   };
 
-/*
-|--------------------------------------------------------------------------
-| Search
-|--------------------------------------------------------------------------
-*/
-
 export type StudentSearchParams = {
   q: string;
   page?: number;
   per_page?: number;
 };
-
-/*
-|--------------------------------------------------------------------------
-| Mutations responses
-|--------------------------------------------------------------------------
-*/
 
 export type ToggleStudentAccountResponse = {
   enrollmentId?: ApiId;
@@ -299,12 +246,6 @@ export type ToggleStudentAccountResponse = {
 export type DeleteStudentResponse = {
   id?: ApiId;
 };
-
-/*
-|--------------------------------------------------------------------------
-| Student import
-|--------------------------------------------------------------------------
-*/
 
 export type StudentImportBatchStatusValue =
   | "pending"
