@@ -2,10 +2,6 @@ import type {
   CrudField,
 } from "../../shared/components/CrudPage";
 
-import type {
-  AssessmentComponent,
-} from "../types/assessment-component.types";
-
 import {
   assessmentTypeOptions,
   type AssessmentSelectOption,
@@ -17,7 +13,7 @@ type CreateAssessmentComponentFieldsParams = {
 
 export function createAssessmentComponentFields({
   gradeSubjectOptions,
-}: CreateAssessmentComponentFieldsParams): CrudField<AssessmentComponent>[] {
+}: CreateAssessmentComponentFieldsParams): CrudField[] {
 
   return [
     {

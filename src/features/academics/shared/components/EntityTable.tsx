@@ -15,13 +15,15 @@ type Props<T> = {
   actions?: (row: T) => ReactNode;
 };
 
+
 function createGridTemplate(columnCount: number, hasActions: boolean): string {
-  const dataColumns = Array.from({ length: columnCount }, (_, index) =>
+
+  const dataColumns: string[] = Array.from({ length: columnCount }, (_, index) =>
     index === 0 ? "minmax(230px, 1.5fr)" : "minmax(150px, 1fr)",
   );
 
   if (hasActions) {
-    dataColumns.push("minmax(132px, 0.68fr)");
+    dataColumns.push("minmax(132px, 0.68fr)"); 
   }
 
   return dataColumns.join(" ");

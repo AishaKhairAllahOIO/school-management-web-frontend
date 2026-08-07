@@ -192,7 +192,6 @@ export function GradeSubjectsPage() {
       }
 
       fields={fields}
-
       columns={columns}
 
       toFormValues={

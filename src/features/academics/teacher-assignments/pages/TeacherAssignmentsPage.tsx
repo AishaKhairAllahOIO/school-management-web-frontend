@@ -45,7 +45,7 @@ export function TeacherAssignmentsPage() {
   const gradeSubjectLabel = new Map(gradeSubjectOptions.map((option) => [option.value, option.label]));
   const classroomLabel = new Map(classroomOptions.map((option) => [option.value, option.label]));
 
-  const fields: Array<CrudField<CreateTeacherAssignmentPayload>> = [
+  const fields: Array<CrudField> = [
     { name: "teacherId", label: "Teacher", type: "select", options: teacherOptions, defaultValue: "", required: true },
     { name: "academicYearId", label: "Academic Year", type: "select", options: yearOptions, defaultValue: "", required: true },
     { name: "academicTermId", label: "Academic Term", type: "select", options: termOptions, defaultValue: "", required: true },

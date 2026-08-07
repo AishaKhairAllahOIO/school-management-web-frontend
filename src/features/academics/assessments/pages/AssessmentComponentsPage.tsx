@@ -43,6 +43,10 @@ import {
   toAssessmentComponentFormValues,
 } from "../utils/assessment-component.payload";
 
+import type { FormValues 
+} from "../../shared/components/CrudPage";
+
+
 export function AssessmentComponentsPage() {
   const assessmentsQuery =
     useAssessmentComponents();
@@ -133,13 +137,14 @@ export function AssessmentComponentsPage() {
         toAssessmentComponentFormValues
       }
 
-      buildPayload={
-        buildCreateAssessmentComponentPayload
-      }
+    buildPayload={
+  (values: FormValues) => buildCreateAssessmentComponentPayload(values as any)
+}
 
-      buildUpdatePayload={
-        buildUpdateAssessmentComponentPayload
-      }
+    buildUpdatePayload={
+  (values: FormValues, currentRow: AssessmentComponent) => 
+    buildUpdateAssessmentComponentPayload(values as any, currentRow)
+}
 
       emptyTitle={
         "No assessment components found"

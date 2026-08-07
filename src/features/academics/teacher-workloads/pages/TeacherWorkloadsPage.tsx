@@ -36,7 +36,7 @@ export function TeacherWorkloadsPage() {
   const teacherLabel = new Map(teacherOptions.map((option) => [option.value, option.label]));
   const yearLabel = new Map(yearOptions.map((option) => [option.value, option.label]));
 
-  const fields: Array<CrudField<CreateTeacherWorkloadPayload>> = [
+  const fields: Array<CrudField> = [
     { name: "teacherId", label: "Teacher", type: "select", options: teacherOptions, defaultValue: "", required: true },
     { name: "academicYearId", label: "Academic Year", type: "select", options: yearOptions, defaultValue: "", required: true },
     { name: "requiredMonthlyPeriods", label: "Required Monthly Periods", type: "number", defaultValue: 1, required: true, min: 1 },

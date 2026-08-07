@@ -444,7 +444,8 @@ function normalizePaginator(
     "data" in raw &&
     !Array.isArray((raw as RawPaginator).data)
   ) {
-    raw = (raw as { data: RawPaginator }).data;
+   raw = (raw as unknown as { data: RawPaginator }).data;
+
   }
 
   if (Array.isArray(raw)) {

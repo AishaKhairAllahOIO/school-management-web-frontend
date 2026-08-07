@@ -12,7 +12,6 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import {
- 
   useMemo,
   useRef,
   useState,
@@ -54,10 +53,9 @@ type FieldType =
   | "select"
   | "array";
 
-export type CrudField<
-  TCreate extends object = Record<string, never>,
-> = {
-  name: keyof TCreate & string;
+// ✅ التغيير الجوهري: إزالة الـ Generic من CrudField
+export type CrudField = {
+  name: string;  // ✅ أصبح string بدلاً من keyof TCreate
   label: string;
   type: FieldType;
   options?:
@@ -117,7 +115,7 @@ type CrudPageProps<
   isError?: boolean;
   onRetry?: () => void;
 
-  fields: Array<CrudField<TCreate>>;
+  fields: Array<CrudField>;  // ✅ أصبح بدون Generic
   columns: Array<CrudColumn<TEntity>>;
 
   createMutation: MutationState<TCreate>;
@@ -192,12 +190,12 @@ export function CrudPage<
   toFormValues,
   buildPayload,
   buildUpdatePayload,
-emptyTitle = "No records found",
-emptyDescription = "Create the first record to get started.",
-deleteTitle = "Delete record?",
-deleteDescription = () =>
-  "This record will be permanently deleted.",
-pageSize = 6,
+  emptyTitle = "No records found",
+  emptyDescription = "Create the first record to get started.",
+  deleteTitle = "Delete record?",
+  deleteDescription = () =>
+    "This record will be permanently deleted.",
+  pageSize = 6,
 }: CrudPageProps<TEntity, TCreate, TUpdate>) {
   const academicTheme = useAcademicTheme();
   const SectionIcon = academicTheme.icon;
@@ -206,8 +204,6 @@ pageSize = 6,
   const [currentPageSize] = useState(pageSize);
 
   const totalPages = Math.max(1, Math.ceil(rows.length / currentPageSize));
-
- 
 
   const visibleRows = useMemo(() => {
     const start = (currentPage - 1) * currentPageSize;
@@ -469,34 +465,33 @@ pageSize = 6,
     Boolean(createMutation.isPending) ||
     Boolean(updateMutation.isPending);
 
-
   if (isError) {
     return (
       <div className="space-y-4" style={academicTheme.style}>
         <BackToAcademicsOverview />
         <div className="rounded-3xl border border-destructive/20 bg-card p-8 text-center shadow-soft">
-        <AlertTriangle
-          size={28}
-          className="mx-auto text-destructive"
-        />
-        <h1 className="mt-4 text-xl font-medium text-foreground">
-          Failed to load{" "}
-          {title.toLowerCase()}
-        </h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          The data could not be retrieved
-          from the server.
-        </p>
-        {onRetry ? (
-          <button
-            type="button"
-            onClick={onRetry}
-            className="mt-5 inline-flex h-10 items-center gap-2 rounded-full bg-[var(--academic-accent)] px-5 text-xs font-semibold text-white"
-          >
-            <RefreshCw size={15} />
-            Try Again
-          </button>
-        ) : null}
+          <AlertTriangle
+            size={28}
+            className="mx-auto text-destructive"
+          />
+          <h1 className="mt-4 text-xl font-medium text-foreground">
+            Failed to load{" "}
+            {title.toLowerCase()}
+          </h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            The data could not be retrieved
+            from the server.
+          </p>
+          {onRetry ? (
+            <button
+              type="button"
+              onClick={onRetry}
+              className="mt-5 inline-flex h-10 items-center gap-2 rounded-full bg-[var(--academic-accent)] px-5 text-xs font-semibold text-white"
+            >
+              <RefreshCw size={15} />
+              Try Again
+            </button>
+          ) : null}
         </div>
       </div>
     );
@@ -709,7 +704,6 @@ pageSize = 6,
       />
     </div>
   );
-
 }
 
 function TableSkeleton({
@@ -1193,9 +1187,8 @@ function DetailsDrawer<
   );
 }
 
-function EditorDialog<
-  TCreate extends object,
->({
+// ✅ تم إزالة الـ Generic من EditorDialog و FieldControl
+function EditorDialog({
   title,
   fields,
   values,
@@ -1209,7 +1202,7 @@ function EditorDialog<
   onSubmit,
 }: {
   title: string;
-  fields: Array<CrudField<TCreate>>;
+  fields: Array<CrudField>;
   values: FormValues;
   errors: Record<string, string>;
   isEdit: boolean;
@@ -1475,12 +1468,11 @@ function EditorDialog<
   );
 }
 
-function EditorFieldsSkeleton<
-  TCreate extends object,
->({
+// ✅ تم إزالة الـ Generic من EditorFieldsSkeleton
+function EditorFieldsSkeleton({
   fields,
 }: {
-  fields: Array<CrudField<TCreate>>;
+  fields: Array<CrudField>;
 }) {
   return (
     <div className="grid animate-pulse gap-4 sm:grid-cols-2">
@@ -1523,9 +1515,8 @@ function EditorFieldsSkeleton<
   );
 }
 
-function FieldControl<
-  TCreate extends object,
->({
+// ✅ تم إزالة الـ Generic من FieldControl
+function FieldControl({
   field,
   value,
   values,
@@ -1534,7 +1525,7 @@ function FieldControl<
   hasError,
   onChange,
 }: {
-  field: CrudField<TCreate>;
+  field: CrudField;
   value: FormValue;
   values: FormValues;
   isEdit: boolean;
