@@ -1,5 +1,4 @@
 import {
-  Bell,
   School,
   Send,
   Users,

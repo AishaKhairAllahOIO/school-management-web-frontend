@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-import { ArrowUpRight, BriefcaseBusiness, Mail, Pencil, Phone, Power, RotateCcw, Trash2 } from "lucide-react";
+import { ArrowUpRight, Mail, Pencil, Phone, Power, RotateCcw, Trash2 } from "lucide-react";
 import { AuthenticatedUserImage } from "../../../shared/components/AuthenticatedUserImage";
 import type { StaffProfile, StaffSectionColor } from "../../types/staff.types";
 

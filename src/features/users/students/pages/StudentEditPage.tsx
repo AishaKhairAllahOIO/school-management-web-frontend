@@ -205,14 +205,28 @@ function normalizeGender(
     ? "female"
     : "male";
 }
-
-function normalizeNationality():
- UserNationality {
-  const allowedStatuses: UserNationality[] = [
-    "syrian","lebanese","palestinian","jordanian","other",
+function normalizeNationality(
+  value: unknown,
+): UserNationality {
+  const allowedNationalities: UserNationality[] = [
+    "syrian",
+    "lebanese",
+    "palestinian",
+    "jordanian",
+    "other",
   ];
-}
 
+  if (
+    typeof value === "string" &&
+    allowedNationalities.includes(
+      value as UserNationality,
+    )
+  ) {
+    return value as UserNationality;
+  }
+
+  return "";
+}
 function getNameParts(
   person: unknown,
 ): {
@@ -312,7 +326,9 @@ function mapPersonToForm(
       getValue(person, ["gender"]),
     ),
 
-    nationality: normalizeNationality(getValue( "nationality" ,["nationality"])),
+    nationality: normalizeNationality(
+      getValue(person, ["nationality"]),
+    ),
 
     address: getString(person, [
       "address",
@@ -323,6 +339,7 @@ function mapPersonToForm(
       "phone_number",
       "phone",
     ]),
+
     photo_url: null,
   };
 }
@@ -881,16 +898,15 @@ function EditablePersonSection({
     SetStateAction<EditablePerson>
   >;
 }) {
-  function update(
-    key: keyof EditablePerson,
-    nextValue: string,
-  ) {
-    onChange((current) => ({
-      ...current,
-      [key]: nextValue,
-    }));
-  }
-
+function update<K extends keyof EditablePerson>(
+  key: K,
+  nextValue: EditablePerson[K],
+) {
+  onChange((current) => ({
+    ...current,
+    [key]: nextValue,
+  }));
+}
   return (
     <FormSection
       eyebrow={eyebrow}
@@ -933,11 +949,14 @@ function EditablePersonSection({
 
         <FormField label="Nationality">
           <Select
-            value={value.nationality || "syrian"}
-            onValueChange={(nextValue) =>
-              update("nationality", nextValue)
-            }
-          >
+  value={value.nationality || "syrian"}
+  onValueChange={(nextValue) =>
+    update(
+      "nationality",
+      nextValue as UserNationality,
+    )
+  }
+>
             <SelectTrigger className="h-12 rounded-[15px]">
               <SelectValue placeholder="Select nationality" />
             </SelectTrigger>
@@ -963,11 +982,14 @@ function EditablePersonSection({
 
         <FormField label="Gender">
           <Select
-            value={value.gender}
-            onValueChange={(nextValue) =>
-              update("gender", nextValue)
-            }
-          >
+  value={value.gender}
+  onValueChange={(nextValue) =>
+    update(
+      "gender",
+      nextValue as UserGender,
+    )
+  }
+>
             <SelectTrigger className="h-12 rounded-[15px]">
               <SelectValue />
             </SelectTrigger>

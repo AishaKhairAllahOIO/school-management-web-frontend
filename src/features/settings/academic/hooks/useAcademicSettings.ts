@@ -67,7 +67,7 @@ function getAcademicDeleteErrorMessage(
 ): string {
   if (isConflictError(error)) {
     return (
-      error.response?.data?.message ??
+      axios.isAxiosError(error),
       "Academic settings cannot be reset because they are currently used by student records."
     );
   }

@@ -83,9 +83,7 @@ export function AttendanceTable({ data, isLoading = false, onUpdate }: Props) {
                         </span>
                         <div className="min-w-0">
                           <p className="truncate font-medium text-foreground">{student.studentName}</p>
-                          <p className="mt-0.5 truncate text-[11px] text-muted-foreground">
-                            Classroom {student.classroomName ?? "No classroom"} · {student.supervisorName}
-                          </p>
+                
                         </div>
                       </div>
                     </td>

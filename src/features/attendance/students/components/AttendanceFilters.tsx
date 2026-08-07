@@ -128,7 +128,7 @@ export function AttendanceFilters({
             ([gradeId, gradeName]) => (
               <SelectItem
                 key={gradeId}
-                value={gradeId}
+                value={gradeId || "all"}
               >
                 {gradeName}
               </SelectItem>

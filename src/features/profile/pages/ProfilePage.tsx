@@ -29,12 +29,15 @@ export function ProfilePage() {
     return <ProfilePageSkeleton />;
   }
 
-  function handleEditPersonalInformation() {
-    navigate(
-      `/users/administrators/${user.id}/edit`,
-    );
+ function handleEditPersonalInformation() {
+  if (!user) {
+    return;
   }
 
+  navigate(
+    `/users/administrators/${user.id}/edit`,
+  );
+}
   return (
     <div className="space-y-4">
       <ProfileHeaderCard

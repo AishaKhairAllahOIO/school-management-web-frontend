@@ -27,16 +27,16 @@ export function useMarkAllSystemNoticesRead() {
     onMutate: async () => {
       await queryClient.cancelQueries({
         queryKey:
-          systemNoticesKeys.unreadCount,
+          systemNoticesKeys.unreadCount(),
       });
 
       const previousCount =
         queryClient.getQueryData<number>(
-          systemNoticesKeys.unreadCount,
+          systemNoticesKeys.unreadCount(),
         );
 
       queryClient.setQueryData(
-        systemNoticesKeys.unreadCount,
+        systemNoticesKeys.unreadCount(),
         0,
       );
 
@@ -51,7 +51,7 @@ export function useMarkAllSystemNoticesRead() {
         "number"
       ) {
         queryClient.setQueryData(
-          systemNoticesKeys.unreadCount,
+          systemNoticesKeys.unreadCount(),
           context.previousCount,
         );
       }
@@ -63,7 +63,7 @@ export function useMarkAllSystemNoticesRead() {
 
     onSuccess: (response) => {
       queryClient.setQueryData(
-        systemNoticesKeys.unreadCount,
+        systemNoticesKeys.unreadCount(),
         response.data.data
           ?.unread_count ?? 0,
       );

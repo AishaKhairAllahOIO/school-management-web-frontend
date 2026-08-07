@@ -50,21 +50,21 @@ export function PrintPreviewDialog({
   onOpenChange,
   document,
 }: PrintPreviewDialogProps) {
-  const iframeRef = useRef<HTMLIFrameElement>(null);
-  const viewportRef = useRef<HTMLDivElement>(null);
+  const iframeRef = useRef<HTMLIFrameElement | null>(null);
+  const viewportRef = useRef<HTMLDivElement | null>(null);
 
   const orientation = document?.orientation ?? "portrait";
   const pageSize = A4_PIXELS[orientation];
 
   const [zoom, setZoom] = useState(0.8);
   const [mode, setMode] = useState<PreviewMode>("fit-page");
-  const [documentHeight, setDocumentHeight] = useState(pageSize.height);
+  const [documentHeight, setDocumentHeight] = useState<number>(pageSize.height);
   const [isReady, setIsReady] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+
   const [settings, setSettings] = useState<PrintSettings>({
     monochrome: document?.kind === "official-document",
   });
-
   const measureDocument = useCallback(() => {
   const frameDocument =
     iframeRef.current?.contentDocument;
@@ -93,19 +93,17 @@ export function PrintPreviewDialog({
     return true;
   }
 
-  const measuredHeight = Math.max(
-    pageSize.height,
-    root.scrollHeight,
-    root.offsetHeight,
-    body?.scrollHeight ?? 0,
-    body?.offsetHeight ?? 0,
-    printPage?.scrollHeight ?? 0,
-    printPage?.offsetHeight ?? 0,
-  );
+ const measuredHeight: number = Math.max(
+  pageSize.height,
+  root.scrollHeight,
+  root.offsetHeight,
+  body?.scrollHeight ?? 0,
+  body?.offsetHeight ?? 0,
+  printPage?.scrollHeight ?? 0,
+  printPage?.offsetHeight ?? 0,
+);
 
-  setDocumentHeight(
-    Math.ceil(measuredHeight),
-  );
+setDocumentHeight(Math.ceil(measuredHeight));
 
   return true;
 }, [

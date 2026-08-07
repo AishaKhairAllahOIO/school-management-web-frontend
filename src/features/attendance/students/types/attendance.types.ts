@@ -4,18 +4,18 @@ export type AbsenceType = "Excused" | "Unexcused";
 
 export interface StudentAttendance {
   id: string;
-  studentId: string;
-  enrollmentId: string;
+  studentId?: string;
+  enrollmentId?: string;
   studentName: string;
 
-  gradeId: string;
+  gradeId?: string;
   gradeName: string;
 
-  classroomId: string | null;
-  classroomName: string | null;
+  classroomId?: string | null;
+  classroomName?: string | null;
 
-  date: string;
-  status: AttendanceStatus;
+  date?: string;
+  status?: AttendanceStatus;
   absenceType?: AbsenceType;
 }
 

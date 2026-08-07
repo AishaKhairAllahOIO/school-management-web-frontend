@@ -12,7 +12,7 @@ import {
 export function useUnreadSystemNoticesCount() {
   return useQuery({
     queryKey:
-      systemNoticesKeys.unreadCount,
+      systemNoticesKeys.unreadCount(),
 
     queryFn: async () => {
       const response =

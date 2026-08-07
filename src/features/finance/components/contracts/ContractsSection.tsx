@@ -179,11 +179,7 @@ export function ContractsSection({
     [rows],
   );
 
-  const visibleAccounts = useMemo(
-    () => rows.flatMap((row) => (row.account ? [row.account] : [])),
-    [rows],
-  );
-
+  
   const [createOpen, setCreateOpen] = useState(false);
   const [createStudent, setCreateStudent] = useState<StudentFinanceRow | null>(
     null,

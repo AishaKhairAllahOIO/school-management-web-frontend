@@ -264,9 +264,14 @@ export const API_ENDPOINTS = {
 
     POLICY_ITEM: (policyItemId: ApiId) =>
       `/admin/finance/settings/policy-items/${policyItemId}`,
+
+    EXTRA_SERVICES:
+  "/admin/finance/settings/extra-services",
+
+EXTRA_SERVICE: (extraServiceId: ApiId) =>
+  `/admin/finance/settings/extra-services/${extraServiceId}`,
   
-    EXTRA_SERVICE: (extraServiceId: ApiId) =>
-      `/admin/finance/settings/extra-services/${extraServiceId}`,
+  
   },
 
   FINANCE_OPERATIONS: {

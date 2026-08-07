@@ -18,6 +18,7 @@ type CreateAssessmentComponentFieldsParams = {
 export function createAssessmentComponentFields({
   gradeSubjectOptions,
 }: CreateAssessmentComponentFieldsParams): CrudField<AssessmentComponent>[] {
+
   return [
     {
       name: "gradeSubjectId",
@@ -25,7 +26,7 @@ export function createAssessmentComponentFields({
       type: "select",
       required: true,
       options: gradeSubjectOptions,
-      placeholder: "Select a subject",
+      defaultValue: "Select a subject",
     },
 
     {
@@ -34,7 +35,7 @@ export function createAssessmentComponentFields({
       type: "select",
       required: true,
       options: assessmentTypeOptions,
-      placeholder: "Select assessment type",
+      defaultValue: "Select assessment type",
     },
 
     {
@@ -42,7 +43,7 @@ export function createAssessmentComponentFields({
       label: "Name",
       type: "text",
       required: true,
-      placeholder: "Enter assessment name",
+      defaultValue: "Enter assessment name",
     },
 
     {
@@ -51,8 +52,8 @@ export function createAssessmentComponentFields({
       type: "number",
       required: true,
       min: 0,
-      step: 0.01,
-      placeholder: "Enter maximum mark",
+      
+      defaultValue: "Enter maximum mark",
     },
 
     {
@@ -62,8 +63,8 @@ export function createAssessmentComponentFields({
       required: true,
       min: 0,
       max: 100,
-      step: 0.01,
-      placeholder: "Enter weight percentage",
+      
+      defaultValue: "Enter weight percentage",
     },
   ];
 }

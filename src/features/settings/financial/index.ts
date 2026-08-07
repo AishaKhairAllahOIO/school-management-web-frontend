@@ -6,6 +6,5 @@ export * from "./types/feePlan.types";
 
 export * from "./types/extraService.types";
 
-export * from "./types/responses.types";
 
 export * from "./types/installmentPolicy.types";

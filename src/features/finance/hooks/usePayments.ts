@@ -60,7 +60,7 @@ export function usePayments() {
   const updatePayment = useMutation({
     mutationFn: ({
       id,
-      studentId,
+     
       payload,
     }: {
       id: string | number;
@@ -84,7 +84,7 @@ export function usePayments() {
   const deletePayment = useMutation({
     mutationFn: ({
       id,
-      studentId,
+     
     }: {
       id: string | number;
       studentId?: string | number;

@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import {
-  useEffect,
+ 
   useMemo,
   useRef,
   useState,
@@ -198,19 +198,16 @@ deleteTitle = "Delete record?",
 deleteDescription = () =>
   "This record will be permanently deleted.",
 pageSize = 6,
-pageSizeOptions = [6, 10, 15, 25],
 }: CrudPageProps<TEntity, TCreate, TUpdate>) {
   const academicTheme = useAcademicTheme();
   const SectionIcon = academicTheme.icon;
 
   const [currentPage, setCurrentPage] = useState(1);
-  const [currentPageSize, setCurrentPageSize] = useState(pageSize);
+  const [currentPageSize] = useState(pageSize);
 
   const totalPages = Math.max(1, Math.ceil(rows.length / currentPageSize));
 
-  useEffect(() => {
-    setCurrentPage((page) => Math.min(page, totalPages));
-  }, [totalPages]);
+ 
 
   const visibleRows = useMemo(() => {
     const start = (currentPage - 1) * currentPageSize;

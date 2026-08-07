@@ -111,7 +111,7 @@ export function StudentAttendanceHistoryPage() {
               {student?.studentName ?? "Student attendance history"}
             </h1>
             <p className="mt-0.5 text-[12px] text-muted-foreground">
-              {student ? `${student.className} · Classroom ${student.section}` : `Student ${studentId}`}
+              {student ? `${student.gradeName} · Classroom ${student.classroomName}` : `Student ${studentId}`}
             </p>
           </div>
         </div>

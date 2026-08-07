@@ -4,7 +4,7 @@ import {
   UserRoundCheck,
   UsersRound,
 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 
 import { ConfirmationDialog } from "@/shared/ui/confirmation-dialog";
 import { SettingsWorkspace } from "@/features/settings/academic/components/shared/SettingsWorkspace";
@@ -25,72 +25,105 @@ import type { StudentAttendanceSetting } from "../types/student-attendance.types
 
 type ActiveSection = "students" | "staff";
 
-const workspaceItems = [
+type WorkspaceItem = {
+  id: ActiveSection;
+  title: string;
+  description: string;
+  icon: ReactNode;
+};
+
+const workspaceItems: WorkspaceItem[] = [
   {
     id: "students",
     title: "Students",
     description: "Set working days and required attendance",
-    icon: <UserRoundCheck size={18} strokeWidth={1.75} />,
+    icon: <UserRoundCheck size={18} strokeWidth={1.8} />,
   },
   {
     id: "staff",
     title: "Staff",
     description: "Define employee attendance and work rules",
-    icon: <UsersRound size={18} strokeWidth={1.75} />,
+    icon: <UsersRound size={18} strokeWidth={1.8} />,
   },
-] satisfies Array<{
-  id: ActiveSection;
-  title: string;
-  description: string;
-  icon: React.ReactNode;
-}>;
+];
 
 export function StudentAttendanceSettingsPage() {
-  const [activeSection, setActiveSection] = useState<ActiveSection>("students");
+  const [activeSection, setActiveSection] =
+    useState<ActiveSection>("students");
+
   const [dialogValue, setDialogValue] = useState<
     StudentAttendanceSetting | "new" | null
   >(null);
-  const [selected, setSelected] = useState<StudentAttendanceSetting | null>(null);
+
+  const [selected, setSelected] =
+    useState<StudentAttendanceSetting | null>(null);
+
   const [pendingDelete, setPendingDelete] =
     useState<StudentAttendanceSetting | null>(null);
 
   const settingsQuery = useStudentAttendanceSettings();
   const termsQuery = useAcademicTerms();
-  const createSetting = useCreateStudentAttendanceSetting();
-  const updateSetting = useUpdateStudentAttendanceSetting();
-  const deleteSetting = useDeleteStudentAttendanceSetting();
+
+  const createSetting =
+    useCreateStudentAttendanceSetting();
+
+  const updateSetting =
+    useUpdateStudentAttendanceSetting();
+
+  const deleteSetting =
+    useDeleteStudentAttendanceSetting();
 
   const items = settingsQuery.data ?? [];
   const terms = termsQuery.data ?? [];
+
   const selectedTerm = useMemo(
-    () => terms.find((term) => term.id === selected?.semesterId),
+    () =>
+      terms.find(
+        (term) => term.id === selected?.semesterId,
+      ),
     [selected, terms],
   );
 
-  const isLoading = settingsQuery.isLoading || termsQuery.isLoading;
-  const isError = settingsQuery.isError || termsQuery.isError;
-  const isFetching = settingsQuery.isFetching || termsQuery.isFetching;
+  const isLoading =
+    settingsQuery.isLoading ||
+    termsQuery.isLoading;
 
-  if (isLoading) return <StudentAttendanceSkeleton />;
+  const isError =
+    settingsQuery.isError ||
+    termsQuery.isError;
+
+  const isFetching =
+    settingsQuery.isFetching ||
+    termsQuery.isFetching;
+
+  if (isLoading) {
+    return <StudentAttendanceSkeleton />;
+  }
 
   if (isError) {
     return (
       <AttendanceErrorState
         isRetrying={isFetching}
         onRetry={() => {
-          void settingsQuery.refetch();
-          void termsQuery.refetch();
+          void Promise.all([
+            settingsQuery.refetch(),
+            termsQuery.refetch(),
+          ]);
         }}
       />
     );
   }
 
   return (
-    <div className="mx-auto w-full max-w-[1500px]">
+    <div className="space-y-5">
       <SettingsWorkspace
         items={workspaceItems}
         activeId={activeSection}
-        onChange={(id) => setActiveSection(id as ActiveSection)}
+        onChange={(id) => {
+          if (id === "students" || id === "staff") {
+            setActiveSection(id);
+          }
+        }}
         hint="Attendance rules are used to calculate eligibility, absence rates and semester attendance summaries."
       >
         {activeSection === "students" ? (
@@ -118,10 +151,12 @@ export function StudentAttendanceSettingsPage() {
               />
               <SummaryCard
                 value={
-                  items.length
+                  items.length > 0
                     ? `${Math.round(
                         items.reduce(
-                          (sum, item) => sum + item.requiredAttendancePercentage,
+                          (sum, item) =>
+                            sum +
+                            item.requiredAttendancePercentage,
                           0,
                         ) / items.length,
                       )}%`
@@ -132,10 +167,13 @@ export function StudentAttendanceSettingsPage() {
               />
               <SummaryCard
                 value={
-                  items.length
+                  items.length > 0
                     ? Math.round(
-                        items.reduce((sum, item) => sum + item.workingDays, 0) /
-                          items.length,
+                        items.reduce(
+                          (sum, item) =>
+                            sum + item.workingDays,
+                          0,
+                        ) / items.length,
                       )
                     : "—"
                 }
@@ -153,20 +191,42 @@ export function StudentAttendanceSettingsPage() {
         <StudentAttendanceSettingDialog
           value={dialogValue}
           terms={terms}
-          usedSemesterIds={items.map((item) => item.semesterId)}
-          isPending={createSetting.isPending || updateSetting.isPending}
-          onClose={() => setDialogValue(null)}
+          usedSemesterIds={items.map(
+            (item) => item.semesterId,
+          )}
+          isPending={
+            createSetting.isPending ||
+            updateSetting.isPending
+          }
+          onClose={() => {
+            if (
+              !createSetting.isPending &&
+              !updateSetting.isPending
+            ) {
+              setDialogValue(null);
+            }
+          }}
           onSubmit={(payload) => {
             if (dialogValue === "new") {
               createSetting.mutate(payload, {
-                onSuccess: () => setDialogValue(null),
+                onSuccess: () => {
+                  setDialogValue(null);
+                },
               });
+
               return;
             }
 
             updateSetting.mutate(
-              { id: dialogValue.id, payload },
-              { onSuccess: () => setDialogValue(null) },
+              {
+                id: dialogValue.id,
+                payload,
+              },
+              {
+                onSuccess: () => {
+                  setDialogValue(null);
+                },
+              },
             );
           }}
         />
@@ -181,23 +241,36 @@ export function StudentAttendanceSettingsPage() {
       <ConfirmationDialog
         open={Boolean(pendingDelete)}
         onOpenChange={(open) => {
-          if (!open) setPendingDelete(null);
+          if (!open && !deleteSetting.isPending) {
+            setPendingDelete(null);
+          }
         }}
         title="Delete attendance setting?"
         description="This semester will no longer have an attendance configuration. This action cannot be undone."
         itemName={
           pendingDelete
             ? terms
-                .find((term) => term.id === pendingDelete.semesterId)
+                .find(
+                  (term) =>
+                    term.id === pendingDelete.semesterId,
+                )
                 ?.semesterName.replaceAll("_", " ")
             : undefined
         }
         isPending={deleteSetting.isPending}
         onConfirm={() => {
-          if (!pendingDelete) return;
-          deleteSetting.mutate(pendingDelete.id, {
-            onSuccess: () => setPendingDelete(null),
-          });
+          if (!pendingDelete) {
+            return;
+          }
+
+          deleteSetting.mutate(
+            pendingDelete.id,
+            {
+              onSuccess: () => {
+                setPendingDelete(null);
+              },
+            },
+          );
         }}
       />
     </div>
@@ -206,27 +279,31 @@ export function StudentAttendanceSettingsPage() {
 
 function StaffAttendancePlaceholder() {
   return (
-    <div>
-      <SectionHeader
-        title="Staff Attendance"
-        description="Configure the workday and attendance rules used to evaluate employee presence, absence and payroll-related attendance."
-      />
+    <div className="rounded-[22px] border border-dashed border-primary/20 bg-primary/[0.025] px-6 py-14 text-center">
+      <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-[18px] bg-primary/[0.08] text-primary">
+        <UsersRound
+          size={24}
+          strokeWidth={1.7}
+        />
+      </span>
 
-      <div className="rounded-[22px] border border-dashed border-primary/20 bg-primary/[0.025] px-6 py-14 text-center">
-        <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-[18px] bg-primary/[0.08] text-primary">
-          <UsersRound size={24} strokeWidth={1.7} />
-        </span>
-        <h3 className="mt-5 text-[17px] font-medium text-foreground">
-          Staff attendance configuration is not connected yet
-        </h3>
-        <p className="mx-auto mt-2 max-w-lg text-[13px] leading-6 text-muted-foreground">
-          No temporary data has been added. Once the staff attendance endpoints are available, this area will use the same clear tables, forms and confirmation dialogs as student attendance.
-        </p>
-        <span className="mt-5 inline-flex items-center gap-2 rounded-full border border-primary/15 bg-card px-3.5 py-2 text-[12px] font-medium text-primary">
-          <CalendarCheck2 size={15} />
-          Waiting for staff attendance API
-        </span>
-      </div>
+      <h3 className="mt-5 text-[17px] font-medium text-foreground">
+        Staff attendance configuration is not
+        connected yet
+      </h3>
+
+      <p className="mx-auto mt-2 max-w-lg text-[13px] leading-6 text-muted-foreground">
+        No temporary data has been added. Once
+        the staff attendance endpoints are
+        available, this area will use the same
+        clear tables, forms and confirmation
+        dialogs as student attendance.
+      </p>
+
+      <span className="mt-5 inline-flex items-center gap-2 rounded-full border border-primary/15 bg-card px-3.5 py-2 text-[12px] font-medium text-primary">
+        <CalendarCheck2 size={15} />
+        Waiting for staff attendance API
+      </span>
     </div>
   );
 }
@@ -241,12 +318,18 @@ function SummaryCard({
   description: string;
 }) {
   return (
-    <div className="rounded-[18px] border border-border/55 bg-card p-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/15 hover:shadow-[0_10px_26px_rgba(30,20,70,0.05)]">
-      <p className="text-[20px] font-semibold tracking-[-0.025em] text-foreground">
+    <div className="rounded-[18px] border border-border/65 bg-card px-5 py-4 shadow-[var(--shadow-card)]">
+      <div className="text-[24px] font-semibold tracking-[-0.03em] text-foreground">
         {value}
+      </div>
+
+      <div className="mt-1 text-[12px] font-semibold text-foreground">
+        {label}
+      </div>
+
+      <p className="mt-1 text-[11px] leading-5 text-muted-foreground">
+        {description}
       </p>
-      <p className="mt-1 text-[13px] font-medium text-foreground">{label}</p>
-      <p className="mt-1 text-[11px] text-muted-foreground">{description}</p>
     </div>
   );
 }
@@ -259,29 +342,47 @@ function AttendanceErrorState({
   onRetry: () => void;
 }) {
   return (
-    <div className="mx-auto w-full max-w-[1500px]">
-      <div className="rounded-[24px] border border-destructive/20 bg-card p-8 text-center shadow-soft">
-        <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-[18px] bg-destructive/10 text-destructive">
-          <CalendarCheck2 size={24} />
+    <div className="flex min-h-[420px] items-center justify-center px-4">
+      <div className="w-full max-w-[480px] rounded-[22px] border border-destructive/20 bg-card p-8 text-center shadow-[var(--shadow-card)]">
+        <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-[15px] bg-destructive/[0.08] text-destructive">
+          <RefreshCw
+            size={22}
+            className={
+              isRetrying
+                ? "animate-spin"
+                : undefined
+            }
+          />
         </span>
-        <h1 className="mt-5 text-xl font-semibold text-foreground">
+
+        <h2 className="mt-5 text-[17px] font-semibold text-foreground">
           Attendance settings are unavailable
-        </h1>
-        <p className="mx-auto mt-2 max-w-lg text-[14px] leading-6 text-muted-foreground">
-          The configuration or academic semester data could not be retrieved.
-          Check the server connection and try again.
+        </h2>
+
+        <p className="mx-auto mt-2 max-w-md text-[13px] leading-6 text-muted-foreground">
+          The configuration or academic semester
+          data could not be retrieved. Check the
+          server connection and try again.
         </p>
+
         <button
           type="button"
           disabled={isRetrying}
           onClick={onRetry}
-          className="mt-5 inline-flex h-11 items-center justify-center gap-2 rounded-[14px] bg-primary px-5 text-[14px] font-medium text-primary-foreground transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
+          className="mt-6 inline-flex h-10 items-center justify-center gap-2 rounded-full bg-primary px-5 text-sm font-semibold text-primary-foreground shadow-sm transition hover:-translate-y-0.5 hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
         >
           <RefreshCw
             size={16}
-            className={isRetrying ? "animate-spin" : undefined}
+            className={
+              isRetrying
+                ? "animate-spin"
+                : undefined
+            }
           />
-          Try Again
+
+          {isRetrying
+            ? "Retrying..."
+            : "Try Again"}
         </button>
       </div>
     </div>

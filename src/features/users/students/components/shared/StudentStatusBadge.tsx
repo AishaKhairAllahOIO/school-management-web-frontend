@@ -18,29 +18,12 @@ const statusStyles: Record<
       "bg-emerald-500/[0.09] text-emerald-600",
     dotClassName: "bg-emerald-500",
   },
-
-  pending: {
-    label: "Pending",
-    className:
-      "bg-amber-500/[0.1] text-amber-600",
-    dotClassName: "bg-amber-500",
-  },
-
   suspended: {
     label: "Suspended",
     className:
       "bg-destructive/[0.08] text-destructive",
     dotClassName: "bg-destructive",
   },
-
-  withdrawn: {
-    label: "Withdrawn",
-    className:
-      "bg-muted/70 text-muted-foreground",
-    dotClassName:
-      "bg-muted-foreground/65",
-  },
-
   completed: {
     label: "Completed",
     className:
