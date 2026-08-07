@@ -63,22 +63,17 @@ const statusOptions: Array<{
   value: EnrollmentStatus;
   label: string;
 }> = [
- 
   {
-    value: "pending",
-    label: "Pending",
+    value: "enrolled",
+    label: "Enrolled",
   },
   {
     value: "suspended",
     label: "Suspended",
   },
   {
-    value: "withdrawn",
-    label: "Withdrawn",
-  },
-  {
-    value: "confirmed",
-    label: "Confirmed",
+    value: "completed",
+    label: "Completed",
   },
 ];
 

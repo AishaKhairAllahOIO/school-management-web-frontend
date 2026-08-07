@@ -42,7 +42,7 @@ function createInitialValues(): RegisterStaffValues {
     address: "",
     photo_url: null,
 
-    degree: "none",
+    degree: null,
     specialization: "",
     university: "",
     graduation_year: null,

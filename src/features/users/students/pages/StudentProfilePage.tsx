@@ -18,7 +18,6 @@ import { ProfileInfoCard } from "../components/profile/ProfileInfoCard";
 import { StudentProfileSection } from "../components/profile/StudentProfileSection";
 import { StudentPageHeader } from "../components/shared/StudentPageHeader";
 import { UserPageBackButton } from "../../shared/components/UserPageBackButton";
-import { StudentStatusBadge } from "../components/shared/StudentStatusBadge";
 import { useStudentFullProfile } from "../hooks/useStudents";
 import type { NamedEntity } from "../types/student.types";
 
@@ -161,15 +160,13 @@ export function StudentProfilePage() {
 
       <StudentProfileSection
         title="Academic enrollment"
-        description="Academic placement and current enrollment status."
+        description="Academic placement and class information."
         icon={<GraduationCap size={18} strokeWidth={1.7} />}
       >
         <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
           <ProfileInfoCard icon={<CalendarDays size={18} />} label="Academic year" value={referenceValue(enrollment.academicYear)} />
           <ProfileInfoCard icon={<BookOpen size={18} />} label="Grade" value={referenceValue(enrollment.grade)} />
           <ProfileInfoCard icon={<GraduationCap size={18} />} label="Classroom" value={referenceValue(enrollment.classroom)} />
-          <ProfileInfoCard icon={<IdCard size={18} />} label="Enrollment status" value={<StudentStatusBadge status={enrollment.enrollmentStatus} />} />
-          <ProfileInfoCard icon={<CalendarDays size={18} />} label="Enrollment date" value={formatDateOnly(enrollment.enrollmentDate)} />
         </div>
       </StudentProfileSection>
     </div>

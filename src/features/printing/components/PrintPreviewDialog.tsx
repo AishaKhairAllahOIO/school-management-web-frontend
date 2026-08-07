@@ -5,6 +5,7 @@ import {
   Plus,
   Printer,
   Scan,
+  Settings2,
   X,
 } from "lucide-react";
 import {
@@ -26,6 +27,10 @@ type PrintPreviewDialogProps = {
 };
 
 type PreviewMode = "custom" | "fit-page" | "fit-width";
+
+type PrintSettings = {
+  monochrome: boolean;
+};
 
 const MIN_ZOOM = 0.35;
 const MAX_ZOOM = 1.8;
@@ -55,10 +60,14 @@ export function PrintPreviewDialog({
   const [mode, setMode] = useState<PreviewMode>("fit-page");
   const [documentHeight, setDocumentHeight] = useState(pageSize.height);
   const [isReady, setIsReady] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+  const [settings, setSettings] = useState<PrintSettings>({
+    monochrome: document?.kind === "official-document",
+  });
 
   const measureDocument = useCallback(() => {
     const frameDocument = iframeRef.current?.contentDocument;
-    if (!frameDocument) return;
+    if (!frameDocument) return false;
 
     const root = frameDocument.documentElement;
     const body = frameDocument.body;
@@ -71,7 +80,7 @@ export function PrintPreviewDialog({
     );
 
     setDocumentHeight(Math.ceil(measuredHeight));
-    setIsReady(true);
+    return true;
   }, [pageSize.height]);
 
   const applyFit = useCallback(
@@ -103,6 +112,22 @@ export function PrintPreviewDialog({
     [documentHeight, pageSize.height, pageSize.width],
   );
 
+  const handleFrameLoad = useCallback(() => {
+    const frameDocument = iframeRef.current?.contentDocument;
+    if (!frameDocument) return;
+
+    const apply = () => {
+      measureDocument();
+      setIsReady(true);
+    };
+
+    // srcDoc is loaded by the browser before this callback. A second frame
+    // lets images/fonts settle before the final page size is measured.
+    apply();
+    window.requestAnimationFrame(apply);
+    window.setTimeout(apply, 120);
+  }, [measureDocument]);
+
   useEffect(() => {
     if (!open) return;
 
@@ -111,6 +136,10 @@ export function PrintPreviewDialog({
 
     function handleKeyDown(event: KeyboardEvent) {
       if (event.key === "Escape") {
+        if (showSettings) {
+          setShowSettings(false);
+          return;
+        }
         onOpenChange(false);
         return;
       }
@@ -133,7 +162,7 @@ export function PrintPreviewDialog({
       window.document.body.style.overflow = previousOverflow;
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [open, onOpenChange]);
+  }, [onOpenChange, open, showSettings]);
 
   useEffect(() => {
     if (!open || !document) return;
@@ -141,13 +170,14 @@ export function PrintPreviewDialog({
     setIsReady(false);
     setDocumentHeight(pageSize.height);
     setMode("fit-page");
+    setShowSettings(false);
+    setSettings({ monochrome: document.kind === "official-document" });
+  }, [document, open, pageSize.height]);
 
-    const frame = window.requestAnimationFrame(() => {
-      applyFit("fit-page");
-    });
-
-    return () => window.cancelAnimationFrame(frame);
-  }, [applyFit, document, open, pageSize.height]);
+  useEffect(() => {
+    if (!open || !isReady) return;
+    applyFit("fit-page");
+  }, [applyFit, isReady, open]);
 
   useEffect(() => {
     if (!open) return;
@@ -162,6 +192,16 @@ export function PrintPreviewDialog({
     return () => window.removeEventListener("resize", handleResize);
   }, [applyFit, mode, open]);
 
+  useEffect(() => {
+    const frameDocument = iframeRef.current?.contentDocument;
+    if (!frameDocument) return;
+
+    frameDocument.documentElement.classList.toggle(
+      "print-monochrome",
+      settings.monochrome,
+    );
+  }, [settings.monochrome, isReady]);
+
   const scaledSize = useMemo(
     () => ({
       width: Math.ceil(pageSize.width * zoom),
@@ -174,7 +214,7 @@ export function PrintPreviewDialog({
 
   function handlePrint() {
     const frameWindow = iframeRef.current?.contentWindow;
-    if (!frameWindow) return;
+    if (!frameWindow || !isReady) return;
     frameWindow.focus();
     frameWindow.print();
   }
@@ -184,6 +224,9 @@ export function PrintPreviewDialog({
     setZoom(clampZoom(nextZoom));
   }
 
+  const kindLabel = document.kind === "poster" ? "Poster" : "Official document";
+  const orientationLabel = orientation === "landscape" ? "A4 Landscape" : "A4 Portrait";
+
   return createPortal(
     <section
       role="dialog"
@@ -191,123 +234,249 @@ export function PrintPreviewDialog({
       aria-label={document.title}
       className="fixed inset-0 z-[120] flex min-h-0 flex-col bg-background"
     >
-      <header className="relative z-10 flex min-h-16 shrink-0 flex-wrap items-center justify-between gap-2 border-b border-border/55 bg-card/98 px-3 py-2.5 shadow-[0_8px_30px_rgba(34,24,72,0.05)] backdrop-blur-xl sm:px-5 lg:px-7">
-        <div className="flex min-w-0 items-center gap-2.5">
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            onClick={() => onOpenChange(false)}
-            className="h-10 w-10 shrink-0 rounded-[13px]"
-            aria-label="Back"
-          >
-            <ArrowLeft className="h-4 w-4 rtl:rotate-180" />
-          </Button>
+      <header className="relative z-10 shrink-0 border-b border-border/70 bg-card shadow-[0_8px_28px_rgb(31_25_78_/_0.08)]">
+        <div className="flex min-h-[64px] items-center gap-3 px-3 py-2 sm:px-5 lg:px-7">
+          <div className="flex min-w-0 flex-1 items-center gap-2.5">
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={() => onOpenChange(false)}
+              className="h-9 w-9 shrink-0 rounded-[11px]"
+              aria-label="Back"
+            >
+              <ArrowLeft className="h-4 w-4 rtl:rotate-180" />
+            </Button>
 
-          <div className="min-w-0">
-            <p className="truncate text-[15px] font-semibold tracking-[-0.02em] text-foreground sm:text-[17px]">
-              {document.title}
-            </p>
-            <p className="mt-0.5 hidden text-[11px] text-muted-foreground sm:block">
-              Review every page, adjust the zoom, then print or save as PDF.
-            </p>
+            <div className="min-w-0">
+              <div className="flex min-w-0 items-center gap-2">
+                <p className="truncate text-[14px] font-semibold tracking-[-0.02em] text-foreground sm:text-[15px]">
+                  {document.title}
+                </p>
+                <span className="hidden shrink-0 rounded-full border border-primary/15 bg-primary/5 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-[0.08em] text-primary sm:inline-flex">
+                  {kindLabel}
+                </span>
+              </div>
+              <p className="mt-0.5 hidden text-[10px] text-muted-foreground md:block">
+                Review the page, adjust the view, then print or save as PDF.
+              </p>
+            </div>
+          </div>
+
+          <div className="hidden items-center gap-1.5 md:flex">
+            <div className="flex items-center rounded-[11px] border border-border/70 bg-muted/30 p-0.5">
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                onClick={() => updateZoom(zoom - ZOOM_STEP)}
+                disabled={zoom <= MIN_ZOOM}
+                className="h-8 w-8 rounded-[8px]"
+                aria-label="Zoom out"
+              >
+                <Minus className="h-3.5 w-3.5" />
+              </Button>
+
+              <button
+                type="button"
+                onClick={() => updateZoom(1)}
+                className="min-w-[54px] px-1.5 text-center text-[10px] font-semibold tabular-nums text-foreground"
+                title="Reset zoom to 100%"
+              >
+                {Math.round(zoom * 100)}%
+              </button>
+
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                onClick={() => updateZoom(zoom + ZOOM_STEP)}
+                disabled={zoom >= MAX_ZOOM}
+                className="h-8 w-8 rounded-[8px]"
+                aria-label="Zoom in"
+              >
+                <Plus className="h-3.5 w-3.5" />
+              </Button>
+            </div>
+
+            <Button
+              type="button"
+              variant={mode === "fit-page" ? "secondary" : "ghost"}
+              size="icon"
+              onClick={() => applyFit("fit-page")}
+              className="h-9 w-9 rounded-[10px]"
+              title="Fit page"
+              aria-label="Fit page"
+            >
+              <Scan className="h-4 w-4" />
+            </Button>
+
+            <Button
+              type="button"
+              variant={mode === "fit-width" ? "secondary" : "ghost"}
+              size="icon"
+              onClick={() => applyFit("fit-width")}
+              className="h-9 w-9 rounded-[10px]"
+              title="Fit width"
+              aria-label="Fit width"
+            >
+              <Maximize2 className="h-4 w-4" />
+            </Button>
+          </div>
+
+          <div className="relative flex shrink-0 items-center gap-1.5">
+            <span className="hidden rounded-full border border-border/70 bg-muted/25 px-2.5 py-1.5 text-[9.5px] font-medium text-muted-foreground lg:inline-flex">
+              {orientationLabel}
+            </span>
+
+            <Button
+              type="button"
+              variant={showSettings ? "secondary" : "ghost"}
+              size="icon"
+              onClick={() => setShowSettings((value) => !value)}
+              className="h-9 w-9 rounded-[11px]"
+              aria-label="Print settings"
+              aria-expanded={showSettings}
+            >
+              <Settings2 className="h-4 w-4" />
+            </Button>
+
+            <Button
+              type="button"
+              onClick={handlePrint}
+              disabled={!isReady}
+              className="h-9 rounded-[11px] px-3 sm:h-10 sm:px-3.5"
+            >
+              <Printer className="h-4 w-4" />
+              <span className="hidden sm:inline">Print / Save PDF</span>
+              <span className="sm:hidden">Print</span>
+            </Button>
+
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={() => onOpenChange(false)}
+              className="h-9 w-9 rounded-[11px]"
+              aria-label="Close print preview"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+
+            {showSettings ? (
+              <div className="absolute end-0 top-full z-20 mt-2 w-[260px] rounded-[16px] border border-border/80 bg-card p-3 shadow-[0_20px_60px_rgb(31_25_78_/_0.16)]">
+                <p className="text-[11px] font-semibold text-foreground">Print settings</p>
+                <div className="mt-3 space-y-2">
+                  <div className="flex items-center justify-between rounded-[11px] border border-border/60 bg-muted/20 px-3 py-2.5">
+                    <span className="text-[11px] font-medium text-foreground">Paper</span>
+                    <span className="text-[10px] text-muted-foreground">A4</span>
+                  </div>
+                  <div className="flex items-center justify-between rounded-[11px] border border-border/60 bg-muted/20 px-3 py-2.5">
+                    <span className="text-[11px] font-medium text-foreground">Orientation</span>
+                    <span className="text-[10px] text-muted-foreground">{orientationLabel.replace("A4 ", "")}</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setSettings((current) => ({
+                        ...current,
+                        monochrome: !current.monochrome,
+                      }))
+                    }
+                    className="flex w-full items-center justify-between rounded-[11px] border border-border/60 bg-muted/20 px-3 py-2.5 text-start transition-colors hover:bg-muted/40"
+                  >
+                    <span>
+                      <span className="block text-[11px] font-medium text-foreground">Black &amp; white</span>
+                      <span className="mt-0.5 block text-[9px] text-muted-foreground">Official documents are monochrome by default.</span>
+                    </span>
+                    <span
+                      className={[
+                        "relative h-5 w-9 shrink-0 rounded-full transition-colors",
+                        settings.monochrome ? "bg-primary" : "bg-muted-foreground/25",
+                      ].join(" ")}
+                    >
+                      <span
+                        className={[
+                          "absolute top-0.5 h-4 w-4 rounded-full bg-white shadow-sm transition-transform",
+                          settings.monochrome ? "translate-x-4" : "translate-x-0.5",
+                        ].join(" ")}
+                      />
+                    </span>
+                  </button>
+                  <p className="px-1 pt-1 text-[9px] leading-4 text-muted-foreground">
+                    The browser controls the final printer and PDF destination. These settings control the document preview before printing.
+                  </p>
+                </div>
+              </div>
+            ) : null}
           </div>
         </div>
 
-        <div className="order-3 flex w-full items-center justify-center gap-1.5 sm:order-none sm:w-auto">
-          <div className="flex items-center rounded-[13px] border border-border/60 bg-muted/25 p-1">
+        <div className="flex items-center justify-center gap-1 border-t border-border/50 px-3 py-1.5 md:hidden">
+          <div className="flex items-center rounded-[10px] border border-border/70 bg-muted/30 p-0.5">
             <Button
               type="button"
               variant="ghost"
               size="icon"
               onClick={() => updateZoom(zoom - ZOOM_STEP)}
               disabled={zoom <= MIN_ZOOM}
-              className="h-8 w-8 rounded-[9px]"
+              className="h-7 w-7 rounded-[7px]"
               aria-label="Zoom out"
             >
-              <Minus className="h-3.5 w-3.5" />
+              <Minus className="h-3 w-3" />
             </Button>
-
             <button
               type="button"
               onClick={() => updateZoom(1)}
-              className="min-w-[58px] px-2 text-center text-[11px] font-semibold tabular-nums text-foreground"
-              title="Reset zoom to 100%"
+              className="min-w-[48px] text-center text-[9px] font-semibold tabular-nums"
             >
               {Math.round(zoom * 100)}%
             </button>
-
             <Button
               type="button"
               variant="ghost"
               size="icon"
               onClick={() => updateZoom(zoom + ZOOM_STEP)}
               disabled={zoom >= MAX_ZOOM}
-              className="h-8 w-8 rounded-[9px]"
+              className="h-7 w-7 rounded-[7px]"
               aria-label="Zoom in"
             >
-              <Plus className="h-3.5 w-3.5" />
+              <Plus className="h-3 w-3" />
             </Button>
           </div>
-
           <Button
             type="button"
             variant={mode === "fit-page" ? "secondary" : "ghost"}
             size="icon"
             onClick={() => applyFit("fit-page")}
-            className="h-10 w-10 rounded-[12px]"
+            className="h-8 w-8 rounded-[9px]"
             title="Fit page"
             aria-label="Fit page"
           >
-            <Scan className="h-4 w-4" />
+            <Scan className="h-3.5 w-3.5" />
           </Button>
-
           <Button
             type="button"
             variant={mode === "fit-width" ? "secondary" : "ghost"}
             size="icon"
             onClick={() => applyFit("fit-width")}
-            className="h-10 w-10 rounded-[12px]"
+            className="h-8 w-8 rounded-[9px]"
             title="Fit width"
             aria-label="Fit width"
           >
-            <Maximize2 className="h-4 w-4" />
+            <Maximize2 className="h-3.5 w-3.5" />
           </Button>
-        </div>
-
-        <div className="flex shrink-0 items-center gap-2">
-          <span className="hidden rounded-full border border-border/60 bg-muted/30 px-3 py-1.5 text-[10.5px] font-medium text-muted-foreground lg:inline-flex">
-            {orientation === "landscape" ? "A4 Landscape" : "A4 Portrait"}
+          <span className="ml-1 text-[9px] font-medium text-muted-foreground">
+            {orientationLabel}
           </span>
-
-          <Button
-            type="button"
-            onClick={handlePrint}
-            className="h-10 rounded-[13px] px-3.5"
-          >
-            <Printer className="h-4 w-4" />
-            <span className="hidden sm:inline">Print / Save PDF</span>
-            <span className="sm:hidden">Print</span>
-          </Button>
-
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            onClick={() => onOpenChange(false)}
-            className="hidden h-10 w-10 rounded-[13px] sm:inline-flex"
-            aria-label="Close print preview"
-          >
-            <X className="h-4 w-4" />
-          </Button>
         </div>
       </header>
 
       <div
         ref={viewportRef}
-        className="relative min-h-0 flex-1 overflow-auto overscroll-contain bg-[radial-gradient(circle_at_top,_hsl(var(--primary)/0.07),_transparent_34%),linear-gradient(to_bottom,hsl(var(--muted)/0.28),hsl(var(--background)))]"
+        className="relative min-h-0 flex-1 overflow-auto overscroll-contain bg-muted/20"
       >
-        <div className="flex min-h-full min-w-full items-start justify-center p-3 sm:p-7 lg:p-10">
+        <div className="flex min-h-full min-w-full items-start justify-center px-3 py-7 sm:px-7 sm:py-9 lg:px-10 lg:py-10">
           <div
             className="relative shrink-0 transition-[width,height] duration-200 ease-out"
             style={{
@@ -316,8 +485,13 @@ export function PrintPreviewDialog({
             }}
           >
             {!isReady ? (
-              <div className="absolute inset-0 z-10 grid place-items-center rounded-[8px] bg-white text-sm text-muted-foreground shadow-[0_24px_80px_rgba(35,25,70,0.16)]">
-                Preparing preview…
+              <div className="absolute inset-0 z-10 grid place-items-center rounded-[3px] bg-card text-muted-foreground shadow-[0_24px_80px_rgb(35_25_70_/_0.16)]">
+                <div className="flex flex-col items-center gap-2.5">
+                  <span className="grid h-9 w-9 place-items-center rounded-full bg-primary/10 text-primary">
+                    <Scan className="h-4 w-4 animate-pulse" />
+                  </span>
+                  <span className="text-xs font-medium">Preparing preview…</span>
+                </div>
               </div>
             ) : null}
 
@@ -325,16 +499,9 @@ export function PrintPreviewDialog({
               ref={iframeRef}
               title={document.title}
               srcDoc={document.html}
-              onLoad={() => {
-                measureDocument();
-                window.requestAnimationFrame(() => {
-                  if (mode === "fit-page" || mode === "fit-width") {
-                    applyFit(mode);
-                  }
-                });
-              }}
+              onLoad={handleFrameLoad}
               scrolling="no"
-              className="absolute left-0 top-0 origin-top-left border-0 bg-white shadow-[0_24px_80px_rgba(35,25,70,0.16)]"
+              className="absolute left-0 top-0 origin-top-left border-0 bg-white shadow-[0_24px_80px_rgb(35_25_70_/_0.16)]"
               style={{
                 width: pageSize.width,
                 height: documentHeight,

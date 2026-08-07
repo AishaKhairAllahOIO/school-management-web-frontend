@@ -8,7 +8,6 @@ import {
   useState,
 } from "react";
 import {
- 
   GraduationCap,
   Loader2,
   Save,
@@ -45,7 +44,6 @@ import {
   useUpdateStudentPersonal,
 } from "../hooks/useStudents";
 import type {
-  EnrollmentStatus,
   UpdateStudentPersonalPayload,
   UserGender,
   UserNationality
@@ -71,7 +69,6 @@ type EditableEnrollment = {
   academic_year_id: string;
   grade_level_id: string;
   class_room_id: string;
-  enrollment_status: EnrollmentStatus;
 };
 
 const emptyPerson: EditablePerson = {
@@ -92,7 +89,6 @@ const emptyEnrollment: EditableEnrollment = {
   academic_year_id: "",
   grade_level_id: "",
   class_room_id: "",
-  enrollment_status: "confirmed",
 };
 
 function isRecord(
@@ -215,23 +211,6 @@ function normalizeNationality():
   const allowedStatuses: UserNationality[] = [
     "syrian","lebanese","palestinian","jordanian","other",
   ];
-}
-
-function normalizeEnrollmentStatus(
-  value: unknown,
-): EnrollmentStatus {
-  const allowedStatuses: EnrollmentStatus[] = [
-    "pending",
-    "suspended",
-    "withdrawn",
-    "confirmed",
-  ];
-
-  return allowedStatuses.includes(
-    value as EnrollmentStatus,
-  )
-    ? (value as EnrollmentStatus)
-    : "confirmed";
 }
 
 function getNameParts(
@@ -503,14 +482,6 @@ export function StudentEditPage() {
         ],
       ),
 
-      enrollment_status:
-        normalizeEnrollmentStatus(
-          getValue(enrollmentData, [
-            "enrollmentStatus",
-            "enrollment_status",
-            "status",
-          ]),
-        ),
     });
   }, [profileQuery.data]);
 
@@ -622,7 +593,6 @@ export function StudentEditPage() {
       academic_year_id: enrollment.academic_year_id || undefined,
       grade_level_id: enrollment.grade_level_id || undefined,
       class_room_id: enrollment.class_room_id || undefined,
-      enrollment_status: enrollment.enrollment_status,
     };
 
     await studentMutation.mutateAsync({
@@ -808,7 +778,7 @@ export function StudentEditPage() {
       <FormSection
         eyebrow="Academic placement"
         title="Enrollment"
-        description="Change the academic year, grade, classroom or enrollment status."
+        description="Update the student academic placement."
         icon={
           <GraduationCap
             size={18}
@@ -859,31 +829,6 @@ export function StudentEditPage() {
           }
         />
 
-        <div className="mt-4 max-w-sm">
-          <FormField label="Enrollment status">
-            <Select
-              value={enrollment.enrollment_status}
-              disabled={isSaving}
-              onValueChange={(value) =>
-                setEnrollment((current) => ({
-                  ...current,
-                  enrollment_status: value as EnrollmentStatus,
-                }))
-              }
-            >
-              <SelectTrigger className="h-12 rounded-[15px]">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="pending">Pending</SelectItem>
-                <SelectItem value="enrolled">Enrolled</SelectItem>
-                <SelectItem value="suspended">Suspended</SelectItem>
-                <SelectItem value="withdrawn">Withdrawn</SelectItem>
-                <SelectItem value="completed">Completed</SelectItem>
-              </SelectContent>
-            </Select>
-          </FormField>
-        </div>
       </FormSection>
     </form>
   );

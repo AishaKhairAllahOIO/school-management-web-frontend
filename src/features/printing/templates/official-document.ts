@@ -12,15 +12,15 @@ export const OFFICIAL_DOCUMENT_STYLES = `
   :root {
     --official-ink: #101010;
     --official-muted: #555;
-    --official-soft: #f4f4f4;
-    --official-line: #b8b8b8;
+    --official-soft: #f7f7f7;
+    --official-line: #a9a9a9;
     --official-line-strong: #191919;
   }
 
   .official-document {
     position: relative;
     min-height: 297mm;
-    padding: 12mm 14mm 11mm;
+    padding: 13mm 15mm 12mm;
     color: var(--official-ink);
     background: #fff;
   }
@@ -30,7 +30,7 @@ export const OFFICIAL_DOCUMENT_STYLES = `
     position: absolute;
     inset: 5mm;
     pointer-events: none;
-    border: .25mm solid #dedede;
+    border: .25mm solid #cfcfcf;
   }
 
   .official-header {
@@ -40,7 +40,7 @@ export const OFFICIAL_DOCUMENT_STYLES = `
     align-items: center;
     gap: 4mm;
     padding: 0 1mm 5mm;
-    border-bottom: .55mm double var(--official-line-strong);
+    border-bottom: .45mm solid var(--official-line-strong);
   }
 
   .official-logo,
@@ -65,7 +65,7 @@ export const OFFICIAL_DOCUMENT_STYLES = `
   .official-school-name {
     margin: 0;
     font-family: Georgia, "Times New Roman", serif;
-    font-size: 5.4mm;
+    font-size: 5.1mm;
     line-height: 1.08;
     font-weight: 700;
     letter-spacing: -.015em;
@@ -91,20 +91,13 @@ export const OFFICIAL_DOCUMENT_STYLES = `
     letter-spacing: .08em;
   }
 
-  .official-document-meta span {
-    display: block;
-    margin-top: 1.1mm;
-    color: var(--official-muted);
-    font-size: 2.35mm;
-    line-height: 1.4;
-  }
 
   .official-title-block {
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
     gap: 8mm;
-    padding: 8mm 1mm 5.5mm;
+    padding: 7mm 1mm 5mm;
   }
 
   .official-kicker {
@@ -119,7 +112,7 @@ export const OFFICIAL_DOCUMENT_STYLES = `
   .official-title {
     margin: 1.2mm 0 0;
     font-family: Georgia, "Times New Roman", serif;
-    font-size: 7.2mm;
+    font-size: 6.8mm;
     line-height: 1.04;
     font-weight: 700;
     letter-spacing: -.025em;
@@ -163,9 +156,9 @@ export const OFFICIAL_DOCUMENT_STYLES = `
   }
 
   .official-field {
-    min-height: 16mm;
-    border: .3mm solid var(--official-line);
-    padding: 3.1mm 3.4mm;
+    min-height: 15mm;
+    border: .28mm solid var(--official-line);
+    padding: 3mm 3.3mm;
     background: #fff;
   }
 
@@ -188,7 +181,7 @@ export const OFFICIAL_DOCUMENT_STYLES = `
   }
 
   .official-section {
-    margin-top: 6mm;
+    margin-top: 5.5mm;
     break-inside: avoid;
   }
 
@@ -274,8 +267,8 @@ export const OFFICIAL_DOCUMENT_STYLES = `
 
   .official-note {
     margin-top: 5mm;
-    border-left: 1mm solid var(--official-line-strong);
-    background: var(--official-soft);
+    border-left: .8mm solid var(--official-line-strong);
+    background: #fafafa;
     padding: 3.5mm 4mm;
     color: #3f3f3f;
     font-size: 2.45mm;
@@ -284,18 +277,32 @@ export const OFFICIAL_DOCUMENT_STYLES = `
 
   .official-signatures {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 20mm;
-    margin-top: 15mm;
+    grid-template-columns: minmax(0, 1fr);
+    margin-top: 18mm;
     break-inside: avoid;
   }
 
   .official-signature {
-    padding-top: 8mm;
+    min-height: 24mm;
+    padding-top: 14mm;
     border-top: .3mm solid var(--official-line-strong);
     text-align: center;
     color: var(--official-muted);
     font-size: 2.4mm;
+  }
+
+  .official-signature strong {
+    display: block;
+    color: var(--official-ink);
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 2.9mm;
+    font-weight: 700;
+  }
+
+  .official-signature span {
+    display: block;
+    margin-top: 1.5mm;
+    font-size: 2.2mm;
   }
 
   .official-footer {
@@ -329,6 +336,10 @@ export function buildOfficialHeader(
   documentTitle: string,
   reference?: string,
 ) {
+  // Kept for backwards compatibility; official documents intentionally do not
+  // print internal references or IDs.
+  void reference;
+
   const logo = identity.logoUrl
     ? `<img class="official-logo" src="${escapePrintHtml(identity.logoUrl)}" alt="" />`
     : `<div class="official-logo-fallback">${escapePrintHtml((identity.shortName || identity.schoolName).slice(0, 1).toUpperCase())}</div>`;
@@ -341,7 +352,6 @@ export function buildOfficialHeader(
     </div>
     <div class="official-document-meta">
       <strong>${escapePrintHtml(documentTitle)}</strong>
-      ${reference ? `<span>${escapePrintHtml(reference)}</span>` : ""}
     </div>
   </header>`;
 }
@@ -353,6 +363,7 @@ export function createOfficialDocument({
   reference,
   content,
   orientation = "portrait",
+  signatureLabel,
 }: {
   title: string;
   identity: PrintIdentity;
@@ -360,8 +371,21 @@ export function createOfficialDocument({
   reference?: string;
   content: string;
   orientation?: PrintOrientation;
+  signatureLabel?: string;
 }): PrintableDocument {
-  const body = `<main class="print-page official-document">${buildOfficialHeader(identity, documentTitle, reference)}${content}</main>`;
+  // Kept in the API for backwards compatibility, but references/IDs are never
+  // rendered on official documents.
+  void reference;
+
+  const resolvedSignatureLabel = signatureLabel || "Director / Principal signature";
+  const signatureHtml = `<section class="official-signatures">
+    <div class="official-signature">
+      <strong>${escapePrintHtml(resolvedSignatureLabel)}</strong>
+      <span>Signature and date</span>
+    </div>
+  </section>`;
+
+  const body = `<main class="print-page official-document">${buildOfficialHeader(identity, documentTitle)}${content}${signatureHtml}</main>`;
 
   return {
     title,

@@ -78,7 +78,7 @@ const emptyValues: RegisterStaffValues = {
   nationality: "syrian",
   address: "",
   photo_url: null,
-  degree: "none",
+  degree: null,
   specialization: "",
   university: "",
   graduation_year: null,
@@ -151,7 +151,7 @@ export function StaffEditPage({
         staff.nationality ?? "syrian",
       address: staff.address ?? "",
       photo_url: null,
-      degree: staff.degree ?? "none",
+      degree: staff.degree ?? null,
       specialization:
         staff.specialization ?? "",
       university:

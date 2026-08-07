@@ -32,26 +32,9 @@ const statusOptions: Array<{
   value: EnrollmentStatus;
   label: string;
 }> = [
-  {
-    value: "enrolled",
-    label: "Enrolled",
-  },
-  {
-    value: "pending",
-    label: "Pending",
-  },
-  {
-    value: "suspended",
-    label: "Suspended",
-  },
-  {
-    value: "withdrawn",
-    label: "Withdrawn",
-  },
-  {
-    value: "completed",
-    label: "Completed",
-  },
+  { value: "enrolled", label: "Enrolled" },
+  { value: "suspended", label: "Suspended" },
+  { value: "completed", label: "Completed" },
 ];
 
 export function StudentsFiltersBar({

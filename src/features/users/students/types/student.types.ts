@@ -19,10 +19,9 @@ export type RecordStatus =
   | "deleted";
 
 export type EnrollmentStatus =
-  | "pending"
   | "suspended"
-  | "withdrawn"
-  | "confirmed";
+  | "enrolled"
+  | "completed";
 
 export type NamedEntity = {
   id: ApiId;
@@ -198,7 +197,6 @@ export type UpdateStudentEnrollmentPayload = {
   academic_year_id?: ApiId;
   grade_level_id?: ApiId;
   class_room_id?: ApiId | null;
-  enrollment_status?: EnrollmentStatus;
 };
 
 
@@ -228,7 +226,6 @@ export type UpdateStudentPersonalPayload =
     academic_year_id?: ApiId;
     grade_level_id?: ApiId;
     class_room_id?: ApiId | null;
-    enrollment_status?: EnrollmentStatus;
   };
 
 export type StudentSearchParams = {

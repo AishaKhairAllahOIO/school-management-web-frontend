@@ -34,8 +34,6 @@ export type StaffDegree =
   | "bachelor"
   | "master"
   | "phd"
-  | "student"
-  | "none"
   | "other";
 
 export type StaffServiceType =

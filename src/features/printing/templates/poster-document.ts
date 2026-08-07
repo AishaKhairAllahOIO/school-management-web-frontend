@@ -146,12 +146,9 @@ export function createPosterDocument({
       position: relative;
       height: 297mm;
       overflow: hidden;
-      padding: 8mm;
+      padding: 7mm;
       color: var(--poster-ink);
-      background:
-        radial-gradient(circle at 13% 10%, color-mix(in srgb, var(--poster-secondary) 42%, transparent) 0 16mm, transparent 16.4mm),
-        radial-gradient(circle at 93% 82%, color-mix(in srgb, var(--poster-accent) 50%, transparent) 0 24mm, transparent 24.4mm),
-        linear-gradient(145deg, var(--poster-bg), #fff 47%, color-mix(in srgb, var(--poster-bg) 66%, #fff));
+      background: linear-gradient(145deg, color-mix(in srgb, var(--poster-bg) 72%, #fff), #fff 58%, color-mix(in srgb, var(--poster-secondary) 16%, #fff));
     }
 
     .poster-shape {
@@ -206,11 +203,11 @@ export function createPosterDocument({
       display: flex;
       min-height: 281mm;
       flex-direction: column;
-      border: .45mm solid color-mix(in srgb, var(--poster-primary) 20%, #fff);
-      border-radius: 8mm;
-      background: rgba(255, 255, 255, .91);
-      padding: 9mm;
-      box-shadow: 0 4mm 18mm rgba(48, 38, 74, .13);
+      border: .45mm solid color-mix(in srgb, var(--poster-primary) 26%, #fff);
+      border-radius: 5mm;
+      background: rgba(255, 255, 255, .96);
+      padding: 8mm;
+      box-shadow: 0 3mm 14mm rgba(48, 38, 74, .10);
     }
 
     .poster-frame::before {
@@ -218,8 +215,8 @@ export function createPosterDocument({
       position: absolute;
       inset: 3mm;
       pointer-events: none;
-      border: .25mm dashed color-mix(in srgb, var(--poster-primary) 20%, transparent);
-      border-radius: 6.5mm;
+      border: .22mm solid color-mix(in srgb, var(--poster-primary) 15%, transparent);
+      border-radius: 3.8mm;
     }
 
     .poster-brand {
@@ -235,8 +232,8 @@ export function createPosterDocument({
       width: 15mm;
       height: 15mm;
       place-items: center;
-      border-radius: 4.5mm;
-      background: color-mix(in srgb, var(--poster-primary) 10%, #fff);
+      border-radius: 3.5mm;
+      background: color-mix(in srgb, var(--poster-primary) 8%, #fff);
       border: .35mm solid color-mix(in srgb, var(--poster-primary) 22%, transparent);
     }
 
@@ -273,7 +270,7 @@ export function createPosterDocument({
     .poster-hero {
       position: relative;
       z-index: 1;
-      padding: 16mm 8mm 8mm;
+      padding: 13mm 8mm 7mm;
       text-align: center;
     }
 
@@ -282,8 +279,8 @@ export function createPosterDocument({
       align-items: center;
       justify-content: center;
       min-height: 8mm;
-      border-radius: 99mm;
-      background: color-mix(in srgb, var(--poster-primary) 11%, #fff);
+      border-radius: 2mm;
+      background: color-mix(in srgb, var(--poster-primary) 9%, #fff);
       border: .3mm solid color-mix(in srgb, var(--poster-primary) 22%, transparent);
       padding: 1.8mm 4mm;
       color: var(--poster-primary);
@@ -297,7 +294,7 @@ export function createPosterDocument({
       max-width: 165mm;
       margin: 5mm auto 0;
       font-family: Georgia, "Times New Roman", serif;
-      font-size: 13.2mm;
+      font-size: 12.2mm;
       line-height: .98;
       font-weight: 800;
       letter-spacing: -.05em;

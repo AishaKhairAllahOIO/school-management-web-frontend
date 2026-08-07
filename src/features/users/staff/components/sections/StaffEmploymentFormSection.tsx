@@ -76,15 +76,17 @@ export function StaffEmploymentFormSection({
             value={values.degree ?? "none"}
             disabled={disabled}
             onValueChange={(value) =>
-              updateValue("degree", value as StaffDegree)
+              updateValue(
+                "degree",
+                value === "none" ? null : (value as StaffDegree),
+              )
             }
           >
             <SelectTrigger className="h-12 rounded-[15px]">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="none">None</SelectItem>
-              <SelectItem value="student">Student</SelectItem>
+              <SelectItem value="none">Not specified</SelectItem>
               <SelectItem value="diploma">Diploma</SelectItem>
               <SelectItem value="bachelor">Bachelor</SelectItem>
               <SelectItem value="master">Master</SelectItem>
