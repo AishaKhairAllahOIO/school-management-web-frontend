@@ -137,14 +137,13 @@ export function AssessmentComponentsPage() {
         toAssessmentComponentFormValues
       }
 
-    buildPayload={
-  (values: FormValues) => buildCreateAssessmentComponentPayload(values as any)
-}
+  buildPayload={
+        (values: FormValues) => buildCreateAssessmentComponentPayload(values as any)
+      }
 
-    buildUpdatePayload={
-  (values: FormValues, currentRow: AssessmentComponent) => 
-    buildUpdateAssessmentComponentPayload(values as any, currentRow)
-}
+      buildUpdatePayload={
+        (values: FormValues) => buildUpdateAssessmentComponentPayload(values as any)
+      }
 
       emptyTitle={
         "No assessment components found"
