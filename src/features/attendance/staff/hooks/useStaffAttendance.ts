@@ -122,17 +122,7 @@ export function useStaffAttendance(
     ),
   });
 
-  /*
-   * useQueries returns a new outer array during renders.
-   * Depending on that array directly makes the mapped
-   * attendance list new on every render. The page then
-   * synchronizes that list into local state, which can
-   * produce an endless render/update cycle.
-   *
-   * The role count is fixed, so depending on each query's
-   * actual data reference keeps the derived list stable
-   * until server data or the selected date changes.
-   */
+
   const teacherData =
     queryResults[0]?.data;
 
