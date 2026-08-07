@@ -10,9 +10,7 @@ import { SidebarMenu } from "@/app/layout/components/sidebar/SidebarMenu";
 import { SidebarSectionSeparator } from "@/app/layout/components/sidebar/SidebarSectionSeparator";
 import { useLayoutStore } from "@/app/layout/store/layoutStore";
 import { useLocale } from "@/app/providers/locale";
-
-const WEBSITE_URL =
-  "https://your-school-website.com";
+import { useGeneralSettings } from "@/features/settings/general/hooks/useGeneralSettings";
 
 function formatSidebarDate(
   locale: string,
@@ -75,6 +73,12 @@ export function Sidebar() {
     language,
     t,
   } = useLocale();
+
+  const { data: generalSettings } =
+  useGeneralSettings();
+
+  const websiteUrl =
+  generalSettings?.website?.trim() || "#";
 
   const dateLocale =
   language === "ar"
@@ -431,7 +435,7 @@ export function Sidebar() {
 
             <a
               data-onboarding-target="website"
-              href={WEBSITE_URL}
+              href={websiteUrl}
               target="_blank"
               rel="noopener noreferrer"
               aria-label={
