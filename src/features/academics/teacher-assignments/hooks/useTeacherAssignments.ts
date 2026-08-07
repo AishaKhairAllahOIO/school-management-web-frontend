@@ -1,7 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { teacherAssignmentApi } from "../api/teacherAssignment.api";
 import type {
-  CreateTeacherAssignmentPayload,
   UpdateTeacherAssignmentPayload,
 } from "../types/teacher-assignment.types";
 

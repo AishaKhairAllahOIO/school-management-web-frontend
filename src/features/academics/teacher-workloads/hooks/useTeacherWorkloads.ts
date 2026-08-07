@@ -1,7 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { teacherWorkloadApi } from "../api/teacherWorkload.api";
 import type {
-  CreateTeacherWorkloadPayload,
   UpdateTeacherWorkloadPayload,
 } from "../types/teacher-workload.types";
 

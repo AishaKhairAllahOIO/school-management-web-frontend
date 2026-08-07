@@ -41,7 +41,6 @@ export function TeacherAssignmentsPage() {
   const classroomOptions = (classroomsQuery.data ?? []).map((item) => ({ value: String(item.id), label: item.name }));
 
   const teacherLabel = new Map(teacherOptions.map((option) => [option.value, option.label]));
-  const yearLabel = new Map(yearOptions.map((option) => [option.value, option.label]));
   const termLabel = new Map(termOptions.map((option) => [option.value, option.label]));
   const gradeSubjectLabel = new Map(gradeSubjectOptions.map((option) => [option.value, option.label]));
   const classroomLabel = new Map(classroomOptions.map((option) => [option.value, option.label]));

@@ -66,22 +66,52 @@ export function PrintPreviewDialog({
   });
 
   const measureDocument = useCallback(() => {
-    const frameDocument = iframeRef.current?.contentDocument;
-    if (!frameDocument) return false;
+  const frameDocument =
+    iframeRef.current?.contentDocument;
 
-    const root = frameDocument.documentElement;
-    const body = frameDocument.body;
-    const measuredHeight = Math.max(
-      pageSize.height,
-      root.scrollHeight,
-      root.offsetHeight,
-      body?.scrollHeight ?? 0,
-      body?.offsetHeight ?? 0,
+  if (!frameDocument) {
+    return false;
+  }
+
+  const root = frameDocument.documentElement;
+  const body = frameDocument.body;
+
+  const printPage =
+    frameDocument.querySelector<HTMLElement>(
+      ".print-page",
     );
 
-    setDocumentHeight(Math.ceil(measuredHeight));
+  /*
+   * Posters are exactly one A4 page.
+   * Do not let inner content inflate the preview height.
+   */
+  if (
+    document?.kind === "poster" &&
+    printPage
+  ) {
+    setDocumentHeight(pageSize.height);
     return true;
-  }, [pageSize.height]);
+  }
+
+  const measuredHeight = Math.max(
+    pageSize.height,
+    root.scrollHeight,
+    root.offsetHeight,
+    body?.scrollHeight ?? 0,
+    body?.offsetHeight ?? 0,
+    printPage?.scrollHeight ?? 0,
+    printPage?.offsetHeight ?? 0,
+  );
+
+  setDocumentHeight(
+    Math.ceil(measuredHeight),
+  );
+
+  return true;
+}, [
+  document?.kind,
+  pageSize.height,
+]);
 
   const applyFit = useCallback(
     (nextMode: Exclude<PreviewMode, "custom">) => {
@@ -113,20 +143,32 @@ export function PrintPreviewDialog({
   );
 
   const handleFrameLoad = useCallback(() => {
-    const frameDocument = iframeRef.current?.contentDocument;
-    if (!frameDocument) return;
+  const frameDocument =
+    iframeRef.current?.contentDocument;
 
-    const apply = () => {
-      measureDocument();
-      setIsReady(true);
-    };
+  if (!frameDocument) {
+    return;
+  }
 
-    // srcDoc is loaded by the browser before this callback. A second frame
-    // lets images/fonts settle before the final page size is measured.
+  const apply = () => {
+    measureDocument();
+    setIsReady(true);
+  };
+
+  apply();
+
+  window.requestAnimationFrame(() => {
     apply();
-    window.requestAnimationFrame(apply);
-    window.setTimeout(apply, 120);
-  }, [measureDocument]);
+  });
+
+  window.setTimeout(() => {
+    apply();
+  }, 100);
+
+  window.setTimeout(() => {
+    apply();
+  }, 400);
+}, [measureDocument]);
 
   useEffect(() => {
     if (!open) return;
