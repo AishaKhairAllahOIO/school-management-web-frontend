@@ -942,3 +942,36 @@ select {
   background: rgb(var(--success) / 0.08);
 }
 }
+/* ========================= */
+/* 🎯 Joyride Custom Styling */
+/* ========================= */
+
+.joyride-spotlight {
+  border-radius: 28px !important;
+  box-shadow:
+    0 0 0 4px rgba(255, 255, 255, 0.1) inset,
+    0 0 20px rgba(103, 58, 244, 0.3);
+}
+
+.joyride-overlay {
+  background-color: rgba(10, 9, 28, 0.6) !important;
+}
+
+.joyride-tooltip__arrow {
+  color: rgb(var(--background)) !important;
+}
+
+.joyride-tooltip {
+  animation: fadeInUp 0.25s ease;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
