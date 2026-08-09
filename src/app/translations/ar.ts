@@ -172,5 +172,39 @@ export const ar: TranslationDictionary = {
       },
     },
   },
+
+  academics: {
+  overview: {
+    title: "نظرة عامة على الشؤون الأكاديمية",
+    description:
+      "إدارة الهيكل الأكاديمي والمنهج والإعدادات التعليمية في المدرسة.",
+    manage: "إدارة",
+  },
+
+  curriculumOverview: {
+    title: "نظرة عامة على المنهج",
+    description:
+      "استعرض الصفوف والشعب والمواد في عرض واحد ومنظم.",
+    academicYear: "العام الدراسي",
+    academicTerm: "الفصل الدراسي",
+    searchGrades: "البحث عن صف...",
+    allAcademicYears: "جميع الأعوام الدراسية",
+    allAcademicTerms: "جميع الفصول الدراسية",
+    grades: "الصفوف",
+    classrooms: "الشعب",
+    subjects: "المواد",
+    students: "الطلاب",
+    availableSeats: "المقاعد المتاحة",
+    weeklyPeriods: "الحصص الأسبوعية",
+    maximumMark: "العلامة العظمى",
+    passingMark: "علامة النجاح",
+    noGrades: "لم يتم العثور على صفوف",
+    noClassrooms: "لا توجد شعب مرتبطة.",
+    noSubjects: "لا توجد مواد مرتبطة.",
+    tryAgain: "إعادة المحاولة",
+    backToAcademics: "العودة إلى الشؤون الأكاديمية",
+    failingSubject: "مادة رسوب",
+  },
+},
   users: usersTranslationAr,
 };

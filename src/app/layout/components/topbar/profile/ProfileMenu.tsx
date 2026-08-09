@@ -10,7 +10,7 @@ import {
 
 import { useRef } from "react";
 import { useNavigate } from "react-router-dom";
-
+import { useOnboardingStore } from "@/features/onboarding/store/onboardingStore";
 import { useCurrentUser } from "@/app/layout/hooks/useCurrentUser";
 import { useLocale } from "@/app/providers/locale";
 import { useLogout } from "@/features/auth/hooks/use-logout";
@@ -44,6 +44,8 @@ export function ProfileMenu({
     enabled: isOpen,
     onDismiss: onClose,
   });
+
+   const resetOnboarding = useOnboardingStore((state) => state.resetOnboarding);
 
   const displayName = user
     ? `${user.firstName} ${user.lastName}`.trim()
@@ -108,6 +110,8 @@ export function ProfileMenu({
     <div
       ref={containerRef}
       className="relative block shrink-0"
+        id="topbar-profile" 
+        data-onboarding="profile"
     >
       <button
         ref={triggerRef}
@@ -300,7 +304,7 @@ export function ProfileMenu({
   icon={HelpCircle}
   onClick={() => {
     onClose();
-
+ resetOnboarding(); 
   }}
 />
           </div>

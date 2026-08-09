@@ -171,6 +171,39 @@ export const en: TranslationDictionary = {
       },
     },
   },
+
+  academics: {
+  overview: {
+    title: "Academic Overview",
+    description: "Manage the school's academic structure, curriculum and teaching setup.",
+    manage: "Manage",
+  },
+
+  curriculumOverview: {
+    title: "Curriculum Overview",
+    description:
+      "Explore grades, classrooms and subjects in one organized view.",
+    academicYear: "Academic Year",
+    academicTerm: "Academic Term",
+    searchGrades: "Search grades...",
+    allAcademicYears: "All academic years",
+    allAcademicTerms: "All academic terms",
+    grades: "Grades",
+    classrooms: "Classrooms",
+    subjects: "Subjects",
+    students: "Students",
+    availableSeats: "Available Seats",
+    weeklyPeriods: "Weekly Periods",
+    maximumMark: "Maximum Mark",
+    passingMark: "Passing Mark",
+    noGrades: "No grades found",
+    noClassrooms: "No classrooms assigned.",
+    noSubjects: "No subjects assigned.",
+    tryAgain: "Try Again",
+    backToAcademics: "Back to Academics",
+    failingSubject: "Failing subject",
+  },
+},
   users: usersTranslationEn,
 
 };

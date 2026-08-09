@@ -10,6 +10,7 @@ import { SubjectsPage } from "@/features/academics/subjects/pages/SubjectsPage";
 import { TimeSlotsPage } from "@/features/academics/time-slots/pages/TimeSlotsPage";
 import { TeacherWorkloadsPage } from "@/features/academics/teacher-workloads/pages/TeacherWorkloadsPage";
 import { TeacherAssignmentsPage } from "@/features/academics/teacher-assignments/pages/TeacherAssignmentsPage";
+import { CurriculumOverviewPage } from "./curriculum-overview/pages/CurriculumOverviewPage";
 
 export const academicsRoutes = [
   {
@@ -64,6 +65,11 @@ export const academicsRoutes = [
       {
         path: "time-slots",
         element: <TimeSlotsPage />,
+      },
+      
+      {
+        path: "curriculum-overview",
+        element: <CurriculumOverviewPage />,
       },
     ],
   },

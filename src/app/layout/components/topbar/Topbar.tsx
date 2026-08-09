@@ -159,11 +159,15 @@ export function Topbar() {
             <ThemeButton />
           </div>
 
-          <ProfileMenu
-            isOpen={isProfileMenuOpen}
-            onToggle={toggleProfileMenu}
-            onClose={closeProfileMenu}
-          />
+          {/* 👇 Added id="topbar-profile" for Onboarding */}
+          <div id="topbar-profile">
+            <ProfileMenu
+              isOpen={isProfileMenuOpen}
+              onToggle={toggleProfileMenu}
+              onClose={closeProfileMenu}
+            />
+          </div>
+          {/* 👆 End of Onboarding changes */}
         </div>
       </div>
     </header>

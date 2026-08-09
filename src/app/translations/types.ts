@@ -144,5 +144,37 @@ export type TranslationDictionary = {
       };
     };
   };
+
+  academics: {
+  overview: {
+    title: string;
+    description: string;
+    manage: string;
+  };
+
+  curriculumOverview: {
+    title: string;
+    description: string;
+    academicYear: string;
+    academicTerm: string;
+    searchGrades: string;
+    allAcademicYears: string;
+    allAcademicTerms: string;
+    grades: string;
+    classrooms: string;
+    subjects: string;
+    students: string;
+    availableSeats: string;
+    weeklyPeriods: string;
+    maximumMark: string;
+    passingMark: string;
+    noGrades: string;
+    noClassrooms: string;
+    noSubjects: string;
+    tryAgain: string;
+    backToAcademics: string;
+    failingSubject: string;
+  };
+};
   users: UsersTranslation;
 };

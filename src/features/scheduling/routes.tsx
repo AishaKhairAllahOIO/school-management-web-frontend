@@ -3,7 +3,6 @@ import { Navigate } from "react-router-dom";
 
 import { ClassSchedulesPage } from "@/features/scheduling/class-schedules/pages/ClassSchedulesPage";
 import { ExamSchedulesPage } from "@/features/scheduling/pages/ExamSchedulesPage";
-import { HolidaysPage } from "@/features/scheduling/pages/HolidaysPage";
 import { QuizSchedulesPage } from "@/features/scheduling/pages/QuizSchedulesPage";
 
 export const schedulingRoutes = [
@@ -14,7 +13,6 @@ export const schedulingRoutes = [
       { path: "classes", element: <ClassSchedulesPage /> },
       { path: "exams", element: <ExamSchedulesPage /> },
       { path: "quizzes", element: <QuizSchedulesPage /> },
-      { path: "holidays", element: <HolidaysPage /> },
     ],
   },
 ] satisfies RouteObject[];

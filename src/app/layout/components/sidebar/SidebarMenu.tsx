@@ -73,11 +73,13 @@ function SidebarMenuItem({
   const Icon = item.icon;
   const isActive = isItemActive(pathname, item);
   const title = t.navigation[item.titleKey];
+const elementId = `sidebar-${item.titleKey.replace(/_/g, '-')}`;
 
   if (variant === "icons") {
     return (
       <NavLink
         to={item.path}
+         id={elementId}
         data-onboarding-path={item.path}
         end={item.exact}
         title={title}
@@ -129,6 +131,7 @@ function SidebarMenuItem({
     <NavLink
       to={item.path}
       data-onboarding-path={item.path}
+       id={elementId}
       end={item.exact}
       aria-current={isActive ? "page" : undefined}
       aria-disabled={item.disabled || undefined}

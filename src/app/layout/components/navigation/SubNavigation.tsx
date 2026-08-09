@@ -90,11 +90,7 @@ const subNavigationSections: SubNavigationSection[] = [
         path: "/scheduling/quizzes",
         icon: BookOpen,
       },
-      {
-        titleKey: "holidays",
-        path: "/scheduling/holidays",
-        icon: CalendarDays,
-      },
+  
     ],
   },
   {

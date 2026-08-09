@@ -411,6 +411,7 @@ export function Sidebar() {
             }
           />
 
+          {/* ✅ لقد قمت بإزالة الـ div الذي يحتوي على id="sidebar-users" من هنا. معرفات العناصر موجودة بالفعل داخل SidebarMenu */}
           <div className="shrink-0">
             <SidebarMenu
               variant={
@@ -433,7 +434,9 @@ export function Sidebar() {
               className="mb-1 mt-1"
             />
 
+            {/* ✅ لقد قمت بإضافة id="sidebar-website" هنا كما طلبت في الخطوات */}
             <a
+              id="sidebar-website"
               data-onboarding-target="website"
               href={websiteUrl}
               target="_blank"

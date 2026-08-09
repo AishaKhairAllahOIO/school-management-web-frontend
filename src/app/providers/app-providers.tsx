@@ -5,6 +5,7 @@ import { NotificationsProvider } from "@/app/providers/notifications";
 import { QueryProvider } from "@/app/providers/query";
 import { ThemeProvider } from "@/app/providers/theme";
 import { AppToaster } from "@/app/providers/ui";
+import  OnboardingProvider  from "@/features/onboarding/components/OnboardingProvider"; 
 
 type AppProvidersProps = {
   children: ReactNode;
@@ -16,9 +17,10 @@ export function AppProviders({ children }: AppProvidersProps) {
       <ThemeProvider>
         <LocaleProvider>
           <NotificationsProvider>
-            {children}
+            <OnboardingProvider >
+               {children}
+            </OnboardingProvider>          
           </NotificationsProvider>
-
           <AppToaster />
         </LocaleProvider>
       </ThemeProvider>

@@ -55,6 +55,7 @@ export function NotificationsMenu({
       <button
         ref={triggerRef}
         data-onboarding-target="notifications"
+        id="topbar-notifications" 
         type="button"
         onClick={onToggle}
         aria-label={t.layout.topbar.notifications}

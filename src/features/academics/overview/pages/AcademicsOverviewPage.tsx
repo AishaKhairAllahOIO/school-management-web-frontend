@@ -1,5 +1,6 @@
 import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
+import { CurriculumOverviewLink } from "../../shared/components/CurriculumOverviewLink";
 
 import { academicNavigationGroups } from "../../shared/config/academic-navigation";
 import { useAcademicStatistics } from "../hooks/useAcademicStatistics";
@@ -259,7 +260,7 @@ export function AcademicsOverviewPage() {
                             group.color.buttonHover,
                           ].join(" ")}
                         >
-                          <span>View</span>
+                          <span>Manage</span>
 
                           <ArrowRight
                             aria-hidden="true"
@@ -276,6 +277,7 @@ export function AcademicsOverviewPage() {
             );
           },
         )}
+        <CurriculumOverviewLink />
       </div>
     </section>
   );
