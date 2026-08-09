@@ -1,30 +1,41 @@
 import React from 'react';
-import type { TooltipRenderProps } from 'react-joyride';
+import type { OnboardingStep } from '../utils/onboardingSteps';
+import { ONBOARDING_STEPS } from '../utils/onboardingSteps';
 
-const CustomTooltip: React.FC<TooltipRenderProps> = ({
-  index,
+interface CustomTooltipProps {
+  step: OnboardingStep;
+  totalSteps: number;
+  onNext: () => void;
+  onBack: () => void;
+  onExit: () => void;
+  isFirst: boolean;
+  isLast: boolean;
+}
+
+export const CustomTooltip: React.FC<CustomTooltipProps> = ({
   step,
-  backProps,
-  closeProps,
-  primaryProps,
-  skipProps,
-  isLastStep,
+  totalSteps,
+  onNext,
+  onBack,
+  onExit,
+  isFirst,
+  isLast,
 }) => {
-  const totalSteps = 12;
+  const currentIndex = ONBOARDING_STEPS.indexOf(step) + 1;
 
   return (
     <div className="bg-[rgb(var(--background))] rounded-[24px] shadow-floating p-5 max-w-[300px] w-full border border-[rgb(var(--border))] relative">
-      
-      {/* Header: Step Count */}
       <div className="flex justify-between items-center mb-1">
         <span className="text-[10px] font-bold text-[rgb(var(--primary))] uppercase tracking-widest">
-          STEP {index + 1} OF {totalSteps}
+          STEP {currentIndex} OF {totalSteps}
         </span>
-        <button 
-          {...skipProps} 
-          className="text-[rgb(var(--muted-foreground))] hover:text-[rgb(var(--foreground))] transition-colors"
+        <button
+          onClick={onExit}
+          className="text-[rgb(var(--muted-foreground))] hover:text-[rgb(var(--foreground))]"
         >
-          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
         </button>
       </div>
 
@@ -39,31 +50,28 @@ const CustomTooltip: React.FC<TooltipRenderProps> = ({
 
       <div className="flex justify-between items-center pt-3 border-t border-[rgb(var(--border))]">
         <button
-          {...closeProps}
-          className="text-[12px] font-medium text-[rgb(var(--muted-foreground))] hover:text-[rgb(var(--foreground))] transition-colors"
+          onClick={onExit}
+          className="text-[12px] font-medium text-[rgb(var(--muted-foreground))] hover:text-[rgb(var(--foreground))]"
         >
           Exit tour
         </button>
-
         <div className="flex gap-2">
-          {index > 0 && (
+          {!isFirst && (
             <button
-              {...backProps}
-              className="w-[34px] h-[34px] flex items-center justify-center rounded-full border border-[rgb(var(--border))] text-[rgb(var(--muted-foreground))] hover:bg-[rgb(var(--muted))] transition-colors text-sm"
+              onClick={onBack}
+              className="w-[34px] h-[34px] flex items-center justify-center rounded-full border border-[rgb(var(--border))] text-[rgb(var(--muted-foreground))] hover:bg-[rgb(var(--muted))]"
             >
               ←
             </button>
           )}
           <button
-            {...primaryProps}
+            onClick={onNext}
             className="px-4 py-1.5 h-[34px] rounded-full primary-gradient text-[rgb(var(--primary-foreground))] text-[12px] font-semibold transition-transform hover:scale-105 shadow-auth-button"
           >
-            {isLastStep ? 'Finish' : 'Next →'}
+            {isLast ? 'Finish' : 'Next →'}
           </button>
         </div>
       </div>
     </div>
   );
 };
-
-export default CustomTooltip;
