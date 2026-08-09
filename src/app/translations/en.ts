@@ -66,7 +66,7 @@ export const en: TranslationDictionary = {
       navigation: "Main navigation",
       schoolName: "School Management",
       schoolWebsite: "School Website",
-      viewWebsite: "View Website",
+      viewWebsite: "Manage Website",
       mainMenu: "Main menu",
       goodMorning: "Good morning",
       goodAfternoon: "Good afternoon",

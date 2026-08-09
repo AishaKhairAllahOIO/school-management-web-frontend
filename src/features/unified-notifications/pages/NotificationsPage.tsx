@@ -81,37 +81,7 @@ export function NotificationsPage() {
         </Button>
       </header>
 
-      <div className="flex flex-col gap-3 rounded-[22px] border border-border/60 bg-card p-2 shadow-[0_8px_28px_rgba(38,24,84,0.04)] sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex min-w-0 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          <div className="flex min-w-max items-center gap-1">
-            {filters.map((item) => (
-              <button
-                key={item.value}
-                type="button"
-                onClick={() => setFilter(item.value)}
-                className={[
-                  "relative inline-flex h-10 items-center justify-center rounded-[13px] px-4 text-[11px] font-medium transition-colors",
-                  filter === item.value
-                    ? "bg-primary/[0.08] text-primary"
-                    : "text-muted-foreground hover:bg-muted/50 hover:text-foreground",
-                ].join(" ")}
-              >
-                {item.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <label className="flex h-10 cursor-pointer items-center gap-2 rounded-[13px] px-3 text-[11px] font-medium text-muted-foreground hover:bg-muted/40">
-          <input
-            type="checkbox"
-            checked={unreadOnly}
-            onChange={(event) => setUnreadOnly(event.target.checked)}
-            className="h-4 w-4 accent-primary"
-          />
-          Unread only
-        </label>
-      </div>
+      <div className="flex items-center gap-2 rounded-[22px] border border-border/60 bg-card p-2 shadow-[0_8px_28px_rgba(38,24,84,0.04)]"> {/* Filter tabs */} <div className="min-w-0 flex-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"> <div className="flex min-w-max items-center gap-1"> {filters.map((item) => ( <button key={item.value} type="button" onClick={() => setFilter(item.value)} className={[ "relative inline-flex h-10 shrink-0 items-center justify-center rounded-[13px] px-4 text-[11px] font-medium transition-colors", filter === item.value ? "bg-primary/[0.08] text-primary" : "text-muted-foreground hover:bg-muted/50 hover:text-foreground", ].join(" ")} > {item.label} </button> ))} </div> </div> {/* Unread only */} <label className="flex h-10 shrink-0 cursor-pointer items-center gap-2 rounded-[13px] px-2 text-[11px] font-medium text-muted-foreground hover:bg-muted/40 sm:px-3"> <input type="checkbox" checked={unreadOnly} onChange={(event) => setUnreadOnly(event.target.checked)} className="h-4 w-4 accent-primary" /> <span className="whitespace-nowrap"> Unread only </span> </label> </div>
 
       {notificationsQuery.isLoading ? (
         <div className="space-y-3">
