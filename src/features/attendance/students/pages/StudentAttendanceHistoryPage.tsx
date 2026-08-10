@@ -6,6 +6,7 @@ import {
   Plus,
   Save,
   Trash2,
+  type LucideIcon,
 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
@@ -21,35 +22,42 @@ import {
   SelectValue,
 } from "@/shared/ui/select";
 
-import {
-  attendanceMock,
-  studentAttendanceHistoryMock,
-} from "../mocks/attendance.mock";
-import type {
-  AbsenceType,
-  AttendanceStatus,
-  StudentAttendanceHistoryRecord,
-} from "../types/attendance.types";
+import { useCreateAttendance } from "../hooks/useCreateAttendance";
+import { useUpdateAttendance } from "../hooks/useUpdateAttendance";
+import { useDeleteAttendance } from "../hooks/useDeleteAttendance";
 
 const controlClass =
   "h-9 rounded-[11px] border-border/60 bg-background/80 text-[12px] shadow-none";
 
-const emptyDraft: Omit<StudentAttendanceHistoryRecord, "id" | "studentId"> = {
+
+export type UIStatus = "Present" | "Absent";
+export type UIAbsenceType = "Excused" | "Unexcused";
+
+export interface UIHistoryRecord {
+  id: string; 
+  apiId?: number; 
+  date: string;
+  status: UIStatus;
+  absenceType?: UIAbsenceType;
+}
+
+const emptyDraft: Omit<UIHistoryRecord, "id" | "apiId"> = {
   date: "",
   status: "Present",
 };
 
 export function StudentAttendanceHistoryPage() {
   const { studentId = "" } = useParams();
-  const student = attendanceMock.find((item) => item.studentId === studentId);
 
-  const [records, setRecords] = useState<StudentAttendanceHistoryRecord[]>(
-    studentAttendanceHistoryMock[studentId] ?? [],
-  );
+  const [records, setRecords] = useState<UIHistoryRecord[]>([]);
   const [draft, setDraft] = useState(emptyDraft);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [editingRecord, setEditingRecord] = useState<StudentAttendanceHistoryRecord | null>(null);
-  const [deleteTarget, setDeleteTarget] = useState<StudentAttendanceHistoryRecord | null>(null);
+  const [editingRecord, setEditingRecord] = useState<UIHistoryRecord | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<UIHistoryRecord | null>(null);
+
+  const createMutation = useCreateAttendance();
+  const updateMutation = useUpdateAttendance();
+  const deleteMutation = useDeleteAttendance();
 
   const totals = useMemo(() => {
     const present = records.filter((item) => item.status === "Present").length;
@@ -59,41 +67,81 @@ export function StudentAttendanceHistoryPage() {
     return { present, absent, excused, unexcused };
   }, [records]);
 
-  function normalizeRecord<T extends typeof draft | StudentAttendanceHistoryRecord>(record: T): T {
+  function normalizeRecord(record: Omit<UIHistoryRecord, "id" | "apiId"> | UIHistoryRecord) {
     if (record.status === "Present") {
       return { ...record, absenceType: undefined };
     }
-
     return { ...record, absenceType: record.absenceType ?? "Excused" };
   }
 
-  function addRecord() {
+  async function addRecord() {
     if (!draft.date) return;
+    const normalized = normalizeRecord(draft);
 
-    const next = normalizeRecord({
-      ...draft,
-      id: `${studentId}-${Date.now()}`,
-      studentId,
-    });
+    try {
+      const response: any = await createMutation.mutateAsync({
+        enrollment_id: Number(studentId),
+        attendance_date: normalized.date,
 
-    setRecords((current) => [next, ...current]);
-    setDraft(emptyDraft);
+        status: normalized.status === "Present" ? "present" : "absent",
+        absence_type: normalized.status === "Present" ? null : (normalized.absenceType === "Unexcused" ? "unexcused" : "excused"),
+      });
+
+      const newRecord: UIHistoryRecord = {
+        ...normalized,
+        id: String(response?.[0]?.id || Date.now()),
+        apiId: response?.[0]?.id,
+      } as UIHistoryRecord;
+
+      setRecords((current) => [newRecord, ...current]);
+      setDraft(emptyDraft);
+    } catch (error) {
+      console.error("Failed to add record", error);
+    }
   }
 
-  function beginEdit(record: StudentAttendanceHistoryRecord) {
+  function beginEdit(record: UIHistoryRecord) {
     setEditingId(record.id);
     setEditingRecord({ ...record });
   }
 
-  function saveEdit() {
-    if (!editingRecord) return;
+  async function saveEdit() {
+    if (!editingRecord || !editingRecord.apiId) return;
+    const normalized = normalizeRecord(editingRecord) as UIHistoryRecord;
 
-    const normalized = normalizeRecord(editingRecord);
-    setRecords((current) =>
-      current.map((record) => (record.id === normalized.id ? normalized : record)),
-    );
-    setEditingId(null);
-    setEditingRecord(null);
+    try {
+      await updateMutation.mutateAsync({
+        id: editingRecord.apiId,
+        payload: {
+          attendance_date: normalized.date,
+
+          status: normalized.status === "Present" ? "present" : "absent",
+          absence_type: normalized.status === "Present" ? null : (normalized.absenceType === "Unexcused" ? "unexcused" : "excused"),
+        },
+      });
+
+      setRecords((current) =>
+        current.map((record) => (record.id === normalized.id ? normalized : record)),
+      );
+      setEditingId(null);
+      setEditingRecord(null);
+    } catch (error) {
+      console.error("Failed to update record", error);
+    }
+  }
+
+  async function confirmDelete() {
+    if (!deleteTarget) return;
+
+    try {
+      if (deleteTarget.apiId) {
+        await deleteMutation.mutateAsync(deleteTarget.apiId);
+      }
+      setRecords((current) => current.filter((record) => record.id !== deleteTarget.id));
+      setDeleteTarget(null);
+    } catch (error) {
+      console.error("Failed to delete record", error);
+    }
   }
 
   return (
@@ -108,10 +156,10 @@ export function StudentAttendanceHistoryPage() {
 
           <div>
             <h1 className="text-[18px] font-semibold tracking-[-0.02em] text-foreground">
-              {student?.studentName ?? "Student attendance history"}
+              Student attendance history
             </h1>
             <p className="mt-0.5 text-[12px] text-muted-foreground">
-              {student ? `${student.gradeName} · Classroom ${student.classroomName}` : `Student ${studentId}`}
+              Student ID: {studentId}
             </p>
           </div>
         </div>
@@ -151,8 +199,9 @@ export function StudentAttendanceHistoryPage() {
 
           <Select
             value={draft.status}
+
             onValueChange={(status) =>
-              setDraft((current) => normalizeRecord({ ...current, status: status as AttendanceStatus }))
+              setDraft((current) => normalizeRecord({ ...current, status: status as UIStatus }))
             }
           >
             <SelectTrigger className={controlClass}><SelectValue /></SelectTrigger>
@@ -168,7 +217,7 @@ export function StudentAttendanceHistoryPage() {
               onValueChange={(absenceType) =>
                 setDraft((current) => ({
                   ...current,
-                  absenceType: absenceType as AbsenceType,
+                  absenceType: absenceType as UIAbsenceType,
                 }))
               }
             >
@@ -182,9 +231,9 @@ export function StudentAttendanceHistoryPage() {
             </Select>
           ) : null}
 
-          <Button type="button" onClick={addRecord} disabled={!draft.date} className="h-9 rounded-[11px]">
+          <Button type="button" onClick={addRecord} disabled={!draft.date || createMutation.isPending} className="h-9 rounded-[11px]">
             <Save className="h-4 w-4" />
-            Save
+            {createMutation.isPending ? "Saving..." : "Save"}
           </Button>
         </div>
       </div>
@@ -231,7 +280,7 @@ export function StudentAttendanceHistoryPage() {
                       {isEditing ? (
                         <Select
                           value={editingRecord.status}
-                          onValueChange={(status) => setEditingRecord(normalizeRecord({ ...editingRecord, status: status as AttendanceStatus }))}
+                          onValueChange={(status) => setEditingRecord(normalizeRecord({ ...editingRecord, status: status as UIStatus }) as UIHistoryRecord)}
                         >
                           <SelectTrigger className={controlClass}><SelectValue /></SelectTrigger>
                           <SelectContent>
@@ -250,7 +299,7 @@ export function StudentAttendanceHistoryPage() {
                         editingRecord.status === "Absent" ? (
                           <Select
                             value={editingRecord.absenceType ?? "Excused"}
-                            onValueChange={(absenceType) => setEditingRecord({ ...editingRecord, absenceType: absenceType as AbsenceType })}
+                            onValueChange={(absenceType) => setEditingRecord({ ...editingRecord, absenceType: absenceType as UIAbsenceType })}
                           >
                             <SelectTrigger className={controlClass}><SelectValue /></SelectTrigger>
                             <SelectContent>
@@ -270,8 +319,8 @@ export function StudentAttendanceHistoryPage() {
                     <td className="px-5 py-3.5">
                       <div className="flex items-center justify-center gap-2">
                         {isEditing ? (
-                          <Button type="button" size="sm" onClick={saveEdit} className="h-8 rounded-[10px] px-3">
-                            <Save className="h-3.5 w-3.5" /> Save
+                          <Button type="button" size="sm" onClick={saveEdit} disabled={updateMutation.isPending} className="h-8 rounded-[10px] px-3">
+                            <Save className="h-3.5 w-3.5" /> {updateMutation.isPending ? "..." : "Save"}
                           </Button>
                         ) : (
                           <Button
@@ -318,11 +367,7 @@ export function StudentAttendanceHistoryPage() {
         title="Delete attendance record"
         description="This attendance date will be removed from the student history."
         itemName={deleteTarget?.date}
-        onConfirm={() => {
-          if (!deleteTarget) return;
-          setRecords((current) => current.filter((record) => record.id !== deleteTarget.id));
-          setDeleteTarget(null);
-        }}
+        onConfirm={confirmDelete}
       />
     </section>
   );
@@ -344,7 +389,7 @@ function SummaryCard({
   detail,
   tone,
 }: {
-  icon: typeof CheckCircle2;
+  icon: LucideIcon | React.ElementType;
   label: string;
   value: number;
   detail: string;
