@@ -22,107 +22,77 @@ import {
   SelectValue,
 } from "@/shared/ui/select";
 
+import { useStudentAttendanceHistory } from "../hooks/useStudentAttendanceHistory";
 import { useCreateAttendance } from "../hooks/useCreateAttendance";
 import { useUpdateAttendance } from "../hooks/useUpdateAttendance";
 import { useDeleteAttendance } from "../hooks/useDeleteAttendance";
+import type { AttendanceStatus, AbsenceType, AttendanceRecord } from "../types/attendance.types";
 
 const controlClass =
   "h-9 rounded-[11px] border-border/60 bg-background/80 text-[12px] shadow-none";
 
-
-export type UIStatus = "Present" | "Absent";
-export type UIAbsenceType = "Excused" | "Unexcused";
-
-export interface UIHistoryRecord {
-  id: string; 
-  apiId?: number; 
-  date: string;
-  status: UIStatus;
-  absenceType?: UIAbsenceType;
-}
-
-const emptyDraft: Omit<UIHistoryRecord, "id" | "apiId"> = {
+const emptyDraft = {
   date: "",
-  status: "Present",
+  status: "present" as AttendanceStatus,
+  absenceType: null as AbsenceType,
 };
 
 export function StudentAttendanceHistoryPage() {
   const { studentId = "" } = useParams();
 
-  const [records, setRecords] = useState<UIHistoryRecord[]>([]);
+  // جلب البيانات من السيرفر
+  const { data: records = [], isLoading } = useStudentAttendanceHistory(studentId);
+
   const [draft, setDraft] = useState(emptyDraft);
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [editingRecord, setEditingRecord] = useState<UIHistoryRecord | null>(null);
-  const [deleteTarget, setDeleteTarget] = useState<UIHistoryRecord | null>(null);
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [editingRecord, setEditingRecord] = useState<AttendanceRecord | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<AttendanceRecord | null>(null);
 
   const createMutation = useCreateAttendance();
   const updateMutation = useUpdateAttendance();
   const deleteMutation = useDeleteAttendance();
 
   const totals = useMemo(() => {
-    const present = records.filter((item) => item.status === "Present").length;
-    const absent = records.filter((item) => item.status === "Absent").length;
-    const excused = records.filter((item) => item.absenceType === "Excused").length;
-    const unexcused = records.filter((item) => item.absenceType === "Unexcused").length;
+    const present = records.filter((item: AttendanceRecord) => item.status === "present").length;
+    const absent = records.filter((item: AttendanceRecord) => item.status === "absent").length;
+    const excused = records.filter((item: AttendanceRecord) => item.absence_type === "excused").length;
+    const unexcused = records.filter((item: AttendanceRecord) => item.absence_type === "unexcused").length;
     return { present, absent, excused, unexcused };
   }, [records]);
 
-  function normalizeRecord(record: Omit<UIHistoryRecord, "id" | "apiId"> | UIHistoryRecord) {
-    if (record.status === "Present") {
-      return { ...record, absenceType: undefined };
-    }
-    return { ...record, absenceType: record.absenceType ?? "Excused" };
-  }
-
   async function addRecord() {
     if (!draft.date) return;
-    const normalized = normalizeRecord(draft);
 
     try {
-      const response: any = await createMutation.mutateAsync({
+      await createMutation.mutateAsync({
         enrollment_id: Number(studentId),
-        attendance_date: normalized.date,
-
-        status: normalized.status === "Present" ? "present" : "absent",
-        absence_type: normalized.status === "Present" ? null : (normalized.absenceType === "Unexcused" ? "unexcused" : "excused"),
+        attendance_date: draft.date,
+        status: draft.status,
+        absence_type: draft.status === "present" ? null : (draft.absenceType ?? "excused"),
       });
-
-      const newRecord: UIHistoryRecord = {
-        ...normalized,
-        id: String(response?.[0]?.id || Date.now()),
-        apiId: response?.[0]?.id,
-      } as UIHistoryRecord;
-
-      setRecords((current) => [newRecord, ...current]);
       setDraft(emptyDraft);
     } catch (error) {
       console.error("Failed to add record", error);
     }
   }
 
-  function beginEdit(record: UIHistoryRecord) {
+  function beginEdit(record: AttendanceRecord) {
     setEditingId(record.id);
     setEditingRecord({ ...record });
   }
 
   async function saveEdit() {
-    if (!editingRecord || !editingRecord.apiId) return;
-    const normalized = normalizeRecord(editingRecord) as UIHistoryRecord;
+    if (!editingRecord) return;
 
     try {
       await updateMutation.mutateAsync({
-        id: editingRecord.apiId,
+        id: editingRecord.id,
         payload: {
-          attendance_date: normalized.date,
-
-          status: normalized.status === "Present" ? "present" : "absent",
-          absence_type: normalized.status === "Present" ? null : (normalized.absenceType === "Unexcused" ? "unexcused" : "excused"),
+          attendance_date: editingRecord.attendance_date,
+          status: editingRecord.status,
+          absence_type: editingRecord.status === "present" ? null : (editingRecord.absence_type ?? "excused"),
         },
       });
-
-      setRecords((current) =>
-        current.map((record) => (record.id === normalized.id ? normalized : record)),
-      );
       setEditingId(null);
       setEditingRecord(null);
     } catch (error) {
@@ -134,14 +104,15 @@ export function StudentAttendanceHistoryPage() {
     if (!deleteTarget) return;
 
     try {
-      if (deleteTarget.apiId) {
-        await deleteMutation.mutateAsync(deleteTarget.apiId);
-      }
-      setRecords((current) => current.filter((record) => record.id !== deleteTarget.id));
+      await deleteMutation.mutateAsync(deleteTarget.id);
       setDeleteTarget(null);
     } catch (error) {
       console.error("Failed to delete record", error);
     }
+  }
+
+  if (isLoading) {
+    return <div className="p-12 text-center text-muted-foreground">Loading history...</div>;
   }
 
   return (
@@ -153,13 +124,12 @@ export function StudentAttendanceHistoryPage() {
               <ArrowLeft className="h-4 w-4 rtl:rotate-180" />
             </Link>
           </Button>
-
           <div>
             <h1 className="text-[18px] font-semibold tracking-[-0.02em] text-foreground">
-              Student attendance history
+              Student Attendance History
             </h1>
             <p className="mt-0.5 text-[12px] text-muted-foreground">
-              Student ID: {studentId}
+              Enrollment ID: {studentId}
             </p>
           </div>
         </div>
@@ -183,53 +153,35 @@ export function StudentAttendanceHistoryPage() {
           </div>
         </div>
 
-        <div
-          className={[
-            "grid gap-3 lg:items-end",
-            draft.status === "Absent"
-              ? "lg:grid-cols-[220px_180px_minmax(190px,1fr)_120px]"
-              : "lg:grid-cols-[220px_180px_120px]",
-          ].join(" ")}
-        >
+        <div className="grid gap-3 lg:items-end lg:grid-cols-[220px_180px_minmax(190px,1fr)_120px]">
           <DatePicker
             value={draft.date}
             onChange={(date) => setDraft((current) => ({ ...current, date }))}
             label="Date"
           />
-
           <Select
             value={draft.status}
-
-            onValueChange={(status) =>
-              setDraft((current) => normalizeRecord({ ...current, status: status as UIStatus }))
-            }
+            onValueChange={(status) => setDraft((current) => ({ ...current, status: status as AttendanceStatus }))}
           >
             <SelectTrigger className={controlClass}><SelectValue /></SelectTrigger>
             <SelectContent>
-              <SelectItem value="Present">Present</SelectItem>
-              <SelectItem value="Absent">Absent</SelectItem>
+              <SelectItem value="present">Present</SelectItem>
+              <SelectItem value="absent">Absent</SelectItem>
             </SelectContent>
           </Select>
 
-          {draft.status === "Absent" ? (
+          {draft.status === "absent" ? (
             <Select
-              value={draft.absenceType ?? "Excused"}
-              onValueChange={(absenceType) =>
-                setDraft((current) => ({
-                  ...current,
-                  absenceType: absenceType as UIAbsenceType,
-                }))
-              }
+              value={draft.absenceType ?? "excused"}
+              onValueChange={(absenceType) => setDraft((current) => ({ ...current, absenceType: absenceType as AbsenceType }))}
             >
-              <SelectTrigger className={controlClass}>
-                <SelectValue />
-              </SelectTrigger>
+              <SelectTrigger className={controlClass}><SelectValue /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="Excused">Excused absence</SelectItem>
-                <SelectItem value="Unexcused">Unexcused absence</SelectItem>
+                <SelectItem value="excused">Excused absence</SelectItem>
+                <SelectItem value="unexcused">Unexcused absence</SelectItem>
               </SelectContent>
             </Select>
-          ) : null}
+          ) : <div />}
 
           <Button type="button" onClick={addRecord} disabled={!draft.date || createMutation.isPending} className="h-9 rounded-[11px]">
             <Save className="h-4 w-4" />
@@ -243,7 +195,6 @@ export function StudentAttendanceHistoryPage() {
           <h2 className="text-[15px] font-semibold text-foreground">Attendance timeline</h2>
           <p className="mt-0.5 text-[12px] text-muted-foreground">{records.length} recorded dates</p>
         </div>
-
         <div className="overflow-x-auto">
           <table className="w-full min-w-[760px] table-fixed">
             <colgroup>
@@ -261,145 +212,109 @@ export function StudentAttendanceHistoryPage() {
               </tr>
             </thead>
             <tbody>
-              {records.map((record) => {
+              {records.map((record: AttendanceRecord) => {
                 const isEditing = editingId === record.id && editingRecord;
-
                 return (
                   <tr key={record.id} className="border-t border-border/45 text-[13px] hover:bg-muted/[0.20]">
                     <td className="px-5 py-3.5">
                       {isEditing ? (
                         <DatePicker
-                          value={editingRecord.date}
-                          onChange={(date) => setEditingRecord({ ...editingRecord, date })}
+                          value={editingRecord.attendance_date}
+                          onChange={(date) => setEditingRecord({ ...editingRecord, attendance_date: date })}
                         />
                       ) : (
-                        <span className="font-medium text-foreground">{record.date}</span>
+                        <span className="font-medium text-foreground">{record.attendance_date}</span>
                       )}
                     </td>
                     <td className="px-5 py-3.5">
                       {isEditing ? (
                         <Select
                           value={editingRecord.status}
-                          onValueChange={(status) => setEditingRecord(normalizeRecord({ ...editingRecord, status: status as UIStatus }) as UIHistoryRecord)}
+                          onValueChange={(status) => setEditingRecord({ ...editingRecord, status: status as AttendanceStatus })}
                         >
                           <SelectTrigger className={controlClass}><SelectValue /></SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="Present">Present</SelectItem>
-                            <SelectItem value="Absent">Absent</SelectItem>
+                            <SelectItem value="present">Present</SelectItem>
+                            <SelectItem value="absent">Absent</SelectItem>
                           </SelectContent>
                         </Select>
                       ) : (
-                        <span className={record.status === "Present" ? "font-medium text-success" : "font-medium text-destructive"}>
+                        <span className={record.status === "present" ? "font-medium text-success" : "font-medium text-destructive"}>
                           {record.status}
                         </span>
                       )}
                     </td>
                     <td className="px-5 py-3.5">
                       {isEditing ? (
-                        editingRecord.status === "Absent" ? (
+                        editingRecord.status === "absent" ? (
                           <Select
-                            value={editingRecord.absenceType ?? "Excused"}
-                            onValueChange={(absenceType) => setEditingRecord({ ...editingRecord, absenceType: absenceType as UIAbsenceType })}
+                            value={editingRecord.absence_type ?? "excused"}
+                            onValueChange={(absence_type) => setEditingRecord({ ...editingRecord, absence_type: absence_type as AbsenceType })}
                           >
                             <SelectTrigger className={controlClass}><SelectValue /></SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="Excused">Excused absence</SelectItem>
-                              <SelectItem value="Unexcused">Unexcused absence</SelectItem>
+                              <SelectItem value="excused">Excused absence</SelectItem>
+                              <SelectItem value="unexcused">Unexcused absence</SelectItem>
                             </SelectContent>
                           </Select>
-                        ) : (
-                          <span className="text-muted-foreground">—</span>
-                        )
+                        ) : <span className="text-muted-foreground">—</span>
                       ) : (
-                        <span className="text-muted-foreground">
-                          {record.status === "Absent" ? record.absenceType : "—"}
-                        </span>
+                        <span className="text-muted-foreground">{record.status === "absent" ? record.absence_type : "—"}</span>
                       )}
                     </td>
                     <td className="px-5 py-3.5">
                       <div className="flex items-center justify-center gap-2">
                         {isEditing ? (
-                          <Button type="button" size="sm" onClick={saveEdit} disabled={updateMutation.isPending} className="h-8 rounded-[10px] px-3">
-                            <Save className="h-3.5 w-3.5" /> {updateMutation.isPending ? "..." : "Save"}
-                          </Button>
+                          <>
+                            <Button type="button" size="sm" onClick={saveEdit} disabled={updateMutation.isPending} className="h-8 rounded-[10px] px-3">
+                              <Save className="h-3.5 w-3.5" /> Save
+                            </Button>
+                            <Button type="button" variant="ghost" size="sm" onClick={() => setEditingId(null)} className="h-8 rounded-[10px] px-3 text-muted-foreground">
+                              Cancel
+                            </Button>
+                          </>
                         ) : (
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="icon-sm"
-                            onClick={() => beginEdit(record)}
-                            className="rounded-[10px] border-info/20 text-info hover:bg-info/[0.08]"
-                          >
-                            <Pencil className="h-3.5 w-3.5" />
-                          </Button>
+                          <>
+                            <Button type="button" variant="outline" size="icon-sm" onClick={() => beginEdit(record)} className="rounded-[10px] border-info/20 text-info hover:bg-info/[0.08]">
+                              <Pencil className="h-3.5 w-3.5" />
+                            </Button>
+                            <Button type="button" variant="outline" size="icon-sm" onClick={() => setDeleteTarget(record)} className="rounded-[10px] border-destructive/20 text-destructive hover:bg-destructive/[0.07]">
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </Button>
+                          </>
                         )}
-
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="icon-sm"
-                          onClick={() => setDeleteTarget(record)}
-                          className="rounded-[10px] border-destructive/20 text-destructive hover:bg-destructive/[0.07]"
-                        >
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </Button>
                       </div>
                     </td>
                   </tr>
                 );
               })}
-
-              {records.length === 0 ? (
-                <tr>
-                  <td colSpan={4} className="px-5 py-14 text-center text-[13px] text-muted-foreground">
-                    No attendance history has been recorded for this student.
-                  </td>
-                </tr>
-              ) : null}
+              {records.length === 0 && (
+                <tr><td colSpan={4} className="px-5 py-14 text-center text-muted-foreground">No records found.</td></tr>
+              )}
             </tbody>
           </table>
         </div>
       </div>
-
       <ConfirmationDialog
         open={Boolean(deleteTarget)}
         onOpenChange={(open) => !open && setDeleteTarget(null)}
         title="Delete attendance record"
-        description="This attendance date will be removed from the student history."
-        itemName={deleteTarget?.date}
+        description="This will be removed."
+        itemName={deleteTarget?.attendance_date}
         onConfirm={confirmDelete}
       />
     </section>
   );
 }
 
+
 type SummaryTone = "success" | "destructive" | "info" | "warning";
+const summaryToneClasses: Record<SummaryTone, string> = { success: "bg-success/[0.10] text-success", destructive: "bg-destructive/[0.09] text-destructive", info: "bg-info/[0.10] text-info", warning: "bg-warning/[0.11] text-warning" };
 
-const summaryToneClasses: Record<SummaryTone, string> = {
-  success: "bg-success/[0.10] text-success",
-  destructive: "bg-destructive/[0.09] text-destructive",
-  info: "bg-info/[0.10] text-info",
-  warning: "bg-warning/[0.11] text-warning",
-};
-
-function SummaryCard({
-  icon: Icon,
-  label,
-  value,
-  detail,
-  tone,
-}: {
-  icon: LucideIcon | React.ElementType;
-  label: string;
-  value: number;
-  detail: string;
-  tone: SummaryTone;
-}) {
+function SummaryCard({ icon: Icon, label, value, detail, tone }: { icon: LucideIcon | React.ElementType; label: string; value: number; detail: string; tone: SummaryTone; }) {
   return (
     <article className="flex min-h-[102px] items-center gap-3 rounded-[18px] border border-border/60 bg-card p-4 shadow-[0_7px_24px_rgba(30,20,70,0.035)]">
-      <span className={["flex h-10 w-10 shrink-0 items-center justify-center rounded-[13px]", summaryToneClasses[tone]].join(" ")}>
-        <Icon className="h-[18px] w-[18px]" strokeWidth={1.8} />
-      </span>
+      <span className={["flex h-10 w-10 shrink-0 items-center justify-center rounded-[13px]", summaryToneClasses[tone]].join(" ")}><Icon className="h-[18px] w-[18px]" strokeWidth={1.8} /></span>
       <div className="min-w-0">
         <strong className="block text-[23px] font-semibold leading-none tracking-[-0.04em] text-foreground">{value}</strong>
         <span className="mt-1.5 block text-[12px] font-medium text-foreground">{label}</span>

@@ -27,7 +27,7 @@ export const studentAttendanceService = {
     absence_type: string | null;
   }) {
     return axiosClient.post<
-      ApiResponse<any> // يمكنك استبدال any بنوع الرد إذا احتجت
+      ApiResponse<any>
     >(
       STUDENT_RECORDS.CREATE,
       payload,
@@ -68,6 +68,13 @@ export const studentAttendanceService = {
       ApiResponse<null>
     >(
       STUDENT_RECORDS.DELETE(id),
+    );
+  },
+
+  getHistory(studentId: string | number) {
+  
+    return axiosClient.get<ApiResponse<any>>(
+      `${API_ENDPOINTS.ATTENDANCE.STUDENT_RECORDS.FILTER}/student/${studentId}`
     );
   },
 };

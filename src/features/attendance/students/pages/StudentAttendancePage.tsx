@@ -1,123 +1,85 @@
 import { CalendarCheck2, CalendarDays, Save } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query"; // إضافة React Query
-
+import { useQueryClient } from "@tanstack/react-query";
+import type { StudentAttendance, AttendanceStatus, AbsenceType } from "../types/attendance.types";
 import { Button } from "@/shared/ui/button";
 import { DatePicker } from "@/shared/ui/date-picker";
-
+import { useCreateAttendance } from "../hooks/useCreateAttendance";
+import { useUpdateAttendance } from "../hooks/useUpdateAttendance";
 import { AttendanceFilters } from "../components/AttendanceFilters";
 import { AttendanceStats } from "../components/AttendanceStats";
 import { AttendanceTable } from "../components/AttendanceTable";
 import { useStudentAttendance } from "../hooks/useStudentAttendance";
-import { updateSingleAttendance, createBulkAttendance } from "../api/attendance.api";
 
 function todayForApi() {
   return new Date().toISOString().slice(0, 10);
-}
-
-// نوع محلي ليتوافق مع مكونات الـ UI الخاصة بك
-export interface UIStudentAttendance {
-  id: string; // يستخدم للواجهة
-  apiAttendanceId?: number; // يستخدم لمعرفة هل نرسل PUT أو POST للباك إند
-  enrollmentId: number;
-  studentId: string;
-  studentName: string;
-  gradeId: string;
-  gradeName: string;
-  classroomId: string;
-  classroomName: string;
-  status?: "Present" | "Absent";
-  absenceType?: "Excused" | "Unexcused";
 }
 
 export function StudentAttendancePage() {
   const queryClient = useQueryClient();
   const [draftDate, setDraftDate] = useState(todayForApi());
   const [selectedDate, setSelectedDate] = useState(todayForApi());
-  
 
-  const [activeClassroom, setActiveClassroom] = useState(1); 
-  
+  // حالة الصف النشط حالياً (يُفترض أن تأتي من قائمة اختيار الصفوف في تطبيقك)
+  const [activeClassroom, setActiveClassroom] = useState(1);
 
   const attendanceQuery = useStudentAttendance(selectedDate, activeClassroom);
 
-
-  const [records, setRecords] = useState<UIStudentAttendance[]>([]);
-
+  const [records, setRecords] = useState<StudentAttendance[]>([]);
   const [search, setSearch] = useState("");
   const [gradeFilter, setGradeFilter] = useState("all");
   const [classroomFilter, setClassroomFilter] = useState("all");
   const [status, setStatus] = useState("all");
   const [absenceType, setAbsenceType] = useState("all");
 
-  const [dirtyIds, setDirtyIds] = useState<Set<string>>(new Set());
+  const [dirtyIds, setDirtyIds] = useState<Set<number>>(new Set());
   const [savedAt, setSavedAt] = useState<string | null>(null);
 
-
   useEffect(() => {
-    if (attendanceQuery.data?.data?.data) {
-      const apiRecords = attendanceQuery.data.data.data;
-      const mappedRecords: UIStudentAttendance[] = apiRecords.map((item) => {
 
-        const hasAttendance = item.attendance !== null; 
-        
-        return {
-          id: hasAttendance ? String(item.attendance!.id) : `draft-${item.enrollment_id}`,
-          apiAttendanceId: hasAttendance ? item.attendance!.id : undefined,
-          enrollmentId: item.enrollment_id,
-          studentId: String(item.student_id),
-          studentName: item.full_name,
-          gradeId: "1",  
-          gradeName: "Grade 7",  
-          classroomId: String(activeClassroom),
-          classroomName: "A",
-
-          status: item.attendance?.status === "absent" ? "Absent" : item.attendance?.status === "present" ? "Present" : undefined,
-          absenceType: item.attendance?.absence_type === "unexcused" ? "Unexcused" : item.attendance?.absence_type === "excused" ? "Excused" : undefined,
-        };
-      });
-      setRecords(mappedRecords);
+    if (attendanceQuery.data?.data) {
+      setRecords(attendanceQuery.data.data); 
     }
-  }, [attendanceQuery.data, activeClassroom]);
+  }, [attendanceQuery.data]);
 
   const filteredData = useMemo(() => {
-      return records.filter((student) => {
-        const normalizedSearch = search.trim().toLowerCase();
-        return (
-          (!normalizedSearch || student.studentName.toLowerCase().includes(normalizedSearch)) &&
-          (gradeFilter === "all" || student.gradeId === gradeFilter) &&
-          (classroomFilter === "all" || student.classroomId === classroomFilter) &&
-          (status === "all" || student.status === status) &&
-          (status !== "Absent" || absenceType === "all" || student.absenceType === absenceType)
-        );
-      });
-    }, [records, search, gradeFilter, classroomFilter, status, absenceType]);
+    return records.filter((student) => {
+      const normalizedSearch = search.trim().toLowerCase();
+      const currentStatus = student.attendance?.status ?? "unmarked";
+      const currentAbsenceType = student.attendance?.absence_type ?? "none";
 
-  const isInitialLoading = attendanceQuery.isLoading && attendanceQuery.data === undefined;
+      return (
+        (!normalizedSearch || student.full_name.toLowerCase().includes(normalizedSearch)) &&
+        // نضيف الفلترة حسب الصف إذا توفرت بياناته في الـ API مستقبلاً
+        (status === "all" || currentStatus === status) &&
+        (status !== "absent" || absenceType === "all" || currentAbsenceType === absenceType)
+      );
+    });
+  }, [records, search, gradeFilter, classroomFilter, status, absenceType]);
 
-  const present = filteredData.filter((item) => item.status === "Present").length;
-  const absent = filteredData.filter((item) => item.status === "Absent").length;
-  const excused = filteredData.filter((item) => item.absenceType === "Excused").length;
-  const unexcused = filteredData.filter((item) => item.absenceType === "Unexcused").length;
+  const isInitialLoading = attendanceQuery.isLoading;
 
-function updateRecord(id: string, patch: any) {
-      setRecords((current) =>
+  const present = filteredData.filter((item) => item.attendance?.status === "present").length;
+  const absent = filteredData.filter((item) => item.attendance?.status === "absent").length;
+  const excused = filteredData.filter((item) => item.attendance?.absence_type === "excused").length;
+  const unexcused = filteredData.filter((item) => item.attendance?.absence_type === "unexcused").length;
+
+  function updateRecord(student: StudentAttendance, patch: { status: AttendanceStatus; absence_type?: AbsenceType | null }) {
+    setRecords((current) =>
       current.map((record) => {
-        if (record.id !== id) return record;
+        if (record.enrollment_id !== student.enrollment_id) return record;
 
-        const next = { ...record, ...patch };
-
-        if (patch.status === "Present") {
-          delete next.absenceType;
-        }
-
-        if (patch.status === "Absent") {
-          next.absenceType = next.absenceType ?? "Excused";
-        }
-        return next;
-      }),
+        return {
+          ...record,
+          attendance: {
+            ...(record.attendance || { id: 0, attendance_date: selectedDate }),
+            status: patch.status,
+            absence_type: patch.absence_type ?? null,
+          } as any,
+        };
+      })
     );
-    setDirtyIds((current) => new Set(current).add(id));
+    setDirtyIds((current) => new Set(current).add(student.enrollment_id));
     setSavedAt(null);
   }
 
@@ -128,46 +90,37 @@ function updateRecord(id: string, patch: any) {
     setSavedAt(null);
   }
 
-
-  const updateMutation = useMutation({ mutationFn: updateSingleAttendance });
-  const createMutation = useMutation({ mutationFn: createBulkAttendance });
-
+  const updateMutation = useUpdateAttendance();
+  const createMutation = useCreateAttendance();
 
   async function saveAttendance() {
     if (dirtyIds.size === 0) return;
 
-    const dirtyRecords = records.filter(r => dirtyIds.has(r.id));
-    
+    const dirtyRecords = records.filter((r) => dirtyIds.has(r.enrollment_id));
 
-    const promises = dirtyRecords.map(record => {
+    const promises = dirtyRecords.map((record) => {
       const payload = {
-        status: record.status === "Absent" ? "absent" : "present" as any,
-        absence_type: record.absenceType === "Unexcused" ? "unexcused" : (record.absenceType === "Excused" ? "excused" : null) as any,
-        attendance_date: selectedDate
+        status: record.attendance!.status,
+        absence_type: record.attendance!.absence_type,
+        attendance_date: selectedDate,
       };
 
-
-      if (record.apiAttendanceId) {
-        return updateMutation.mutateAsync({ id: record.apiAttendanceId, payload });
-      } 
-
-      else {
-        return createMutation.mutateAsync({ enrollment_id: record.enrollmentId, ...payload });
+      // إذا كان لدى الطالب id حضور حقيقي، نقوم بتحديثه PUT، وإلا نرسل POST
+      if (record.attendance && record.attendance.id !== 0) {
+        return updateMutation.mutateAsync({ id: record.attendance.id, payload });
+      } else {
+        return createMutation.mutateAsync({ enrollment_id: record.enrollment_id, ...payload });
       }
     });
 
     try {
       await Promise.all(promises);
-      
-
       setDirtyIds(new Set());
       setSavedAt(new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }));
-      queryClient.invalidateQueries({ queryKey: ['student-attendance'] });
-      
+      queryClient.invalidateQueries({ queryKey: ["student-attendance"] });
     } catch (error) {
       console.error("Failed to save attendance", error);
-
-     }
+    }
   }
 
   return (
@@ -186,7 +139,6 @@ function updateRecord(id: string, patch: any) {
             <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[15px] border border-primary/10 bg-primary/[0.075] text-primary">
               <CalendarCheck2 className="h-[19px] w-[19px]" strokeWidth={1.8} />
             </span>
-
             <div className="min-w-0">
               <div className="flex items-center gap-2">
                 <h2 className="text-[14px] font-semibold tracking-[-0.012em] text-foreground">
@@ -196,7 +148,6 @@ function updateRecord(id: string, patch: any) {
                   One date for the table
                 </span>
               </div>
-
               <p className="mt-1 text-[11px] leading-4 text-muted-foreground">
                 Select the working day, apply it to the student directory, then save edited attendance rows.
               </p>
@@ -236,7 +187,7 @@ function updateRecord(id: string, patch: any) {
 
         <div className="border-t border-border/45 bg-muted/[0.10] p-4">
           <AttendanceFilters
-            data={records as any} 
+            data={records}
             search={search}
             setSearch={setSearch}
             gradeFilter={gradeFilter}
@@ -247,6 +198,8 @@ function updateRecord(id: string, patch: any) {
             setStatus={setStatus}
             absenceType={absenceType}
             setAbsenceType={setAbsenceType}
+            grades={[]} // يمكنك تمرير قائمة الـ Grades الحقيقية هنا
+            classrooms={[]} // يمكنك تمرير قائمة الصفوف هنا
           />
         </div>
       </div>
@@ -257,8 +210,8 @@ function updateRecord(id: string, patch: any) {
         </p>
       ) : null}
 
-     <AttendanceTable
-        data={filteredData as any}
+      <AttendanceTable
+        data={filteredData}
         isLoading={isInitialLoading}
         onUpdate={updateRecord as any}
       />

@@ -1,11 +1,11 @@
 import { CalendarDays } from "lucide-react";
-
-import type { LeaveRequest } from "../types/staffLeave.types";
+import type { StaffLeave } from "../../staff/types/staffAttendance.types";
 
 type Props = {
-  data: LeaveRequest[];
+  data: StaffLeave[];
   compact?: boolean;
   isLoading?: boolean;
+  onSelect?: (leave: StaffLeave) => void;  
 };
 
 function calculateDays(startDate: string, endDate: string) {
@@ -17,6 +17,7 @@ export function LeaveRequestsTable({
   data,
   compact = false,
   isLoading = false,
+  onSelect,
 }: Props) {
   if (compact) {
     return (
@@ -31,29 +32,30 @@ export function LeaveRequestsTable({
           : data.map((item) => (
               <div
                 key={item.id}
+                onClick={() => onSelect?.(item)}
                 className="flex w-full items-start gap-2.5 rounded-[14px] border border-transparent px-2.5 py-2.5 transition-colors hover:border-border/55 hover:bg-muted/[0.28]"
               >
                 <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[11px] bg-warning/[0.10] text-[11px] font-semibold text-warning">
-                  {item.employeeName.charAt(0)}
+                  {item.staff_id}
                 </span>
 
                 <span className="min-w-0 flex-1">
                   <span className="flex items-start justify-between gap-2">
                     <strong className="truncate text-[12px] font-medium text-foreground">
-                      {item.employeeName}
+                      Staff ID: {item.staff_id}
                     </strong>
                     <span className="shrink-0 rounded-full bg-warning/[0.10] px-2 py-0.5 text-[9px] font-medium text-warning">
-                      {calculateDays(item.startDate, item.endDate)} days
+                      {calculateDays(item.start_date, item.end_date)} days
                     </span>
                   </span>
 
                   <span className="mt-1 block truncate text-[10px] text-muted-foreground">
-                    {item.leaveType.replace(" Leave", " vacation")}
+                    {item.leave_type?.name}
                   </span>
 
                   <span className="mt-1 flex items-center gap-1 text-[10px] text-muted-foreground/85">
                     <CalendarDays className="h-3 w-3" strokeWidth={1.7} />
-                    {item.startDate} — {item.endDate}
+                    {item.start_date} — {item.end_date}
                   </span>
                 </span>
               </div>

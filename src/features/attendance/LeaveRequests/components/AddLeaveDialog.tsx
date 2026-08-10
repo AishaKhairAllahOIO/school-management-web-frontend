@@ -19,26 +19,24 @@ import {
   SelectValue,
 } from "@/shared/ui/select";
 
-import type { LeaveRequest, LeaveType } from "../types/staffLeave.types";
+import type { CreateStaffLeavePayload } from "../../staff/types/staffAttendance.types";
+import { useCreateStaffLeave } from "../hooks/useCreateStaffLeave";
 
 const staffOptions = [
-  { id: "EMP001", name: "Ahmed Ali", role: "Teacher", department: "Science" },
-  { id: "EMP002", name: "Sara Omar", role: "Secretary", department: "Administration" },
-  { id: "EMP003", name: "Mohammad Hasan", role: "Supervisor", department: "Academic" },
+  { id: 1, name: "Ahmed Ali", role: "Teacher", department: "Science" },
+  { id: 2, name: "Sara Omar", role: "Secretary", department: "Administration" },
+  { id: 3, name: "Mohammad Hasan", role: "Supervisor", department: "Academic" },
 ];
 
-type Props = {
-  onAdd?: (leave: LeaveRequest) => void;
-};
-
-export function AddLeaveDialog({ onAdd }: Props) {
+export function AddLeaveDialog() {
   const [open, setOpen] = useState(false);
   const [employeeSearch, setEmployeeSearch] = useState("");
-  const [employeeId, setEmployeeId] = useState("");
-  const [leaveType, setLeaveType] = useState<LeaveType>("Annual Leave");
+  const [employeeId, setEmployeeId] = useState<number | "">("");
+  const [leaveTypeId, setLeaveTypeId] = useState<number>(1);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
-  const [reason, setReason] = useState("");
+
+  const createLeaveMutation = useCreateStaffLeave();
 
   const filteredStaff = useMemo(
     () =>
@@ -48,32 +46,29 @@ export function AddLeaveDialog({ onAdd }: Props) {
     [employeeSearch],
   );
 
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    const employee = staffOptions.find((staff) => staff.id === employeeId);
-    if (!employee || !startDate || !endDate) return;
+    if (!employeeId || !startDate || !endDate) return;
 
-    onAdd?.({
-      id: `${Date.now()}`,
-      employeeId: employee.id,
-      employeeName: employee.name,
-      role: employee.role,
-      department: employee.department,
-      leaveType,
-      startDate,
-      endDate,
-      status: "Pending",
-      reason,
-      createdAt: new Date().toISOString().slice(0, 10),
-    });
+    const payload: CreateStaffLeavePayload = {
+      staff_id: Number(employeeId),
+      leave_type_id: Number(leaveTypeId),
+      academic_year_id: 1,
+      start_date: startDate,
+      end_date: endDate,
+    };
 
-    setOpen(false);
-    setEmployeeSearch("");
-    setEmployeeId("");
-    setStartDate("");
-    setEndDate("");
-    setReason("");
+    try {
+      await createLeaveMutation.mutateAsync(payload);
+      setOpen(false);
+      setEmployeeSearch("");
+      setEmployeeId("");
+      setStartDate("");
+      setEndDate("");
+    } catch (error) {
+      console.error("Failed to create leave request", error);
+    }
   }
 
   return (
@@ -109,13 +104,16 @@ export function AddLeaveDialog({ onAdd }: Props) {
               />
             </div>
 
-            <Select value={employeeId} onValueChange={setEmployeeId}>
+            <Select 
+              value={employeeId ? String(employeeId) : ""} 
+              onValueChange={(val) => setEmployeeId(Number(val))}
+            >
               <SelectTrigger className="h-10 rounded-[13px] border-border/60 text-[12px]">
                 <SelectValue placeholder="Select employee" />
               </SelectTrigger>
               <SelectContent>
                 {filteredStaff.map((staff) => (
-                  <SelectItem key={staff.id} value={staff.id}>
+                  <SelectItem key={staff.id} value={String(staff.id)}>
                     {staff.name} · {staff.role}
                   </SelectItem>
                 ))}
@@ -126,18 +124,16 @@ export function AddLeaveDialog({ onAdd }: Props) {
           <div className="space-y-2">
             <Label className="text-[12px]">Vacation type</Label>
             <Select
-              value={leaveType}
-              onValueChange={(value) => setLeaveType(value as LeaveType)}
+              value={String(leaveTypeId)}
+              onValueChange={(value) => setLeaveTypeId(Number(value))}
             >
               <SelectTrigger className="h-10 rounded-[13px] border-border/60 text-[12px]">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="Annual Leave">Annual vacation</SelectItem>
-                <SelectItem value="Sick Leave">Sick vacation</SelectItem>
-                <SelectItem value="Emergency Leave">Emergency vacation</SelectItem>
-                <SelectItem value="Maternity Leave">Maternity vacation</SelectItem>
-                <SelectItem value="Unpaid Leave">Unpaid vacation</SelectItem>
+                <SelectItem value="1">Administrative Leave</SelectItem>
+                <SelectItem value="2">Sick Leave</SelectItem>
+                <SelectItem value="3">Emergency Leave</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -167,16 +163,6 @@ export function AddLeaveDialog({ onAdd }: Props) {
             </div>
           </div>
 
-          <div className="space-y-2">
-            <Label className="text-[12px]">Notes</Label>
-            <Input
-              value={reason}
-              onChange={(event) => setReason(event.target.value)}
-              placeholder="Optional vacation note"
-              className="h-10 rounded-[13px] border-border/60 text-[12px]"
-            />
-          </div>
-
           <div className="flex justify-end gap-2 pt-1">
             <Button
               type="button"
@@ -189,9 +175,9 @@ export function AddLeaveDialog({ onAdd }: Props) {
             <Button
               type="submit"
               className="h-10 rounded-[13px]"
-              disabled={!employeeId || !startDate || !endDate}
+              disabled={!employeeId || !startDate || !endDate || createLeaveMutation.isPending}
             >
-              Add vacation
+              {createLeaveMutation.isPending ? "Saving..." : "Add vacation"}
             </Button>
           </div>
         </form>
