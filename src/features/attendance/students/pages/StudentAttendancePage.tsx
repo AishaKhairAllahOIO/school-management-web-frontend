@@ -21,7 +21,7 @@ export function StudentAttendancePage() {
   const [selectedDate, setSelectedDate] = useState(todayForApi());
 
   // حالة الصف النشط حالياً (يُفترض أن تأتي من قائمة اختيار الصفوف في تطبيقك)
-  const [activeClassroom, setActiveClassroom] = useState(1);
+  const [activeClassroom, ] = useState(1);
 
   const attendanceQuery = useStudentAttendance(selectedDate, activeClassroom);
 

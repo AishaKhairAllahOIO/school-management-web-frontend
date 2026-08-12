@@ -9,10 +9,10 @@ import {
   SelectValue,
 } from "@/shared/ui/select";
 
-import type { StaffAttendance } from "../types/staffAttendance.types";
+import type { StaffAttendanceStatus } from "../types/staffAttendance.types";
 
 type Props = {
-  data: StaffAttendance[];
+  data: StaffAttendanceStatus[];
   search: string;
   setSearch: (value: string) => void;
   role: string;
