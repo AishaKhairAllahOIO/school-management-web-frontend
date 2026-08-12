@@ -65,7 +65,7 @@ export type TranslationDictionary = {
       navigation: string;
       schoolName: string;
       schoolWebsite: string;
-      viewWebsite: string;
+      ManageWebsite: string;
       mainMenu: string;
       goodMorning: string;
       goodAfternoon: string;

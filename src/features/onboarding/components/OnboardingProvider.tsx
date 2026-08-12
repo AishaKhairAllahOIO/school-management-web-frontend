@@ -125,22 +125,18 @@ export const OnboardingProvider: React.FC<OnboardingProviderProps> = ({ children
               ? {
                   top: adjustedPosition.top,
                   left: adjustedPosition.left,
-                  transform: 'translateY(-50%)', // توسيط عمودي تام
+                  transform: 'translateY(-50%)', 
                 }
               : undefined
           }
         >
           
-          {/* ✅ المؤشر (السهم) المحسن والدقيق */}
           {!isCenter && (
             <div
               className="absolute top-1/2 -translate-y-1/2 w-4 h-4 bg-[rgb(var(--background))] border border-[rgb(var(--border))] z-[1002]"
               style={{
-                // تدوير المربع 45 درجة ليصبح مثلثاً
                 transform: 'translateY(-50%) rotate(45deg)',
-                // تحديد مكان السهم بناءً على isOnRightSide
                 [adjustedPosition!.isOnRightSide ? 'left' : 'right']: -8,
-                // إخفاء الحدود الداخلية ليظهر شكل السهم فقط
                 borderRight: adjustedPosition!.isOnRightSide ? 'none' : '1px solid rgb(var(--border))',
                 borderTop: adjustedPosition!.isOnRightSide ? '1px solid rgb(var(--border))' : 'none',
                 borderLeft: adjustedPosition!.isOnRightSide ? '1px solid rgb(var(--border))' : 'none',

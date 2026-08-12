@@ -429,7 +429,7 @@ export function Sidebar() {
               }
               label={
                 t.layout.sidebar
-                  .viewWebsite
+                  .ManageWebsite
               }
               className="mb-1 mt-1"
             />
@@ -443,11 +443,11 @@ export function Sidebar() {
               rel="noopener noreferrer"
               aria-label={
                 t.layout.sidebar
-                  .viewWebsite
+                  .ManageWebsite
               }
               title={
                 t.layout.sidebar
-                  .viewWebsite
+                  .ManageWebsite
               }
               className={[
                 "group flex items-center",
@@ -496,7 +496,7 @@ export function Sidebar() {
                 >
                   {
                     t.layout.sidebar
-                      .viewWebsite
+                      .ManageWebsite
                   }
                 </span>
               ) : null}

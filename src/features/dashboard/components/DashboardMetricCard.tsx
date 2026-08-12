@@ -77,3 +77,5 @@ export function DashboardMetricCard({
     </article>
   );
 }
+// في نهاية الملف، أضف هذا السطر:
+export default DashboardMetricCard;

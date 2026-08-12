@@ -1,6 +1,6 @@
 import { AlertTriangle, CalendarDays, FileText, ShieldCheck } from "lucide-react";
 
-import { DashboardMetricCard } from "@/features/dashboard/components/DashboardMetricCard";
+import DashboardMetricCard from "@/features/dashboard/components/DashboardMetricCard";
 import { DashboardSection } from "@/features/dashboard/components/DashboardSection";
 import {
   supervisorActivities,
