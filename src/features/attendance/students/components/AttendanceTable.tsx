@@ -20,8 +20,8 @@ type Props = {
   data: StudentAttendance[];
   isLoading?: boolean;
   onUpdate: (
-    id: string,
-    patch: Partial<Pick<StudentAttendance, "status" | "absenceType">>,
+    student: StudentAttendance,
+    patch: { status: AttendanceStatus | string; absence_type?: AbsenceType | string | null }
   ) => void;
 };
 
@@ -35,7 +35,7 @@ export function AttendanceTable({ data, isLoading = false, onUpdate }: Props) {
         <div>
           <h3 className="text-[15px] font-semibold text-foreground">Student attendance</h3>
           <p className="mt-0.5 text-[12px] text-muted-foreground">
-            {isLoading ? "Loading records" : `${data.length} students for the selected date`}
+            {isLoading ? "Loading records..." : `${data.length} students for the selected date`}
           </p>
         </div>
       </div>
@@ -51,14 +51,11 @@ export function AttendanceTable({ data, isLoading = false, onUpdate }: Props) {
           </colgroup>
           <thead className="bg-muted/[0.28]">
             <tr className="text-[11px] font-semibold uppercase tracking-[0.075em] text-muted-foreground">
-              {["Student", "Grade", "Attendance", "Attendance details", "Actions"].map((label) => (
-                <th
-                  key={label}
-                  className={label === "Actions" ? "h-11 px-5 text-center" : "h-11 px-5 text-start"}
-                >
-                  {label}
-                </th>
-              ))}
+              <th className="h-11 px-5 text-start">Student</th>
+              <th className="h-11 px-5 text-start">Stats</th>
+              <th className="h-11 px-5 text-start">Attendance</th>
+              <th className="h-11 px-5 text-start">Absence Details</th>
+              <th className="h-11 px-5 text-center">Actions</th>
             </tr>
           </thead>
 
@@ -71,85 +68,98 @@ export function AttendanceTable({ data, isLoading = false, onUpdate }: Props) {
                     </td>
                   </tr>
                 ))
-              : data.map((student) => (
-                  <tr
-                    key={student.id}
-                    className="border-t border-border/45 text-[13px] transition-colors hover:bg-muted/[0.22]"
-                  >
-                    <td className="px-5 py-3.5">
-                      <div className="flex items-center gap-3">
-                        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[12px] bg-primary/[0.08] text-[13px] font-semibold text-primary">
-                          {student.studentName.charAt(0)}
-                        </span>
-                        <div className="min-w-0">
-                          <p className="truncate font-medium text-foreground">{student.studentName}</p>
-                
+              : data.map((student) => {
+                  const currentStatus = student.attendance?.status ?? "";
+                  const currentAbsenceType = student.attendance?.absence_type ?? "excused";
+
+                  return (
+                    <tr
+                      key={student.enrollment_id}
+                      className="border-t border-border/45 text-[13px] transition-colors hover:bg-muted/[0.22]"
+                    >
+                      <td className="px-5 py-3.5">
+                        <div className="flex items-center gap-3">
+                          {student.photo_url ? (
+                            <img src={student.photo_url} alt={student.full_name} className="h-9 w-9 rounded-[12px] object-cover" />
+                          ) : (
+                            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[12px] bg-primary/[0.08] text-[13px] font-semibold text-primary">
+                              {student.full_name.charAt(0)}
+                            </span>
+                          )}
+                          <div className="min-w-0">
+                            <p className="truncate font-medium text-foreground">{student.full_name}</p>
+                            <p className="text-[10px] text-muted-foreground">ID: {student.student_id}</p>
+                          </div>
                         </div>
-                      </div>
-                    </td>
+                      </td>
 
-                    <td className="px-5 py-3.5 text-muted-foreground">{student.gradeName}</td>
+                      <td className="px-5 py-3.5">
+                        <div className="flex flex-col gap-0.5 text-[11px]">
+                          <span className="text-muted-foreground">Allowed: <strong className="text-foreground">{student.allowed_absence_days}</strong></span>
+                          <span className="text-destructive">Unexcused: <strong>{student.total_unexcused_absent}</strong></span>
+                        </div>
+                      </td>
 
-                    <td className="px-5 py-3.5">
-                      <Select
-                        value={student.status}
-                        onValueChange={(value) =>
-                          onUpdate(student.id, {
-                            status: value as AttendanceStatus,
-                            ...(value === "Present"
-                              ? { absenceType: undefined }
-                              : { absenceType: student.absenceType ?? "Excused" }),
-                          })
-                        }
-                      >
-                        <SelectTrigger className={inlineControlClass}>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="Present">Present</SelectItem>
-                          <SelectItem value="Absent">Absent</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </td>
-
-                    <td className="px-5 py-3.5">
-                      {student.status === "Absent" ? (
+                      <td className="px-5 py-3.5">
                         <Select
-                          value={student.absenceType ?? "Excused"}
+                          value={currentStatus}
                           onValueChange={(value) =>
-                            onUpdate(student.id, { absenceType: value as AbsenceType })
+                            onUpdate(student, {
+                              status: value as AttendanceStatus,
+                              absence_type: value === "present" ? null : currentAbsenceType,
+                            })
                           }
                         >
                           <SelectTrigger className={inlineControlClass}>
-                            <SelectValue />
+                            <SelectValue placeholder="Mark attendance" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="Excused">Excused absence</SelectItem>
-                            <SelectItem value="Unexcused">Unexcused absence</SelectItem>
+                            <SelectItem value="present">Present</SelectItem>
+                            <SelectItem value="absent">Absent</SelectItem>
+                            <SelectItem value="late">Late</SelectItem>
                           </SelectContent>
                         </Select>
-                      ) : (
-                        <span className="text-muted-foreground">—</span>
-                      )}
-                    </td>
+                      </td>
 
-                    <td className="px-5 py-3.5 text-center">
-                      <Button
-                        asChild
-                        variant="outline"
-                        size="icon"
-                        className="h-9 w-9 rounded-full border-primary/15 text-primary hover:bg-primary/[0.06]"
-                      >
-                        <Link
-                          to={`/attendance/students/${student.studentId}`}
-                          aria-label={`View attendance history for ${student.studentName}`}
+                      <td className="px-5 py-3.5">
+                        {currentStatus === "absent" || currentStatus === "late" ? (
+                          <Select
+                            value={currentAbsenceType}
+                            onValueChange={(value) =>
+                              onUpdate(student, { status: currentStatus, absence_type: value as AbsenceType })
+                            }
+                          >
+                            <SelectTrigger className={inlineControlClass}>
+                              <SelectValue placeholder="Absence type" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="excused">Excused</SelectItem>
+                              <SelectItem value="unexcused">Unexcused</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        ) : (
+                          <span className="text-muted-foreground">—</span>
+                        )}
+                      </td>
+
+                      <td className="px-5 py-3.5 text-center">
+                        <Button
+                          asChild
+                          variant="outline"
+                          size="icon"
+                          className="h-9 w-9 rounded-full border-primary/15 text-primary hover:bg-primary/[0.06]"
                         >
-                          <Eye className="h-4 w-4" />
-                        </Link>
-                      </Button>
-                    </td>
-                  </tr>
-                ))}
+                          <Link
+                            to={`/attendance/students/${student.student_id}`}
+                            aria-label={`View history for ${student.full_name}`}
+                          >
+                            <Eye className="h-4 w-4" />
+                          </Link>
+                        </Button>
+                      </td>
+                    </tr>
+                  );
+                })}
 
             {!isLoading && data.length === 0 && (
               <tr>

@@ -2,7 +2,6 @@ import { Eye } from "lucide-react";
 import { Link } from "react-router-dom";
 
 import { Button } from "@/shared/ui/button";
-import { Input } from "@/shared/ui/input";
 import {
   Select,
   SelectContent,
@@ -13,19 +12,19 @@ import {
 
 import type {
   StaffAbsenceType,
-  StaffAttendance,
+  StaffAttendanceRecord,
   StaffAttendanceStatus,
 } from "../types/staffAttendance.types";
 
 type Props = {
-  data: StaffAttendance[];
+  data: StaffAttendanceRecord[];
   isLoading?: boolean;
   onUpdate: (
-    id: string,
+    id: string | number,
     patch: Partial<
       Pick<
-        StaffAttendance,
-        "status" | "absenceType" | "attendedPeriods"
+        StaffAttendanceRecord,
+        "status" | "absence_type"
       >
     >,
   ) => void;
@@ -51,19 +50,19 @@ export function StaffAttendanceTable({
       <div className="overflow-x-hidden">
         <table className="w-full table-fixed">
           <colgroup>
-            <col className="w-[31%]" />
-            <col className="w-[17%]" />
+            <col className="w-[25%]" />
             <col className="w-[20%]" />
-            <col className="w-[22%]" />
+            <col className="w-[25%]" />
+            <col className="w-[20%]" />
             <col className="w-[10%]" />
           </colgroup>
 
           <thead className="bg-muted/[0.28]">
             <tr className="text-[10px] font-semibold uppercase tracking-[0.075em] text-muted-foreground">
-              <th className="h-11 px-4 text-start">Name</th>
-              <th className="h-11 px-4 text-start">Staff type</th>
-              <th className="h-11 px-4 text-start">Attendance</th>
-              <th className="h-11 px-4 text-start">Attendance details</th>
+              <th className="h-11 px-4 text-start">Staff ID</th>
+              <th className="h-11 px-4 text-start">Date</th>
+              <th className="h-11 px-4 text-start">Attendance Status</th>
+              <th className="h-11 px-4 text-start">Absence Type</th>
               <th className="h-11 px-3 text-center">Actions</th>
             </tr>
           </thead>
@@ -85,103 +84,44 @@ export function StaffAttendanceTable({
                     <td className="px-4 py-3.5">
                       <div className="flex min-w-0 items-center gap-3">
                         <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[12px] bg-info/[0.09] text-[12px] font-semibold text-info">
-                          {item.employeeName.charAt(0)}
+                          {item.staff_id}
                         </span>
                         <div className="min-w-0">
-                          <p className="truncate font-medium text-foreground">{item.employeeName}</p>
-                          {item.role === "Teacher" ? (
-                            <p className="mt-0.5 truncate text-[10px] text-muted-foreground">
-                              Daily teaching attendance
-                            </p>
-                          ) : null}
+                          <p className="truncate font-medium text-foreground">Staff #{item.staff_id}</p>
                         </div>
                       </div>
                     </td>
 
-                    <td className="px-4 py-3.5 text-muted-foreground">{item.role}</td>
+                    <td className="px-4 py-3.5 text-muted-foreground">{item.attendance_date}</td>
 
                     <td className="px-4 py-3.5">
-                      {item.role === "Teacher" ? (
-                        <div className="flex min-w-0 items-center gap-2">
-                          <Input
-                            type="number"
-                            min={0}
-                            max={item.requiredPeriods ?? 0}
-                            value={item.attendedPeriods ?? 0}
-                            onChange={(event) => {
-                              const value = Math.max(
-                                0,
-                                Math.min(
-                                  Number(event.target.value),
-                                  item.requiredPeriods ?? 0,
-                                ),
-                              );
-
-                              onUpdate(item.id, {
-                                attendedPeriods: value,
-                                status: value > 0 ? "Present" : "Absent",
-                              });
-                            }}
-                            className="h-9 w-14 rounded-[11px] border-border/55 px-2 text-center text-[12px]"
-                            aria-label={`Attended periods for ${item.employeeName}`}
-                          />
-                          <span className="shrink-0 text-[10px] text-muted-foreground">
-                            / {item.requiredPeriods ?? 0}
-                          </span>
-                        </div>
-                      ) : (
-                        <Select
-                          value={item.status}
-                          onValueChange={(value) =>
-                            onUpdate(item.id, {
-                              status: value as StaffAttendanceStatus,
-                              ...(value === "Present"
-                                ? { absenceType: undefined }
-                                : { absenceType: item.absenceType ?? "Excused" }),
-                            })
-                          }
-                        >
-                          <SelectTrigger className={inlineControlClass}>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="Present">Present</SelectItem>
-                            <SelectItem value="Absent">Absent</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      )}
+                      <Select
+                        value={item.status}
+                        onValueChange={(value) =>
+                          onUpdate(item.id, {
+                            status: value as StaffAttendanceStatus,
+                            absence_type: value === "present" ? null : (item.absence_type ?? "excused"),
+                          })
+                        }
+                      >
+                        <SelectTrigger className={inlineControlClass}>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="present">Present</SelectItem>
+                          <SelectItem value="absent">Absent</SelectItem>
+                          <SelectItem value="partial_absence">Partial Absence</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </td>
 
                     <td className="px-4 py-3.5">
-                      {item.role === "Teacher" ? (
-                        item.status === "Absent" ? (
-                          <Select
-                            value={item.absenceType ?? "Excused"}
-                            onValueChange={(value) =>
-                              onUpdate(item.id, {
-                                absenceType: value as StaffAbsenceType,
-                              })
-                            }
-                          >
-                            <SelectTrigger className={inlineControlClass}>
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="Excused">Excused absence</SelectItem>
-                              <SelectItem value="Unexcused">Unexcused absence</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        ) : (
-                          <div className="rounded-[11px] border border-info/15 bg-info/[0.05] px-3 py-2 text-[11px] text-info">
-                            {item.attendedPeriods ?? 0} of {item.requiredPeriods ?? 0} periods
-                          </div>
-                        )
-                      ) : item.status === "Absent" ? (
+                      {item.status !== "present" ? (
                         <Select
-                          value={item.absenceType ?? "Excused"}
+                          value={item.absence_type ?? "excused"}
                           onValueChange={(value) =>
                             onUpdate(item.id, {
-                              absenceType: value as StaffAbsenceType,
+                              absence_type: value as StaffAbsenceType,
                             })
                           }
                         >
@@ -189,8 +129,8 @@ export function StaffAttendanceTable({
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="Excused">Excused absence</SelectItem>
-                            <SelectItem value="Unexcused">Unexcused absence</SelectItem>
+                            <SelectItem value="excused">Excused</SelectItem>
+                            <SelectItem value="unexcused">Unexcused</SelectItem>
                           </SelectContent>
                         </Select>
                       ) : (
@@ -206,8 +146,8 @@ export function StaffAttendanceTable({
                         className="h-9 w-9 rounded-full border-info/15 text-info hover:bg-info/[0.06]"
                       >
                         <Link
-                          to={`/attendance/staff/${item.employeeId}`}
-                          aria-label={`View attendance history for ${item.employeeName}`}
+                          to={`/attendance/staff/${item.staff_id}`}
+                          aria-label={`View attendance history for staff ${item.staff_id}`}
                         >
                           <Eye className="h-4 w-4" />
                         </Link>

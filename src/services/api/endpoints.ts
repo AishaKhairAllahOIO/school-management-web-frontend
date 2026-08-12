@@ -64,7 +64,7 @@ export const API_ENDPOINTS = {
     ACADEMIC_CLASSROOM: (classroomId: ApiId) =>
       `/admin/settings/classrooms/${classroomId}`,
 
-        ATTENDANCE: {
+    ATTENDANCE: {
       STUDENT_SETTINGS: {
         LIST: "/attendance-settings",
 
@@ -249,7 +249,6 @@ export const API_ENDPOINTS = {
   },
 
   FINANCIAL: {
-
     POLICIES:
       "/admin/finance/settings/policies",
 
@@ -266,12 +265,10 @@ export const API_ENDPOINTS = {
       `/admin/finance/settings/policy-items/${policyItemId}`,
 
     EXTRA_SERVICES:
-  "/admin/finance/settings/extra-services",
+      "/admin/finance/settings/extra-services",
 
-EXTRA_SERVICE: (extraServiceId: ApiId) =>
-  `/admin/finance/settings/extra-services/${extraServiceId}`,
-  
-  
+    EXTRA_SERVICE: (extraServiceId: ApiId) =>
+      `/admin/finance/settings/extra-services/${extraServiceId}`,
   },
 
   FINANCE_OPERATIONS: {
@@ -300,128 +297,119 @@ EXTRA_SERVICE: (extraServiceId: ApiId) =>
       `/admin/finance/contracts/payments/${paymentId}`,
   },
 
-COMMUNICATIONS: {
-  BELL_UNREAD_COUNT: "/auth/bell/count/unread",
-  BELL_MARK_ALL_READ: "/auth/bell/mark/all/read",
+  COMMUNICATIONS: {
+    BELL_UNREAD_COUNT: "/auth/bell/count/unread",
+    BELL_MARK_ALL_READ: "/auth/bell/mark/all/read",
 
- 
-  // Activities
-  // =========================
+    CREATE_ACTIVITY: "/auth/activity/create",
 
-  CREATE_ACTIVITY: "/auth/activity/create",
+    UPDATE_ACTIVITY: (activityId: ApiId) =>
+      `/auth/activity/update/${activityId}`,
 
-  UPDATE_ACTIVITY: (activityId: ApiId) =>
-    `/auth/activity/update/${activityId}`,
+    DELETE_ACTIVITY: (activityId: ApiId) =>
+      `/auth/activity/delete/${activityId}`,
 
-  DELETE_ACTIVITY: (activityId: ApiId) =>
-    `/auth/activity/delete/${activityId}`,
+    ACTIVITY: (activityId: ApiId) =>
+      `/auth/activity/show/one/${activityId}`,
 
-  ACTIVITY: (activityId: ApiId) =>
-    `/auth/activity/show/one/${activityId}`,
+    ALL_ACTIVITIES:
+      "/auth/activity/show/all",
 
-  ALL_ACTIVITIES:
-    "/auth/activity/show/all",
+    CREATE_ANNOUNCEMENT:
+      "/auth/announcements",
 
+    UPDATE_ANNOUNCEMENT: (
+      announcementId: ApiId,
+    ) =>
+      `/auth/announcement/update/${announcementId}`,
 
+    DELETE_ANNOUNCEMENT: (
+      announcementId: ApiId,
+    ) =>
+      `/auth/announcements/${announcementId}`,
 
-  CREATE_ANNOUNCEMENT:
-    "/auth/announcements",
+    STAFF_ANNOUNCEMENTS:
+      "/auth/staff-announcements",
 
-  UPDATE_ANNOUNCEMENT: (
-    announcementId: ApiId,
-  ) =>
-    `/auth/announcement/update/${announcementId}`,
+    CREATOR_ANNOUNCEMENTS:
+      "/auth/creater/show/announcements",
 
-  DELETE_ANNOUNCEMENT: (
-    announcementId: ApiId,
-  ) =>
-    `/auth/announcements/${announcementId}`,
+    MY_ANNOUNCEMENTS:
+      "/user/my-announcements",
 
-  STAFF_ANNOUNCEMENTS:
-    "/auth/staff-announcements",
+    CHILD_ANNOUNCEMENTS:
+      "/user/child-announcements",
 
-  CREATOR_ANNOUNCEMENTS:
-    "/auth/creater/show/announcements",
+    ANNOUNCEMENTS_UNREAD_COUNT:
+      "/auth/announcements/unread-count",
 
-  MY_ANNOUNCEMENTS:
-    "/user/my-announcements",
+    MARK_ALL_ANNOUNCEMENTS_READ:
+      "/auth/announcements/mark-all-read",
 
-  CHILD_ANNOUNCEMENTS:
-    "/user/child-announcements",
+    USER_ANNOUNCEMENTS_UNREAD_COUNT:
+      "/user/announcements/unread-count",
 
-  ANNOUNCEMENTS_UNREAD_COUNT:
-    "/auth/announcements/unread-count",
+    MARK_ALL_USER_ANNOUNCEMENTS_READ:
+      "/user/announcements/mark-all-read",
 
-  MARK_ALL_ANNOUNCEMENTS_READ:
-    "/auth/announcements/mark-all-read",
+    ALERTS: "/auth/alerts",
 
-  USER_ANNOUNCEMENTS_UNREAD_COUNT:
-    "/user/announcements/unread-count",
+    STAFF_ALERTS:
+      "/auth/alerts/show/general/staff",
 
-  MARK_ALL_USER_ANNOUNCEMENTS_READ:
-    "/user/announcements/mark-all-read",
+    PAYMENT_ALERTS:
+      "/auth/alerts/show/payments/staff",
 
-  
-  ALERTS: "/auth/alerts",
+    ALERTS_UNREAD_COUNT:
+      "/auth/alerts/unread-count",
 
-  STAFF_ALERTS:
-    "/auth/alerts/show/general/staff",
+    MARK_ALL_ALERTS_READ:
+      "/auth/alerts/mark-all-read",
 
-  PAYMENT_ALERTS:
-    "/auth/alerts/show/payments/staff",
+    DELETE_ALERT: (alertId: ApiId) =>
+      `/auth/delete/alert/${alertId}`,
 
-  ALERTS_UNREAD_COUNT:
-    "/auth/alerts/unread-count",
+    ADVISOR_ALERTS:
+      "/auth/alerts/for-student/send",
 
-  MARK_ALL_ALERTS_READ:
-    "/auth/alerts/mark-all-read",
+    TEACHER_ALERTS:
+      "/auth/teacher/teacher-alerts",
 
-  DELETE_ALERT: (alertId: ApiId) =>
-    `/auth/delete/alert/${alertId}`,
+    MY_ALERTS:
+      "/user/my-alerts",
 
-  ADVISOR_ALERTS:
-    "/auth/alerts/for-student/send",
+    CHILD_ALERTS: (studentId: ApiId) =>
+      `/user/child-alerts/${studentId}`,
 
-  TEACHER_ALERTS:
-    "/auth/teacher/teacher-alerts",
+    CHILD_PAYMENT_ALERTS: (studentId: ApiId) =>
+      `/user/payment-alerts/${studentId}`,
 
-  MY_ALERTS:
-    "/user/my-alerts",
+    USER_ALERTS_UNREAD_COUNT:
+      "/user/alerts/unread-count",
 
-  CHILD_ALERTS: (studentId: ApiId) =>
-    `/user/child-alerts/${studentId}`,
+    MARK_ALL_USER_ALERTS_READ:
+      "/user/alerts/mark-all-read",
 
-  CHILD_PAYMENT_ALERTS: (studentId: ApiId) =>
-    `/user/payment-alerts/${studentId}`,
+    CREATED_ALERTS:
+      "/auth/created/alerts/show/by/role",
 
-  USER_ALERTS_UNREAD_COUNT:
-    "/user/alerts/unread-count",
+    UPDATE_CREATED_ALERT: (id: ApiId) =>
+      `/auth/created/alerts/update/${id}`,
 
-  MARK_ALL_USER_ALERTS_READ:
-    "/user/alerts/mark-all-read",
+    DELETE_CREATED_ALERT: (id: ApiId) =>
+      `/auth/created/alerts/delete/group/${id}`,
+  },
 
-  
-  CREATED_ALERTS:
-    "/auth/created/alerts/show/by/role",
+  SYSTEM_NOTICES: {
+    LIST:
+      "/auth/system-notices/show/alerts",
 
-  UPDATE_CREATED_ALERT: (id: ApiId) =>
-    `/auth/created/alerts/update/${id}`,
+    UNREAD_COUNT:
+      "/auth/system-notices/unread-count",
 
-  DELETE_CREATED_ALERT: (id: ApiId) =>
-    `/auth/created/alerts/delete/group/${id}`,
-},
-
-SYSTEM_NOTICES: {
-  LIST:
-    "/auth/system-notices/show/alerts",
-
-  UNREAD_COUNT:
-    "/auth/system-notices/unread-count",
-
-  MARK_ALL_READ:
-    "/auth/system-notices/mark-all-read",
-},
-
+    MARK_ALL_READ:
+      "/auth/system-notices/mark-all-read",
+  },
 
   SCHOOL_LAWS: {
     GET_ALL: "/auth/school/laws/all/show",
@@ -438,5 +426,40 @@ SYSTEM_NOTICES: {
       `/auth/school/law/delete/${lawId}`,
   },
 
-  
+  ATTENDANCE: {
+    STUDENT_RECORDS: {
+      CREATE: "/admin/attendance/bulk",
+      FILTER: "/admin/attendance/filter", 
+      DETAILS: (recordId: ApiId) => `/admin/attendance/getRecord/${recordId}`,
+      UPDATE: (recordId: ApiId) => `/admin/attendance/record/${recordId}`,
+      DELETE: (recordId: ApiId) => `/admin/attendance/record/${recordId}`,
+    },
+
+    STUDENT_SETTINGS: {
+      LIST: "/attendance-settings",
+      CREATE: "/attendance-settings",
+      BY_SEMESTER: (semesterId: ApiId) =>
+        `/attendance-settings/semester/${semesterId}`,
+      UPDATE: (settingId: ApiId) =>
+        `/attendance-settings/${settingId}`,
+      DELETE: (settingId: ApiId) =>
+        `/attendance-settings/${settingId}`,
+    },
+
+    STAFF_RECORDS: {
+      CREATE: "/admin/staff-attendances",
+      DETAILS: (id: ApiId) => `/admin/staff-attendances/${id}`,
+      UPDATE: (id: ApiId) => `/admin/staff-attendances/${id}`,
+      DELETE: (id: ApiId) => `/admin/staff-attendances/${id}`,
+      HISTORY: (staffId: ApiId) => `/admin/staff-attendances/staff/${staffId}`,
+    },
+
+    STAFF_LEAVES: {
+      CREATE: "/admin/staff-leaves",
+      LIST_BY_STAFF: (staffId: ApiId) => `/admin/staff-leaves/${staffId}`,
+      DETAILS: (leaveId: ApiId) => `/admin/staff-leaves/${leaveId}/staff`,
+      UPDATE: (id: ApiId) => `/admin/staff-leaves/${id}`,
+      DELETE: (id: ApiId) => `/admin/staff-leaves/${id}`,
+    },
+  },
 } as const;

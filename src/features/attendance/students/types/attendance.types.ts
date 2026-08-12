@@ -1,29 +1,68 @@
-export type AttendanceStatus = "Present" | "Absent";
+export type AttendanceStatus = 'present' | 'absent' | 'late';
+export type AbsenceType = 'excused' | 'unexcused' | null;
 
-export type AbsenceType = "Excused" | "Unexcused";
 
-export interface StudentAttendance {
-  id: string;
-  studentId?: string;
-  enrollmentId?: string;
-  studentName: string;
-
-  gradeId?: string;
-  gradeName: string;
-
-  classroomId?: string | null;
-  classroomName?: string | null;
-
-  date?: string;
-  status?: AttendanceStatus;
-  absenceType?: AbsenceType;
+export interface AttendanceRecord {
+  id: number;
+  status: AttendanceStatus;
+  absence_type: AbsenceType;
+  notes?: string | null;
+  attendance_date: string;
 }
 
-export interface StudentAttendanceHistoryRecord {
-  id: string;
-  studentId: string;
-  enrollmentId?: string;
-  date: string;
+
+export interface StudentAttendance {
+  enrollment_id: number;
+  student_id: number;
+  full_name: string;
+  photo_url: string | null;
+  allowed_absence_days: number;
+  total_unexcused_absent: number;
+  remaining_absence_days: number;
+  attendance: AttendanceRecord | null;
+}
+
+
+export interface AttendanceFilterParams {
+  class_room_id: number;
+  attendance_date?: string;
+  status?: string;
+  absence_type?: string;
+  semester_id?: number;
+  page?: number;
+}
+
+
+export interface PaginatedResponse<T> {
+  status: boolean;
+  message: string;
+  data: {
+    current_page: number;
+    data: T[];
+    total: number;
+    per_page: number;
+  };
+}
+
+
+export interface UpdateAttendancePayload {
   status: AttendanceStatus;
-  absenceType?: AbsenceType;
+  absence_type: AbsenceType;
+  attendance_date: string;
+}
+
+export interface PaginatedData<T> {
+  current_page: number;
+  data: T[];
+  total: number;
+  per_page: number;
+}
+
+export interface AttendanceSummaryResponse {
+  attendance_record: AttendanceRecord;
+  attendance_summary: {
+    allowed_absence_days: number;
+    total_unexcused_absent: number;
+    remaining_absence_days: number;
+  };
 }
