@@ -13,7 +13,7 @@ import {
 import { useAcademicSettings } from "@/features/settings/academic/hooks/useAcademicSettings";
 
 
-import { schedulesApi } from "../api/schedules.api";
+import { schedulingApi } from "../api/scheduling.api";
 
 import type {
   GenerateSchedulePayload,
@@ -109,7 +109,7 @@ export function useAdminSchedule(
     ],
 
     queryFn: () =>
-      schedulesApi.getAdminSchedule({
+      schedulingApi.getAdminSchedule({
         academic_year_id:
           academicYearId!,
         semester_id:
@@ -150,7 +150,7 @@ export function useTeacherSchedule(
     ],
 
     queryFn: () =>
-      schedulesApi.getTeacherSchedule({
+      schedulingApi.getTeachersSchedule({
         academic_year_id:
           academicYearId!,
         semester_id:
@@ -173,7 +173,7 @@ export function useGenerateSchedule() {
     mutationFn: (
       payload: GenerateSchedulePayload,
     ) =>
-      schedulesApi.generate(payload),
+      schedulingApi.generate(payload),
 
     onSuccess: async () => {
       toast.success(
@@ -201,7 +201,7 @@ export function useRegenerateSchedule() {
     mutationFn: (
       payload: GenerateSchedulePayload,
     ) =>
-      schedulesApi.regenerate(payload),
+      schedulingApi.regenerate(payload),
 
     onSuccess: async () => {
       toast.success(
@@ -230,7 +230,7 @@ export function useUpdateScheduleEntry() {
       entryId,
       payload,
     }: UpdateScheduleEntryVariables) =>
-      schedulesApi.updateEntry(
+      schedulingApi.updateEntry(
         entryId,
         payload,
       ),

@@ -86,3 +86,8 @@ export type TeacherSchedule = Record<
   string,
   Record<string, TeacherSchedulePeriod[]>
 >;
+
+export interface GenerateScheduleParams {
+  academic_year_id: number;
+  semester_id: number;
+}
