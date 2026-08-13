@@ -44,7 +44,6 @@ export function OtpInput({
 
   return (
     <div 
-    dir="ltr"
     className="grid grid-cols-6 gap-2 sm:gap-3">
       {digits.map((digit, index) => (
         <input
