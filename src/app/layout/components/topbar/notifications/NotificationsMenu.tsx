@@ -75,7 +75,7 @@ export function NotificationsMenu({
       {isOpen ? (
         <div
           role="menu"
-className="topbar-menu-shadow absolute top-full z-[100] mt-2 w-[calc(100vw-24px)] max-w-[320px] max-h-[calc(100dvh-88px)] overflow-hidden rounded-[18px] border border-topbar-border/80 bg-topbar-surface/95 backdrop-blur-2xl origin-top-end animate-in fade-in-0 zoom-in-95 slide-in-from-top-1 duration-150 ltr:right-0 rtl:left-0 lg:w-[278px]"        >
+className="topbar-menu-shadow absolute start-1/2 top-full z-[100] mt-2 w-[calc(100vw-24px)] max-w-[320px] -translate-x-1/2 max-h-[calc(100dvh-88px)] overflow-hidden rounded-[18px] border border-topbar-border/80 bg-topbar-surface/95 backdrop-blur-2xl origin-top animate-in fade-in-0 zoom-in-95 slide-in-from-top-1 duration-150 lg:start-auto lg:end-0 lg:w-[278px] lg:translate-x-0 lg:origin-top-end"        >
           <div className="flex items-start justify-between gap-3 border-b border-topbar-divider px-4 py-3">
             <div className="min-w-0">
               <h2 className="text-[14px] font-semibold text-topbar-title">
