@@ -82,7 +82,7 @@ export const en: TranslationDictionary = {
       staff: "Staff",
       classes: "Classes",
       exams: "Exams",
-      quizzes: "Quizzes",
+      mark: "Marks",
       holidays: "Holidays",
      studentFinance: "Student Finance",
       staffPayroll: "Staff Payroll",

@@ -81,7 +81,7 @@ export type TranslationDictionary = {
       staff: string;
       classes: string;
       exams: string;
-      quizzes: string;
+      mark: string;
       holidays: string;
       studentFinance: string;
       staffPayroll: string;

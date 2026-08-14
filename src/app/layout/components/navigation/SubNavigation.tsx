@@ -86,8 +86,8 @@ const subNavigationSections: SubNavigationSection[] = [
         icon: FileText,
       },
       {
-        titleKey: "quizzes",
-        path: "/scheduling/quizzes",
+        titleKey: "mark",
+        path: "/scheduling/mark",
         icon: BookOpen,
       },
   

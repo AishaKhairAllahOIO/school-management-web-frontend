@@ -83,7 +83,7 @@ export const ar: TranslationDictionary = {
       staff: "الموظفون",
       classes: "الحصص",
       exams: "الامتحانات",
-      quizzes: "الاختبارات القصيرة",
+      mark: "العلامات",
       holidays: "العطل",
       studentFinance: "مالية الطلاب",
       staffPayroll: "رواتب الموظفين",
