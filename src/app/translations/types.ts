@@ -28,6 +28,7 @@ export type TranslationDictionary = {
     settings: string;
     profile: string;
     notifications: string;
+    content: string;
   };
 
   auth: {

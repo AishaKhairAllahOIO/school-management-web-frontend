@@ -48,6 +48,9 @@ export function getSectionKey(
   if (pathname.startsWith("/settings")) return "settings";
   if (pathname.startsWith("/profile")) return "profile";
 
+  if (pathname.startsWith("/manage-content")) {
+    return "content";
+  }
   return "dashboard";
 }
 

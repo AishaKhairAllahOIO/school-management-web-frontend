@@ -28,7 +28,8 @@ export const en: TranslationDictionary = {
     reports: "Reports",
     settings: "Settings",
     profile: "Profile",
-    notifications: "Notifications"
+    notifications: "Notifications",
+    content: "Manage Content",
   },
 
   auth: {

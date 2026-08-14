@@ -29,7 +29,8 @@ export const ar: TranslationDictionary = {
     reports: "التقارير",
     settings: "الإعدادات",
     profile: "الملف الشخصي",
-    notifications: "الإشعارات"
+    notifications: "الإشعارات",
+    content: "إدارة المحتوى",
   },
 
   auth: {
