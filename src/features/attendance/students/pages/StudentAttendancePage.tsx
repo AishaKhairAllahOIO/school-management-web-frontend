@@ -1,6 +1,7 @@
 import { CalendarCheck2, CalendarDays, Save } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { axiosClient } from "@/services/axios/axiosClient"; // استيراد عميل الأكسيوس للاتصال بالباك إند
 import type { StudentAttendance, AttendanceStatus, AbsenceType } from "../types/attendance.types";
 import { Button } from "@/shared/ui/button";
 import { DatePicker } from "@/shared/ui/date-picker";
@@ -19,56 +20,92 @@ export function StudentAttendancePage() {
   const [draftDate, setDraftDate] = useState(todayForApi());
   const [selectedDate, setSelectedDate] = useState(todayForApi());
   
-  const [activeClassroom, setActiveClassroom] = useState(1);
-  const [activeSemester, setActiveSemester] = useState(1);
+  const [activeSemester] = useState(1);
+  const [classroomFilter, setClassroomFilter] = useState(""); 
 
-  const attendanceQuery = useStudentAttendance(selectedDate, activeClassroom);
+
+  const { data: gradesData = [] } = useQuery({
+    queryKey: ['real-grades'],
+    queryFn: async () => {
+      const response = await axiosClient.get('/admin/settings/grades');
+      return response.data.data || [];
+    }
+  });
+
+
+  const { data: classroomsData = [] } = useQuery({
+    queryKey: ['real-classrooms'],
+    queryFn: async () => {
+      const response = await axiosClient.get('/admin/settings/classrooms');
+      return response.data.data || [];
+    }
+  });
+
+
+  const attendanceQuery = useStudentAttendance(selectedDate, Number(classroomFilter));
   const bulkAttendanceMutation = useBulkAttendance();
 
   const [records, setRecords] = useState<StudentAttendance[]>([]);
   const [search, setSearch] = useState("");
   const [gradeFilter, setGradeFilter] = useState("all");
-  const [classroomFilter, setClassroomFilter] = useState("all");
   const [status, setStatus] = useState("all");
   const [absenceType, setAbsenceType] = useState("all");
 
   const [dirtyIds, setDirtyIds] = useState<Set<number>>(new Set());
   const [savedAt, setSavedAt] = useState<string | null>(null);
 
+
+  const filteredClassrooms = useMemo(() => {
+    if (gradeFilter === "all") return classroomsData;
+
+    return classroomsData.filter((c: any) => String(c.grade_id) === gradeFilter);
+  }, [classroomsData, gradeFilter]);
+
+
   useEffect(() => {
-    // ✅ الحل الجذري للخطأ: الوصول للمصفوفة الداخلية "data" الخاصة بـ PaginatedData
+    if (filteredClassrooms.length > 0 && !classroomFilter && classroomFilter !== "all") {
+      setClassroomFilter(String(filteredClassrooms[0].id));
+    }
+  }, [filteredClassrooms, classroomFilter]);
+
+  useEffect(() => {
     if (attendanceQuery.data?.data) {
       setRecords(attendanceQuery.data.data);
+    } else if (Array.isArray(attendanceQuery.data)) {
+      setRecords(attendanceQuery.data);
+    } else {
+      setRecords([]);
     }
   }, [attendanceQuery.data]);
 
   const filteredData = useMemo(() => {
     return records.filter((student) => {
       const normalizedSearch = search.trim().toLowerCase();
-      // إذا لم يوجد سجل، فهو حاضر
-      const currentStatus = student.attendance?.status ?? "present";
-      const currentAbsenceType = student.attendance?.absence_type ?? "none";
+      const currentStatus = (student.attendance?.status ?? "present").toLowerCase();
+      const currentAbsenceType = (student.attendance?.absence_type ?? "none").toLowerCase();
+
+      const filterStatus = status.toLowerCase();
+      const filterAbsence = absenceType.toLowerCase();
 
       return (
         (!normalizedSearch || student.full_name.toLowerCase().includes(normalizedSearch)) &&
-        (status === "all" || currentStatus === status) &&
-        (status !== "absent" || absenceType === "all" || currentAbsenceType === absenceType)
+        (filterStatus === "all" || currentStatus === filterStatus) &&
+        (filterStatus !== "absent" || filterAbsence === "all" || currentAbsenceType === filterAbsence)
       );
     });
-  }, [records, search, gradeFilter, classroomFilter, status, absenceType]);
+  }, [records, search, status, absenceType]); 
 
   const isInitialLoading = attendanceQuery.isLoading;
 
-  const present = filteredData.filter((item) => (item.attendance?.status ?? "present") === "present").length;
-  const absent = filteredData.filter((item) => item.attendance?.status === "absent").length;
-  const excused = filteredData.filter((item) => item.attendance?.absence_type === "excused").length;
-  const unexcused = filteredData.filter((item) => item.attendance?.absence_type === "unexcused").length;
+  const present = filteredData.filter((item) => (item.attendance?.status?.toLowerCase() ?? "present") === "present").length;
+  const absent = filteredData.filter((item) => item.attendance?.status?.toLowerCase() === "absent").length;
+  const excused = filteredData.filter((item) => item.attendance?.absence_type?.toLowerCase() === "excused").length;
+  const unexcused = filteredData.filter((item) => item.attendance?.absence_type?.toLowerCase() === "unexcused").length;
 
   function updateRecord(student: StudentAttendance, patch: { status: AttendanceStatus; absence_type?: AbsenceType | null }) {
     setRecords((current) =>
       current.map((record) => {
         if (record.enrollment_id !== student.enrollment_id) return record;
-
         return {
           ...record,
           attendance: {
@@ -93,7 +130,6 @@ export function StudentAttendancePage() {
   async function saveAttendance() {
     if (dirtyIds.size === 0) return;
 
-    // تجهيز الداتا للإرسال بالجملة للباك إند
     const attendancesPayload = records
       .filter((r) => dirtyIds.has(r.enrollment_id))
       .map((record) => ({
@@ -105,7 +141,7 @@ export function StudentAttendancePage() {
     try {
       await bulkAttendanceMutation.mutateAsync({
         semester_id: activeSemester,
-        class_room_id: activeClassroom,
+        class_room_id: Number(classroomFilter),
         attendance_date: selectedDate,
         attendances: attendancesPayload,
       });
@@ -120,13 +156,7 @@ export function StudentAttendancePage() {
 
   return (
     <section className="space-y-4 pt-5">
-      <AttendanceStats
-        present={present}
-        absent={absent}
-        excused={excused}
-        unexcused={unexcused}
-        isLoading={isInitialLoading}
-      />
+      <AttendanceStats present={present} absent={absent} excused={excused} unexcused={unexcused} isLoading={isInitialLoading} />
 
       <div className="overflow-hidden rounded-[22px] border border-border/60 bg-card shadow-[0_10px_30px_rgba(30,20,70,0.045)]">
         <div className="flex flex-col gap-4 px-4 py-4 lg:flex-row lg:items-center lg:justify-between">
@@ -150,32 +180,14 @@ export function StudentAttendancePage() {
           </div>
 
           <div className="flex w-full flex-col gap-2 sm:flex-row lg:w-auto lg:items-end">
-            <DatePicker
-              value={draftDate}
-              onChange={setDraftDate}
-              label="Attendance date"
-              className="w-full sm:w-[228px]"
-            />
+            <DatePicker value={draftDate} onChange={setDraftDate} label="Attendance date" className="w-full sm:w-[228px]" />
 
-            <Button
-              type="button"
-              variant="outline"
-              onClick={applyDate}
-              disabled={!draftDate || draftDate === selectedDate}
-              className="h-11 rounded-[13px] border-primary/20 bg-transparent px-4 text-primary hover:bg-primary/[0.055]"
-            >
-              <CalendarDays className="h-4 w-4" />
-              Apply
+            <Button type="button" variant="outline" onClick={applyDate} disabled={!draftDate || draftDate === selectedDate} className="h-11 rounded-[13px] border-primary/20 bg-transparent px-4 text-primary hover:bg-primary/[0.055]">
+              <CalendarDays className="h-4 w-4" /> Apply
             </Button>
 
-            <Button
-              type="button"
-              onClick={saveAttendance}
-              disabled={dirtyIds.size === 0 || bulkAttendanceMutation.isPending}
-              className="h-11 rounded-[13px] px-5"
-            >
-              <Save className="h-4 w-4" />
-              {bulkAttendanceMutation.isPending ? "Saving..." : "Save"}
+            <Button type="button" onClick={saveAttendance} disabled={dirtyIds.size === 0 || bulkAttendanceMutation.isPending} className="h-11 rounded-[13px] px-5">
+              <Save className="h-4 w-4" /> {bulkAttendanceMutation.isPending ? "Saving..." : "Save"}
             </Button>
           </div>
         </div>
@@ -193,23 +205,19 @@ export function StudentAttendancePage() {
             setStatus={setStatus}
             absenceType={absenceType}
             setAbsenceType={setAbsenceType}
-            grades={[]} 
-            classrooms={[]} 
+            grades={gradesData}              
+            classrooms={filteredClassrooms} 
           />
         </div>
       </div>
 
-      {savedAt ? (
+      {savedAt && (
         <p className="-mt-1 text-end text-[11px] font-medium text-success">
           Attendance changes saved at {savedAt}.
         </p>
-      ) : null}
+      )}
 
-      <AttendanceTable
-        data={filteredData}
-        isLoading={isInitialLoading}
-        onUpdate={updateRecord as any}
-      />
+      <AttendanceTable data={filteredData} isLoading={isInitialLoading} onUpdate={updateRecord as any} />
     </section>
   );
 }

@@ -22,7 +22,6 @@ import {
 import type { CreateStaffLeavePayload } from "../../staff/types/staffAttendance.types";
 import { useCreateStaffLeave } from "../hooks/useCreateStaffLeave";
 
-// تعريف الأنواع للبيانات القادمة من الباك إند
 export type LeaveTypeOption = { id: number; name: string };
 export type StaffOption = { id: number; full_name: string; role?: string };
 
@@ -57,7 +56,7 @@ export function AddLeaveDialog({ staffList = [], leaveTypes = [] }: Props) {
     const payload: CreateStaffLeavePayload = {
       staff_id: Number(employeeId),
       leave_type_id: Number(leaveTypeId),
-      academic_year_id: 1, // يمكنك جعل هذا متغيراً حقيقياً لاحقاً
+      academic_year_id: 1, 
       start_date: startDate,
       end_date: endDate,
     };

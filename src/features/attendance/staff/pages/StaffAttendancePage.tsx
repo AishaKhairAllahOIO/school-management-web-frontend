@@ -10,6 +10,8 @@ import {
   useMemo,
   useState,
 } from "react";
+import { axiosClient } from "@/services/axios/axiosClient";
+import { useQuery } from "@tanstack/react-query";
 
 import { AddLeaveDialog } from "../../LeaveRequests/components/AddLeaveDialog";
 import { LeaveRequestsTable } from "../../LeaveRequests/components/LeaveRequestsTable";
@@ -44,6 +46,24 @@ export function StaffAttendancePage() {
   const staffIdForLeaves = 1;
   const leaveQuery = useStaffLeaves(staffIdForLeaves);
   const updateAttendanceMutation = useUpdateStaffAttendance();
+
+  // ✅ جلب قائمة الموظفين الحقيقية لتمريرها لنافذة الإجازات
+  const { data: staffList = [] } = useQuery({
+    queryKey: ['real-staff-list-for-leave'],
+    queryFn: async () => {
+      const response = await axiosClient.get('/admin/staff/showAllStaff');
+      return response.data.data || [];
+    }
+  });
+
+  // ✅ جلب أنواع الإجازات الحقيقية لتمريرها لنافذة الإجازات
+  const { data: leaveTypes = [] } = useQuery({
+    queryKey: ['real-leave-types-for-leave'],
+    queryFn: async () => {
+      const response = await axiosClient.get('/admin/leave/leaves');
+      return response.data.data || [];
+    }
+  });
 
   const [records, setRecords] = useState<StaffAttendanceRecord[]>([]);
   const [vacations, setVacations] = useState<StaffLeave[]>([]);
@@ -153,7 +173,6 @@ export function StaffAttendancePage() {
     if (dirtyIds.size === 0) return;
 
     try {
-      // إرسال التعديلات المعلقة عبر الـ Mutation للباك إند
       for (const id of dirtyIds) {
         const record = records.find((r) => r.id === id);
         if (record) {
@@ -288,7 +307,8 @@ export function StaffAttendancePage() {
               </div>
             </div>
 
-            <AddLeaveDialog />
+            {/* ✅ تمرير البيانات الحقيقية للـ Dialog */}
+            <AddLeaveDialog staffList={staffList} leaveTypes={leaveTypes} />
           </div>
 
           <div className="border-b border-border/45 p-3.5">
