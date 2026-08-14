@@ -94,8 +94,12 @@ export function TimeSlotsPage() {
    * The API returns the teacher schedule grouped by teacher.
    * We flatten the entries here only for presentation.
    */
-  const teachers = teacherSchedule.teachers ?? [];
-
+const teachers = Object.entries(teacherSchedule).map(
+  ([teacher_name, schedule]) => ({
+    teacher_name,
+    schedule,
+  }),
+);
   return (
     <section className="space-y-6">
       {/* Header */}
@@ -141,7 +145,7 @@ export function TimeSlotsPage() {
         <div className="space-y-5">
           {teachers.map((teacher) => (
             <TeacherScheduleCard
-              key={teacher.teacher_id ?? teacher.teacher_name}
+              key={teacher.teacher_name}
               teacher={teacher}
             />
           ))}
