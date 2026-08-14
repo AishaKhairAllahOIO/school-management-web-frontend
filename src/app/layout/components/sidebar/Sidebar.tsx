@@ -10,7 +10,7 @@ import { SidebarMenu } from "@/app/layout/components/sidebar/SidebarMenu";
 import { SidebarSectionSeparator } from "@/app/layout/components/sidebar/SidebarSectionSeparator";
 import { useLayoutStore } from "@/app/layout/store/layoutStore";
 import { useLocale } from "@/app/providers/locale";
-import { useGeneralSettings } from "@/features/settings/general/hooks/useGeneralSettings";
+import { NavLink } from "react-router-dom";
 
 function formatSidebarDate(
   locale: string,
@@ -74,11 +74,7 @@ export function Sidebar() {
     t,
   } = useLocale();
 
-  const { data: generalSettings } =
-  useGeneralSettings();
 
-  const websiteUrl =
-  generalSettings?.website?.trim() || "#";
 
   const dateLocale =
   language === "ar"
@@ -434,73 +430,52 @@ export function Sidebar() {
               className="mb-1 mt-1"
             />
 
-            {/* ✅ لقد قمت بإضافة id="sidebar-website" هنا كما طلبت في الخطوات */}
-            <a
-              id="sidebar-website"
-              data-onboarding-target="website"
-              href={websiteUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label={
-                t.layout.sidebar
-                  .ManageWebsite
-              }
-              title={
-                t.layout.sidebar
-                  .ManageWebsite
-              }
-              className={[
-                "group flex items-center",
-                "text-sidebar-muted",
-                "transition-colors duration-200",
-                "hover:bg-sidebar-foreground/[0.045]",
-                "hover:text-sidebar-foreground",
-                "focus-visible:outline-none",
-                "focus-visible:ring-2",
-                "focus-visible:ring-sidebar-foreground/25",
-                isCollapsed
-                  ? "h-[46px] w-[46px] justify-center rounded-[17px]"
-                  : "h-[48px] w-full justify-start rounded-[17px] px-3",
-              ].join(" ")}
-            >
-              <span
-                className="
-                  flex
-                  h-8
-                  w-8
-                  shrink-0
-                  items-center
-                  justify-center
-                  text-current
-                "
-              >
-                <Globe2
-                  aria-hidden="true"
-                  size={18}
-                  strokeWidth={1.8}
-                />
-              </span>
+    <NavLink
+  id="sidebar-content"
+  data-onboarding-target="content"
+  to="/manage-content"
+  aria-label="Manage Content"
+  title="Manage Content"
+  className={[
+    "group flex items-center",
+    "text-sidebar-muted",
+    "transition-colors duration-200",
+    "hover:bg-sidebar-foreground/[0.045]",
+    "hover:text-sidebar-foreground",
+    "focus-visible:outline-none",
+    "focus-visible:ring-2",
+    "focus-visible:ring-sidebar-foreground/25",
+    isCollapsed
+      ? "h-[46px] w-[46px] justify-center rounded-[17px]"
+      : "h-[48px] w-full justify-start rounded-[17px] px-3",
+  ].join(" ")}
+>
+  <span
+    className="
+      flex h-8 w-8 shrink-0
+      items-center justify-center
+      text-current
+    "
+  >
+    <Globe2
+      aria-hidden="true"
+      size={18}
+      strokeWidth={1.8}
+    />
+  </span>
 
-              {!isCollapsed ? (
-                <span
-                  className="
-                    ms-3
-                    min-w-0
-                    flex-1
-                    truncate
-                    text-start
-                    text-[13px]
-                    font-medium
-                    tracking-[-0.004em]
-                  "
-                >
-                  {
-                    t.layout.sidebar
-                      .ManageWebsite
-                  }
-                </span>
-              ) : null}
-            </a>
+  {!isCollapsed ? (
+    <span
+      className="
+        ms-3 min-w-0 flex-1 truncate
+        text-start text-[13px]
+        font-medium tracking-[-0.004em]
+      "
+    >
+      Manage Content
+    </span>
+  ) : null}
+</NavLink>
           </div>
 
           <div className="h-8 shrink-0" />
