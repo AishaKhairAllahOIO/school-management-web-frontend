@@ -21,7 +21,7 @@ type Props = {
   isLoading?: boolean;
   onUpdate: (
     student: StudentAttendance,
-    patch: { status: AttendanceStatus | string; absence_type?: AbsenceType | string | null }
+    patch: { status: AttendanceStatus; absence_type?: AbsenceType }
   ) => void;
 };
 
@@ -41,18 +41,16 @@ export function AttendanceTable({ data, isLoading = false, onUpdate }: Props) {
       </div>
 
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[820px] table-fixed">
+        <table className="w-full min-w-[720px] table-fixed">
           <colgroup>
-            <col className="w-[31%]" />
-            <col className="w-[14%]" />
-            <col className="w-[21%]" />
-            <col className="w-[22%]" />
-            <col className="w-[12%]" />
+            <col className="w-[40%]" />
+            <col className="w-[25%]" />
+            <col className="w-[20%]" />
+            <col className="w-[15%]" />
           </colgroup>
           <thead className="bg-muted/[0.28]">
             <tr className="text-[11px] font-semibold uppercase tracking-[0.075em] text-muted-foreground">
               <th className="h-11 px-5 text-start">Student</th>
-              <th className="h-11 px-5 text-start">Stats</th>
               <th className="h-11 px-5 text-start">Attendance</th>
               <th className="h-11 px-5 text-start">Absence Details</th>
               <th className="h-11 px-5 text-center">Actions</th>
@@ -63,13 +61,13 @@ export function AttendanceTable({ data, isLoading = false, onUpdate }: Props) {
             {isLoading
               ? Array.from({ length: 5 }).map((_, index) => (
                   <tr key={index} className="border-t border-border/45">
-                    <td colSpan={5} className="px-5 py-3.5">
+                    <td colSpan={4} className="px-5 py-3.5">
                       <div className="h-10 animate-pulse rounded-[10px] bg-muted/45" />
                     </td>
                   </tr>
                 ))
               : data.map((student) => {
-                  const currentStatus = student.attendance?.status ?? "";
+                  const currentStatus = student.attendance?.status ?? "present";
                   const currentAbsenceType = student.attendance?.absence_type ?? "excused";
 
                   return (
@@ -87,16 +85,9 @@ export function AttendanceTable({ data, isLoading = false, onUpdate }: Props) {
                             </span>
                           )}
                           <div className="min-w-0">
+                            {/* تم الاكتفاء بالاسم فقط لتكون الواجهة مريحة ونظيفة */}
                             <p className="truncate font-medium text-foreground">{student.full_name}</p>
-                            <p className="text-[10px] text-muted-foreground">ID: {student.student_id}</p>
                           </div>
-                        </div>
-                      </td>
-
-                      <td className="px-5 py-3.5">
-                        <div className="flex flex-col gap-0.5 text-[11px]">
-                          <span className="text-muted-foreground">Allowed: <strong className="text-foreground">{student.allowed_absence_days}</strong></span>
-                          <span className="text-destructive">Unexcused: <strong>{student.total_unexcused_absent}</strong></span>
                         </div>
                       </td>
 
@@ -116,15 +107,14 @@ export function AttendanceTable({ data, isLoading = false, onUpdate }: Props) {
                           <SelectContent>
                             <SelectItem value="present">Present</SelectItem>
                             <SelectItem value="absent">Absent</SelectItem>
-                            <SelectItem value="late">Late</SelectItem>
                           </SelectContent>
                         </Select>
                       </td>
 
                       <td className="px-5 py-3.5">
-                        {currentStatus === "absent" || currentStatus === "late" ? (
+                        {currentStatus === "absent" ? (
                           <Select
-                            value={currentAbsenceType}
+                            value={currentAbsenceType ?? "excused"}
                             onValueChange={(value) =>
                               onUpdate(student, { status: currentStatus, absence_type: value as AbsenceType })
                             }
@@ -150,7 +140,7 @@ export function AttendanceTable({ data, isLoading = false, onUpdate }: Props) {
                           className="h-9 w-9 rounded-full border-primary/15 text-primary hover:bg-primary/[0.06]"
                         >
                           <Link
-                            to={`/attendance/students/${student.student_id}`}
+                            to={`/attendance/students/${student.enrollment_id}`}
                             aria-label={`View history for ${student.full_name}`}
                           >
                             <Eye className="h-4 w-4" />
@@ -163,7 +153,7 @@ export function AttendanceTable({ data, isLoading = false, onUpdate }: Props) {
 
             {!isLoading && data.length === 0 && (
               <tr>
-                <td colSpan={5} className="px-5 py-14 text-center text-[13px] text-muted-foreground">
+                <td colSpan={4} className="px-5 py-14 text-center text-[13px] text-muted-foreground">
                   No student attendance records match the selected filters.
                 </td>
               </tr>

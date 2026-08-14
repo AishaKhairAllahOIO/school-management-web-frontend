@@ -22,17 +22,20 @@ import {
 import type { CreateStaffLeavePayload } from "../../staff/types/staffAttendance.types";
 import { useCreateStaffLeave } from "../hooks/useCreateStaffLeave";
 
-const staffOptions = [
-  { id: 1, name: "Ahmed Ali", role: "Teacher", department: "Science" },
-  { id: 2, name: "Sara Omar", role: "Secretary", department: "Administration" },
-  { id: 3, name: "Mohammad Hasan", role: "Supervisor", department: "Academic" },
-];
+// تعريف الأنواع للبيانات القادمة من الباك إند
+export type LeaveTypeOption = { id: number; name: string };
+export type StaffOption = { id: number; full_name: string; role?: string };
 
-export function AddLeaveDialog() {
+interface Props {
+  staffList: StaffOption[];
+  leaveTypes: LeaveTypeOption[];
+}
+
+export function AddLeaveDialog({ staffList = [], leaveTypes = [] }: Props) {
   const [open, setOpen] = useState(false);
   const [employeeSearch, setEmployeeSearch] = useState("");
   const [employeeId, setEmployeeId] = useState<number | "">("");
-  const [leaveTypeId, setLeaveTypeId] = useState<number>(1);
+  const [leaveTypeId, setLeaveTypeId] = useState<number | "">("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
 
@@ -40,21 +43,21 @@ export function AddLeaveDialog() {
 
   const filteredStaff = useMemo(
     () =>
-      staffOptions.filter((staff) =>
-        staff.name.toLowerCase().includes(employeeSearch.toLowerCase()),
+      staffList.filter((staff) =>
+        staff.full_name.toLowerCase().includes(employeeSearch.toLowerCase())
       ),
-    [employeeSearch],
+    [staffList, employeeSearch]
   );
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    if (!employeeId || !startDate || !endDate) return;
+    if (!employeeId || !leaveTypeId || !startDate || !endDate) return;
 
     const payload: CreateStaffLeavePayload = {
       staff_id: Number(employeeId),
       leave_type_id: Number(leaveTypeId),
-      academic_year_id: 1,
+      academic_year_id: 1, // يمكنك جعل هذا متغيراً حقيقياً لاحقاً
       start_date: startDate,
       end_date: endDate,
     };
@@ -64,6 +67,7 @@ export function AddLeaveDialog() {
       setOpen(false);
       setEmployeeSearch("");
       setEmployeeId("");
+      setLeaveTypeId("");
       setStartDate("");
       setEndDate("");
     } catch (error) {
@@ -114,9 +118,12 @@ export function AddLeaveDialog() {
               <SelectContent>
                 {filteredStaff.map((staff) => (
                   <SelectItem key={staff.id} value={String(staff.id)}>
-                    {staff.name} · {staff.role}
+                    {staff.full_name} {staff.role ? `· ${staff.role}` : ""}
                   </SelectItem>
                 ))}
+                {filteredStaff.length === 0 && (
+                  <div className="p-2 text-center text-sm text-muted-foreground">No staff found</div>
+                )}
               </SelectContent>
             </Select>
           </div>
@@ -124,16 +131,19 @@ export function AddLeaveDialog() {
           <div className="space-y-2">
             <Label className="text-[12px]">Vacation type</Label>
             <Select
-              value={String(leaveTypeId)}
+              value={leaveTypeId ? String(leaveTypeId) : ""}
               onValueChange={(value) => setLeaveTypeId(Number(value))}
             >
               <SelectTrigger className="h-10 rounded-[13px] border-border/60 text-[12px]">
-                <SelectValue />
+                <SelectValue placeholder="Select type" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="1">Administrative Leave</SelectItem>
-                <SelectItem value="2">Sick Leave</SelectItem>
-                <SelectItem value="3">Emergency Leave</SelectItem>
+                {/* استدعاء الأنواع الحقيقية من قاعدة البيانات */}
+                {leaveTypes.map((type) => (
+                  <SelectItem key={type.id} value={String(type.id)}>
+                    {type.name}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
@@ -157,6 +167,7 @@ export function AddLeaveDialog() {
               <Input
                 type="date"
                 value={endDate}
+                min={startDate}
                 onChange={(event) => setEndDate(event.target.value)}
                 className="h-10 rounded-[13px] border-border/60 text-[12px]"
               />
@@ -175,7 +186,7 @@ export function AddLeaveDialog() {
             <Button
               type="submit"
               className="h-10 rounded-[13px]"
-              disabled={!employeeId || !startDate || !endDate || createLeaveMutation.isPending}
+              disabled={!employeeId || !leaveTypeId || !startDate || !endDate || createLeaveMutation.isPending}
             >
               {createLeaveMutation.isPending ? "Saving..." : "Add vacation"}
             </Button>

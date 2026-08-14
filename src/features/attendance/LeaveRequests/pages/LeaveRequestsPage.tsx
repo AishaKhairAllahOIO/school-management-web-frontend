@@ -1,4 +1,4 @@
- import { useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useStaffLeaves } from "../hooks/useStaffLeaves";
 import { LeaveStats } from "../components/LeaveStats";
 import { LeaveFilters } from "../components/LeaveFilters";
@@ -7,12 +7,24 @@ import { AddLeaveDialog } from "../components/AddLeaveDialog";
 import type { StaffLeave } from "../../staff/types/staffAttendance.types";
 import { LeaveDetailsDrawer } from "../components/LeaveDetailsDrawer";
 
+// ✅ مصفوفات مؤقتة لتشغيل المكونات التي تتطلب Props لحين ربطها مع API جلب الموظفين الحقيقي
+const DUMMY_STAFF_LIST = [
+  { id: 1, full_name: "Ahmed Ali", role: "Teacher" },
+  { id: 2, full_name: "Sara Omar", role: "Secretary" },
+  { id: 3, full_name: "Mohammad Hasan", role: "Supervisor" },
+];
+
+const DUMMY_LEAVE_TYPES = [
+  { id: 1, name: "Administrative Leave" },
+  { id: 2, name: "Sick Leave" },
+  { id: 3, name: "Emergency Leave" },
+];
+
 export const LeaveRequestsPage = () => {
-  // ✅ ربط حالة التحديد وفتح الـ Drawer
   const [selectedLeave, setSelectedLeave] = useState<StaffLeave | undefined>();
   const [drawerOpen, setDrawerOpen] = useState(false);
 
-  // معرف الموظف (يمكن جعله ديناميكياً لاحقاً حسب نظام التنقل لديك)
+  // معرف الموظف (للتجربة حالياً)
   const staffId = 1; 
   
   const {
@@ -25,10 +37,12 @@ export const LeaveRequestsPage = () => {
   const [status, setStatus] = useState("all");
 
   const filteredData = useMemo(() => {
-    if (!Array.isArray(data)) return [];
+    // التأكد من أن الداتا مصفوفة قبل عمل Filter
+    const safeData = Array.isArray(data) ? data : [];
 
-    return data.filter((leave: StaffLeave) => {
+    return safeData.filter((leave: StaffLeave) => {
       const typeName = leave.leave_type?.name || "";
+      const currentStatus = (leave as any).status || "Pending";
       
       const matchesSearch = 
         String(leave.staff_id).toLowerCase().includes(search.toLowerCase()) ||
@@ -38,44 +52,38 @@ export const LeaveRequestsPage = () => {
         leaveType === "all" ||
         String(leave.leave_type?.id) === leaveType;
 
-      const matchesStatus = status === "all"; 
+      const matchesStatus = 
+        status === "all" || currentStatus === status; 
 
       return matchesSearch && matchesType && matchesStatus;
     });
   }, [data, search, leaveType, status]);
 
-  // دالة التعامل مع اختيار إجازة من الجدول لفتح تفاصيلها
   const handleSelectLeave = (leave: StaffLeave) => {
     setSelectedLeave(leave);
     setDrawerOpen(true);
   };
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center p-12 text-muted-foreground">
-        Loading leave requests...
-      </div>
-    );
-  }
-
+  // ✅ حساب الإحصائيات بشكل ديناميكي من الفلتر
   const totalLeaves = filteredData.length;
-  const approved = 0; 
-  const pending = totalLeaves; 
-  const rejected = 0; 
+  const approved = filteredData.filter(l => ((l as any).status || "Pending") === "Approved").length; 
+  const pending = filteredData.filter(l => ((l as any).status || "Pending") === "Pending").length; 
+  const rejected = filteredData.filter(l => ((l as any).status || "Pending") === "Rejected").length; 
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="space-y-6 pt-5">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-3xl font-bold">
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">
             Leave Requests
           </h1>
-          <p className="text-muted-foreground">
+          <p className="mt-1 text-sm text-muted-foreground">
             Manage staff leave requests.
           </p>
         </div>
 
-        <AddLeaveDialog />
+        {/* ✅ تمرير المصفوفات الحقيقية إلى نافذة الإضافة لتجنب الأخطاء */}
+        <AddLeaveDialog staffList={DUMMY_STAFF_LIST} leaveTypes={DUMMY_LEAVE_TYPES} />
       </div>
 
       <LeaveStats
@@ -85,7 +93,8 @@ export const LeaveRequestsPage = () => {
         rejected={rejected}
       />
 
-      <div className="soft-card rounded-3xl p-5">
+      <div className="rounded-[22px] border border-border/60 bg-card p-4 shadow-[0_10px_30px_rgba(30,20,70,0.045)]">
+        {/* ✅ تمرير الأنواع الحقيقية إلى الفلاتر لتجنب الأخطاء */}
         <LeaveFilters
           search={search}
           setSearch={setSearch}
@@ -93,10 +102,10 @@ export const LeaveRequestsPage = () => {
           setLeaveType={setLeaveType}
           status={status}
           setStatus={setStatus}
+          leaveTypes={DUMMY_LEAVE_TYPES}
         />
       </div>
 
-      {/* ✅ ربط الجدول بدالة التحديد */}
       <LeaveRequestsTable
         data={filteredData}
         compact={false}

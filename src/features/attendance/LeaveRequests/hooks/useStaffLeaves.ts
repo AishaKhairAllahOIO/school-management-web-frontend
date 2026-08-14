@@ -6,7 +6,9 @@ export const useStaffLeaves = (staffId: string | number) => {
     queryKey: ['staff-leaves', staffId],
     queryFn: async () => {
       const response = await staffLeaveService.getStaffLeaves(staffId);
-      return response.data.data;
+      const responseData = response.data.data;
+      
+      return Array.isArray(responseData) ? responseData : (responseData?.data || []);
     },
     enabled: !!staffId,
   });

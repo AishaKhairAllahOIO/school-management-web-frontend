@@ -4,8 +4,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import type { StudentAttendance, AttendanceStatus, AbsenceType } from "../types/attendance.types";
 import { Button } from "@/shared/ui/button";
 import { DatePicker } from "@/shared/ui/date-picker";
-import { useCreateAttendance } from "../hooks/useCreateAttendance";
-import { useUpdateAttendance } from "../hooks/useUpdateAttendance";
+import { useBulkAttendance } from "../hooks/useBulkAttendance";
 import { AttendanceFilters } from "../components/AttendanceFilters";
 import { AttendanceStats } from "../components/AttendanceStats";
 import { AttendanceTable } from "../components/AttendanceTable";
@@ -19,11 +18,12 @@ export function StudentAttendancePage() {
   const queryClient = useQueryClient();
   const [draftDate, setDraftDate] = useState(todayForApi());
   const [selectedDate, setSelectedDate] = useState(todayForApi());
-
-  // حالة الصف النشط حالياً (يُفترض أن تأتي من قائمة اختيار الصفوف في تطبيقك)
-  const [activeClassroom, ] = useState(1);
+  
+  const [activeClassroom, setActiveClassroom] = useState(1);
+  const [activeSemester, setActiveSemester] = useState(1);
 
   const attendanceQuery = useStudentAttendance(selectedDate, activeClassroom);
+  const bulkAttendanceMutation = useBulkAttendance();
 
   const [records, setRecords] = useState<StudentAttendance[]>([]);
   const [search, setSearch] = useState("");
@@ -36,21 +36,21 @@ export function StudentAttendancePage() {
   const [savedAt, setSavedAt] = useState<string | null>(null);
 
   useEffect(() => {
-
+    // ✅ الحل الجذري للخطأ: الوصول للمصفوفة الداخلية "data" الخاصة بـ PaginatedData
     if (attendanceQuery.data?.data) {
-      setRecords(attendanceQuery.data.data); 
+      setRecords(attendanceQuery.data.data);
     }
   }, [attendanceQuery.data]);
 
   const filteredData = useMemo(() => {
     return records.filter((student) => {
       const normalizedSearch = search.trim().toLowerCase();
-      const currentStatus = student.attendance?.status ?? "unmarked";
+      // إذا لم يوجد سجل، فهو حاضر
+      const currentStatus = student.attendance?.status ?? "present";
       const currentAbsenceType = student.attendance?.absence_type ?? "none";
 
       return (
         (!normalizedSearch || student.full_name.toLowerCase().includes(normalizedSearch)) &&
-        // نضيف الفلترة حسب الصف إذا توفرت بياناته في الـ API مستقبلاً
         (status === "all" || currentStatus === status) &&
         (status !== "absent" || absenceType === "all" || currentAbsenceType === absenceType)
       );
@@ -59,7 +59,7 @@ export function StudentAttendancePage() {
 
   const isInitialLoading = attendanceQuery.isLoading;
 
-  const present = filteredData.filter((item) => item.attendance?.status === "present").length;
+  const present = filteredData.filter((item) => (item.attendance?.status ?? "present") === "present").length;
   const absent = filteredData.filter((item) => item.attendance?.status === "absent").length;
   const excused = filteredData.filter((item) => item.attendance?.absence_type === "excused").length;
   const unexcused = filteredData.filter((item) => item.attendance?.absence_type === "unexcused").length;
@@ -90,36 +90,31 @@ export function StudentAttendancePage() {
     setSavedAt(null);
   }
 
-  const updateMutation = useUpdateAttendance();
-  const createMutation = useCreateAttendance();
-
   async function saveAttendance() {
     if (dirtyIds.size === 0) return;
 
-    const dirtyRecords = records.filter((r) => dirtyIds.has(r.enrollment_id));
-
-    const promises = dirtyRecords.map((record) => {
-      const payload = {
-        status: record.attendance!.status,
-        absence_type: record.attendance!.absence_type,
-        attendance_date: selectedDate,
-      };
-
-      // إذا كان لدى الطالب id حضور حقيقي، نقوم بتحديثه PUT، وإلا نرسل POST
-      if (record.attendance && record.attendance.id !== 0) {
-        return updateMutation.mutateAsync({ id: record.attendance.id, payload });
-      } else {
-        return createMutation.mutateAsync({ enrollment_id: record.enrollment_id, ...payload });
-      }
-    });
+    // تجهيز الداتا للإرسال بالجملة للباك إند
+    const attendancesPayload = records
+      .filter((r) => dirtyIds.has(r.enrollment_id))
+      .map((record) => ({
+        enrollment_id: record.enrollment_id,
+        status: record.attendance?.status ?? "present",
+        absence_type: record.attendance?.status === "absent" ? (record.attendance?.absence_type ?? "excused") : null,
+      }));
 
     try {
-      await Promise.all(promises);
+      await bulkAttendanceMutation.mutateAsync({
+        semester_id: activeSemester,
+        class_room_id: activeClassroom,
+        attendance_date: selectedDate,
+        attendances: attendancesPayload,
+      });
+
       setDirtyIds(new Set());
       setSavedAt(new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }));
       queryClient.invalidateQueries({ queryKey: ["student-attendance"] });
     } catch (error) {
-      console.error("Failed to save attendance", error);
+      console.error("Failed to save bulk attendance", error);
     }
   }
 
@@ -176,11 +171,11 @@ export function StudentAttendancePage() {
             <Button
               type="button"
               onClick={saveAttendance}
-              disabled={dirtyIds.size === 0 || updateMutation.isPending || createMutation.isPending}
+              disabled={dirtyIds.size === 0 || bulkAttendanceMutation.isPending}
               className="h-11 rounded-[13px] px-5"
             >
               <Save className="h-4 w-4" />
-              {updateMutation.isPending || createMutation.isPending ? "Saving..." : "Save"}
+              {bulkAttendanceMutation.isPending ? "Saving..." : "Save"}
             </Button>
           </div>
         </div>
@@ -198,8 +193,8 @@ export function StudentAttendancePage() {
             setStatus={setStatus}
             absenceType={absenceType}
             setAbsenceType={setAbsenceType}
-            grades={[]} // يمكنك تمرير قائمة الـ Grades الحقيقية هنا
-            classrooms={[]} // يمكنك تمرير قائمة الصفوف هنا
+            grades={[]} 
+            classrooms={[]} 
           />
         </div>
       </div>

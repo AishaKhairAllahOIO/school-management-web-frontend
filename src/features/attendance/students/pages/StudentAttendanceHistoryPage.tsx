@@ -40,8 +40,9 @@ const emptyDraft = {
 export function StudentAttendanceHistoryPage() {
   const { studentId = "" } = useParams();
 
-  // جلب البيانات من السيرفر
-  const { data: records = [], isLoading } = useStudentAttendanceHistory(studentId);
+
+  const { data, isLoading } = useStudentAttendanceHistory(studentId);
+  const records = Array.isArray(data) ? data : [];
 
   const [draft, setDraft] = useState(emptyDraft);
   const [editingId, setEditingId] = useState<number | null>(null);
