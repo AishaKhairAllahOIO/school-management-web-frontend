@@ -69,7 +69,7 @@ export const schedulingApi = {
       ),
     );
 
-    return response.data;
+    return response.data.data;
   },
 
   updateEntry: async (
