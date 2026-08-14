@@ -1,24 +1,16 @@
-import { API_ENDPOINTS } from "@/services/api/endpoints";
 import { axiosClient } from "@/services/axios/axiosClient";
 import type { ApiResponse } from "@/services/types/apiResponse";
-
 import type {
   AttendanceFilterParams,
   StudentAttendance,
   UpdateAttendancePayload,
-  AttendanceSummaryResponse,
   PaginatedData,
   BulkAttendancePayload,
 } from "../types/attendance.types";
 
-const { STUDENT_RECORDS } = API_ENDPOINTS.ATTENDANCE;
-
 export const studentAttendanceService = {
   storeBulk(payload: BulkAttendancePayload) {
-    return axiosClient.post<ApiResponse<any>>(
-      STUDENT_RECORDS.BULK,
-      payload
-    );
+    return axiosClient.post<ApiResponse<any>>('/admin/attendance/bulk', payload);
   },
 
   createRecord(payload: {
@@ -39,44 +31,31 @@ export const studentAttendanceService = {
         }
       ]
     };
-
-    return axiosClient.post<ApiResponse<any>>(
-      STUDENT_RECORDS.BULK, 
-      bulkPayload,
-    );
+    return axiosClient.post<ApiResponse<any>>('/admin/attendance/bulk', bulkPayload);
   },
 
   getRecords(params: AttendanceFilterParams) {
     return axiosClient.get<ApiResponse<PaginatedData<StudentAttendance>>>(
-      STUDENT_RECORDS.FILTER,
-      { params },
+      '/admin/attendance/filter',
+      { params }
     );
   },
 
   getRecord(id: string | number) {
-    return axiosClient.get<ApiResponse<AttendanceSummaryResponse>>(
-      STUDENT_RECORDS.DETAILS(id),
-    );
+    return axiosClient.get<ApiResponse<any>>(`/admin/attendance/getRecord/${id}`);
   },
 
   updateRecord(id: string | number, payload: UpdateAttendancePayload) {
-    return axiosClient.post<ApiResponse<AttendanceSummaryResponse>>(
-      STUDENT_RECORDS.UPDATE(id),
-      payload,
-    );
+    return axiosClient.post<ApiResponse<any>>(`/admin/attendance/record/${id}`, payload);
   },
 
   deleteRecord(id: string | number) {
-    return axiosClient.delete<ApiResponse<null>>(
-      STUDENT_RECORDS.DELETE(id),
-    );
+    return axiosClient.delete<ApiResponse<null>>(`/admin/attendance/record/${id}`);
   },
 
-
   getHistory(studentId: string | number) {
-    return axiosClient.get<ApiResponse<any>>(
-      STUDENT_RECORDS.FILTER,
-      { params: { enrollment_id: studentId } }  
-    );
+    return axiosClient.get<ApiResponse<any>>('/admin/attendance/filter', { 
+      params: { student_id: studentId } 
+    });
   },
 };

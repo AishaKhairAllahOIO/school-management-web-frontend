@@ -10,7 +10,7 @@ export const staffLeaveService = {
 
 
     getStaffLeaves: (staffId: string | number) => 
-    axiosClient.get(API_ENDPOINTS.ATTENDANCE.STAFF_LEAVES.LIST_BY_STAFF(staffId)),
+    axiosClient.get(API_ENDPOINTS.ATTENDANCE.STAFF_LEAVES.GET_BY_STAFF(staffId)),
 
 
     getLeaveById: (leaveId: string | number) => 

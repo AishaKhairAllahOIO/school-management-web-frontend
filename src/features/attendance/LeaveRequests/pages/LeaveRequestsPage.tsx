@@ -7,7 +7,6 @@ import { AddLeaveDialog } from "../components/AddLeaveDialog";
 import type { StaffLeave } from "../../staff/types/staffAttendance.types";
 import { LeaveDetailsDrawer } from "../components/LeaveDetailsDrawer";
 
-// ✅ مصفوفات مؤقتة لتشغيل المكونات التي تتطلب Props لحين ربطها مع API جلب الموظفين الحقيقي
 const DUMMY_STAFF_LIST = [
   { id: 1, full_name: "Ahmed Ali", role: "Teacher" },
   { id: 2, full_name: "Sara Omar", role: "Secretary" },
@@ -64,7 +63,6 @@ export const LeaveRequestsPage = () => {
     setDrawerOpen(true);
   };
 
-  // ✅ حساب الإحصائيات بشكل ديناميكي من الفلتر
   const totalLeaves = filteredData.length;
   const approved = filteredData.filter(l => ((l as any).status || "Pending") === "Approved").length; 
   const pending = filteredData.filter(l => ((l as any).status || "Pending") === "Pending").length; 
@@ -82,8 +80,7 @@ export const LeaveRequestsPage = () => {
           </p>
         </div>
 
-        {/* ✅ تمرير المصفوفات الحقيقية إلى نافذة الإضافة لتجنب الأخطاء */}
-        <AddLeaveDialog staffList={DUMMY_STAFF_LIST} leaveTypes={DUMMY_LEAVE_TYPES} />
+         <AddLeaveDialog staffList={DUMMY_STAFF_LIST} leaveTypes={DUMMY_LEAVE_TYPES} />
       </div>
 
       <LeaveStats
@@ -94,7 +91,7 @@ export const LeaveRequestsPage = () => {
       />
 
       <div className="rounded-[22px] border border-border/60 bg-card p-4 shadow-[0_10px_30px_rgba(30,20,70,0.045)]">
-        {/* ✅ تمرير الأنواع الحقيقية إلى الفلاتر لتجنب الأخطاء */}
+
         <LeaveFilters
           search={search}
           setSearch={setSearch}
