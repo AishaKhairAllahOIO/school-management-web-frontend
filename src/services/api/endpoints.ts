@@ -463,25 +463,25 @@ export const API_ENDPOINTS = {
     },
   },
   SCHEDULING: {
-  GENERATE: "/scheduale/generate",
+  GENERATE: "auth/scheduale/generate",
 
-  REGENERATE: "/scheduale/regenerate",
+  REGENERATE: "auth/scheduale/regenerate",
 
   ADMIN_VIEW: (
     academicId: number | string,
     semesterId: number | string,
   ) =>
-    `/scheduale/show/all/${academicId}/${semesterId}`,
+    `auth/scheduale/show/all/${academicId}/${semesterId}`,
 
   TEACHER_VIEW: (
     academicId: number | string,
     semesterId: number | string,
   ) =>
-    `/scheduale/teacher/show/${academicId}/${semesterId}`,
+    `auth/scheduale/teacher/show/${academicId}/${semesterId}`,
 
   UPDATE_ENTRY: (
     entryId: number | string,
   ) =>
-    `/scheduale/update/${entryId}`,
+    `auth/scheduale/update/${entryId}`,
 },
 } as const;
