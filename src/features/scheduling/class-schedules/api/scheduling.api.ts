@@ -46,18 +46,18 @@ export const schedulingApi = {
     return response.data;
   },
 
-  getAdminSchedule: async (
-    params: GenerateScheduleParams,
-  ) => {
-    const response = await axiosClient.get(
-      API_ENDPOINTS.SCHEDULING.ADMIN_VIEW(
-        params.academic_year_id,
-        params.semester_id,
-      ),
-    );
+ getAdminSchedule: async (
+  params: GenerateScheduleParams,
+) => {
+  const response = await axiosClient.get(
+    API_ENDPOINTS.SCHEDULING.ADMIN_VIEW(
+      params.academic_year_id,
+      params.semester_id,
+    ),
+  );
 
-    return response.data;
-  },
+  return response.data.data;
+},
 
  getTeachersSchedule: async (
     params: GenerateScheduleParams,
