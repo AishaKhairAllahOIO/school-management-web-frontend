@@ -2,6 +2,7 @@
 import {
   AlertTriangle,
   BookOpen,
+  CalendarDays,
   CircleDollarSign,
   FileText,
   GraduationCap,
@@ -24,9 +25,11 @@ const icons = {
   calls: Phone,
   cases: ShieldCheck,
   warnings: AlertTriangle,
+  meetings: CalendarDays,
   wallet: Wallet,
   revenue: CircleDollarSign,
 };
+
 
 const tones = [
   "bg-sky-50 text-sky-600 dark:bg-sky-500/10",
