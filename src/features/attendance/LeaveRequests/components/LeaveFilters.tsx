@@ -1,7 +1,7 @@
 import { Search } from "lucide-react";
-
 import { Input } from "@/shared/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/ui/select";
+import type { LeaveTypeOption } from "./AddLeaveDialog"; // استيراد النوع
 
 type Props = {
   search: string;
@@ -10,10 +10,11 @@ type Props = {
   setLeaveType: (value: string) => void;
   status: string;
   setStatus: (value: string) => void;
+  leaveTypes: LeaveTypeOption[]; // 👈 تم إضافة الأنواع الحقيقية هنا
   compact?: boolean;
 };
 
-export function LeaveFilters({ search, setSearch, leaveType, setLeaveType, status, setStatus, compact = false }: Props) {
+export function LeaveFilters({ search, setSearch, leaveType, setLeaveType, status, setStatus, leaveTypes = [], compact = false }: Props) {
   const triggerClass = "h-9 rounded-[12px] border-border/60 bg-background/80 text-[11px] shadow-none";
 
   return (
@@ -29,18 +30,18 @@ export function LeaveFilters({ search, setSearch, leaveType, setLeaveType, statu
       </div>
 
       <div className={compact ? "grid grid-cols-2 gap-2" : "contents"}>
-        {/* فلتر نوع الإجازة مطابفاً لأسماء الـ Backend (Leave Types) */}
         <Select value={leaveType} onValueChange={setLeaveType}>
           <SelectTrigger className={triggerClass}><SelectValue placeholder="Leave type" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All types</SelectItem>
-            <SelectItem value="Administrative Leave">Administrative</SelectItem>
-            <SelectItem value="Sick Leave">Sick</SelectItem>
-            <SelectItem value="Emergency Leave">Emergency</SelectItem>
+            {leaveTypes.map((type) => (
+              <SelectItem key={type.id} value={String(type.id)}>
+                {type.name}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
 
-        {/* فلتر الحالة (ملاحظة: الباك إند يسقط الإجازات تلقائياً، يمكنك إبقاؤه كواجهة أو تخصيصه حسب الحاجة) */}
         <Select value={status} onValueChange={setStatus}>
           <SelectTrigger className={triggerClass}><SelectValue placeholder="Status" /></SelectTrigger>
           <SelectContent>

@@ -1,6 +1,5 @@
-export type AttendanceStatus = 'present' | 'absent' | 'late';
+export type AttendanceStatus = 'present' | 'absent';
 export type AbsenceType = 'excused' | 'unexcused' | null;
-
 
 export interface AttendanceRecord {
   id: number;
@@ -9,7 +8,6 @@ export interface AttendanceRecord {
   notes?: string | null;
   attendance_date: string;
 }
-
 
 export interface StudentAttendance {
   enrollment_id: number;
@@ -22,7 +20,6 @@ export interface StudentAttendance {
   attendance: AttendanceRecord | null;
 }
 
-
 export interface AttendanceFilterParams {
   class_room_id: number;
   attendance_date?: string;
@@ -31,7 +28,6 @@ export interface AttendanceFilterParams {
   semester_id?: number;
   page?: number;
 }
-
 
 export interface PaginatedResponse<T> {
   status: boolean;
@@ -44,11 +40,21 @@ export interface PaginatedResponse<T> {
   };
 }
 
-
 export interface UpdateAttendancePayload {
   status: AttendanceStatus;
   absence_type: AbsenceType;
   attendance_date: string;
+}
+
+export interface BulkAttendancePayload {
+  semester_id: number;
+  class_room_id: number;
+  attendance_date: string;
+  attendances: {
+    enrollment_id: number;
+    status: AttendanceStatus;
+    absence_type?: AbsenceType;
+  }[];
 }
 
 export interface PaginatedData<T> {

@@ -427,12 +427,12 @@ export const API_ENDPOINTS = {
   },
 
   ATTENDANCE: {
-    STUDENT_RECORDS: {
-      CREATE: "/admin/attendance/bulk",
-      FILTER: "/admin/attendance/filter", 
-      DETAILS: (recordId: ApiId) => `/admin/attendance/getRecord/${recordId}`,
-      UPDATE: (recordId: ApiId) => `/admin/attendance/record/${recordId}`,
-      DELETE: (recordId: ApiId) => `/admin/attendance/record/${recordId}`,
+  STUDENT_RECORDS: {
+      FILTER: "/admin/attendance/filter",  
+      BULK: "/admin/attendance/bulk",
+      DETAILS: (id: string | number) => `/admin/attendance/getRecord/${id}`,
+      UPDATE: (id: string | number) => `/admin/attendance/record/${id}`,
+      DELETE: (id: string | number) => `/admin/attendance/record/${id}`,
     },
 
     STUDENT_SETTINGS: {
@@ -446,20 +446,21 @@ export const API_ENDPOINTS = {
         `/attendance-settings/${settingId}`,
     },
 
-    STAFF_RECORDS: {
+   STAFF_RECORDS: {
+      FILTER: "/admin/staff/filter",
       CREATE: "/admin/staff-attendances",
-      DETAILS: (id: ApiId) => `/admin/staff-attendances/${id}`,
-      UPDATE: (id: ApiId) => `/admin/staff-attendances/${id}`,
-      DELETE: (id: ApiId) => `/admin/staff-attendances/${id}`,
-      HISTORY: (staffId: ApiId) => `/admin/staff-attendances/staff/${staffId}`,
+      DETAILS: (id: string | number) => `/admin/staff-attendances/${id}`,
+      UPDATE: (id: string | number) => `/admin/staff-attendances/${id}`,
+      DELETE: (id: string | number) => `/admin/staff-attendances/${id}`,
+      HISTORY: (staffId: string | number) => `/admin/staff-attendances/staff/${staffId}`,
     },
 
     STAFF_LEAVES: {
       CREATE: "/admin/staff-leaves",
-      LIST_BY_STAFF: (staffId: ApiId) => `/admin/staff-leaves/${staffId}`,
-      DETAILS: (leaveId: ApiId) => `/admin/staff-leaves/${leaveId}/staff`,
-      UPDATE: (id: ApiId) => `/admin/staff-leaves/${id}`,
-      DELETE: (id: ApiId) => `/admin/staff-leaves/${id}`,
+      GET_BY_STAFF: (staffId: string | number) => `/admin/staff-leaves/${staffId}`,
+      DETAILS: (leaveId: string | number) => `/admin/staff-leaves/${leaveId}/staff`,
+      UPDATE: (id: string | number) => `/admin/staff-leaves/${id}`,
+      DELETE: (id: string | number) => `/admin/staff-leaves/${id}`,
     },
   },
 } as const;

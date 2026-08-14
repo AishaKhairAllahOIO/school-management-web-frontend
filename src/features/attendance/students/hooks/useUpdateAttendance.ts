@@ -11,7 +11,6 @@ export const useUpdateAttendance = () => {
       return response.data.data;
     },
     onSuccess: () => {
-
       queryClient.invalidateQueries({ queryKey: ['student-attendance'] });
     },
   });

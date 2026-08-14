@@ -1,4 +1,4 @@
- import { Search } from "lucide-react";
+import { Search } from "lucide-react";
 import { Input } from "@/shared/ui/input";
 import {
   Select,
@@ -21,7 +21,6 @@ type Props = {
   setStatus: (value: string) => void;
   absenceType: string;
   setAbsenceType: (value: string) => void;
-  // إضافة المصفوفات الحقيقية
   grades?: { id: string | number; name: string }[];
   classrooms?: { id: string | number; name: string }[];
 };
@@ -43,7 +42,8 @@ export function AttendanceFilters({
   const triggerClass =
     "h-11 rounded-[13px] border-border/60 bg-background/80 text-[12px] shadow-none";
 
-  const absenceTypeEnabled = status === "absent" || status === "late";
+  // تم التعديل هنا: التفعيل فقط للغياب (لأنه لا يوجد Late)
+  const absenceTypeEnabled = status === "absent";
 
   return (
     <div className="grid gap-2.5 md:grid-cols-2 xl:grid-cols-[minmax(240px,1.35fr)_155px_165px_155px_170px]">
@@ -104,7 +104,7 @@ export function AttendanceFilters({
         value={status}
         onValueChange={(value) => {
           setStatus(value);
-          if (value !== "absent" && value !== "late") {
+          if (value !== "absent") {
             setAbsenceType("all");
           }
         }}
@@ -116,7 +116,6 @@ export function AttendanceFilters({
           <SelectItem value="all">All attendance</SelectItem>
           <SelectItem value="present">Present</SelectItem>
           <SelectItem value="absent">Absent</SelectItem>
-          <SelectItem value="late">Late</SelectItem>
         </SelectContent>
       </Select>
 
