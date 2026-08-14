@@ -2,6 +2,7 @@ import {
   zodResolver,
 } from "@hookform/resolvers/zod";
 import {
+  ArrowLeft,
   ArrowRight,
   Eye,
   EyeOff,
@@ -51,9 +52,17 @@ import type {
   LoginResponse,
 } from "../types/auth.types";
 
-export function LoginForm() {
+type LoginFormProps = {
+  dir?: "ltr" | "rtl";
+};
+
+export function LoginForm({
+  dir = "ltr",
+}: LoginFormProps) {
   const navigate = useNavigate();
   const loginMutation = useLogin();
+
+  const isRtl = dir === "rtl";
 
   const [
     showPassword,
@@ -61,8 +70,8 @@ export function LoginForm() {
   ] = useState(false);
 
   const form = useForm<LoginSchema>({
-    resolver: zodResolver(loginSchema),
-
+    resolver:
+      zodResolver(loginSchema),
     defaultValues: {
       email: "",
       password: "",
@@ -118,17 +127,25 @@ export function LoginForm() {
             validationErrors.password?.[0];
 
           if (emailMessage) {
-            form.setError("email", {
-              type: "server",
-              message: emailMessage,
-            });
+            form.setError(
+              "email",
+              {
+                type: "server",
+                message:
+                  emailMessage,
+              },
+            );
           }
 
           if (passwordMessage) {
-            form.setError("password", {
-              type: "server",
-              message: passwordMessage,
-            });
+            form.setError(
+              "password",
+              {
+                type: "server",
+                message:
+                  passwordMessage,
+              },
+            );
           }
         },
       },
@@ -144,33 +161,40 @@ export function LoginForm() {
       autoComplete="on"
       noValidate
     >
-      <div className="space-y-2">
+      <div className="space-y-2 text-start">
         <label
           htmlFor="login-email"
           className="block text-sm font-medium text-foreground"
         >
-          Email address
+          {isRtl
+            ? "البريد الإلكتروني"
+            : "Email address"}
         </label>
 
         <div className="relative">
           <Mail
             aria-hidden="true"
-            className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground"
+            className="pointer-events-none absolute start-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground"
           />
 
           <Input
             id="login-email"
             type="email"
+            dir="ltr"
             autoComplete="email"
             autoCapitalize="none"
             spellCheck={false}
-            placeholder="Enter your email"
+            placeholder={
+              isRtl
+                ? "أدخل بريدك الإلكتروني"
+                : "Enter your email"
+            }
             aria-invalid={
               form.formState.errors.email
                 ? "true"
                 : "false"
             }
-            className="h-14 rounded-xl border-input bg-background pl-12 pr-4 text-base text-foreground shadow-none placeholder:text-muted-foreground/70 focus-visible:border-primary focus-visible:ring-4 focus-visible:ring-primary/10"
+            className="h-14 rounded-xl border-input bg-background ps-12 pe-4 text-base text-foreground shadow-none placeholder:text-muted-foreground/70 focus-visible:border-primary focus-visible:ring-4 focus-visible:ring-primary/10"
             {...form.register("email")}
           />
         </div>
@@ -186,18 +210,20 @@ export function LoginForm() {
         )}
       </div>
 
-      <div className="space-y-2">
+      <div className="space-y-2 text-start">
         <label
           htmlFor="login-password"
           className="block text-sm font-medium text-foreground"
         >
-          Password
+          {isRtl
+            ? "كلمة المرور"
+            : "Password"}
         </label>
 
         <div className="relative">
           <LockKeyhole
             aria-hidden="true"
-            className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground"
+            className="pointer-events-none absolute start-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground"
           />
 
           <Input
@@ -208,14 +234,18 @@ export function LoginForm() {
                 : "password"
             }
             autoComplete="current-password"
-            placeholder="Enter your password"
+            placeholder={
+              isRtl
+                ? "أدخل كلمة المرور"
+                : "Enter your password"
+            }
             aria-invalid={
               form.formState.errors
                 .password
                 ? "true"
                 : "false"
             }
-            className="h-14 rounded-xl border-input bg-background pl-12 pr-12 text-base text-foreground shadow-none placeholder:text-muted-foreground/70 focus-visible:border-primary focus-visible:ring-4 focus-visible:ring-primary/10"
+            className="h-14 rounded-xl border-input bg-background ps-12 pe-12 text-base text-foreground shadow-none placeholder:text-muted-foreground/70 focus-visible:border-primary focus-visible:ring-4 focus-visible:ring-primary/10"
             {...form.register(
               "password",
             )}
@@ -229,11 +259,15 @@ export function LoginForm() {
                   !current,
               )
             }
-            className="absolute right-4 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-lg text-muted-foreground transition hover:bg-muted hover:text-foreground"
+            className="absolute end-4 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-lg text-muted-foreground transition hover:bg-muted hover:text-foreground"
             aria-label={
               showPassword
-                ? "Hide password"
-                : "Show password"
+                ? isRtl
+                  ? "إخفاء كلمة المرور"
+                  : "Hide password"
+                : isRtl
+                  ? "إظهار كلمة المرور"
+                  : "Show password"
             }
           >
             {showPassword ? (
@@ -244,8 +278,8 @@ export function LoginForm() {
           </button>
         </div>
 
-        {form.formState.errors
-          .password?.message && (
+        {form.formState.errors.password
+          ?.message && (
           <p className="text-sm text-destructive">
             {
               form.formState.errors
@@ -277,7 +311,9 @@ export function LoginForm() {
                   htmlFor="remember-me"
                   className="cursor-pointer text-sm font-normal text-muted-foreground"
                 >
-                  Remember me
+                  {isRtl
+                    ? "تذكرني"
+                    : "Remember me"}
                 </Label>
               </div>
             )}
@@ -289,22 +325,23 @@ export function LoginForm() {
             }
             className="shrink-0 text-sm font-semibold text-primary transition-opacity hover:opacity-80"
           >
-            Forgot password?
+            {isRtl
+              ? "نسيت كلمة المرور؟"
+              : "Forgot password?"}
           </Link>
         </div>
       </div>
 
       {loginMutation.isError &&
         !form.formState.errors.email &&
-        !form.formState.errors
-          .password && (
+        !form.formState.errors.password && (
           <div
             role="alert"
             className="rounded-xl border border-destructive/20 bg-destructive/5 px-4 py-3 text-sm text-destructive"
           >
-            We couldn&apos;t sign you
-            in. Please check your
-            credentials and try again.
+            {isRtl
+              ? "تعذر تسجيل الدخول. يرجى التحقق من بيانات الدخول والمحاولة مرة أخرى."
+              : "We couldn't sign you in. Please check your credentials and try again."}
           </div>
         )}
 
@@ -318,20 +355,30 @@ export function LoginForm() {
         {loginMutation.isPending ? (
           <>
             <LoaderCircle className="h-5 w-5 animate-spin" />
-            Signing in...
+
+            {isRtl
+              ? "جارٍ تسجيل الدخول..."
+              : "Signing in..."}
           </>
         ) : (
           <>
-            Sign in
+            {isRtl
+              ? "تسجيل الدخول"
+              : "Sign in"}
 
-            <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+            {isRtl ? (
+              <ArrowLeft className="h-5 w-5 transition-transform group-hover:-translate-x-1" />
+            ) : (
+              <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+            )}
           </>
         )}
       </Button>
 
       <p className="pt-1 text-center text-sm text-muted-foreground">
-        Access is limited to authorized
-        school staff and administrators.
+        {isRtl
+          ? "الوصول مخصص لموظفي وإداريي المدرسة المصرح لهم."
+          : "Access is limited to authorized school staff and administrators."}
       </p>
     </form>
   );

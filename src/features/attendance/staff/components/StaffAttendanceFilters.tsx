@@ -9,10 +9,10 @@ import {
   SelectValue,
 } from "@/shared/ui/select";
 
-import type { StaffAttendance } from "../types/staffAttendance.types";
+import type { StaffAttendanceStatus } from "../types/staffAttendance.types";
 
 type Props = {
-  data: StaffAttendance[];
+  data: StaffAttendanceStatus[];
   search: string;
   setSearch: (value: string) => void;
   role: string;
@@ -24,7 +24,7 @@ type Props = {
 };
 
 export function AttendanceFilters({
-  data,
+  // data,
   search,
   setSearch,
   role,
@@ -36,7 +36,7 @@ export function AttendanceFilters({
 }: Props) {
   const controlClass =
     "h-11 rounded-[13px] border-border/60 bg-background/80 text-[12px] shadow-none";
-  const roles = [...new Set(data.map((item) => item.role))];
+  // const roles = [...new Set(data.map((item) => item.role))];
   const absenceTypeEnabled = status === "Absent";
 
   return (
@@ -60,9 +60,9 @@ export function AttendanceFilters({
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="all">All staff types</SelectItem>
-          {roles.map((item) => (
+          {/* {roles.map((item) => (
             <SelectItem key={item} value={item}>{item}</SelectItem>
-          ))}
+          ))} */}
         </SelectContent>
       </Select>
 

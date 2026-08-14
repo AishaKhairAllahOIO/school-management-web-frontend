@@ -375,7 +375,7 @@ export function MobileSidebar() {
                 variant="labels"
                 label={
                   t.layout.sidebar
-                    .viewWebsite
+                    .ManageWebsite
                 }
                 className="mb-1 mt-1"
               />
@@ -387,11 +387,11 @@ export function MobileSidebar() {
                 rel="noopener noreferrer"
                 aria-label={
                   t.layout.sidebar
-                    .viewWebsite
+                    .ManageWebsite
                 }
                 title={
                   t.layout.sidebar
-                    .viewWebsite
+                    .ManageWebsite
                 }
                 className="
                   group
@@ -443,7 +443,7 @@ export function MobileSidebar() {
                 >
                   {
                     t.layout.sidebar
-                      .viewWebsite
+                      .ManageWebsite
                   }
                 </span>
               </a>

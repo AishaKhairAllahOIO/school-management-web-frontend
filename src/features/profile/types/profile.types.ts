@@ -1,7 +1,7 @@
 export type ProfileRole =
   | "super_admin"
   | "secretary"
-  | "supervisor"
+  | "adviser"
   | string;
 
 

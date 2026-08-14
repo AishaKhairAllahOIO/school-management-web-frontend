@@ -43,13 +43,17 @@ export function OtpInput({
   }
 
   return (
-    <div className="grid grid-cols-6 gap-2 sm:gap-3">
+    <div
+      dir="ltr"
+      className="grid grid-cols-6 gap-2 sm:gap-3"
+    >
       {digits.map((digit, index) => (
         <input
           key={index}
           ref={(node) => {
             inputsRef.current[index] = node;
           }}
+          dir="ltr"
           value={digit}
           disabled={disabled}
           inputMode="numeric"

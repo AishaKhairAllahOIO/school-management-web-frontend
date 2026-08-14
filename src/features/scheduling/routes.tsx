@@ -1,7 +1,7 @@
 import type { RouteObject } from "react-router-dom";
 import { Navigate } from "react-router-dom";
 
-import { ClassSchedulesPage } from "@/features/scheduling/class-schedules/pages/ClassSchedulesPage";
+import { ClassSchedulesPage } from "@/features/scheduling/class-schedules/pages/SchedulePage";
 import { ExamSchedulesPage } from "@/features/scheduling/pages/ExamSchedulesPage";
 import { QuizSchedulesPage } from "@/features/scheduling/pages/QuizSchedulesPage";
 

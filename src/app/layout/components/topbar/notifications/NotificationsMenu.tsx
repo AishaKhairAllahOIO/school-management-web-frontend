@@ -3,7 +3,7 @@ import {
   CheckCheck,
   RefreshCw,
 } from "lucide-react";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { TOPBAR_ICON_BUTTON_CLASS_NAME } from "@/app/layout/components/topbar/topbar.constants";
@@ -30,9 +30,12 @@ export function NotificationsMenu({
   const navigate = useNavigate();
   const { t } = useLocale();
 
+  const [mobileMenuTop, setMobileMenuTop] = useState<number | null>(null);
+
   const notificationsQuery = useUnifiedNotifications({
     enabled: isOpen,
   });
+
   const unreadQuery = useUnifiedUnreadCount();
   const markAllMutation = useMarkAllUnifiedNotificationsRead();
 
@@ -45,6 +48,35 @@ export function NotificationsMenu({
     onDismiss: onClose,
   });
 
+  useEffect(() => {
+    if (!isOpen) {
+      setMobileMenuTop(null);
+      return;
+    }
+
+    const updatePosition = () => {
+      const button = triggerRef.current;
+
+      if (!button) {
+        return;
+      }
+
+      const rect = button.getBoundingClientRect();
+
+      setMobileMenuTop(rect.bottom + 8);
+    };
+
+    updatePosition();
+
+    window.addEventListener("resize", updatePosition);
+    window.addEventListener("scroll", updatePosition, true);
+
+    return () => {
+      window.removeEventListener("resize", updatePosition);
+      window.removeEventListener("scroll", updatePosition, true);
+    };
+  }, [isOpen]);
+
   function openNotificationCenter() {
     onClose();
     navigate("/view/notifications");
@@ -55,7 +87,7 @@ export function NotificationsMenu({
       <button
         ref={triggerRef}
         data-onboarding-target="notifications"
-        id="topbar-notifications" 
+        id="topbar-notifications"
         type="button"
         onClick={onToggle}
         aria-label={t.layout.topbar.notifications}
@@ -63,7 +95,11 @@ export function NotificationsMenu({
         aria-haspopup="menu"
         className={TOPBAR_ICON_BUTTON_CLASS_NAME}
       >
-        <Bell aria-hidden="true" size={17} strokeWidth={2.1} />
+        <Bell
+          aria-hidden="true"
+          size={17}
+          strokeWidth={2.1}
+        />
 
         {unreadCount > 0 ? (
           <span className="absolute -end-[7px] -top-[5px] flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-primary px-[4px] text-[10px] font-semibold leading-none text-primary-foreground shadow-[0_4px_10px_rgb(99_102_241_/_0.22)]">
@@ -75,13 +111,21 @@ export function NotificationsMenu({
       {isOpen ? (
         <div
           role="menu"
-          className="topbar-menu-shadow absolute end-0 top-full z-[100] mt-2 w-[min(320px,calc(100vw-24px))] max-h-[calc(100dvh-88px)] overflow-hidden rounded-[18px] border border-topbar-border/80 bg-topbar-surface/95 backdrop-blur-2xl origin-top-end animate-in fade-in-0 zoom-in-95 slide-in-from-top-1 duration-150 lg:w-[278px]"
+          style={
+            mobileMenuTop !== null
+              ? {
+                  top: mobileMenuTop,
+                }
+              : undefined
+          }
+          className="topbar-menu-shadow fixed inset-x-3 z-[100] mt-0 max-h-[calc(100dvh-88px)] overflow-hidden rounded-[18px] border border-topbar-border/80 bg-topbar-surface/95 backdrop-blur-2xl origin-top animate-in fade-in-0 zoom-in-95 slide-in-from-top-1 duration-150 sm:inset-x-auto sm:end-3 sm:w-[320px] lg:absolute lg:inset-x-auto lg:end-0 lg:top-full lg:mt-2 lg:w-[278px] lg:max-h-[calc(100dvh-88px)]"
         >
           <div className="flex items-start justify-between gap-3 border-b border-topbar-divider px-4 py-3">
             <div className="min-w-0">
               <h2 className="text-[14px] font-semibold text-topbar-title">
                 {t.layout.topbar.notificationsTitle}
               </h2>
+
               <p className="mt-1 text-[12px] text-topbar-subtle">
                 {t.layout.topbar.unreadUpdates.replace(
                   "{{count}}",
@@ -97,7 +141,12 @@ export function NotificationsMenu({
                 disabled={markAllMutation.isPending}
                 className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-[11px] px-2.5 text-[11px] font-medium text-primary transition-colors hover:bg-primary/[0.07] disabled:cursor-not-allowed disabled:opacity-55"
               >
-                <CheckCheck aria-hidden="true" size={14} strokeWidth={1.9} />
+                <CheckCheck
+                  aria-hidden="true"
+                  size={14}
+                  strokeWidth={1.9}
+                />
+
                 {t.layout.topbar.markAllRead}
               </button>
             ) : null}
@@ -111,15 +160,22 @@ export function NotificationsMenu({
                 <p className="text-[12px] font-medium text-topbar-text">
                   {t.layout.topbar.notificationsLoadErrorTitle}
                 </p>
+
                 <p className="mt-1 text-[11px] leading-5 text-topbar-subtle">
                   {t.layout.topbar.notificationsLoadErrorDescription}
                 </p>
+
                 <button
                   type="button"
                   onClick={() => void notificationsQuery.refetch()}
                   className="mt-3 inline-flex h-8 items-center gap-1.5 rounded-[11px] bg-topbar-soft px-3 text-[11px] font-medium text-topbar-text transition hover:bg-topbar-soft-hover"
                 >
-                  <RefreshCw aria-hidden="true" size={13} strokeWidth={1.9} />
+                  <RefreshCw
+                    aria-hidden="true"
+                    size={13}
+                    strokeWidth={1.9}
+                  />
+
                   {t.common.tryAgain}
                 </button>
               </div>

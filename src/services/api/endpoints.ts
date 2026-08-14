@@ -463,4 +463,26 @@ export const API_ENDPOINTS = {
       DELETE: (id: string | number) => `/admin/staff-leaves/${id}`,
     },
   },
+  SCHEDULING: {
+  GENERATE: "/auth/scheduale/generate",
+
+  REGENERATE: "/auth/scheduale/regenerate",
+
+  ADMIN_VIEW: (
+    academicId: number | string,
+    semesterId: number | string,
+  ) =>
+    `/auth/scheduale/show/all/${academicId}/${semesterId}`,
+
+  TEACHER_VIEW: (
+    academicId: number | string,
+    semesterId: number | string,
+  ) =>
+    `/auth/scheduale/teacher/show/${academicId}/${semesterId}`,
+
+  UPDATE_ENTRY: (
+    entryId: number | string,
+  ) =>
+    `/auth/scheduale/update/${entryId}`,
+},
 } as const;

@@ -67,7 +67,7 @@ export const ar: TranslationDictionary = {
       navigation: "التنقل الرئيسي",
       schoolName: "إدارة المدرسة",
       schoolWebsite: "موقع المدرسة",
-      viewWebsite: "إدارة الموقع",
+      ManageWebsite: "إدارة الموقع",
       mainMenu: "القائمة الرئيسية",
       goodMorning: "صباح الخير",
       goodAfternoon: "مساء الخير",
