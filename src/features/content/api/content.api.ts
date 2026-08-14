@@ -19,11 +19,10 @@ export type UpdateContentResponse = {
 export async function updateContent(
   payload: UpdateContentPayload,
 ): Promise<UpdateContentResponse> {
-  const response =
-    await axiosClient.post<UpdateContentResponse>(
-      "/content",
-      payload,
-    );
+  const response = await axiosClient.post<UpdateContentResponse>(
+    "/content",
+    payload,
+  );
 
   return response.data;
 }
