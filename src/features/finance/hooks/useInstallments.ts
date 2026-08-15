@@ -1,11 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
+
 import { financeOperationsService } from "../services/finance-operations.service";
+import { installmentsQueryKey } from "./usePayments";
 
 export function useInstallments() {
-  const installmentsQuery = useQuery({
-    queryKey: ["installments-list"],
+  return useQuery({
+    queryKey: installmentsQueryKey,
     queryFn: financeOperationsService.getAllInstallments,
   });
-
-  return { ...installmentsQuery };
 }

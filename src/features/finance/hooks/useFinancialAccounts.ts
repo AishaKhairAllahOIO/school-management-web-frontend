@@ -12,6 +12,7 @@ import type {
 } from "../types/finance.payloads";
 
 export const financialAccountsQueryKey = ["financial-accounts"] as const;
+
 export const studentFinancialAccountQueryKey = (
   studentId: string | number,
 ) => ["financial-account", studentId] as const;
@@ -20,6 +21,7 @@ function errorMessage(error: unknown, fallback: string) {
   const candidate = error as {
     response?: { data?: { message?: string } };
   };
+
   return candidate.response?.data?.message || fallback;
 }
 
@@ -62,7 +64,6 @@ export function useFinancialAccounts() {
   const updateContract = useMutation({
     mutationFn: ({
       accountId,
-      studentId: _studentId,
       payload,
     }: {
       accountId: number | string;
@@ -94,14 +95,14 @@ export function useStudentFinancialAccount(
   studentId: string | number | undefined,
   enabled = true,
 ) {
+  const hasStudentId = studentId !== undefined && studentId !== null;
+
   return useQuery({
-    queryKey:
-      studentId === undefined
-        ? ["financial-account", "missing"]
-        : studentFinancialAccountQueryKey(studentId),
+    queryKey: hasStudentId
+      ? studentFinancialAccountQueryKey(studentId!)
+      : ["financial-account", "missing"],
     queryFn: () => financeOperationsService.getAccountByStudentId(studentId!),
-    enabled:
-      enabled && studentId !== undefined && studentId !== null,
+    enabled: enabled && hasStudentId,
     retry: false,
   });
 }
