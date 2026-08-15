@@ -9,7 +9,9 @@ import {
   Plus,
   RefreshCw,
   School,
+  Trash2,
   Users,
+  X,
 } from "lucide-react";
 
 import { useAcademicSettings } from "@/features/settings/academic/hooks/useAcademicSettings";
@@ -35,6 +37,9 @@ export function ExamSchedulePage() {
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingExam, setEditingExam] =
+    useState<AdminExam | null>(null);
+
+  const [deleteExam, setDeleteExam] =
     useState<AdminExam | null>(null);
 
   const currentAcademicYear = settings?.academicYears.find(
@@ -80,16 +85,29 @@ export function ExamSchedulePage() {
     setDialogOpen(true);
   }
 
-  function handleDelete(exam: AdminExam) {
-    if (
-      !window.confirm(
-        `Delete "${exam.title}"? This action cannot be undone.`,
-      )
-    ) {
-      return;
-    }
+  function requestDelete(exam: AdminExam) {
+    setDeleteExam(exam);
+  }
 
-    deleteMutation.mutate(exam.exam_id);
+  function closeDeleteDialog() {
+    if (deleteMutation.isPending) return;
+
+    setDeleteExam(null);
+  }
+
+  function confirmDeleteExam() {
+    if (!deleteExam) return;
+
+    deleteMutation.mutate(deleteExam.exam_id, {
+      onSuccess: () => {
+        setDeleteExam(null);
+
+        if (editingExam?.exam_id === deleteExam.exam_id) {
+          setEditingExam(null);
+          setDialogOpen(false);
+        }
+      },
+    });
   }
 
   if (isInitialLoading) {
@@ -154,6 +172,7 @@ export function ExamSchedulePage() {
           semester={currentTerm.semesterName}
           onCreate={openCreate}
           isCreating={false}
+          exams={[]}
         />
 
         <ErrorState
@@ -170,47 +189,56 @@ export function ExamSchedulePage() {
   const exams = examsQuery.data ?? [];
 
   return (
-    <div className="space-y-5">
-      <PageHeader
-        academicYear={currentAcademicYear.name}
-        semester={currentTerm.semesterName}
-        onCreate={openCreate}
-        isCreating={false}
-      />
-
-      <ExamSummary exams={exams} />
-
-      {exams.length === 0 ? (
-        <EmptyExamState
+    <>
+      <div className="space-y-5">
+        <PageHeader
+          academicYear={currentAcademicYear.name}
+          semester={currentTerm.semesterName}
           onCreate={openCreate}
+          isCreating={false}
+          exams={exams}
         />
-      ) : (
-        <div className="space-y-3">
-          {exams.map((exam) => (
-            <ExamCard
-              key={exam.exam_id}
-              exam={exam}
-              onEdit={() => openEdit(exam)}
-              onDelete={() =>
-                handleDelete(exam)
-              }
-              isDeleting={
-                deleteMutation.isPending &&
-                deleteMutation.variables ===
-                  exam.exam_id
-              }
-            />
-          ))}
-        </div>
-      )}
 
-      <ExamFormDialog
-        open={dialogOpen}
-        exam={editingExam}
-        grades={gradesQuery.data ?? []}
-        onClose={() => setDialogOpen(false)}
+        {exams.length === 0 ? (
+          <EmptyExamState
+            onCreate={openCreate}
+          />
+        ) : (
+          <div className="space-y-3">
+            {exams.map((exam) => (
+              <ExamCard
+                key={exam.exam_id}
+                exam={exam}
+                onEdit={() => openEdit(exam)}
+                onDelete={() =>
+                  requestDelete(exam)
+                }
+                isDeleting={
+                  deleteMutation.isPending &&
+                  deleteMutation.variables ===
+                    exam.exam_id
+                }
+              />
+            ))}
+          </div>
+        )}
+
+        <ExamFormDialog
+          open={dialogOpen}
+          exam={editingExam}
+          grades={gradesQuery.data ?? []}
+          onClose={() => setDialogOpen(false)}
+        />
+      </div>
+
+      <DeleteExamDialog
+        open={deleteExam !== null}
+        exam={deleteExam}
+        loading={deleteMutation.isPending}
+        onClose={closeDeleteDialog}
+        onConfirm={confirmDeleteExam}
       />
-    </div>
+    </>
   );
 }
 
@@ -223,60 +251,12 @@ function PageHeader({
   semester,
   onCreate,
   isCreating,
+  exams,
 }: {
   academicYear: string;
   semester: string;
   onCreate: () => void;
   isCreating: boolean;
-}) {
-  return (
-    <section className="overflow-hidden rounded-[26px] border border-border/45 bg-card shadow-[0_12px_40px_rgba(30,20,70,0.045)]">
-      <div className="relative p-4 sm:p-5">
-        <div className="absolute -right-16 -top-20 h-40 w-40 rounded-full bg-violet-400/[0.08] blur-3xl" />
-        <div className="absolute -bottom-20 left-1/3 h-36 w-36 rounded-full bg-cyan-400/[0.06] blur-3xl" />
-
-        <div className="relative flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-          <div className="flex items-start gap-3">
-            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[15px] bg-gradient-to-br from-violet-500/15 to-fuchsia-500/10 text-violet-600">
-              <ClipboardList size={20} />
-            </span>
-
-            <div className="min-w-0">
-              <h1 className="text-[17px] font-semibold tracking-[-0.02em]">
-                Exam Schedules
-              </h1>
-
-              <p className="mt-1 flex items-center gap-1.5 text-[12px] text-muted-foreground">
-                <CalendarDays size={12} />
-                {academicYear}
-                <span>·</span>
-                {semester}
-              </p>
-            </div>
-          </div>
-
-          <button
-            type="button"
-            onClick={onCreate}
-            disabled={isCreating}
-            className="inline-flex h-9 items-center justify-center gap-2 rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 px-4 text-[12px] font-medium text-white shadow-[0_7px_18px_rgba(124,58,237,0.18)] transition hover:from-violet-700 hover:to-fuchsia-700 disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            <Plus size={14} />
-            Create Exam
-          </button>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* -------------------------------------------------------------------------- */
-/* Summary                                                                    */
-/* -------------------------------------------------------------------------- */
-
-function ExamSummary({
-  exams,
-}: {
   exams: AdminExam[];
 }) {
   const stats = useMemo(() => {
@@ -302,32 +282,93 @@ function ExamSummary({
   }, [exams]);
 
   return (
-    <section className="grid gap-3 sm:grid-cols-3">
-      <SummaryCard
-        label="Exam Sessions"
-        value={stats.exams}
-        icon={ClipboardList}
-        className="border-violet-200/70 bg-gradient-to-br from-violet-50 to-fuchsia-50 text-violet-700"
-      />
+    <section className="overflow-hidden rounded-[26px] border border-border/45 bg-card shadow-[0_12px_40px_rgba(30,20,70,0.045)]">
+      <div className="relative px-4 py-3.5 sm:px-5">
+        {/* Soft decorative background */}
+        <div className="absolute -right-16 -top-20 h-40 w-40 rounded-full bg-violet-400/[0.08] blur-3xl" />
 
-      <SummaryCard
-        label="Quizzes"
-        value={stats.quizzes}
-        icon={CheckCircle2}
-        className="border-cyan-200/70 bg-gradient-to-br from-cyan-50 to-sky-50 text-cyan-700"
-      />
+        <div className="absolute -bottom-20 left-1/3 h-36 w-36 rounded-full bg-cyan-400/[0.06] blur-3xl" />
 
-      <SummaryCard
-        label="Scheduled Subjects"
-        value={stats.subjects}
-        icon={GraduationCap}
-        className="border-emerald-200/70 bg-gradient-to-br from-emerald-50 to-teal-50 text-emerald-700"
-      />
+        <div className="relative flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+
+          {/* ---------------------------------------------------------------- */}
+          {/* Title                                                             */}
+          {/* ---------------------------------------------------------------- */}
+
+          <div className="flex min-w-0 items-center gap-3">
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px] bg-violet-50 text-violet-600">
+              <ClipboardList size={19} />
+            </span>
+
+            <div className="min-w-0">
+              <h1 className="text-[16px] font-semibold tracking-[-0.02em]">
+                Exam Schedules
+              </h1>
+
+              <p className="mt-0.5 flex items-center gap-1.5 text-[11px] text-muted-foreground">
+                <CalendarDays size={11} />
+
+                <span>{academicYear}</span>
+
+                <span>·</span>
+
+                <span>{semester}</span>
+              </p>
+            </div>
+          </div>
+
+          {/* ---------------------------------------------------------------- */}
+          {/* Actions + Compact Stats                                          */}
+          {/* ---------------------------------------------------------------- */}
+
+          <div className="flex flex-wrap items-center gap-2">
+
+            {/* Compact Statistics */}
+            <div className="flex items-center gap-1.5">
+              <MiniStat
+                label="Exams"
+                value={stats.exams}
+                icon={ClipboardList}
+                className="border-violet-100 bg-violet-50 text-violet-700"
+              />
+
+              <MiniStat
+                label="Quizzes"
+                value={stats.quizzes}
+                icon={CheckCircle2}
+                className="border-cyan-100 bg-cyan-50 text-cyan-700"
+              />
+
+              <MiniStat
+                label="Subjects"
+                value={stats.subjects}
+                icon={GraduationCap}
+                className="border-emerald-100 bg-emerald-50 text-emerald-700"
+              />
+            </div>
+
+            {/* Create Exam */}
+            <button
+              type="button"
+              onClick={onCreate}
+              disabled={isCreating}
+              className="inline-flex h-9 items-center justify-center gap-2 rounded-full bg-violet-600 px-4 text-[12px] font-medium text-white shadow-[0_6px_16px_rgba(124,58,237,0.16)] transition hover:bg-violet-700 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <Plus size={14} />
+              Create Exam
+            </button>
+          </div>
+        </div>
+      </div>
     </section>
   );
 }
 
-function SummaryCard({
+/* -------------------------------------------------------------------------- */
+/* Compact Statistic                                                          */
+/* -------------------------------------------------------------------------- */
+
+function MiniStat({
   label,
   value,
   icon: Icon,
@@ -339,23 +380,23 @@ function SummaryCard({
   className: string;
 }) {
   return (
-    <article
-      className={`rounded-[22px] border p-4 ${className}`}
+    <div
+      className={`inline-flex h-9 items-center gap-2 rounded-full border px-2.5 ${className}`}
     >
-      <div className="flex items-center justify-between">
-        <p className="text-[11px] font-medium opacity-75">
-          {label}
-        </p>
+      <span className="flex h-6 w-6 items-center justify-center rounded-full bg-white/70">
+        <Icon size={12} />
+      </span>
 
-        <span className="flex h-8 w-8 items-center justify-center rounded-[11px] bg-white/60">
-          <Icon size={15} />
+      <span className="flex items-baseline gap-1 pr-0.5">
+        <span className="text-[12px] font-semibold leading-none">
+          {value}
         </span>
-      </div>
 
-      <p className="mt-2 text-[23px] font-semibold tracking-[-0.03em]">
-        {value}
-      </p>
-    </article>
+        <span className="text-[9px] font-medium opacity-65">
+          {label}
+        </span>
+      </span>
+    </div>
   );
 }
 
@@ -443,12 +484,15 @@ function ExamCard({
             disabled={isDeleting}
             className="inline-flex items-center gap-1.5 rounded-full border border-rose-200/70 bg-rose-50 px-3.5 py-2 text-[11px] font-medium text-rose-700 transition hover:bg-rose-100 disabled:opacity-50"
           >
-            {isDeleting && (
+            {isDeleting ? (
               <RefreshCw
                 size={12}
                 className="animate-spin"
               />
+            ) : (
+              <Trash2 size={12} />
             )}
+
             Delete
           </button>
         </div>
@@ -539,6 +583,116 @@ function ExamSubjectCard({
 }
 
 /* -------------------------------------------------------------------------- */
+/* Delete Exam Dialog                                                         */
+/* -------------------------------------------------------------------------- */
+
+function DeleteExamDialog({
+  open,
+  exam,
+  loading,
+  onClose,
+  onConfirm,
+}: {
+  open: boolean;
+  exam: AdminExam | null;
+  loading: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+}) {
+  if (!open || !exam) return null;
+
+  return (
+    <div className="fixed inset-0 z-[70] flex items-center justify-center p-4">
+      <button
+        type="button"
+        aria-label="Close delete dialog"
+        onClick={onClose}
+        disabled={loading}
+        className="absolute inset-0 bg-slate-950/35 backdrop-blur-[3px]"
+      />
+
+      <section className="relative z-10 w-full max-w-[390px] overflow-hidden rounded-[26px] border border-rose-200/50 bg-card shadow-[0_25px_80px_rgba(15,23,42,0.2)]">
+        <div className="p-5">
+          <div className="flex items-start justify-between">
+            <span className="flex h-11 w-11 items-center justify-center rounded-[15px] bg-rose-50 text-rose-600">
+              <Trash2 size={19} />
+            </span>
+
+            <button
+              type="button"
+              onClick={onClose}
+              disabled={loading}
+              className="flex h-8 w-8 items-center justify-center rounded-full bg-muted/50 text-muted-foreground transition hover:bg-muted disabled:opacity-50"
+            >
+              <X size={15} />
+            </button>
+          </div>
+
+          <h2 className="mt-4 text-[15px] font-semibold">
+            Delete exam schedule?
+          </h2>
+
+          <p className="mt-1.5 text-[11px] leading-5 text-muted-foreground">
+            You are about to delete{" "}
+            <span className="font-semibold text-foreground">
+              "{exam.title}"
+            </span>
+            . All subjects associated with this
+            schedule will be removed.
+          </p>
+
+          <div className="mt-4 rounded-[15px] border border-rose-100 bg-rose-50/60 px-3.5 py-3">
+            <div className="flex items-center gap-2 text-[10px] text-rose-700">
+              <GraduationCap size={13} />
+
+              <span>{exam.grade_level.name}</span>
+
+              <span className="text-rose-300">
+                ·
+              </span>
+
+              <span>
+                {exam.subjects.length}{" "}
+                {exam.subjects.length === 1
+                  ? "subject"
+                  : "subjects"}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex items-center justify-end gap-2 border-t border-border/45 bg-muted/[0.08] p-4">
+          <button
+            type="button"
+            onClick={onClose}
+            disabled={loading}
+            className="rounded-full border border-border/60 bg-background px-4 py-2 text-[11px] font-medium text-foreground/70 transition hover:bg-muted/50 disabled:opacity-50"
+          >
+            Cancel
+          </button>
+
+          <button
+            type="button"
+            onClick={onConfirm}
+            disabled={loading}
+            className="inline-flex items-center gap-2 rounded-full bg-rose-600 px-4 py-2 text-[11px] font-medium text-white shadow-[0_6px_18px_rgba(225,29,72,0.16)] transition hover:bg-rose-700 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {loading && (
+              <RefreshCw
+                size={12}
+                className="animate-spin"
+              />
+            )}
+
+            Delete Schedule
+          </button>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
 /* Empty                                                                      */
 /* -------------------------------------------------------------------------- */
 
@@ -565,7 +719,7 @@ function EmptyExamState({
       <button
         type="button"
         onClick={onCreate}
-        className="mt-5 inline-flex h-9 items-center gap-2 rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 px-4 text-[12px] font-medium text-white"
+        className="mt-5 inline-flex h-9 items-center gap-2 rounded-full bg-violet-600 px-4 text-[12px] font-medium text-white shadow-[0_6px_16px_rgba(124,58,237,0.14)] transition hover:bg-violet-700"
       >
         <Plus size={14} />
         Create Exam
@@ -606,7 +760,7 @@ function ErrorState({
       <button
         type="button"
         onClick={onRetry}
-        className="mt-4 inline-flex items-center gap-2 rounded-full bg-violet-600 px-4 py-2 text-[12px] font-medium text-white"
+        className="mt-4 inline-flex items-center gap-2 rounded-full bg-violet-600 px-4 py-2 text-[12px] font-medium text-white transition hover:bg-violet-700"
       >
         <RefreshCw size={14} />
         Try again
@@ -623,26 +777,25 @@ function ExamScheduleSkeleton() {
   return (
     <div className="space-y-5">
       <section className="rounded-[26px] border border-border/45 bg-card p-5">
-        <div className="flex items-center gap-3">
-          <div className="h-11 w-11 animate-pulse rounded-[15px] bg-muted/50" />
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 animate-pulse rounded-[14px] bg-muted/50" />
 
-          <div className="space-y-2">
-            <div className="h-4 w-36 animate-pulse rounded-md bg-muted/50" />
-            <div className="h-3 w-48 animate-pulse rounded-md bg-muted/40" />
+            <div className="space-y-2">
+              <div className="h-4 w-36 animate-pulse rounded-md bg-muted/50" />
+
+              <div className="h-3 w-48 animate-pulse rounded-md bg-muted/40" />
+            </div>
+          </div>
+
+          <div className="hidden items-center gap-2 sm:flex">
+            <div className="h-9 w-20 animate-pulse rounded-full bg-muted/40" />
+            <div className="h-9 w-20 animate-pulse rounded-full bg-muted/40" />
+            <div className="h-9 w-24 animate-pulse rounded-full bg-muted/40" />
+            <div className="h-9 w-28 animate-pulse rounded-full bg-muted/50" />
           </div>
         </div>
       </section>
-
-      <div className="grid gap-3 sm:grid-cols-3">
-        {Array.from({ length: 3 }).map(
-          (_, index) => (
-            <div
-              key={index}
-              className="h-24 animate-pulse rounded-[22px] bg-muted/40"
-            />
-          ),
-        )}
-      </div>
 
       <div className="space-y-3">
         {Array.from({ length: 3 }).map(
@@ -665,9 +818,12 @@ function ExamScheduleSkeleton() {
 function formatDate(value: string) {
   if (!value) return "—";
 
-  const date = new Date(value);
+  const normalized = value.slice(0, 10);
 
-  if (Number.isNaN(date.getTime())) {
+  const [year, month, day] =
+    normalized.split("-").map(Number);
+
+  if (!year || !month || !day) {
     return value;
   }
 
@@ -678,7 +834,9 @@ function formatDate(value: string) {
       month: "short",
       year: "numeric",
     },
-  ).format(date);
+  ).format(
+    new Date(year, month - 1, day),
+  );
 }
 
 function formatTime(value: string) {

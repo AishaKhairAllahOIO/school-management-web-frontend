@@ -1,15 +1,15 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-
-import { getAxiosErrorMessage } from "@/services/axios/axiosError";
-
 import {
   createExamSchedule,
   deleteExamSchedule,
+  deleteExamSubject,
   getAdminExams,
   getExamSetup,
   updateExamSchedule,
 } from "../api/exam-schedule.api";
+import { getAxiosErrorMessage } from "@/services/axios/axiosError";
+
 
 import type { ExamFormData } from "../types/exam-schedule.types";
 
@@ -122,6 +122,39 @@ export function useDeleteExamSchedule() {
 
     onError: (error) => {
       toast.error(getAxiosErrorMessage(error));
+    },
+  });
+}
+export function useDeleteExamSubject() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      examId,
+      gradeSubjectId,
+    }: {
+      examId: number | string;
+      gradeSubjectId: number | string;
+    }) =>
+      deleteExamSubject(
+        examId,
+        gradeSubjectId,
+      ),
+
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: examScheduleQueryKey,
+      });
+
+      toast.success(
+        "Subject removed from exam schedule successfully.",
+      );
+    },
+
+    onError: (error) => {
+      toast.error(
+        getAxiosErrorMessage(error),
+      );
     },
   });
 }

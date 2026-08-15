@@ -1,75 +1,240 @@
-import React from 'react';
-import type { OnboardingStep } from '../utils/onboardingSteps';
-import { ONBOARDING_STEPS } from '../utils/onboardingSteps';
+import React from "react";
+import type { OnboardingStep } from "../utils/onboardingSteps";
 
 interface CustomTooltipProps {
   step: OnboardingStep;
   totalSteps: number;
+  currentIndex: number;
+
   onNext: () => void;
   onBack: () => void;
   onExit: () => void;
+
   isFirst: boolean;
   isLast: boolean;
 }
 
-export const CustomTooltip: React.FC<CustomTooltipProps> = ({
+export const CustomTooltip: React.FC<
+  CustomTooltipProps
+> = ({
   step,
   totalSteps,
+  currentIndex,
   onNext,
   onBack,
   onExit,
   isFirst,
   isLast,
 }) => {
-  const currentIndex = ONBOARDING_STEPS.indexOf(step) + 1;
+  const Icon = step.icon;
 
   return (
-    <div className="bg-[rgb(var(--background))] rounded-[24px] shadow-floating p-5 max-w-[300px] w-full border border-[rgb(var(--border))] relative">
-      <div className="flex justify-between items-center mb-1">
-        <span className="text-[10px] font-bold text-[rgb(var(--primary))] uppercase tracking-widest">
-          STEP {currentIndex} OF {totalSteps}
-        </span>
-        <button
-          onClick={onExit}
-          className="text-[rgb(var(--muted-foreground))] hover:text-[rgb(var(--foreground))]"
-        >
-          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
-      </div>
+    <div
+      className="
+        relative
+        w-[min(300px,calc(100vw-32px))]
+        overflow-hidden
+        rounded-[22px]
+        border
+        border-[rgb(var(--border))]
+        bg-[rgb(var(--background))]
+        p-5
+        shadow-[0_24px_70px_rgba(0,0,0,0.18)]
+        backdrop-blur-xl
+      "
+    >
+      {/* subtle decorative glow */}
+      <div
+        aria-hidden="true"
+        className="
+          pointer-events-none
+          absolute
+          -end-10
+          -top-10
+          h-24
+          w-24
+          rounded-full
+          bg-[rgb(var(--primary)/0.08)]
+          blur-2xl
+        "
+      />
 
-      <div className="w-9 h-9 rounded-full bg-[rgb(var(--secondary))] text-[rgb(var(--primary))] flex items-center justify-center mb-3 mt-1">
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-        </svg>
-      </div>
-
-      <h3 className="text-[15px] font-semibold text-[rgb(var(--foreground))] mb-0.5">{step.title}</h3>
-      <p className="text-[12px] text-[rgb(var(--muted-foreground))] leading-relaxed mb-4">{step.content}</p>
-
-      <div className="flex justify-between items-center pt-3 border-t border-[rgb(var(--border))]">
-        <button
-          onClick={onExit}
-          className="text-[12px] font-medium text-[rgb(var(--muted-foreground))] hover:text-[rgb(var(--foreground))]"
-        >
-          Exit tour
-        </button>
-        <div className="flex gap-2">
-          {!isFirst && (
-            <button
-              onClick={onBack}
-              className="w-[34px] h-[34px] flex items-center justify-center rounded-full border border-[rgb(var(--border))] text-[rgb(var(--muted-foreground))] hover:bg-[rgb(var(--muted))]"
-            >
-              ←
-            </button>
-          )}
-          <button
-            onClick={onNext}
-            className="px-4 py-1.5 h-[34px] rounded-full primary-gradient text-[rgb(var(--primary-foreground))] text-[12px] font-semibold transition-transform hover:scale-105 shadow-auth-button"
+      <div className="relative z-10">
+        {/* Header */}
+        <div className="mb-3 flex items-center justify-between">
+          <span
+            className="
+              text-[10px]
+              font-bold
+              uppercase
+              tracking-[0.16em]
+              text-[rgb(var(--primary))]
+            "
           >
-            {isLast ? 'Finish' : 'Next →'}
+            STEP {currentIndex} OF {totalSteps}
+          </span>
+
+          <button
+            type="button"
+            onClick={onExit}
+            aria-label="Close onboarding"
+            className="
+              flex
+              h-7
+              w-7
+              items-center
+              justify-center
+              rounded-full
+              text-[rgb(var(--muted-foreground))]
+              transition
+              hover:bg-[rgb(var(--muted))]
+              hover:text-[rgb(var(--foreground))]
+            "
+          >
+            <svg
+              className="h-3.5 w-3.5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
           </button>
+        </div>
+
+        {/* Icon */}
+        <div
+          className="
+            mb-3
+            flex
+            h-10
+            w-10
+            items-center
+            justify-center
+            rounded-[14px]
+            bg-[rgb(var(--primary)/0.10)]
+            text-[rgb(var(--primary))]
+          "
+        >
+          <Icon
+            size={18}
+            strokeWidth={1.9}
+            aria-hidden="true"
+          />
+        </div>
+
+        {/* Content */}
+        <h3
+          className="
+            mb-1
+            text-[15px]
+            font-semibold
+            tracking-[-0.01em]
+            text-[rgb(var(--foreground))]
+          "
+        >
+          {step.title}
+        </h3>
+
+        <p
+          className="
+            mb-5
+            text-[12px]
+            leading-[1.7]
+            text-[rgb(var(--muted-foreground))]
+          "
+        >
+          {step.content}
+        </p>
+
+        {/* Footer */}
+        <div
+          className="
+            flex
+            items-center
+            justify-between
+            border-t
+            border-[rgb(var(--border))]
+            pt-3.5
+          "
+        >
+          <button
+            type="button"
+            onClick={onExit}
+            className="
+              text-[11px]
+              font-medium
+              text-[rgb(var(--muted-foreground))]
+              transition
+              hover:text-[rgb(var(--foreground))]
+            "
+          >
+            Exit tour
+          </button>
+
+          <div className="flex items-center gap-2">
+            {!isFirst && (
+              <button
+                type="button"
+                onClick={onBack}
+                aria-label="Previous step"
+                className="
+                  flex
+                  h-[34px]
+                  w-[34px]
+                  items-center
+                  justify-center
+                  rounded-full
+                  border
+                  border-[rgb(var(--border))]
+                  text-[rgb(var(--muted-foreground))]
+                  transition
+                  hover:bg-[rgb(var(--muted))]
+                  hover:text-[rgb(var(--foreground))]
+                "
+              >
+                <svg
+                  className="h-3.5 w-3.5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M15 19l-7-7 7-7"
+                  />
+                </svg>
+              </button>
+            )}
+
+            <button
+              type="button"
+              onClick={onNext}
+              className="
+                h-[34px]
+                rounded-full
+                bg-[rgb(var(--primary))]
+                px-4
+                text-[12px]
+                font-semibold
+                text-[rgb(var(--primary-foreground))]
+                shadow-[0_7px_20px_rgb(var(--primary)/0.20)]
+                transition-all
+                hover:-translate-y-0.5
+                hover:shadow-[0_9px_24px_rgb(var(--primary)/0.25)]
+                active:translate-y-0
+              "
+            >
+              {isLast ? "Finish" : "Next"}
+            </button>
+          </div>
         </div>
       </div>
     </div>

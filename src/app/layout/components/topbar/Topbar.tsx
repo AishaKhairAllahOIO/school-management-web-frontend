@@ -30,38 +30,48 @@ export function Topbar() {
   const location = useLocation();
   const { t } = useLocale();
 
-  const openMobileSidebar = useLayoutStore(
-    (state) => state.openMobileSidebar,
-  );
+  const openMobileSidebar =
+    useLayoutStore(
+      (state) =>
+        state.openMobileSidebar,
+    );
 
   const [menuState, setMenuState] =
     useState<TopbarMenuState>({
-      pathname: location.pathname,
+      pathname:
+        location.pathname,
       openMenu: null,
     });
 
   const isCurrentPath =
-    menuState.pathname === location.pathname;
+    menuState.pathname ===
+    location.pathname;
 
   const isNotificationsOpen =
     isCurrentPath &&
-    menuState.openMenu === "notifications";
+    menuState.openMenu ===
+      "notifications";
 
   const isProfileMenuOpen =
     isCurrentPath &&
-    menuState.openMenu === "profile";
+    menuState.openMenu ===
+      "profile";
 
   function toggleNotifications() {
     setMenuState((current) => {
       const isAlreadyOpen =
-        current.pathname === location.pathname &&
-        current.openMenu === "notifications";
+        current.pathname ===
+          location.pathname &&
+        current.openMenu ===
+          "notifications";
 
       return {
-        pathname: location.pathname,
-        openMenu: isAlreadyOpen
-          ? null
-          : "notifications",
+        pathname:
+          location.pathname,
+        openMenu:
+          isAlreadyOpen
+            ? null
+            : "notifications",
       };
     });
   }
@@ -69,28 +79,34 @@ export function Topbar() {
   function toggleProfileMenu() {
     setMenuState((current) => {
       const isAlreadyOpen =
-        current.pathname === location.pathname &&
-        current.openMenu === "profile";
+        current.pathname ===
+          location.pathname &&
+        current.openMenu ===
+          "profile";
 
       return {
-        pathname: location.pathname,
-        openMenu: isAlreadyOpen
-          ? null
-          : "profile",
+        pathname:
+          location.pathname,
+        openMenu:
+          isAlreadyOpen
+            ? null
+            : "profile",
       };
     });
   }
 
   function closeNotifications() {
     setMenuState({
-      pathname: location.pathname,
+      pathname:
+        location.pathname,
       openMenu: null,
     });
   }
 
   function closeProfileMenu() {
     setMenuState({
-      pathname: location.pathname,
+      pathname:
+        location.pathname,
       openMenu: null,
     });
   }
@@ -99,10 +115,20 @@ export function Topbar() {
     <header className="sticky top-0 z-40 pb-2 pt-2.5 sm:pb-3 sm:pt-4 lg:pt-6">
       <div className="flex min-h-11 w-full items-center justify-between gap-1.5 sm:h-14 sm:gap-3">
         <div className="flex min-w-0 flex-1 items-center gap-1.5 overflow-hidden">
+          {/* ------------------------------------------------------------ */}
+          {/* Mobile Sidebar Trigger                                       */}
+          {/* ------------------------------------------------------------ */}
+
           <button
+            id="topbar-mobile-sidebar"
             type="button"
-            onClick={openMobileSidebar}
-            aria-label={t.layout.topbar.openSidebar}
+            onClick={
+              openMobileSidebar
+            }
+            aria-label={
+              t.layout.topbar
+                .openSidebar
+            }
             className="
               me-0.5
               flex
@@ -136,16 +162,32 @@ export function Topbar() {
           </button>
 
           <TopbarBreadcrumb
-            pathname={location.pathname}
+            pathname={
+              location.pathname
+            }
           />
         </div>
 
         <div className="flex shrink-0 items-center gap-1 sm:gap-1.5 lg:gap-2.5">
+          {/* ---------------------------------------------------------- */}
+          {/* Notifications                                              */}
+          {/* ---------------------------------------------------------- */}
+
           <NotificationsMenu
-            isOpen={isNotificationsOpen}
-            onToggle={toggleNotifications}
-            onClose={closeNotifications}
+            isOpen={
+              isNotificationsOpen
+            }
+            onToggle={
+              toggleNotifications
+            }
+            onClose={
+              closeNotifications
+            }
           />
+
+          {/* ---------------------------------------------------------- */}
+          {/* Language                                                   */}
+          {/* ---------------------------------------------------------- */}
 
           <div className="block shrink-0">
             <LanguageToggle
@@ -155,19 +197,31 @@ export function Topbar() {
             />
           </div>
 
+          {/* ---------------------------------------------------------- */}
+          {/* Theme                                                      */}
+          {/* ---------------------------------------------------------- */}
+
           <div className="block shrink-0">
             <ThemeButton />
           </div>
 
-          {/* 👇 Added id="topbar-profile" for Onboarding */}
+          {/* ---------------------------------------------------------- */}
+          {/* Profile                                                    */}
+          {/* ---------------------------------------------------------- */}
+
           <div id="topbar-profile">
             <ProfileMenu
-              isOpen={isProfileMenuOpen}
-              onToggle={toggleProfileMenu}
-              onClose={closeProfileMenu}
+              isOpen={
+                isProfileMenuOpen
+              }
+              onToggle={
+                toggleProfileMenu
+              }
+              onClose={
+                closeProfileMenu
+              }
             />
           </div>
-          {/* 👆 End of Onboarding changes */}
         </div>
       </div>
     </header>

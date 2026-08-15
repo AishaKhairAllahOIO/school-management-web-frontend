@@ -57,3 +57,13 @@ export async function deleteExamSchedule(examId: number | string) {
 
   return response.data;
 }
+export async function deleteExamSubject(
+  examId: number | string,
+  gradeSubjectId: number | string,
+) {
+  const response = await axiosClient.delete(
+    API_ENDPOINTS.EXAM_SCHEDULE.DELETE_SUBJECT(examId, gradeSubjectId),
+  );
+
+  return response.data;
+}

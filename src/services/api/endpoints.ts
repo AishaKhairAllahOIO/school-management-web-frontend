@@ -421,6 +421,11 @@ export const API_ENDPOINTS = {
 
     ADMIN_VIEW: (academicId: ApiId, semesterId: ApiId) =>
       `/auth/exam/schedule/show/${academicId}/${semesterId}`,
+
+    DELETE_SUBJECT: (
+      examId: number | string,
+      gradeSubjectId: number | string,
+    ) => `/auth/exam/schedule/delete/one/subject/${examId}/${gradeSubjectId}`,
   },
 
   MARKS: {
