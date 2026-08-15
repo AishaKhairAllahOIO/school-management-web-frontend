@@ -15,14 +15,22 @@ export const OFFICIAL_DOCUMENT_STYLES = `
   position: relative;
 
   width: 210mm;
+
   min-height: 297mm;
 
-  padding: 13mm 15mm 12mm;
+  padding:
+    13mm
+    15mm
+    12mm;
 
-  color: var(--print-foreground);
-  background: #ffffff;
+  color:
+    var(--print-foreground);
 
-  font-family: var(--print-font-family);
+  background:
+    #ffffff;
+
+  font-family:
+    var(--print-font-family);
 
   overflow: visible;
 }
@@ -42,8 +50,10 @@ export const OFFICIAL_DOCUMENT_STYLES = `
     rgba(103, 58, 244, 0.18);
 }
 
+
 .official-header {
   position: relative;
+
   z-index: 1;
 
   display: grid;
@@ -67,22 +77,25 @@ export const OFFICIAL_DOCUMENT_STYLES = `
     var(--print-primary);
 }
 
+
 .official-logo,
 .official-logo-fallback {
   width: 16mm;
+
   height: 16mm;
 }
+
 
 .official-logo {
   display: block;
 
   object-fit: contain;
 
-
   filter:
     grayscale(1)
     contrast(1.08);
 }
+
 
 .official-logo-fallback {
   display: grid;
@@ -95,26 +108,32 @@ export const OFFICIAL_DOCUMENT_STYLES = `
 
   border-radius: 3mm;
 
-  color: var(--print-primary);
+  color:
+    var(--print-primary);
 
   background:
     var(--print-secondary);
 
-  font-family: var(--print-font-brand);
+  font-family:
+    var(--print-font-brand);
 
   font-size: 5.2mm;
+
   font-weight: 800;
 }
+
 
 .official-school-name {
   margin: 0;
 
-  color: var(--print-foreground);
+  color:
+    var(--print-foreground);
 
   font-family:
     var(--print-font-brand);
 
   font-size: 5.1mm;
+
   line-height: 1.08;
 
   font-weight: 700;
@@ -122,8 +141,12 @@ export const OFFICIAL_DOCUMENT_STYLES = `
   letter-spacing: -0.015em;
 }
 
+
 .official-school-meta {
-  margin: 1.2mm 0 0;
+  margin:
+    1.2mm
+    0
+    0;
 
   color:
     var(--print-muted-foreground);
@@ -132,8 +155,10 @@ export const OFFICIAL_DOCUMENT_STYLES = `
     var(--print-font-family);
 
   font-size: 2.35mm;
+
   line-height: 1.45;
 }
+
 
 .official-document-meta {
   min-width: 39mm;
@@ -141,14 +166,17 @@ export const OFFICIAL_DOCUMENT_STYLES = `
   text-align: right;
 }
 
+
 [dir="rtl"] .official-document-meta {
   text-align: left;
 }
 
+
 .official-document-meta strong {
   display: block;
 
-  color: var(--print-primary);
+  color:
+    var(--print-primary);
 
   font-family:
     var(--print-font-brand);
@@ -160,10 +188,12 @@ export const OFFICIAL_DOCUMENT_STYLES = `
   letter-spacing: 0.08em;
 }
 
+
 .official-title-block {
   display: flex;
 
   align-items: flex-start;
+
   justify-content: space-between;
 
   gap: 8mm;
@@ -174,10 +204,12 @@ export const OFFICIAL_DOCUMENT_STYLES = `
     5mm;
 }
 
+
 .official-kicker {
   margin: 0;
 
-  color: var(--print-primary);
+  color:
+    var(--print-primary);
 
   font-size: 2.25mm;
 
@@ -187,6 +219,7 @@ export const OFFICIAL_DOCUMENT_STYLES = `
 
   letter-spacing: 0.14em;
 }
+
 
 .official-title {
   margin:
@@ -209,10 +242,14 @@ export const OFFICIAL_DOCUMENT_STYLES = `
   letter-spacing: -0.025em;
 }
 
+
 .official-description {
   max-width: 125mm;
 
-  margin: 2mm 0 0;
+  margin:
+    2mm
+    0
+    0;
 
   color:
     var(--print-muted-foreground);
@@ -221,6 +258,7 @@ export const OFFICIAL_DOCUMENT_STYLES = `
 
   line-height: 1.55;
 }
+
 
 .official-highlight {
   min-width: 43mm;
@@ -241,9 +279,11 @@ export const OFFICIAL_DOCUMENT_STYLES = `
     var(--print-secondary);
 }
 
+
 [dir="rtl"] .official-highlight {
   text-align: left;
 }
+
 
 .official-highlight small {
   display: block;
@@ -257,6 +297,7 @@ export const OFFICIAL_DOCUMENT_STYLES = `
 
   letter-spacing: 0.09em;
 }
+
 
 .official-highlight strong {
   display: block;
@@ -284,6 +325,7 @@ export const OFFICIAL_DOCUMENT_STYLES = `
   gap: 2.5mm;
 }
 
+
 .official-field {
   min-height: 15mm;
 
@@ -301,6 +343,7 @@ export const OFFICIAL_DOCUMENT_STYLES = `
     var(--print-card);
 }
 
+
 .official-field span {
   display: block;
 
@@ -315,6 +358,7 @@ export const OFFICIAL_DOCUMENT_STYLES = `
 
   letter-spacing: 0.075em;
 }
+
 
 .official-field strong {
   display: block;
@@ -334,11 +378,13 @@ export const OFFICIAL_DOCUMENT_STYLES = `
   overflow-wrap: anywhere;
 }
 
+
 .official-section {
   margin-top: 5.5mm;
 
   break-inside: avoid;
 }
+
 
 .official-section-title {
   display: grid;
@@ -367,6 +413,7 @@ export const OFFICIAL_DOCUMENT_STYLES = `
   font-weight: 700;
 }
 
+
 .official-section-title::after {
   content: "";
 
@@ -385,13 +432,16 @@ export const OFFICIAL_DOCUMENT_STYLES = `
   table-layout: fixed;
 }
 
+
 .official-table thead {
   display: table-header-group;
 }
 
+
 .official-table tr {
   break-inside: avoid;
 }
+
 
 .official-table th {
   padding:
@@ -422,9 +472,11 @@ export const OFFICIAL_DOCUMENT_STYLES = `
   letter-spacing: 0.045em;
 }
 
+
 [dir="rtl"] .official-table th {
   text-align: right;
 }
+
 
 .official-table td {
   padding:
@@ -450,6 +502,7 @@ export const OFFICIAL_DOCUMENT_STYLES = `
   overflow-wrap: anywhere;
 }
 
+
 .official-summary {
   display: grid;
 
@@ -460,6 +513,7 @@ export const OFFICIAL_DOCUMENT_STYLES = `
 
   margin-top: 4mm;
 }
+
 
 .official-summary-card {
   border:
@@ -474,6 +528,7 @@ export const OFFICIAL_DOCUMENT_STYLES = `
     var(--print-secondary);
 }
 
+
 .official-summary-card span {
   color:
     var(--print-muted-foreground);
@@ -486,6 +541,7 @@ export const OFFICIAL_DOCUMENT_STYLES = `
 
   letter-spacing: 0.06em;
 }
+
 
 .official-summary-card strong {
   display: block;
@@ -538,6 +594,7 @@ export const OFFICIAL_DOCUMENT_STYLES = `
   break-inside: avoid;
 }
 
+
 .official-signature {
   min-height: 24mm;
 
@@ -555,6 +612,7 @@ export const OFFICIAL_DOCUMENT_STYLES = `
   font-size: 2.4mm;
 }
 
+
 .official-signature strong {
   display: block;
 
@@ -568,6 +626,7 @@ export const OFFICIAL_DOCUMENT_STYLES = `
 
   font-weight: 700;
 }
+
 
 .official-signature span {
   display: block;
@@ -604,6 +663,7 @@ export const OFFICIAL_DOCUMENT_STYLES = `
   line-height: 1.4;
 }
 
+
 @media print {
   .official-document {
     break-after: page;
@@ -611,7 +671,10 @@ export const OFFICIAL_DOCUMENT_STYLES = `
 }
 `;
 
-function compactIdentity(identity: PrintIdentity): string {
+
+function compactIdentity(
+  identity: PrintIdentity,
+): string {
   return [
     identity.address,
     identity.city,
@@ -624,12 +687,12 @@ function compactIdentity(identity: PrintIdentity): string {
     .join(" · ");
 }
 
+
 export function buildOfficialHeader(
   identity: PrintIdentity,
   documentTitle: string,
   reference?: string,
 ): string {
-
   void reference;
 
   const logo = identity.logoUrl
@@ -643,7 +706,10 @@ export function buildOfficialHeader(
     : `
         <div class="official-logo-fallback">
           ${escapePrintHtml(
-            (identity.shortName || identity.schoolName)
+            (
+              identity.shortName ||
+              identity.schoolName
+            )
               .slice(0, 1)
               .toUpperCase(),
           )}
@@ -651,7 +717,8 @@ export function buildOfficialHeader(
       `;
 
   const identityMeta =
-    compactIdentity(identity) || "Official school document";
+    compactIdentity(identity) ||
+    "Official school document";
 
   return `
     <header class="official-header">
@@ -659,7 +726,9 @@ export function buildOfficialHeader(
 
       <div>
         <h1 class="official-school-name">
-          ${escapePrintHtml(identity.schoolName)}
+          ${escapePrintHtml(
+            identity.schoolName,
+          )}
         </h1>
 
         <p class="official-school-meta">
@@ -669,12 +738,15 @@ export function buildOfficialHeader(
 
       <div class="official-document-meta">
         <strong>
-          ${escapePrintHtml(documentTitle)}
+          ${escapePrintHtml(
+            documentTitle,
+          )}
         </strong>
       </div>
     </header>
   `;
 }
+
 
 export function createOfficialDocument({
   title,
@@ -686,23 +758,32 @@ export function createOfficialDocument({
   signatureLabel,
 }: {
   title: string;
+
   identity: PrintIdentity;
+
   documentTitle: string;
+
   reference?: string;
+
   content: string;
+
   orientation?: PrintOrientation;
+
   signatureLabel?: string;
 }): PrintableDocument {
   void reference;
 
   const resolvedSignatureLabel =
-    signatureLabel || "Director / Principal signature";
+    signatureLabel ||
+    "Director / Principal signature";
 
   const signatureHtml = `
     <section class="official-signatures">
       <div class="official-signature">
         <strong>
-          ${escapePrintHtml(resolvedSignatureLabel)}
+          ${escapePrintHtml(
+            resolvedSignatureLabel,
+          )}
         </strong>
 
         <span>
@@ -730,13 +811,19 @@ export function createOfficialDocument({
 
   return {
     title,
+
     orientation,
+
     kind: "official-document",
 
     html: createPrintableHtml({
       title,
+
       body,
-      styles: OFFICIAL_DOCUMENT_STYLES,
+
+      styles:
+        OFFICIAL_DOCUMENT_STYLES,
+
       orientation,
     }),
   };

@@ -1,10 +1,6 @@
-import {
-  useGeneralSettings,
-} from "@/features/settings/general/hooks/useGeneralSettings";
+import { useGeneralSettings } from "@/features/settings/general/hooks/useGeneralSettings";
 
-import type {
-  PrintIdentity,
-} from "../types/print.types";
+import type { PrintIdentity } from "../types/print.types";
 
 const FALLBACK_IDENTITY: PrintIdentity = {
   schoolName: "School Management System",
@@ -23,35 +19,27 @@ export function usePrintIdentity(): PrintIdentity {
       FALLBACK_IDENTITY.schoolName,
 
     shortName:
-      data.shortName.trim() ||
-      undefined,
+      data.shortName.trim() || undefined,
 
     logoUrl:
-      data.logoUrl ||
-      undefined,
+      data.logoUrl || undefined,
 
     phoneNumber:
-      data.phoneNumber.trim() ||
-      undefined,
+      data.phoneNumber.trim() || undefined,
 
     email:
-      data.email.trim() ||
-      undefined,
+      data.email.trim() || undefined,
 
     website:
-      data.website.trim() ||
-      undefined,
+      data.website.trim() || undefined,
 
     address:
-      data.address.trim() ||
-      undefined,
+      data.address.trim() || undefined,
 
     city:
-      data.city.trim() ||
-      undefined,
+      data.city.trim() || undefined,
 
     country:
-      data.country.trim() ||
-      undefined,
+      data.country.trim() || undefined,
   };
 }

@@ -15,13 +15,6 @@ export type PosterTone =
   | "mint"
   | "sunset";
 
-/**
- * Poster tones now inherit the application's design language.
- *
- * The primary application purple remains the source of truth.
- * Other tones are controlled through controlled secondary values
- * instead of creating a completely separate design system.
- */
 type PosterPalette = {
   background: string;
   primary: string;
@@ -33,48 +26,48 @@ type PosterPalette = {
 
 const toneMap: Record<PosterTone, PosterPalette> = {
   violet: {
-    background: "rgb(250 250 255)",
+    background: "rgb(251 250 255)",
     primary: "rgb(103 58 244)",
-    secondary: "rgb(244 241 255)",
+    secondary: "rgb(246 244 252)",
     accent: "rgb(139 92 246)",
-    ink: "rgb(21 20 44)",
-    muted: "rgb(103 102 125)",
+    ink: "rgb(34 32 48)",
+    muted: "rgb(112 109 126)",
   },
 
   sky: {
-    background: "rgb(247 250 255)",
+    background: "rgb(249 251 255)",
     primary: "rgb(103 58 244)",
-    secondary: "rgb(236 231 255)",
-    accent: "rgb(108 153 224)",
-    ink: "rgb(21 20 44)",
-    muted: "rgb(103 102 125)",
+    secondary: "rgb(244 246 252)",
+    accent: "rgb(126 155 202)",
+    ink: "rgb(34 32 48)",
+    muted: "rgb(112 109 126)",
   },
 
   coral: {
-    background: "rgb(252 248 250)",
+    background: "rgb(253 250 250)",
     primary: "rgb(103 58 244)",
-    secondary: "rgb(244 241 255)",
-    accent: "rgb(223 118 128)",
-    ink: "rgb(21 20 44)",
-    muted: "rgb(103 102 125)",
+    secondary: "rgb(248 244 245)",
+    accent: "rgb(204 130 136)",
+    ink: "rgb(34 32 48)",
+    muted: "rgb(112 109 126)",
   },
 
   mint: {
-    background: "rgb(247 252 250)",
+    background: "rgb(249 252 250)",
     primary: "rgb(103 58 244)",
-    secondary: "rgb(244 241 255)",
-    accent: "rgb(95 186 143)",
-    ink: "rgb(21 20 44)",
-    muted: "rgb(103 102 125)",
+    secondary: "rgb(243 248 246)",
+    accent: "rgb(112 169 143)",
+    ink: "rgb(34 32 48)",
+    muted: "rgb(112 109 126)",
   },
 
   sunset: {
-    background: "rgb(253 250 247)",
+    background: "rgb(253 251 248)",
     primary: "rgb(103 58 244)",
-    secondary: "rgb(244 241 255)",
-    accent: "rgb(223 181 88)",
-    ink: "rgb(21 20 44)",
-    muted: "rgb(103 102 125)",
+    secondary: "rgb(248 246 241)",
+    accent: "rgb(193 159 92)",
+    ink: "rgb(34 32 48)",
+    muted: "rgb(112 109 126)",
   },
 };
 
@@ -99,7 +92,7 @@ export function createPosterDocument({
   description,
   details = [],
   bodyHtml = "",
-  footer = "Learn · Connect · Grow",
+  footer = "",
   tone = "violet",
 }: {
   title: string;
@@ -116,6 +109,15 @@ export function createPosterDocument({
   tone?: PosterTone;
 }): PrintableDocument {
   const palette = toneMap[tone];
+
+  /*
+   * عندما يكون هناك bodyHtml فهذا يعني أن لدينا محتوى إضافياً
+   * مثل قوانين المدرسة.
+   *
+   * عندها نستخدم layout مضغوط حتى نحاول إبقاء كل شيء
+   * ضمن صفحة A4 واحدة.
+   */
+  const hasContent = Boolean(bodyHtml.trim());
 
   const detailsHtml =
     details.length > 0
@@ -154,7 +156,10 @@ export function createPosterDocument({
     : `
         <div class="poster-logo-fallback">
           ${escapePrintHtml(
-            (identity.shortName || identity.schoolName)
+            (
+              identity.shortName ||
+              identity.schoolName
+            )
               .slice(0, 1)
               .toUpperCase(),
           )}
@@ -163,59 +168,56 @@ export function createPosterDocument({
 
   const body = `
     <main
-      class="print-page poster-page"
+      class="print-page poster-page ${
+        hasContent ? "poster-page-compact" : ""
+      }"
       style="${posterCssVariables(palette)}"
       dir="auto"
     >
-      <!-- Decorative shapes -->
-      <div
-        class="poster-shape poster-shape-one"
-        aria-hidden="true"
-      ></div>
-
-      <div
-        class="poster-shape poster-shape-two"
-        aria-hidden="true"
-      ></div>
-
-      <div
-        class="poster-shape poster-shape-three"
-        aria-hidden="true"
-      ></div>
-
-      <div
-        class="poster-dot-grid"
-        aria-hidden="true"
-      ></div>
 
       <div class="poster-frame">
 
-        <!-- Brand -->
+        <!-- ================= BRAND ================= -->
+
         <header class="poster-brand">
+
           <div class="poster-brand-mark">
             ${logo}
           </div>
 
           <div class="poster-brand-copy">
+
             <strong>
               ${escapePrintHtml(identity.schoolName)}
             </strong>
 
-            <span>
-              ${escapePrintHtml(
-                identity.city ||
-                  identity.country ||
-                  "School community",
-              )}
-            </span>
+            ${
+              identity.city ||
+              identity.country
+                ? `
+                  <span>
+                    ${escapePrintHtml(
+                      identity.city ||
+                        identity.country ||
+                        "",
+                    )}
+                  </span>
+                `
+                : ""
+            }
+
           </div>
+
         </header>
 
-        <!-- Hero -->
+
+        <!-- ================= HERO ================= -->
+
         <section class="poster-hero">
-          <div class="poster-eyebrow">
+
+          <p class="poster-eyebrow">
             ${escapePrintHtml(eyebrow)}
-          </div>
+          </p>
 
           <h1 dir="auto">
             ${escapePrintHtml(headline)}
@@ -234,17 +236,15 @@ export function createPosterDocument({
               : ""
           }
 
-          <div
-            class="poster-hero-rule"
-            aria-hidden="true"
-          >
-            <span></span>
-            <i></i>
-            <span></span>
-          </div>
         </section>
 
+
+        <!-- ================= DETAILS ================= -->
+
         ${detailsHtml}
+
+
+        <!-- ================= CONTENT ================= -->
 
         ${
           bodyHtml
@@ -259,28 +259,47 @@ export function createPosterDocument({
             : ""
         }
 
-        <!-- Footer -->
-        <footer class="poster-footer">
-          <strong>
-            ${escapePrintHtml(footer)}
-          </strong>
 
-          <span dir="auto">
-            ${escapePrintHtml(
-              identity.website ||
-                identity.phoneNumber ||
-                "",
-            )}
-          </span>
-        </footer>
+        <!-- ================= FOOTER ================= -->
+
+        ${
+          footer
+            ? `
+              <footer class="poster-footer">
+
+                <span>
+                  ${escapePrintHtml(footer)}
+                </span>
+
+                ${
+                  identity.website ||
+                  identity.phoneNumber
+                    ? `
+                      <span>
+                        ${escapePrintHtml(
+                          identity.website ||
+                            identity.phoneNumber ||
+                            "",
+                        )}
+                      </span>
+                    `
+                    : ""
+                }
+
+              </footer>
+            `
+            : ""
+        }
+
       </div>
+
     </main>
   `;
 
   const styles = `
-    /* =====================================================
-       POSTER PAGE
-       ===================================================== */
+    /* =========================================================
+       BASE
+       ========================================================= */
 
     .poster-page {
       position: relative;
@@ -289,203 +308,123 @@ export function createPosterDocument({
       height: 297mm;
       min-height: 297mm;
 
+      box-sizing: border-box;
+
+      padding: 9mm;
+
       overflow: hidden;
-
-      padding: 7mm;
-
-      color: var(--poster-ink);
 
       background:
         linear-gradient(
-          145deg,
+          150deg,
           var(--poster-bg) 0%,
-          #ffffff 62%,
+          #ffffff 58%,
           var(--poster-secondary) 100%
         );
 
+      color: var(--poster-ink);
+
       font-family:
         var(--print-font-family);
+
+      page-break-after: avoid;
+      break-after: avoid;
     }
 
-    /* =====================================================
-       DECORATION
-       ===================================================== */
 
-    .poster-shape {
-      position: absolute;
-
-      pointer-events: none;
-
-      border:
-        0.45mm solid
-        rgba(103, 58, 244, 0.18);
-    }
-
-    .poster-shape-one {
-      width: 58mm;
-      height: 58mm;
-
-      left: -22mm;
-      top: 82mm;
-
-      border-radius: 18mm;
-
-      transform: rotate(26deg);
-
-      background:
-        rgba(103, 58, 244, 0.06);
-    }
-
-    .poster-shape-two {
-      width: 42mm;
-      height: 42mm;
-
-      right: -13mm;
-      top: -11mm;
-
-      border-radius: 50%;
-
-      background:
-        rgba(139, 92, 246, 0.10);
-    }
-
-    .poster-shape-three {
-      width: 48mm;
-      height: 18mm;
-
-      right: 16mm;
-      bottom: 25mm;
-
-      border-radius: 50%;
-
-      transform: rotate(-18deg);
-
-      background:
-        rgba(103, 58, 244, 0.06);
-    }
-
-    .poster-dot-grid {
-      position: absolute;
-
-      right: 9mm;
-      top: 62mm;
-
-      width: 24mm;
-      height: 38mm;
-
-      opacity: 0.22;
-
-      background-image:
-        radial-gradient(
-          var(--poster-primary) 0.65mm,
-          transparent 0.7mm
-        );
-
-      background-size: 4mm 4mm;
-    }
-
-    /* =====================================================
+    /* =========================================================
        FRAME
-       ===================================================== */
+       ========================================================= */
 
     .poster-frame {
       position: relative;
 
-      z-index: 2;
+      width: 100%;
+      height: 279mm;
+      min-height: 279mm;
+
+      box-sizing: border-box;
 
       display: flex;
-
-      min-height: 281mm;
-
       flex-direction: column;
 
-      border:
-        0.45mm solid
-        rgba(103, 58, 244, 0.22);
-
-      border-radius: 5mm;
+      padding: 8mm 10mm;
 
       background:
-        rgba(255, 255, 255, 0.97);
-
-      padding: 8mm;
-
-      box-shadow:
-        var(--print-shadow-card);
-    }
-
-    .poster-frame::before {
-      content: "";
-
-      position: absolute;
-
-      inset: 3mm;
-
-      pointer-events: none;
+        rgba(255, 255, 255, 0.95);
 
       border:
-        0.22mm solid
-        rgba(103, 58, 244, 0.13);
+        0.25mm solid
+        rgba(103, 58, 244, 0.12);
 
-      border-radius: 3.8mm;
+      overflow: hidden;
+
+      page-break-inside: avoid;
+      break-inside: avoid;
     }
 
-    /* =====================================================
+
+    /* =========================================================
        BRAND
-       ===================================================== */
+       ========================================================= */
 
     .poster-brand {
-      position: relative;
-
-      z-index: 1;
-
       display: flex;
 
       align-items: center;
 
-      gap: 3mm;
+      gap: 3.5mm;
+
+      flex-shrink: 0;
+
+      padding-bottom: 5mm;
+
+      border-bottom:
+        0.25mm solid
+        rgba(103, 58, 244, 0.12);
+
+      page-break-inside: avoid;
+      break-inside: avoid;
     }
+
 
     .poster-brand-mark {
       display: grid;
 
-      width: 15mm;
-      height: 15mm;
-
-      place-items: center;
-
-      flex-shrink: 0;
-
-      border-radius: 3.5mm;
-
-      background:
-        var(--print-secondary);
-
-      border:
-        0.35mm solid
-        rgba(103, 58, 244, 0.22);
-    }
-
-    .poster-logo,
-    .poster-logo-fallback {
       width: 11mm;
       height: 11mm;
 
+      flex-shrink: 0;
+
+      place-items: center;
+
+      border:
+        0.25mm solid
+        rgba(103, 58, 244, 0.16);
+
+      background:
+        var(--poster-secondary);
+    }
+
+
+    .poster-logo,
+    .poster-logo-fallback {
+      width: 8mm;
+      height: 8mm;
+
       object-fit: contain;
     }
+
 
     .poster-logo {
       display: block;
     }
 
+
     .poster-logo-fallback {
       display: grid;
 
       place-items: center;
-
-      border-radius: 3mm;
-
-      background: #ffffff;
 
       color:
         var(--poster-primary);
@@ -493,10 +432,11 @@ export function createPosterDocument({
       font-family:
         var(--print-font-brand);
 
-      font-size: 4.5mm;
+      font-size: 3.5mm;
 
-      font-weight: 900;
+      font-weight: 400;
     }
+
 
     .poster-brand-copy strong {
       display: block;
@@ -507,10 +447,13 @@ export function createPosterDocument({
       font-family:
         var(--print-font-brand);
 
-      font-size: 3.5mm;
+      font-size: 3.2mm;
 
-      line-height: 1.15;
+      line-height: 1.25;
+
+      font-weight: 400;
     }
+
 
     .poster-brand-copy span {
       display: block;
@@ -520,86 +463,53 @@ export function createPosterDocument({
       color:
         var(--poster-muted);
 
-      font-size: 2.25mm;
+      font-size: 2mm;
+
+      line-height: 1.3;
+
+      font-weight: 400;
     }
 
-    /* =====================================================
+
+    /* =========================================================
        HERO
-       ===================================================== */
+       ========================================================= */
 
     .poster-hero {
-      position: relative;
-
-      z-index: 1;
+      flex-shrink: 0;
 
       padding:
-        13mm
-        8mm
-        7mm;
+        17mm
+        7mm
+        11mm;
 
       text-align: center;
+
+      page-break-inside: avoid;
+      break-inside: avoid;
     }
 
+
     .poster-eyebrow {
-      display: inline-flex;
-
-      align-items: center;
-      justify-content: center;
-
-      min-height: 8mm;
-
-      border-radius: 2mm;
-
-      background:
-        var(--print-secondary);
-
-      border:
-        0.3mm solid
-        rgba(103, 58, 244, 0.22);
-
-      padding:
-        1.8mm
-        4mm;
+      margin: 0;
 
       color:
         var(--poster-primary);
 
-      font-size: 2.35mm;
+      font-size: 2.2mm;
 
-      font-weight: 900;
+      line-height: 1.3;
 
-      letter-spacing: 0.16em;
+      font-weight: 400;
+
+      letter-spacing: 0.1em;
 
       text-transform: uppercase;
     }
 
+
     .poster-hero h1 {
-      max-width: 165mm;
-
-      margin:
-        5mm
-        auto
-        0;
-
-      color:
-        var(--poster-ink);
-
-      font-family:
-        var(--print-font-brand);
-
-      font-size: 12.2mm;
-
-      line-height: 0.98;
-
-      font-weight: 800;
-
-      letter-spacing: -0.05em;
-
-      text-wrap: balance;
-    }
-
-    .poster-description {
-      max-width: 145mm;
+      max-width: 160mm;
 
       margin:
         4.5mm
@@ -607,91 +517,144 @@ export function createPosterDocument({
         0;
 
       color:
-        var(--poster-muted);
+        var(--poster-ink);
 
-      font-size: 3.35mm;
+      font-family:
+        var(--print-font-brand);
 
-      line-height: 1.58;
+      font-size: 10mm;
+
+      line-height: 1.1;
+
+      font-weight: 400;
+
+      letter-spacing: -0.02em;
 
       text-wrap: balance;
     }
 
-    .poster-hero-rule {
-      display: grid;
 
-      grid-template-columns:
-        24mm
-        3mm
-        24mm;
+    .poster-description {
+      max-width: 130mm;
 
-      align-items: center;
-      justify-content: center;
+      margin:
+        4mm
+        auto
+        0;
 
-      gap: 2mm;
+      color:
+        var(--poster-muted);
 
-      margin-top: 6mm;
+      font-size: 2.8mm;
+
+      line-height: 1.5;
+
+      font-weight: 400;
+
+      text-wrap: balance;
     }
 
-    .poster-hero-rule span {
-      height: 0.4mm;
 
-      background:
-        rgba(103, 58, 244, 0.30);
+    /* =========================================================
+       COMPACT HERO
+       يستخدم عندما يكون لدينا محتوى طويل مثل القوانين
+       ========================================================= */
+
+    .poster-page-compact .poster-hero {
+      padding:
+        8mm
+        5mm
+        6mm;
     }
 
-    .poster-hero-rule i {
-      width: 3mm;
-      height: 3mm;
 
-      border-radius: 50%;
+    .poster-page-compact .poster-hero h1 {
+      margin-top: 3mm;
 
-      background:
-        var(--poster-accent);
+      font-size: 7.5mm;
+
+      line-height: 1.08;
     }
 
-    /* =====================================================
+
+    .poster-page-compact .poster-description {
+      margin-top: 2.5mm;
+
+      font-size: 2.45mm;
+
+      line-height: 1.4;
+    }
+
+
+    /* =========================================================
        DETAILS
-       ===================================================== */
+       ========================================================= */
 
     .poster-details {
-      position: relative;
-
-      z-index: 1;
-
       display: grid;
 
       grid-template-columns:
         repeat(3, minmax(0, 1fr));
 
-      gap: 3mm;
+      gap: 0;
+
+      flex-shrink: 0;
 
       margin:
-        4mm
-        2mm
+        0
+        6mm;
+
+      padding:
+        5mm
         0;
+
+      border-top:
+        0.25mm solid
+        rgba(103, 58, 244, 0.12);
+
+      border-bottom:
+        0.25mm solid
+        rgba(103, 58, 244, 0.12);
+
+      page-break-inside: avoid;
+      break-inside: avoid;
     }
 
+
     .poster-detail {
-      min-height: 23mm;
-
-      border-radius: 5mm;
-
-      background: #ffffff;
-
-      border:
-        0.35mm solid
-        rgba(103, 58, 244, 0.18);
-
-      padding: 4mm;
+      padding:
+        0
+        4mm;
 
       text-align: center;
 
-      box-shadow:
-        0 2mm 6mm
-        rgba(31, 25, 78, 0.06);
+      border-right:
+        0.25mm solid
+        rgba(103, 58, 244, 0.1);
 
+      page-break-inside: avoid;
       break-inside: avoid;
     }
+
+
+    .poster-detail:last-child {
+      border-right: none;
+    }
+
+
+    [dir="rtl"] .poster-detail {
+      border-right: none;
+
+      border-left:
+        0.25mm solid
+        rgba(103, 58, 244, 0.1);
+    }
+
+
+    [dir="rtl"] .poster-detail:last-child {
+      border-left: none;
+    }
+
 
     .poster-detail span {
       display: block;
@@ -699,135 +662,174 @@ export function createPosterDocument({
       color:
         var(--poster-muted);
 
-      font-size: 2.1mm;
+      font-size: 1.9mm;
 
-      font-weight: 800;
+      line-height: 1.3;
+
+      font-weight: 400;
+
+      letter-spacing: 0.06em;
 
       text-transform: uppercase;
-
-      letter-spacing: 0.085em;
     }
+
 
     .poster-detail strong {
       display: block;
 
-      margin-top: 2mm;
+      margin-top: 1.8mm;
 
       color:
-        var(--poster-primary);
+        var(--poster-ink);
 
       font-family:
         var(--print-font-brand);
 
-      font-size: 3.6mm;
+      font-size: 3mm;
 
-      line-height: 1.25;
+      line-height: 1.3;
+
+      font-weight: 400;
 
       overflow-wrap: anywhere;
     }
 
-    /* =====================================================
-       BODY CONTENT
-       ===================================================== */
+
+    /* =========================================================
+       CONTENT
+       ========================================================= */
 
     .poster-content {
-      position: relative;
+      flex: 1;
 
-      z-index: 1;
+      min-height: 0;
 
       margin:
-        6mm
-        2mm
+        4mm
+        4mm
         0;
-
-      border-radius: 6mm;
-
-      background:
-        var(--print-secondary);
-
-      border:
-        0.35mm solid
-        rgba(103, 58, 244, 0.15);
-
-      padding: 6mm;
 
       color:
         var(--poster-ink);
+
+      font-size: 2.6mm;
+
+      line-height: 1.4;
+
+      overflow: hidden;
+
+      page-break-inside: avoid;
+      break-inside: avoid;
     }
+
+
+    /* =========================================================
+       CONTENT TITLE
+       ========================================================= */
 
     .poster-content-title {
       margin:
         0
         0
-        4mm;
-
-      text-align: center;
+        3.5mm;
 
       color:
-        var(--poster-primary);
+        var(--poster-ink);
 
-      font-size: 2.8mm;
+      font-family:
+        var(--print-font-brand);
 
-      font-weight: 900;
+      font-size: 4mm;
 
-      letter-spacing: 0.12em;
+      line-height: 1.25;
 
-      text-transform: uppercase;
+      font-weight: 400;
+
+      page-break-after: avoid;
+      break-after: avoid;
     }
+
+
+    /* =========================================================
+       LAWS GRID
+       ========================================================= */
 
     .poster-grid {
       display: grid;
 
+      /*
+       * أهم تعديل:
+       * القوانين أصبحت عمودين بدلاً من عمود واحد.
+       */
       grid-template-columns:
         repeat(2, minmax(0, 1fr));
 
-      gap: 3mm;
+      column-gap: 8mm;
+
+      row-gap: 0;
+
+      width: 100%;
+
+      box-sizing: border-box;
     }
+
+
+    /* =========================================================
+       LAW CARD
+       ========================================================= */
 
     .poster-card {
       display: grid;
 
       grid-template-columns:
-        9mm
-        1fr;
+        7mm
+        minmax(0, 1fr);
 
-      gap: 3mm;
+      gap: 2.5mm;
 
-      border-radius: 4.5mm;
+      align-items: start;
 
-      background: #ffffff;
+      min-width: 0;
 
-      border:
-        0.3mm solid
-        rgba(103, 58, 244, 0.15);
+      padding:
+        2.5mm
+        0;
 
-      padding: 3.5mm;
+      border-bottom:
+        0.25mm solid
+        rgba(103, 58, 244, 0.09);
 
+      background: transparent;
+
+      page-break-inside: avoid;
       break-inside: avoid;
     }
 
+
+    /* =========================================================
+       LAW NUMBER
+       ========================================================= */
+
     .poster-card-number {
-      display: grid;
+      display: block;
 
-      width: 8mm;
-      height: 8mm;
-
-      place-items: center;
-
-      border-radius: 50%;
-
-      background:
-        var(--poster-primary);
-
-      color: #ffffff;
+      color:
+        var(--poster-accent);
 
       font-family:
         var(--print-font-brand);
 
-      font-size: 2.7mm;
+      font-size: 2.6mm;
 
-      font-weight: 900;
+      line-height: 1.3;
+
+      font-weight: 400;
     }
+
+
+    /* =========================================================
+       LAW TITLE
+       ========================================================= */
 
     .poster-card h2 {
       margin: 0;
@@ -838,94 +840,154 @@ export function createPosterDocument({
       font-family:
         var(--print-font-brand);
 
-      font-size: 3.2mm;
+      font-size: 3mm;
 
-      line-height: 1.2;
+      line-height: 1.3;
+
+      font-weight: 400;
+
+      overflow-wrap: anywhere;
     }
+
+
+    /* =========================================================
+       LAW DESCRIPTION
+       ========================================================= */
 
     .poster-card p {
       margin:
-        1.2mm
+        1mm
         0
         0;
 
       color:
         var(--poster-muted);
 
-      font-size: 2.4mm;
+      font-size: 2.3mm;
 
-      line-height: 1.44;
-    }
+      line-height: 1.35;
 
-    /* =====================================================
-       FOOTER
-       ===================================================== */
-
-    .poster-footer {
-      position: relative;
-
-      z-index: 1;
-
-      display: flex;
-
-      align-items: flex-end;
-      justify-content: space-between;
-
-      gap: 8mm;
-
-      margin-top: auto;
-
-      padding:
-        8mm
-        2mm
-        1mm;
-    }
-
-    .poster-footer strong {
-      color:
-        var(--poster-primary);
-
-      font-family:
-        var(--print-font-brand);
-
-      font-size: 3mm;
-    }
-
-    .poster-footer span {
-      color:
-        var(--poster-muted);
-
-      font-size: 2.35mm;
+      font-weight: 400;
 
       overflow-wrap: anywhere;
     }
 
-    /* =====================================================
+
+    /* =========================================================
+       FOOTER
+       ========================================================= */
+
+    .poster-footer {
+      display: flex;
+
+      justify-content: space-between;
+
+      align-items: center;
+
+      gap: 8mm;
+
+      flex-shrink: 0;
+
+      margin-top: auto;
+
+      padding:
+        5mm
+        4mm
+        0;
+
+      color:
+        var(--poster-muted);
+
+      font-size: 1.9mm;
+
+      line-height: 1.3;
+
+      font-weight: 400;
+
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+
+
+    .poster-footer span {
+      min-width: 0;
+
+      overflow-wrap: anywhere;
+    }
+
+
+    .poster-footer span:first-child {
+      color:
+        var(--poster-primary);
+    }
+
+
+    /* =========================================================
        PRINT
-       ===================================================== */
+       ========================================================= */
 
     @media print {
+
+      @page {
+        size: A4 portrait;
+
+        margin: 0;
+      }
+
+
       .poster-page {
         width: 210mm;
+
         height: 297mm;
+
         min-height: 297mm;
+
+        max-height: 297mm;
 
         margin: 0;
 
+        padding: 9mm;
+
         overflow: hidden;
+
+        page-break-after: avoid;
+        break-after: avoid;
       }
 
+
       .poster-frame {
+        width: 100%;
+
+        height: 279mm;
+
+        min-height: 279mm;
+
+        max-height: 279mm;
+
+        overflow: hidden;
+
         box-shadow: none;
+
+        page-break-inside: avoid;
+        break-inside: avoid;
+      }
+
+
+      .poster-brand,
+      .poster-hero,
+      .poster-details,
+      .poster-content,
+      .poster-card,
+      .poster-footer {
+        page-break-inside: avoid;
+        break-inside: avoid;
       }
     }
   `;
 
   return {
     title,
-
     orientation: "portrait",
-
     kind: "poster",
 
     html: createPrintableHtml({

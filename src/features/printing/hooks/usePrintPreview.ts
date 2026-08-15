@@ -1,32 +1,40 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 
-import type {
-  PrintableDocument,
-} from "../types/print.types";
+import type { PrintableDocument } from "../types/print.types";
 
 export function usePrintPreview() {
   const [document, setDocument] =
     useState<PrintableDocument | null>(null);
+
+  const openPreview = useCallback(
+    (printableDocument: PrintableDocument) => {
+      setDocument(printableDocument);
+    },
+    [],
+  );
+
+  const closePreview = useCallback(() => {
+    setDocument(null);
+  }, []);
+
+  const setOpen = useCallback(
+    (open: boolean) => {
+      if (!open) {
+        setDocument(null);
+      }
+    },
+    [],
+  );
 
   return {
     document,
 
     isOpen: Boolean(document),
 
-    openPreview: (
-      printableDocument: PrintableDocument,
-    ) => {
-      setDocument(printableDocument);
-    },
+    openPreview,
 
-    closePreview: () => {
-      setDocument(null);
-    },
+    closePreview,
 
-    setOpen: (open: boolean) => {
-      if (!open) {
-        setDocument(null);
-      }
-    },
+    setOpen,
   };
 }
