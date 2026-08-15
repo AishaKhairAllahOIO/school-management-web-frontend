@@ -41,7 +41,7 @@ export type ScheduleQualityReport = {
 };
 
 export type SchedulePeriod = {
-  entry_id : number | string;
+  entry_id: number | string;
   period_index: number;
   subject_name: string | null;
   teacher_name: string | null;
@@ -76,10 +76,7 @@ export type ScheduleViewPayload = {
 export type UpdateScheduleEntryPayload = {
   teacher_id?: number;
   grade_subject_id?: number;
-  day?: ScheduleDay;
-  period_index?: number;
 };
-
 export type UpdateScheduleEntryVariables = {
   entryId: number | string;
   payload: UpdateScheduleEntryPayload;
@@ -106,3 +103,15 @@ export interface GenerateScheduleParams {
   academic_year_id: number;
   semester_id: number;
 }
+export type AddScheduleEntryPayload = {
+  schedule_id: number;
+  class_room_id: number;
+  teacher_id: number;
+  teacher_assignment_id: number;
+  grade_subject_id: number;
+  day: ScheduleDay;
+};
+
+export type AddScheduleEntryVariables = {
+  payload: AddScheduleEntryPayload;
+};
