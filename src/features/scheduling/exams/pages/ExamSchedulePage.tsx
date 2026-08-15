@@ -261,8 +261,7 @@ function PageHeader({
 }) {
   const stats = useMemo(() => {
     const subjects = exams.reduce(
-      (total, exam) =>
-        total + exam.subjects.length,
+      (total, exam) => total + exam.subjects.length,
       0,
     );
 
@@ -282,82 +281,61 @@ function PageHeader({
   }, [exams]);
 
   return (
-    <section className="overflow-hidden rounded-[26px] border border-border/45 bg-card shadow-[0_12px_40px_rgba(30,20,70,0.045)]">
-      <div className="relative px-4 py-3.5 sm:px-5">
-        {/* Soft decorative background */}
-        <div className="absolute -right-16 -top-20 h-40 w-40 rounded-full bg-violet-400/[0.08] blur-3xl" />
+    <section className="rounded-[26px] border border-border/45 bg-card p-3.5 shadow-[0_10px_35px_rgba(30,20,70,0.035)] sm:p-4">
+      <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
 
-        <div className="absolute -bottom-20 left-1/3 h-36 w-36 rounded-full bg-cyan-400/[0.06] blur-3xl" />
+        {/* ---------------------------------------------------------------- */}
+        {/* Title                                                             */}
+        {/* ---------------------------------------------------------------- */}
 
-        <div className="relative flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+        <div className="flex items-center gap-3">
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px] bg-violet-50 text-violet-600">
+            <ClipboardList size={19} />
+          </span>
 
-          {/* ---------------------------------------------------------------- */}
-          {/* Title                                                             */}
-          {/* ---------------------------------------------------------------- */}
+          <div>
+            <h1 className="text-[16px] font-semibold tracking-[-0.02em]">
+              Exam Schedules
+            </h1>
 
-          <div className="flex min-w-0 items-center gap-3">
-            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px] bg-violet-50 text-violet-600">
-              <ClipboardList size={19} />
-            </span>
-
-            <div className="min-w-0">
-              <h1 className="text-[16px] font-semibold tracking-[-0.02em]">
-                Exam Schedules
-              </h1>
-
-              <p className="mt-0.5 flex items-center gap-1.5 text-[11px] text-muted-foreground">
-                <CalendarDays size={11} />
-
-                <span>{academicYear}</span>
-
-                <span>·</span>
-
-                <span>{semester}</span>
-              </p>
-            </div>
+            <p className="mt-0.5 text-[11px] text-muted-foreground">
+              {academicYear} · {semester}
+            </p>
           </div>
+        </div>
 
-          {/* ---------------------------------------------------------------- */}
-          {/* Actions + Compact Stats                                          */}
-          {/* ---------------------------------------------------------------- */}
+        {/* ---------------------------------------------------------------- */}
+        {/* Statistics + Action                                               */}
+        {/* ---------------------------------------------------------------- */}
 
-          <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <MetricCard
+            label="Exams"
+            value={stats.exams}
+            className="border-violet-200/60 bg-violet-50/70 text-violet-700"
+          />
 
-            {/* Compact Statistics */}
-            <div className="flex items-center gap-1.5">
-              <MiniStat
-                label="Exams"
-                value={stats.exams}
-                icon={ClipboardList}
-                className="border-violet-100 bg-violet-50 text-violet-700"
-              />
+          <MetricCard
+            label="Quizzes"
+            value={stats.quizzes}
+            className="border-cyan-200/60 bg-cyan-50/70 text-cyan-700"
+          />
 
-              <MiniStat
-                label="Quizzes"
-                value={stats.quizzes}
-                icon={CheckCircle2}
-                className="border-cyan-100 bg-cyan-50 text-cyan-700"
-              />
+          <MetricCard
+            label="Subjects"
+            value={stats.subjects}
+            className="border-emerald-200/60 bg-emerald-50/70 text-emerald-700"
+          />
 
-              <MiniStat
-                label="Subjects"
-                value={stats.subjects}
-                icon={GraduationCap}
-                className="border-emerald-100 bg-emerald-50 text-emerald-700"
-              />
-            </div>
-
-            {/* Create Exam */}
-            <button
-              type="button"
-              onClick={onCreate}
-              disabled={isCreating}
-              className="inline-flex h-9 items-center justify-center gap-2 rounded-full bg-violet-600 px-4 text-[12px] font-medium text-white shadow-[0_6px_16px_rgba(124,58,237,0.16)] transition hover:bg-violet-700 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              <Plus size={14} />
-              Create Exam
-            </button>
-          </div>
+          <button
+            type="button"
+            onClick={onCreate}
+            disabled={isCreating}
+            className="inline-flex h-9 items-center justify-center gap-2 rounded-full bg-violet-600 px-4 text-[12px] font-medium text-white shadow-[0_6px_16px_rgba(124,58,237,0.14)] transition hover:bg-violet-700 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            <Plus size={14} />
+            Create Exam
+          </button>
         </div>
       </div>
     </section>
@@ -365,38 +343,32 @@ function PageHeader({
 }
 
 /* -------------------------------------------------------------------------- */
-/* Compact Statistic                                                          */
+/* Metric Card                                                                */
 /* -------------------------------------------------------------------------- */
 
-function MiniStat({
+function MetricCard({
   label,
   value,
-  icon: Icon,
   className,
 }: {
   label: string;
-  value: number;
-  icon: typeof ClipboardList;
+  value: string | number;
   className: string;
 }) {
   return (
-    <div
-      className={`inline-flex h-9 items-center gap-2 rounded-full border px-2.5 ${className}`}
+    <article
+      className={`flex h-9 min-w-[82px] items-center rounded-[13px] border px-3 ${className}`}
     >
-      <span className="flex h-6 w-6 items-center justify-center rounded-full bg-white/70">
-        <Icon size={12} />
-      </span>
-
-      <span className="flex items-baseline gap-1 pr-0.5">
-        <span className="text-[12px] font-semibold leading-none">
-          {value}
-        </span>
-
-        <span className="text-[9px] font-medium opacity-65">
+      <div className="flex min-w-0 flex-col justify-center">
+        <p className="text-[9px] font-medium uppercase leading-none tracking-[0.04em] opacity-65">
           {label}
-        </span>
-      </span>
-    </div>
+        </p>
+
+        <p className="mt-1 text-[12px] font-semibold leading-none">
+          {value}
+        </p>
+      </div>
+    </article>
   );
 }
 

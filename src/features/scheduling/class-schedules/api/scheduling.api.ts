@@ -5,6 +5,7 @@ import { API_ENDPOINTS } from "@/services/api/endpoints";
 import type {
   GenerateScheduleParams,
   UpdateScheduleEntryPayload,
+  AddScheduleEntryPayload,
 } from "../types/schedule.types";
 
 export const schedulingApi = {
@@ -66,6 +67,15 @@ export const schedulingApi = {
   ) => {
     const response = await axiosClient.put(
       API_ENDPOINTS.SCHEDULING.UPDATE_ENTRY(entryId),
+      payload,
+    );
+
+    return response.data;
+  },
+
+  addEntry: async (payload: AddScheduleEntryPayload) => {
+    const response = await axiosClient.post(
+      API_ENDPOINTS.SCHEDULING.ADD_ENTRY,
       payload,
     );
 

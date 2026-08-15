@@ -9,8 +9,9 @@ import { useAcademicSettings } from "@/features/settings/academic/hooks/useAcade
 import { schedulingApi } from "../api/scheduling.api";
 
 import type {
-  GenerateSchedulePayload,
+  AddScheduleEntryPayload,
   AdminSchedule,
+  GenerateSchedulePayload,
   TeacherSchedule,
   UpdateScheduleEntryVariables,
 } from "../types/schedule.types";
@@ -162,6 +163,31 @@ export function useUpdateScheduleEntry() {
 
     onSuccess: async () => {
       toast.success("Schedule entry updated successfully.");
+
+      await queryClient.invalidateQueries({
+        queryKey: scheduleQueryKey,
+      });
+
+      await queryClient.invalidateQueries({
+        queryKey: teacherScheduleQueryKey,
+      });
+    },
+
+    onError: (error) => {
+      toast.error(getScheduleErrorMessage(error));
+    },
+  });
+}
+
+export function useAddScheduleEntry() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (payload: AddScheduleEntryPayload) =>
+      schedulingApi.addEntry(payload),
+
+    onSuccess: async () => {
+      toast.success("Schedule entry added successfully.");
 
       await queryClient.invalidateQueries({
         queryKey: scheduleQueryKey,
