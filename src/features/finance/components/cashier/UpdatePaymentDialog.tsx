@@ -1,3 +1,5 @@
+// features/finance/components/cashier/UpdatePaymentDialog.tsx
+
 import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
@@ -61,13 +63,13 @@ export function UpdatePaymentDialog({ open, onOpenChange, payment, isLoading, on
 
   function handleFormSubmit(values: UpdatePaymentPayload) {
     if (!payment) return;
-    
+
     const payload = {
       ...values,
       paperReceiptNo: values.paperReceiptNo || null,
       digitalReference: values.digitalReference || null,
     };
-    
+
     onSubmit(payment.id, payload);
   }
 
@@ -82,7 +84,6 @@ export function UpdatePaymentDialog({ open, onOpenChange, payment, isLoading, on
         </DialogHeader>
 
         <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-5 mt-4">
-          
           {/* Read-Only Receipt Amount Reminder */}
           <div className="soft-purple-gradient flex items-center justify-between rounded-2xl border border-primary/20 p-4 text-sm">
             <span className="font-medium text-muted-foreground">Receipt Amount:</span>

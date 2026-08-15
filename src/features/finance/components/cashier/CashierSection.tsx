@@ -1,20 +1,17 @@
+// features/finance/components/cashier/CashierSection.tsx
+
 import { useMemo, useState } from "react";
-import { Plus, ReceiptText } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
+import { ReceiptText } from "lucide-react";
 
 import { Button } from "@/shared/ui/button";
-import { axiosClient } from "@/services/axios/axiosClient";
-import { API_ENDPOINTS } from "@/services/api/endpoints";
 
 import { PaymentsTable } from "./PaymentsTable";
-import { ProcessPaymentDialog } from "./ProcessPaymentDialog";
 import { UpdatePaymentDialog } from "./UpdatePaymentDialog";
 import { PaymentReceiptDialog } from "./PaymentReceiptDialog";
 import { DeletePaymentDialog } from "./DeletePaymentDialog";
 import { usePayments } from "../../hooks/usePayments";
 
 import type { PaymentReceipt } from "../../types/finance.types";
-import type { PaymentFormValues } from "../../schemas/payment.schema";
 import { FinanceSectionShell } from "../shared/FinanceSectionShell";
 import { FinanceTableSkeleton } from "../shared/FinanceTableSkeleton";
 
@@ -24,16 +21,14 @@ type CashierSectionProps = {
   accountId?: string | number;
   title?: string;
   description?: string;
-  canProcessPayment?: boolean;
 };
 
 export function CashierSection({
   studentId,
-  studentName,
+
   accountId,
-  title = "Student Payments",
-  description = "Record collections and manage student receipts.",
-  canProcessPayment = true,
+  title = "Payment History",
+  description = "Review and manage recorded payments.",
 }: CashierSectionProps = {}) {
   const {
     data: payments = [],
@@ -41,7 +36,6 @@ export function CashierSection({
     isError,
     isFetching,
     refetch,
-    processPayment,
     updatePayment,
     deletePayment,
   } = usePayments();
@@ -59,88 +53,14 @@ export function CashierSection({
     [accountId, payments, studentId],
   );
 
-  const [createOpen, setCreateOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [selectedPayment, setSelectedPayment] = useState<PaymentReceipt | null>(null);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [selectedPaymentIdToDelete, setSelectedPaymentIdToDelete] = useState<string | number | null>(null);
-
-
   const [viewOpen, setViewOpen] = useState(false);
   const [selectedPaymentIdToView, setSelectedPaymentIdToView] = useState<string | number | null>(null);
 
-  const { data: students = [], isLoading: isLoadingStudents } = useQuery({
-    queryKey: ["students-list"],
-    queryFn: async () => {
-      try {
-        const response = await axiosClient.get(API_ENDPOINTS.STUDENTS.FILTER, {
-          params: { per_page: 100 }
-        }); 
-        const rawData = response.data?.data?.data ?? response.data?.data ?? response.data?.items ?? [];
-        return rawData.map((student: any) => ({
-          id: student.studentId || student.id,
-          name:
-            student.fullName ||
-            student.full_name ||
-            [
-              student.firstName || student.first_name,
-              student.fatherName || student.father_name,
-              student.lastName || student.last_name,
-            ]
-              .filter(Boolean)
-              .join(" ") ||
-            "Unnamed student",
-        }));
-      } catch (error) {
-        return [];
-      }
-    },
-  });
-
-  const paymentStudents = useMemo(
-    () =>
-      studentId === undefined
-        ? students
-        : [
-            {
-              id: studentId,
-              name: studentName || "Selected student",
-            },
-          ],
-    [studentId, studentName, students],
-  );
-
-  function handleProcessPayment(values: PaymentFormValues) {
-    const payload = {
-      ...values,
-      paperReceiptNo: values.paperReceiptNo || null,
-      digitalReference: values.digitalReference || null,
-    };
-
-    processPayment.mutate(payload, {
-      onSuccess: () => {
-        setCreateOpen(false);
-      },
-    });
-  }
-
-  function handleDelete(id: string | number) {
-    setSelectedPaymentIdToDelete(id);
-    setDeleteOpen(true);
-  }
-
-  function confirmDelete() {
-    if (selectedPaymentIdToDelete == null) return;
-    deletePayment.mutate({ id: selectedPaymentIdToDelete, studentId }, {
-      onSuccess: () => {
-        setDeleteOpen(false);
-        setSelectedPaymentIdToDelete(null);
-      },
-    });
-  }
-
-
-  if (isLoadingPayments || isLoadingStudents) {
+  if (isLoadingPayments) {
     return (
       <FinanceSectionShell
         title={title}
@@ -155,10 +75,34 @@ export function CashierSection({
   if (isError) {
     return (
       <div className="flex flex-col items-center justify-center rounded-[18px] border border-destructive/20 bg-destructive/[0.045] py-12 text-center">
-        <Button variant="outline" onClick={() => refetch()} disabled={isFetching}>
-          {isFetching ? "Retrying..." : "Retry Loading Cashier"}
+        <p className="text-sm text-muted-foreground">Failed to load payment history.</p>
+        <Button 
+          variant="outline" 
+          onClick={() => refetch()} 
+          disabled={isFetching}
+          className="mt-4"
+        >
+          {isFetching ? "Retrying..." : "Retry"}
         </Button>
       </div>
+    );
+  }
+
+  function handleDelete(id: string | number) {
+    setSelectedPaymentIdToDelete(id);
+    setDeleteOpen(true);
+  }
+
+  function confirmDelete() {
+    if (selectedPaymentIdToDelete == null) return;
+    deletePayment.mutate(
+      { id: selectedPaymentIdToDelete, studentId },
+      {
+        onSuccess: () => {
+          setDeleteOpen(false);
+          setSelectedPaymentIdToDelete(null);
+        },
+      }
     );
   }
 
@@ -170,37 +114,15 @@ export function CashierSection({
     >
       <PaymentsTable
         payments={visiblePayments}
-        headerAction={
-          canProcessPayment ? <Button
-            type="button"
-            variant="outline"
-            size="icon"
-            onClick={() => setCreateOpen(true)}
-            aria-label="Process payment"
-            title="Process payment"
-            className="h-8 w-8 rounded-[11px] border-primary/25 bg-transparent text-primary shadow-none hover:border-primary/45 hover:bg-primary/[0.045] hover:text-primary"
-          >
-            <Plus className="h-4 w-4" strokeWidth={1.9} />
-          </Button> : undefined
-        } 
         onView={(id) => {
           setSelectedPaymentIdToView(id);
           setViewOpen(true);
         }}
-        onDelete={handleDelete} 
+        onDelete={handleDelete}
         onEdit={(payment) => {
           setSelectedPayment(payment);
           setEditOpen(true);
         }}
-      />
-    
-      <ProcessPaymentDialog
-        open={createOpen}
-        onOpenChange={setCreateOpen}
-        students={paymentStudents}
-        initialStudentId={studentId}
-        isLoading={processPayment.isPending}
-        onSubmit={handleProcessPayment}
       />
 
       <UpdatePaymentDialog
@@ -219,15 +141,17 @@ export function CashierSection({
                 setEditOpen(false);
                 setSelectedPayment(null);
               },
-            },
+            }
           )
         }
       />
 
-
       <DeletePaymentDialog
         open={deleteOpen}
-        onOpenChange={(open: boolean) => { setDeleteOpen(open); if (!open) setSelectedPaymentIdToDelete(null); }}
+        onOpenChange={(open: boolean) => {
+          setDeleteOpen(open);
+          if (!open) setSelectedPaymentIdToDelete(null);
+        }}
         isLoading={deletePayment.isPending}
         onConfirm={confirmDelete}
       />

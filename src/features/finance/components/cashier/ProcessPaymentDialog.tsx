@@ -1,3 +1,5 @@
+// features/finance/components/cashier/ProcessPaymentDialog.tsx
+
 import {
   Dialog,
   DialogContent,
