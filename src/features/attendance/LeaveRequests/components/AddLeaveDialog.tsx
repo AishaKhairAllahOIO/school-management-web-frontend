@@ -43,7 +43,6 @@ export function AddLeaveDialog({ staffList = [], leaveTypes = [] }: Props) {
 
   const createLeaveMutation = useCreateStaffLeave();
 
-  // 1. جلب السنوات الأكاديمية الحقيقية ديناميكياً من السيرفر
   const { data: academicYears = [] } = useQuery({
     queryKey: ['active-academic-years'],
     queryFn: async () => {
@@ -56,7 +55,6 @@ export function AddLeaveDialog({ staffList = [], leaveTypes = [] }: Props) {
     },
   });
 
-  // 2. تحديد السنة الأكاديمية الفعالة تلقائياً (التي تحتوي على is_active أو status نشط، أو كخيار أخير أول سنة متاحة)
   const activeAcademicYearId = useMemo(() => {
     if (!academicYears.length) return null;
     const activeYear = academicYears.find((y: any) => y.is_active || y.status === "active" || y.isCurrent);
@@ -85,7 +83,6 @@ export function AddLeaveDialog({ staffList = [], leaveTypes = [] }: Props) {
 
     if (!employeeId || !leaveTypeId || !startDate || !endDate || !activeAcademicYearId) return;
 
-    // استخدام الـ ID الحقيقي المستخرج من السيرفر بدلاً من الرقم الوهمي 1
     const payload: CreateStaffLeavePayload = {
       staff_id: Number(employeeId),
       leave_type_id: Number(leaveTypeId),

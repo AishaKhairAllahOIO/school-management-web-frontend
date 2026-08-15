@@ -17,6 +17,26 @@ type Props = {
 const inlineControlClass = "h-9 w-full rounded-[11px] border-border/55 bg-background/80 text-[12px] shadow-none"; 
 const PERIODS = [1, 2, 3, 4, 5, 6, 7]; 
  
+const extractStaffRole = (item: any): string => {
+
+  const directRole = item.role || item.user?.role || item.position || item.job_title;
+  if (directRole) {
+    if (Array.isArray(directRole)) return String(directRole[0] || "Staff");
+    if (typeof directRole === 'object') return String(directRole.name || directRole.title || "Staff");
+    return String(directRole);
+  }
+
+  // 2. فحص علاقة الـ roles (شائعة جداً في Laravel Spatie مثل user.roles أو item.roles)
+  const rolesArr = item.roles || item.user?.roles;
+  if (Array.isArray(rolesArr) && rolesArr.length > 0) {
+    const first = rolesArr[0];
+    if (typeof first === 'object') return String(first.name || first.title || "Staff");
+    return String(first);
+  }
+
+  return "Staff";
+};
+
 export function StaffAttendanceTable({ data, isLoading = false, onUpdate }: Props) { 
   return ( 
     <div className="w-full overflow-hidden rounded-[20px] border border-border/60 bg-card shadow-[0_8px_28px_rgba(30,20,70,0.04)]"> 
@@ -63,14 +83,12 @@ export function StaffAttendanceTable({ data, isLoading = false, onUpdate }: Prop
                   const currentStatus = isPresent ? "present" : (item.attendance?.status || "present");
                   const currentPeriods = item.attendance?.missing_periods || [];
 
-                  // استخدام نفس منطق استخراج الـ Role السليم تماماً مثل AddLeaveDialog
-                  const rawRole = (item as any).role || (item.user as any)?.role;
-                  const roleString = Array.isArray(rawRole) ? rawRole[0] : (rawRole || "staff");
+                  // استخراج الرول الحقيقي عبر الدالة الذكية
+                  const roleString = extractStaffRole(item);
                   const isTeacher = roleString.toLowerCase().includes('teach') || roleString.includes('معلم');
 
                   return (
                   <tr key={item.id} className="text-[12px] text-foreground transition-colors hover:bg-muted/[0.22]"> 
-                    {/* اسم الموظف وتحته الـ Role الحقيقي */}
                     <td className="px-4 py-3.5"> 
                       <div className="flex items-center gap-2.5 min-w-0"> 
                         <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[10px] bg-info/[0.09] text-[11px] font-semibold text-info"> 

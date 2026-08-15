@@ -349,7 +349,6 @@ export function StaffAttendanceHistoryPage() {
   );
 }
 
-// مكون البطاقات (يبقى كما هو، فقط تأكدي من وجوده في نفس الملف)
 type SummaryTone = "success" | "destructive" | "info" | "warning" | "primary";
 const summaryToneClasses: Record<SummaryTone, string> = {
   success: "bg-success/[0.10] text-success",
