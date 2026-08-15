@@ -23,7 +23,7 @@ import type { CreateStaffLeavePayload } from "../../staff/types/staffAttendance.
 import { useCreateStaffLeave } from "../hooks/useCreateStaffLeave";
 
 export type LeaveTypeOption = { id: number; name: string };
-export type StaffOption = { id: number; full_name: string; role?: string };
+export type StaffOption = any;
 
 interface Props {
   staffList: StaffOption[];
@@ -40,13 +40,24 @@ export function AddLeaveDialog({ staffList = [], leaveTypes = [] }: Props) {
 
   const createLeaveMutation = useCreateStaffLeave();
 
-  const filteredStaff = useMemo(
-    () =>
-      staffList.filter((staff) =>
-        staff.full_name.toLowerCase().includes(employeeSearch.toLowerCase())
-      ),
-    [staffList, employeeSearch]
-  );
+ const getStaffName = (staff: any) => {
+    if (!staff) return "Unknown";
+
+    const finalName = staff.fullName || staff.name || `${staff.firstName || ''} ${staff.lastName || ''}`.trim();
+    return finalName ? finalName : `Staff #${staff.id}`;
+  };
+
+  const filteredStaff = useMemo(() => {
+    return staffList.filter((staff: any) => {
+      const fullName = getStaffName(staff);
+      const safeSearch = (employeeSearch || "").trim().toLowerCase();
+
+      return (
+        fullName.toLowerCase().includes(safeSearch) ||
+        String(staff?.id || "").includes(safeSearch)
+      );
+    });
+  }, [staffList, employeeSearch]);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -56,7 +67,7 @@ export function AddLeaveDialog({ staffList = [], leaveTypes = [] }: Props) {
     const payload: CreateStaffLeavePayload = {
       staff_id: Number(employeeId),
       leave_type_id: Number(leaveTypeId),
-      academic_year_id: 1, 
+      academic_year_id: 1,
       start_date: startDate,
       end_date: endDate,
     };
@@ -102,27 +113,31 @@ export function AddLeaveDialog({ staffList = [], leaveTypes = [] }: Props) {
               <Input
                 value={employeeSearch}
                 onChange={(event) => setEmployeeSearch(event.target.value)}
-                placeholder="Search by employee name..."
+                placeholder="Search by employee name or ID..."
                 className="h-10 rounded-[13px] border-border/60 ps-9 text-[12px]"
               />
             </div>
 
-            <Select 
-              value={employeeId ? String(employeeId) : ""} 
+            <Select
+              value={employeeId ? String(employeeId) : ""}
               onValueChange={(val) => setEmployeeId(Number(val))}
             >
               <SelectTrigger className="h-10 rounded-[13px] border-border/60 text-[12px]">
                 <SelectValue placeholder="Select employee" />
               </SelectTrigger>
               <SelectContent>
-                {filteredStaff.map((staff) => (
-                  <SelectItem key={staff.id} value={String(staff.id)}>
-                    {staff.full_name} {staff.role ? `· ${staff.role}` : ""}
-                  </SelectItem>
-                ))}
-                {filteredStaff.length === 0 && (
-                  <div className="p-2 text-center text-sm text-muted-foreground">No staff found</div>
-                )}
+               {filteredStaff.map((staff: any) => {
+               const fullName = getStaffName(staff);
+
+               const roleString = Array.isArray(staff?.role) ? staff.role[0] : staff?.role;
+               const roleDisplay = roleString ? ` · ${roleString}` : "";
+
+               return (
+                 <SelectItem key={staff.id} value={String(staff.id)}>
+                   {fullName}{roleDisplay}
+                 </SelectItem>
+    );
+  })}
               </SelectContent>
             </Select>
           </div>
@@ -137,12 +152,12 @@ export function AddLeaveDialog({ staffList = [], leaveTypes = [] }: Props) {
                 <SelectValue placeholder="Select type" />
               </SelectTrigger>
               <SelectContent>
-                {/* استدعاء الأنواع الحقيقية من قاعدة البيانات */}
                 {leaveTypes.map((type) => (
                   <SelectItem key={type.id} value={String(type.id)}>
                     {type.name}
                   </SelectItem>
                 ))}
+                 
               </SelectContent>
             </Select>
           </div>

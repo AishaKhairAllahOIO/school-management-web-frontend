@@ -1,4 +1,7 @@
 import { useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { axiosClient } from "@/services/axios/axiosClient";
+
 import { useStaffLeaves } from "../hooks/useStaffLeaves";
 import { LeaveStats } from "../components/LeaveStats";
 import { LeaveFilters } from "../components/LeaveFilters";
@@ -7,37 +10,42 @@ import { AddLeaveDialog } from "../components/AddLeaveDialog";
 import type { StaffLeave } from "../../staff/types/staffAttendance.types";
 import { LeaveDetailsDrawer } from "../components/LeaveDetailsDrawer";
 
-const DUMMY_STAFF_LIST = [
-  { id: 1, full_name: "Ahmed Ali", role: "Teacher" },
-  { id: 2, full_name: "Sara Omar", role: "Secretary" },
-  { id: 3, full_name: "Mohammad Hasan", role: "Supervisor" },
-];
-
-const DUMMY_LEAVE_TYPES = [
-  { id: 1, name: "Administrative Leave" },
-  { id: 2, name: "Sick Leave" },
-  { id: 3, name: "Emergency Leave" },
-];
-
 export const LeaveRequestsPage = () => {
   const [selectedLeave, setSelectedLeave] = useState<StaffLeave | undefined>();
   const [drawerOpen, setDrawerOpen] = useState(false);
 
-  // معرف الموظف (للتجربة حالياً)
-  const staffId = 1; 
-  
-  const {
-    data = [],
-    isLoading,
-  } = useStaffLeaves(staffId);
+
+  const { data: leavesData = [], isLoading: isLeavesLoading } = useStaffLeaves();
+
+
+  const { data: realStaffList = [] } = useQuery({
+    queryKey: ['real-staff-list'],
+    queryFn: async () => {
+      const response = await axiosClient.get('/admin/staff/showAllStaff');
+      const data = response.data;
+      return Array.isArray(data) ? data : (data?.data || []);
+    }
+  });
+
+
+  const { data: realLeaveTypes = [] } = useQuery({
+    queryKey: ['real-leave-types'],
+    queryFn: async () => {
+      const response = await axiosClient.get('/admin/leave/leaves');
+      const data = response.data;
+      if (Array.isArray(data)) return data;
+      if (Array.isArray(data?.data)) return data.data;
+      if (Array.isArray(data?.data?.data)) return data.data.data;
+      return [];
+    }
+  });
 
   const [search, setSearch] = useState("");
   const [leaveType, setLeaveType] = useState("all");
   const [status, setStatus] = useState("all");
 
   const filteredData = useMemo(() => {
-    // التأكد من أن الداتا مصفوفة قبل عمل Filter
-    const safeData = Array.isArray(data) ? data : [];
+    const safeData = Array.isArray(leavesData) ? leavesData : [];
 
     return safeData.filter((leave: StaffLeave) => {
       const typeName = leave.leave_type?.name || "";
@@ -56,7 +64,7 @@ export const LeaveRequestsPage = () => {
 
       return matchesSearch && matchesType && matchesStatus;
     });
-  }, [data, search, leaveType, status]);
+  }, [leavesData, search, leaveType, status]);
 
   const handleSelectLeave = (leave: StaffLeave) => {
     setSelectedLeave(leave);
@@ -80,7 +88,8 @@ export const LeaveRequestsPage = () => {
           </p>
         </div>
 
-         <AddLeaveDialog staffList={DUMMY_STAFF_LIST} leaveTypes={DUMMY_LEAVE_TYPES} />
+
+        <AddLeaveDialog staffList={realStaffList} leaveTypes={realLeaveTypes} />
       </div>
 
       <LeaveStats
@@ -99,14 +108,14 @@ export const LeaveRequestsPage = () => {
           setLeaveType={setLeaveType}
           status={status}
           setStatus={setStatus}
-          leaveTypes={DUMMY_LEAVE_TYPES}
+          leaveTypes={realLeaveTypes}
         />
       </div>
 
       <LeaveRequestsTable
         data={filteredData}
         compact={false}
-        isLoading={isLoading}
+        isLoading={isLeavesLoading}
         onSelect={handleSelectLeave}
       />
 

@@ -1,15 +1,19 @@
 import { useQuery } from '@tanstack/react-query';
 import { staffLeaveService } from '../api/staffLeave.api';
 
-export const useStaffLeaves = (staffId: string | number) => {
+export const useStaffLeaves = (staffId?: string | number) => {
   return useQuery({
     queryKey: ['staff-leaves', staffId],
     queryFn: async () => {
+      if (!staffId) return [];
       const response = await staffLeaveService.getStaffLeaves(staffId);
-      const responseData = response.data.data;
+      const data = response.data;
       
-      return Array.isArray(responseData) ? responseData : (responseData?.data || []);
+      if (Array.isArray(data)) return data;
+      if (Array.isArray(data?.data)) return data.data;
+      if (Array.isArray(data?.data?.data)) return data.data.data;
+      return [];
     },
-    enabled: !!staffId,
+    enabled: !!staffId, // ✅ لا ينفذ الطلب أبدًا إذا لم يكن هناك موظف محدد
   });
 };

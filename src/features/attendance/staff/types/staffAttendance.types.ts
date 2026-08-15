@@ -18,6 +18,24 @@ export interface StaffAttendanceRecord {
   missing_periods?: MissingPeriod[];
 }
 
+export interface StaffDailyRosterRecord {
+  id: number;
+  user_id: number;
+  degree?: string;
+  attendance: {
+    id: number | null; 
+    status: StaffAttendanceStatus;
+    absence_type: StaffAbsenceType | null;
+    attendance_date: string;
+    staff_leave_id?: number | null;
+  };
+  user: {
+    id: number;
+    first_name: string;
+    last_name: string;
+  };
+}
+
 export interface CreateStaffAttendancePayload {
   staff_id: number;
   attendance_date: string;

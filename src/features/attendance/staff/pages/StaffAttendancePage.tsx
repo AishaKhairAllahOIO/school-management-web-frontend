@@ -1,18 +1,7 @@
-import {
-  CalendarCheck2,
-  CalendarDays,
-  Palmtree,
-  Save,
-  Search,
-} from "lucide-react";
-import {
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import { CalendarCheck2, CalendarDays, Palmtree, Save, Search } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 import { axiosClient } from "@/services/axios/axiosClient";
-import { useQuery } from "@tanstack/react-query";
-
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { AddLeaveDialog } from "../../LeaveRequests/components/AddLeaveDialog";
 import { LeaveRequestsTable } from "../../LeaveRequests/components/LeaveRequestsTable";
 import { useStaffLeaves } from "../../LeaveRequests/hooks/useStaffLeaves";
@@ -20,61 +9,64 @@ import type { StaffLeave } from "../types/staffAttendance.types";
 import { Button } from "@/shared/ui/button";
 import { DatePicker } from "@/shared/ui/date-picker";
 import { Input } from "@/shared/ui/input";
-
 import { AttendanceStats } from "../components/AttendanceStats";
 import { AttendanceFilters } from "../components/StaffAttendanceFilters";
 import { StaffAttendanceTable } from "../components/StaffAttendanceTable";
 import { useStaffAttendance } from "../hooks/useStaffAttendance";
+
+import { useCreateStaffAttendance } from "../hooks/useCreateStaffAttendance";
 import { useUpdateStaffAttendance } from "../hooks/useUpdateStaffAttendance";
-import type {
-  StaffAttendanceRecord,
-  StaffAttendanceStatus,
-  StaffAbsenceType,
-} from "../types/staffAttendance.types";
+import type { StaffDailyRosterRecord } from "../types/staffAttendance.types";
 
 function todayForApi() {
-  return new Date()
-    .toISOString()
-    .slice(0, 10);
+  return new Date().toISOString().slice(0, 10);
 }
 
 export function StaffAttendancePage() {
+  const queryClient = useQueryClient();
   const [draftDate, setDraftDate] = useState(todayForApi());
   const [selectedDate, setSelectedDate] = useState(todayForApi());
-
+  
   const attendanceQuery = useStaffAttendance(selectedDate);
-  const staffIdForLeaves = 1;
-  const leaveQuery = useStaffLeaves(staffIdForLeaves);
+
+  const leaveQuery = useStaffLeaves();
+  
+  const createAttendanceMutation = useCreateStaffAttendance();
   const updateAttendanceMutation = useUpdateStaffAttendance();
 
-  // ✅ جلب قائمة الموظفين الحقيقية لتمريرها لنافذة الإجازات
   const { data: staffList = [] } = useQuery({
     queryKey: ['real-staff-list-for-leave'],
     queryFn: async () => {
       const response = await axiosClient.get('/admin/staff/showAllStaff');
-      return response.data.data || [];
+      const data = response.data.data;
+
+      return Array.isArray(data) ? data : (data?.data || []);
     }
   });
 
-  // ✅ جلب أنواع الإجازات الحقيقية لتمريرها لنافذة الإجازات
-  const { data: leaveTypes = [] } = useQuery({
-    queryKey: ['real-leave-types-for-leave'],
+ const { data: leaveTypes = [] } = useQuery({
+    queryKey: ['leave-types'],
     queryFn: async () => {
       const response = await axiosClient.get('/admin/leave/leaves');
-      return response.data.data || [];
+      const data = response.data;
+      
+
+      if (Array.isArray(data)) return data;
+      if (Array.isArray(data?.data)) return data.data;
+      if (Array.isArray(data?.data?.data)) return data.data.data;
+      return [];
     }
   });
 
-  const [records, setRecords] = useState<StaffAttendanceRecord[]>([]);
+  const [records, setRecords] = useState<StaffDailyRosterRecord[]>([]);
   const [vacations, setVacations] = useState<StaffLeave[]>([]);
-
   const [search, setSearch] = useState("");
   const [role, setRole] = useState("all");
   const [status, setStatus] = useState("all");
   const [absenceType, setAbsenceType] = useState("all");
-
   const [vacationSearch, setVacationSearch] = useState("");
-  const [dirtyIds, setDirtyIds] = useState<Set<string | number>>(new Set());
+  
+  const [dirtyIds, setDirtyIds] = useState<Set<number>>(new Set());
   const [savedAt, setSavedAt] = useState<string | null>(null);
 
   useEffect(() => {
@@ -89,23 +81,23 @@ export function StaffAttendancePage() {
     }
   }, [leaveQuery.data]);
 
-  const filteredAttendance = useMemo(
-    () =>
+  const filteredAttendance = useMemo(() =>
       records.filter((employee) => {
         const normalizedSearch = search.trim().toLowerCase();
-        const staffName = `Staff #${employee.staff_id}`.toLowerCase();
+        const staffName = `${employee.user?.first_name} ${employee.user?.last_name}`.toLowerCase();
+        const currentStatus = (employee.attendance?.status || "present").toLowerCase();
+        const currentAbsence = (employee.attendance?.absence_type || "none").toLowerCase();
 
         return (
           (!normalizedSearch || staffName.includes(normalizedSearch)) &&
-          (status === "all" || employee.status === status) &&
-          (status !== "absent" || absenceType === "all" || employee.absence_type === absenceType)
+          (status === "all" || currentStatus === status.toLowerCase()) &&
+          (status !== "Absent" || absenceType === "all" || currentAbsence === absenceType.toLowerCase())
         );
       }),
     [records, search, status, absenceType],
   );
 
-  const filteredVacations = useMemo(
-    () =>
+  const filteredVacations = useMemo(() =>
       vacations.filter((vacation) => {
         const typeName = vacation.leave_type?.name || "";
         const searchStr = vacationSearch.trim().toLowerCase();
@@ -117,48 +109,29 @@ export function StaffAttendancePage() {
     [vacationSearch, vacations],
   );
 
-  const present = filteredAttendance.filter((item) => item.status === "present").length;
-  const absent = filteredAttendance.filter((item) => item.status === "absent" || item.status === "partial_absence").length;
-  const excused = filteredAttendance.filter((item) => item.absence_type === "excused").length;
-  const unexcused = filteredAttendance.filter((item) => item.absence_type === "unexcused").length;
+  const present = filteredAttendance.filter((item) => (item.attendance?.status || "present") === "present").length;
+  const absent = filteredAttendance.filter((item) => item.attendance?.status === "absent" || item.attendance?.status === "partial_absence").length;
+  const excused = filteredAttendance.filter((item) => item.attendance?.absence_type === "excused").length;
+  const unexcused = filteredAttendance.filter((item) => item.attendance?.absence_type === "unexcused").length;
 
-  const isInitialLoading =
-    attendanceQuery.isLoading ||
-    (leaveQuery.isLoading && leaveQuery.data === undefined);
+  const isInitialLoading = attendanceQuery.isLoading || (leaveQuery.isLoading && leaveQuery.data === undefined);
 
-  function updateRecord(
-    id: string | number,
-    patch: Partial<
-      Pick<
-        StaffAttendanceRecord,
-        "status" | "absence_type"
-      >
-    >,
-  ) {
+  // تحديث محلي في المتصفح فقط
+  function updateRecord(staffId: number, patch: Partial<Pick<StaffDailyRosterRecord["attendance"], "status" | "absence_type">>) {
     setRecords((current) =>
       current.map((record) => {
-        if (record.id !== id) {
-          return record;
-        }
-
-        const next = {
+        if (record.id !== staffId) return record;
+        
+        return {
           ...record,
-          ...patch,
+          attendance: {
+            ...record.attendance,
+            ...patch,
+          }
         };
-
-        if (patch.status === "present") {
-          next.absence_type = null;
-        }
-
-        if (patch.status === "absent") {
-          next.absence_type = next.absence_type ?? "excused";
-        }
-
-        return next;
-      }),
+      })
     );
-
-    setDirtyIds((current) => new Set(current).add(id));
+    setDirtyIds((current) => new Set(current).add(staffId));
     setSavedAt(null);
   }
 
@@ -169,30 +142,41 @@ export function StaffAttendancePage() {
     setSavedAt(null);
   }
 
+
   async function saveAttendance() {
     if (dirtyIds.size === 0) return;
 
     try {
-      for (const id of dirtyIds) {
-        const record = records.find((r) => r.id === id);
-        if (record) {
+      for (const staffId of dirtyIds) {
+        const record = records.find((r) => r.id === staffId);
+        if (!record) continue;
+
+        const isPresent = record.attendance.status === "present";
+        const hasId = !!record.attendance.id;
+
+        if (hasId) {
+
           await updateAttendanceMutation.mutateAsync({
-            id: record.id,
+            id: record.attendance.id!,
             payload: {
-              status: record.status as StaffAttendanceStatus,
-              absence_type: record.absence_type as StaffAbsenceType,
+              status: record.attendance.status,
+              absence_type: isPresent ? null : record.attendance.absence_type,
             },
+          });
+        } else if (!hasId && !isPresent) {
+
+          await createAttendanceMutation.mutateAsync({
+            staff_id: record.id,
+            attendance_date: selectedDate,
+            status: record.attendance.status,
+            absence_type: record.attendance.absence_type,
           });
         }
       }
 
       setDirtyIds(new Set());
-      setSavedAt(
-        new Date().toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-        }),
-      );
+      setSavedAt(new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }));
+      queryClient.invalidateQueries({ queryKey: ["staff-attendances"] });
     } catch (error) {
       console.error("Failed to save attendance changes", error);
     }
@@ -200,13 +184,7 @@ export function StaffAttendancePage() {
 
   return (
     <section className="space-y-4 pt-5">
-      <AttendanceStats
-        present={present}
-        absent={absent}
-        excused={excused}
-        unexcused={unexcused}
-        isLoading={isInitialLoading}
-      />
+      <AttendanceStats present={present} absent={absent} excused={excused} unexcused={unexcused} isLoading={isInitialLoading} />
 
       <div className="overflow-hidden rounded-[22px] border border-border/60 bg-card shadow-[0_10px_30px_rgba(30,20,70,0.045)]">
         <div className="flex flex-col gap-4 px-4 py-4 lg:flex-row lg:items-center lg:justify-between">
@@ -214,7 +192,6 @@ export function StaffAttendancePage() {
             <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[15px] border border-info/10 bg-info/[0.075] text-info">
               <CalendarCheck2 className="h-[19px] w-[19px]" strokeWidth={1.8} />
             </span>
-
             <div className="min-w-0">
               <div className="flex items-center gap-2">
                 <h2 className="text-[14px] font-semibold tracking-[-0.012em] text-foreground">
@@ -231,64 +208,30 @@ export function StaffAttendancePage() {
           </div>
 
           <div className="flex w-full flex-col gap-2 sm:flex-row lg:w-auto lg:items-end">
-            <DatePicker
-              value={draftDate}
-              onChange={setDraftDate}
-              label="Attendance date"
-              className="w-full sm:w-[228px]"
-            />
+            <DatePicker value={draftDate} onChange={setDraftDate} label="Attendance date" className="w-full sm:w-[228px]" />
 
-            <Button
-              type="button"
-              variant="outline"
-              onClick={applyDate}
-              disabled={!draftDate || draftDate === selectedDate}
-              className="h-11 rounded-[13px] border-info/20 bg-transparent px-4 text-info hover:bg-info/[0.055]"
-            >
-              <CalendarDays className="h-4 w-4" />
-              Apply
+            <Button type="button" variant="outline" onClick={applyDate} disabled={!draftDate || draftDate === selectedDate} className="h-11 rounded-[13px] border-info/20 bg-transparent px-4 text-info hover:bg-info/[0.055]">
+              <CalendarDays className="h-4 w-4" /> Apply
             </Button>
 
-            <Button
-              type="button"
-              onClick={saveAttendance}
-              disabled={dirtyIds.size === 0 || updateAttendanceMutation.isPending}
-              className="h-11 rounded-[13px] px-5"
-            >
-              <Save className="h-4 w-4" />
-              {updateAttendanceMutation.isPending ? "Saving..." : "Save"}
+            <Button type="button" onClick={saveAttendance} disabled={dirtyIds.size === 0 || updateAttendanceMutation.isPending || createAttendanceMutation.isPending} className="h-11 rounded-[13px] px-5">
+              <Save className="h-4 w-4" /> {(updateAttendanceMutation.isPending || createAttendanceMutation.isPending) ? "Saving..." : "Save"}
             </Button>
           </div>
         </div>
 
         <div className="border-t border-border/45 bg-muted/[0.10] p-4">
           <AttendanceFilters
-            data={records as any}
-            search={search}
-            setSearch={setSearch}
-            role={role}
-            setRole={setRole}
-            status={status}
-            setStatus={setStatus}
-            absenceType={absenceType}
-            setAbsenceType={setAbsenceType}
+            data={records as any} search={search} setSearch={setSearch} role={role} setRole={setRole} status={status} setStatus={setStatus} absenceType={absenceType} setAbsenceType={setAbsenceType}
           />
         </div>
       </div>
 
-      {savedAt ? (
-        <p className="-mt-1 text-end text-[11px] font-medium text-success">
-          Staff attendance changes saved at {savedAt}.
-        </p>
-      ) : null}
+      {savedAt ? <p className="-mt-1 text-end text-[11px] font-medium text-success">Staff attendance changes saved at {savedAt}.</p> : null}
 
       <div className="grid min-w-0 gap-4 xl:grid-cols-[minmax(0,2fr)_minmax(290px,1fr)]">
         <div className="min-w-0">
-          <StaffAttendanceTable
-            data={filteredAttendance}
-            isLoading={isInitialLoading}
-            onUpdate={updateRecord}
-          />
+          <StaffAttendanceTable data={filteredAttendance} isLoading={isInitialLoading} onUpdate={updateRecord} />
         </div>
 
         <aside className="min-w-0 self-start overflow-hidden rounded-[20px] border border-border/60 bg-card shadow-[0_8px_28px_rgba(30,20,70,0.04)]">
@@ -298,36 +241,20 @@ export function StaffAttendancePage() {
                 <Palmtree className="h-[17px] w-[17px]" strokeWidth={1.75} />
               </span>
               <div className="min-w-0">
-                <h2 className="text-[15px] font-semibold tracking-[-0.015em] text-foreground">
-                  Vacation
-                </h2>
-                <p className="mt-0.5 truncate text-[11px] text-muted-foreground">
-                  Search staff and add vacation directly.
-                </p>
+                <h2 className="text-[15px] font-semibold tracking-[-0.015em] text-foreground">Vacation</h2>
+                <p className="mt-0.5 truncate text-[11px] text-muted-foreground">Search staff and add vacation directly.</p>
               </div>
             </div>
-
-            {/* ✅ تمرير البيانات الحقيقية للـ Dialog */}
             <AddLeaveDialog staffList={staffList} leaveTypes={leaveTypes} />
           </div>
 
           <div className="border-b border-border/45 p-3.5">
             <div className="relative">
               <Search className="absolute start-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                value={vacationSearch}
-                onChange={(event) => setVacationSearch(event.target.value)}
-                placeholder="Search staff vacation..."
-                className="h-10 rounded-[12px] border-border/60 bg-background/80 ps-8 text-[11px] shadow-none"
-              />
+              <Input value={vacationSearch} onChange={(e) => setVacationSearch(e.target.value)} placeholder="Search staff vacation..." className="h-10 rounded-[12px] border-border/60 bg-background/80 ps-8 text-[11px] shadow-none" />
             </div>
           </div>
-
-          <LeaveRequestsTable
-            data={filteredVacations}
-            compact
-            isLoading={isInitialLoading}
-          />
+          <LeaveRequestsTable data={filteredVacations} compact isLoading={isInitialLoading} />
         </aside>
       </div>
     </section>

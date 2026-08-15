@@ -452,16 +452,16 @@ export const API_ENDPOINTS = {
       DETAILS: (id: string | number) => `/admin/staff-attendances/${id}`,
       UPDATE: (id: string | number) => `/admin/staff-attendances/${id}`,
       DELETE: (id: string | number) => `/admin/staff-attendances/${id}`,
-      HISTORY: (staffId: string | number) => `/admin/staff-attendances/staff/${staffId}`,
+      HISTORY: (staffId: string | number) => `/admin/staff-attendances/${staffId}`,
     },
 
     STAFF_LEAVES: {
-      CREATE: "/admin/staff-leaves",
-      GET_BY_STAFF: (staffId: string | number) => `/admin/staff-leaves/${staffId}`,
-      DETAILS: (leaveId: string | number) => `/admin/staff-leaves/${leaveId}/staff`,
-      UPDATE: (id: string | number) => `/admin/staff-leaves/${id}`,
-      DELETE: (id: string | number) => `/admin/staff-leaves/${id}`,
-    },
+  CREATE: "/admin/staff-leaves",
+  GET_BY_STAFF: (staffId: string | number) => `/admin/staff-leaves/${staffId}`,
+  DETAILS: (leaveId: string | number) => `/admin/staff-leaves/${leaveId}/staff`,
+  UPDATE: (leaveId: string | number) => `/admin/staff-leaves/${leaveId}`,
+  DELETE: (leaveId: string | number) => `/admin/staff-leaves/${leaveId}`,
+}
   },
   SCHEDULING: {
   GENERATE: "/auth/scheduale/generate",

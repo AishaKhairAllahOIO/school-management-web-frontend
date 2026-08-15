@@ -121,8 +121,9 @@ export function LeaveRequestsTable({
                   </td>
                   <td className="px-5 py-4 text-center">
                     <div className="flex items-center justify-center gap-2">
-                      <EditLeaveDialog onEdit={() => onSelect?.(item)} />
-                      <DeleteLeaveDialog onDelete={() => console.log("Delete", item.id)} />
+                      {/* ✅ التصحيح هنا: تمرير الخصائص الصحيحة للنوافذ لتتصل بالهوكات مباشرة */}
+                      <EditLeaveDialog leave={item} />
+                      <DeleteLeaveDialog leaveId={item.id} />
                     </div>
                   </td>
                 </tr>
