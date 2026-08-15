@@ -7,7 +7,7 @@ import {
   RefreshCw,
 } from "lucide-react";
 import { useState } from "react";
-
+import { ScheduleViolations } from "../components/ScheduleViolations";
 import { useAcademicSettings } from "@/features/settings/academic/hooks/useAcademicSettings";
 
 import {
@@ -274,6 +274,11 @@ export function ClassSchedulesPage() {
           </div>
         </section>
       )}
+      {schedule && (
+  <ScheduleViolations
+    violations={schedule.quality_report.violations}
+  />
+)}
 
       {!schedule && (
         <EmptyScheduleState

@@ -15,6 +15,14 @@ export const API_ENDPOINTS = {
     DEVICE_TOKENS: "/auth/device-tokens",
   },
 
+  DASHBOARD: {
+    SUPER_ADMIN: "/dashboard/super-admin",
+
+    ADVISER: "/dashboard/adviser",
+
+    SECRETARY: "/dashboard/secretary",
+  },
+
   SETTINGS: {
     GENERAL: "/admin/settings/general",
 
@@ -385,6 +393,7 @@ export const API_ENDPOINTS = {
       DELETE: (id: string | number) => `/admin/staff-leaves/${id}`,
     },
   },
+
   SCHEDULING: {
     GENERATE: "/auth/scheduale/generate",
 

@@ -1,4 +1,8 @@
-import { useEffect, useMemo, useState } from "react";
+import {
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import {
   AlertCircle,
   CalendarDays,
@@ -8,10 +12,19 @@ import {
   GraduationCap,
   Loader2,
   Plus,
+  RefreshCw,
   Trash2,
   Users,
   X,
 } from "lucide-react";
+import {
+  format,
+  isBefore,
+  parse,
+  startOfDay,
+} from "date-fns";
+
+import { Calendar } from "@/shared/ui/date-picker";
 
 import { useExamSetup } from "../hooks/useExamSchedule";
 import {
@@ -37,6 +50,84 @@ interface ExamFormDialogProps {
   onClose: () => void;
 }
 
+/* -------------------------------------------------------------------------- */
+/* Helpers                                                                    */
+/* -------------------------------------------------------------------------- */
+
+function normalizeDate(value: string): string {
+  if (!value) return "";
+
+  // Handles:
+  // 2026-08-20
+  // 2026-08-20T00:00:00
+  // 2026-08-20T00:00:00.000Z
+  return value.slice(0, 10);
+}
+
+function normalizeTime(value: string): string {
+  if (!value) return "";
+
+  // Handles:
+  // 08:30
+  // 08:30:00
+  // 08:30:00.000
+  return value.slice(0, 5);
+}
+
+function parseDateValue(value: string): Date | undefined {
+  const normalized = normalizeDate(value);
+
+  if (!normalized) return undefined;
+
+  const parsed = parse(
+    normalized,
+    "yyyy-MM-dd",
+    new Date(),
+  );
+
+  return Number.isNaN(parsed.getTime())
+    ? undefined
+    : parsed;
+}
+
+function parseTimeValue(value: string): Date | undefined {
+  const normalized = normalizeTime(value);
+
+  if (!normalized) return undefined;
+
+  const parsed = parse(
+    normalized,
+    "HH:mm",
+    new Date(),
+  );
+
+  return Number.isNaN(parsed.getTime())
+    ? undefined
+    : parsed;
+}
+
+function isValidTimeRange(
+  startTime: string,
+  endTime: string,
+): boolean {
+  if (!startTime || !endTime) {
+    return true;
+  }
+
+  const start = parseTimeValue(startTime);
+  const end = parseTimeValue(endTime);
+
+  if (!start || !end) {
+    return false;
+  }
+
+  return isBefore(start, end);
+}
+
+/* -------------------------------------------------------------------------- */
+/* Dialog                                                                     */
+/* -------------------------------------------------------------------------- */
+
 export function ExamFormDialog({
   open,
   exam,
@@ -52,6 +143,7 @@ export function ExamFormDialog({
     useUpdateExamSchedule();
 
   const [title, setTitle] = useState("");
+
   const [type, setType] =
     useState<"exam" | "quiz">("exam");
 
@@ -62,6 +154,9 @@ export function ExamFormDialog({
     ExamFormSubject[]
   >([]);
 
+  const [validationError, setValidationError] =
+    useState<string | null>(null);
+
   const setupQuery =
     useExamSetup(gradeLevelId);
 
@@ -69,8 +164,14 @@ export function ExamFormDialog({
     createMutation.isPending ||
     updateMutation.isPending;
 
+  /* ------------------------------------------------------------------------ */
+  /* Initialize                                                               */
+  /* ------------------------------------------------------------------------ */
+
   useEffect(() => {
     if (!open) return;
+
+    setValidationError(null);
 
     if (exam) {
       setTitle(exam.title);
@@ -81,10 +182,19 @@ export function ExamFormDialog({
         exam.subjects.map((subject) => ({
           grade_subject_id:
             subject.grade_subject_id,
-          exam_date: subject.exam_date,
-          start_time: subject.start_time,
-          end_time: subject.end_time,
-          syllabus: subject.syllabus ?? "",
+
+          exam_date:
+            normalizeDate(subject.exam_date),
+
+          start_time:
+            normalizeTime(subject.start_time),
+
+          end_time:
+            normalizeTime(subject.end_time),
+
+          syllabus:
+            subject.syllabus ?? "",
+
           teacher_ids:
             subject.teachers.map(
               (teacher) =>
@@ -101,6 +211,10 @@ export function ExamFormDialog({
     setGradeLevelId(null);
     setSubjects([]);
   }, [open, exam]);
+
+  /* ------------------------------------------------------------------------ */
+  /* Setup data                                                               */
+  /* ------------------------------------------------------------------------ */
 
   const setupSubjects =
     setupQuery.data ?? [];
@@ -123,6 +237,10 @@ export function ExamFormDialog({
     [subjects],
   );
 
+  /* ------------------------------------------------------------------------ */
+  /* Grade                                                                    */
+  /* ------------------------------------------------------------------------ */
+
   function handleGradeChange(
     value: string,
   ) {
@@ -132,7 +250,12 @@ export function ExamFormDialog({
 
     setGradeLevelId(id);
     setSubjects([]);
+    setValidationError(null);
   }
+
+  /* ------------------------------------------------------------------------ */
+  /* Subjects                                                                 */
+  /* ------------------------------------------------------------------------ */
 
   function addSubject(
     gradeSubjectId: number,
@@ -159,10 +282,15 @@ export function ExamFormDialog({
       {
         grade_subject_id:
           gradeSubjectId,
+
         exam_date: "",
+
         start_time: "",
+
         end_time: "",
+
         syllabus: "",
+
         teacher_ids:
           setupSubject.auto_teachers.map(
             (teacher) =>
@@ -170,6 +298,8 @@ export function ExamFormDialog({
           ),
       },
     ]);
+
+    setValidationError(null);
   }
 
   function removeSubject(
@@ -182,6 +312,8 @@ export function ExamFormDialog({
           gradeSubjectId,
       ),
     );
+
+    setValidationError(null);
   }
 
   function updateSubject(
@@ -196,7 +328,13 @@ export function ExamFormDialog({
           : subject,
       ),
     );
+
+    setValidationError(null);
   }
+
+  /* ------------------------------------------------------------------------ */
+  /* Teachers                                                                 */
+  /* ------------------------------------------------------------------------ */
 
   function toggleTeacher(
     gradeSubjectId: number,
@@ -230,24 +368,159 @@ export function ExamFormDialog({
     );
   }
 
+  /* ------------------------------------------------------------------------ */
+  /* Validation                                                               */
+  /* ------------------------------------------------------------------------ */
+
+  function validateForm(): boolean {
+    if (!title.trim()) {
+      setValidationError(
+        "Please enter an exam title.",
+      );
+      return false;
+    }
+
+    if (gradeLevelId === null) {
+      setValidationError(
+        "Please select a grade.",
+      );
+      return false;
+    }
+
+    if (subjects.length === 0) {
+      setValidationError(
+        "Please select at least one subject.",
+      );
+      return false;
+    }
+
+    const today = startOfDay(new Date());
+
+    for (
+      let index = 0;
+      index < subjects.length;
+      index++
+    ) {
+      const subject = subjects[index];
+
+      const subjectName =
+        setupSubjects.find(
+          (item) =>
+            item.grade_subject_id ===
+            subject.grade_subject_id,
+        )?.subject_name ??
+        `Subject ${index + 1}`;
+
+      if (!subject.exam_date) {
+        setValidationError(
+          `Please select an exam date for ${subjectName}.`,
+        );
+        return false;
+      }
+
+      const examDate = parseDateValue(
+        subject.exam_date,
+      );
+
+      if (
+        !examDate ||
+        isBefore(
+          startOfDay(examDate),
+          today,
+        )
+      ) {
+        setValidationError(
+          `The exam date for ${subjectName} must be today or a future date.`,
+        );
+        return false;
+      }
+
+      if (!subject.start_time) {
+        setValidationError(
+          `Please select a start time for ${subjectName}.`,
+        );
+        return false;
+      }
+
+      if (!subject.end_time) {
+        setValidationError(
+          `Please select an end time for ${subjectName}.`,
+        );
+        return false;
+      }
+
+      if (
+        !isValidTimeRange(
+          subject.start_time,
+          subject.end_time,
+        )
+      ) {
+        setValidationError(
+          `The end time must be after the start time for ${subjectName}.`,
+        );
+        return false;
+      }
+    }
+
+    setValidationError(null);
+
+    return true;
+  }
+
+  /* ------------------------------------------------------------------------ */
+  /* Submit                                                                   */
+  /* ------------------------------------------------------------------------ */
+
   function handleSubmit(
     event: React.FormEvent,
   ) {
     event.preventDefault();
 
-    if (
-      gradeLevelId === null ||
-      !title.trim() ||
-      subjects.length === 0
-    ) {
+    if (!validateForm()) {
       return;
     }
 
+    if (gradeLevelId === null) {
+      return;
+    }
+
+    /*
+     * IMPORTANT:
+     * The API expects:
+     *
+     * exam_date  => yyyy-MM-dd
+     * start_time => HH:mm
+     * end_time   => HH:mm
+     */
+
+    const normalizedSubjects =
+      subjects.map((subject) => ({
+        ...subject,
+
+        exam_date:
+          normalizeDate(
+            subject.exam_date,
+          ),
+
+        start_time:
+          normalizeTime(
+            subject.start_time,
+          ),
+
+        end_time:
+          normalizeTime(
+            subject.end_time,
+          ),
+      }));
+
     const payload: ExamFormData = {
       title: title.trim(),
+
       type,
+
       grade_level_id: gradeLevelId,
-      subjects,
+
+      subjects: normalizedSubjects,
     };
 
     if (exam) {
@@ -290,9 +563,14 @@ export function ExamFormDialog({
       />
 
       <section className="relative z-10 flex max-h-[92vh] w-full max-w-4xl flex-col overflow-hidden rounded-[28px] border border-border/50 bg-card shadow-[0_25px_80px_rgba(15,23,42,0.18)]">
+
+        {/* ------------------------------------------------------------------ */}
+        {/* Header                                                             */}
+        {/* ------------------------------------------------------------------ */}
+
         <header className="flex items-start justify-between border-b border-border/45 p-5">
           <div className="flex items-start gap-3">
-            <span className="flex h-11 w-11 items-center justify-center rounded-[15px] bg-gradient-to-br from-violet-500/15 to-fuchsia-500/10 text-violet-600">
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[15px] bg-gradient-to-br from-violet-500/15 to-fuchsia-500/10 text-violet-600">
               <GraduationCap size={20} />
             </span>
 
@@ -304,8 +582,8 @@ export function ExamFormDialog({
               </h2>
 
               <p className="mt-1 text-[11px] text-muted-foreground">
-                Select a grade, then configure its
-                exam subjects.
+                Select a grade, then configure
+                its exam subjects.
               </p>
             </div>
           </div>
@@ -313,26 +591,55 @@ export function ExamFormDialog({
           <button
             type="button"
             onClick={onClose}
-            className="flex h-8 w-8 items-center justify-center rounded-full bg-muted/50 text-muted-foreground transition hover:bg-muted"
+            disabled={isPending}
+            className="flex h-8 w-8 items-center justify-center rounded-full bg-muted/50 text-muted-foreground transition hover:bg-muted disabled:opacity-50"
           >
             <X size={15} />
           </button>
         </header>
+
+        {/* ------------------------------------------------------------------ */}
+        {/* Form                                                               */}
+        {/* ------------------------------------------------------------------ */}
 
         <form
           onSubmit={handleSubmit}
           className="flex min-h-0 flex-1 flex-col"
         >
           <div className="min-h-0 flex-1 overflow-y-auto p-5">
+
+            {/* -------------------------------------------------------------- */}
+            {/* Validation error                                               */}
+            {/* -------------------------------------------------------------- */}
+
+            {validationError && (
+              <div className="mb-5 flex items-start gap-2.5 rounded-[16px] border border-rose-200/70 bg-rose-50/70 px-3.5 py-3 text-rose-700">
+                <AlertCircle
+                  size={16}
+                  className="mt-0.5 shrink-0"
+                />
+
+                <p className="text-[11px] leading-5">
+                  {validationError}
+                </p>
+              </div>
+            )}
+
+            {/* -------------------------------------------------------------- */}
+            {/* General information                                            */}
+            {/* -------------------------------------------------------------- */}
+
             <div className="grid gap-4 md:grid-cols-2">
+
               <Field label="Exam title">
                 <input
                   value={title}
-                  onChange={(event) =>
+                  onChange={(event) => {
                     setTitle(
                       event.target.value,
-                    )
-                  }
+                    );
+                    setValidationError(null);
+                  }}
                   placeholder="e.g. First Semester Final Exam"
                   className="h-10 w-full rounded-[13px] border border-border/60 bg-background px-3 text-[12px] outline-none transition focus:border-violet-400 focus:ring-2 focus:ring-violet-500/10"
                 />
@@ -342,17 +649,19 @@ export function ExamFormDialog({
                 <div className="grid grid-cols-2 gap-2">
                   <TypeButton
                     active={type === "exam"}
-                    onClick={() =>
-                      setType("exam")
-                    }
+                    onClick={() => {
+                      setType("exam");
+                      setValidationError(null);
+                    }}
                     label="Exam"
                   />
 
                   <TypeButton
                     active={type === "quiz"}
-                    onClick={() =>
-                      setType("quiz")
-                    }
+                    onClick={() => {
+                      setType("quiz");
+                      setValidationError(null);
+                    }}
                     label="Quiz"
                   />
                 </div>
@@ -396,8 +705,13 @@ export function ExamFormDialog({
               </Field>
             </div>
 
+            {/* -------------------------------------------------------------- */}
+            {/* Subjects                                                        */}
+            {/* -------------------------------------------------------------- */}
+
             {gradeLevelId !== null && (
               <div className="mt-6">
+
                 <div className="mb-3 flex items-center justify-between">
                   <div>
                     <h3 className="text-[13px] font-semibold">
@@ -434,8 +748,8 @@ export function ExamFormDialog({
                     />
 
                     <p className="mt-2 text-[11px] text-rose-700">
-                      Could not load subjects for
-                      this grade.
+                      Could not load subjects
+                      for this grade.
                     </p>
 
                     <button
@@ -480,11 +794,9 @@ export function ExamFormDialog({
                                   : "border-border/60 bg-background text-foreground/70 hover:bg-muted/40"
                               }`}
                             >
-                              {selected && (
+                              {selected ? (
                                 <Check size={11} />
-                              )}
-
-                              {!selected && (
+                              ) : (
                                 <Plus size={11} />
                               )}
 
@@ -505,8 +817,8 @@ export function ExamFormDialog({
                         />
 
                         <p className="mt-2 text-[11px] text-muted-foreground">
-                          Select at least one subject
-                          above.
+                          Select at least one
+                          subject above.
                         </p>
                       </div>
                     ) : (
@@ -570,6 +882,10 @@ export function ExamFormDialog({
             )}
           </div>
 
+          {/* ---------------------------------------------------------------- */}
+          {/* Footer                                                           */}
+          {/* ---------------------------------------------------------------- */}
+
           <footer className="flex items-center justify-end gap-2 border-t border-border/45 bg-muted/[0.08] p-4">
             <button
               type="button"
@@ -608,9 +924,9 @@ export function ExamFormDialog({
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/* Subject Form                                                               */
-/* -------------------------------------------------------------------------- */
+/* ========================================================================== */
+/* Subject Form Card                                                          */
+/* ========================================================================== */
 
 function SubjectFormCard({
   subject,
@@ -620,24 +936,53 @@ function SubjectFormCard({
   onToggleTeacher,
 }: {
   subject: ExamFormSubject;
+
   setupSubject: {
     grade_subject_id: number;
     subject_name: string;
+
     auto_teachers: {
       teacher_id: number;
       teacher_name: string;
     }[];
   };
+
   onRemove: () => void;
+
   onUpdate: (
     patch: Partial<ExamFormSubject>,
   ) => void;
+
   onToggleTeacher: (
     teacherId: number,
   ) => void;
 }) {
+  const [dateOpen, setDateOpen] =
+    useState(false);
+
+  const [startTimeOpen, setStartTimeOpen] =
+    useState(false);
+
+  const [endTimeOpen, setEndTimeOpen] =
+    useState(false);
+
+  const selectedDate = parseDateValue(
+    subject.exam_date,
+  );
+
+  const selectedStartTime =
+    parseTimeValue(subject.start_time);
+
+ 
+  const today = startOfDay(new Date());
+
   return (
     <section className="rounded-[20px] border border-border/45 bg-card p-4">
+
+      {/* -------------------------------------------------------------------- */}
+      {/* Subject header                                                       */}
+      {/* -------------------------------------------------------------------- */}
+
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-2.5">
           <span className="flex h-9 w-9 items-center justify-center rounded-[11px] bg-emerald-50 text-emerald-600">
@@ -664,70 +1009,161 @@ function SubjectFormCard({
         </button>
       </div>
 
+      {/* -------------------------------------------------------------------- */}
+      {/* Date + Time                                                           */}
+      {/* -------------------------------------------------------------------- */}
+
       <div className="mt-4 grid gap-3 md:grid-cols-3">
+
+        {/* ------------------------------------------------------------------ */}
+        {/* Date                                                               */}
+        {/* ------------------------------------------------------------------ */}
+
         <Field label="Exam date">
           <div className="relative">
-            <CalendarDays
-              size={13}
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
-            />
-
-            <input
-              type="date"
-              value={subject.exam_date}
-              onChange={(event) =>
-                onUpdate({
-                  exam_date:
-                    event.target.value,
-                })
+            <button
+              type="button"
+              onClick={() =>
+                setDateOpen(
+                  (value) => !value,
+                )
               }
-              className="h-9 w-full rounded-[12px] border border-border/60 bg-background pl-9 pr-2 text-[11px] outline-none focus:border-violet-400"
-            />
+              className={`flex h-9 w-full items-center gap-2 rounded-[12px] border bg-background px-3 text-left text-[11px] outline-none transition ${
+                dateOpen
+                  ? "border-violet-400 ring-2 ring-violet-500/10"
+                  : "border-border/60 hover:border-border"
+              }`}
+            >
+              <CalendarDays
+                size={13}
+                className="shrink-0 text-violet-500"
+              />
+
+              <span
+                className={
+                  selectedDate
+                    ? "text-foreground"
+                    : "text-muted-foreground"
+                }
+              >
+                {selectedDate
+                  ? format(
+                      selectedDate,
+                      "dd MMM yyyy",
+                    )
+                  : "Select date"}
+              </span>
+
+              <ChevronDown
+                size={12}
+                className="ml-auto text-muted-foreground"
+              />
+            </button>
+
+            {dateOpen && (
+              <div className="absolute left-0 top-[calc(100%+6px)] z-40 rounded-[18px] border border-border/60 bg-card p-2 shadow-[0_18px_45px_rgba(15,23,42,0.15)]">
+                <Calendar
+                  mode="single"
+                  selected={selectedDate}
+                  onSelect={(date) => {
+                    if (!date) return;
+
+                    if (
+                      isBefore(
+                        startOfDay(date),
+                        today,
+                      )
+                    ) {
+                      return;
+                    }
+
+                    onUpdate({
+                      exam_date:
+                        format(
+                          date,
+                          "yyyy-MM-dd",
+                        ),
+                    });
+
+                    setDateOpen(false);
+                  }}
+                  disabled={{
+                    before: today,
+                  }}
+                  defaultMonth={
+                    selectedDate ??
+                    today
+                  }
+                  startMonth={today}
+                  captionLayout="label"
+                />
+              </div>
+            )}
           </div>
         </Field>
+
+        {/* ------------------------------------------------------------------ */}
+        {/* Start time                                                         */}
+        {/* ------------------------------------------------------------------ */}
 
         <Field label="Start time">
-          <div className="relative">
-            <Clock3
-              size={13}
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
-            />
+          <TimePicker
+            value={subject.start_time}
+            open={startTimeOpen}
+            onOpenChange={
+              setStartTimeOpen
+            }
+            onChange={(value) => {
+              onUpdate({
+                start_time: value,
+              });
 
-            <input
-              type="time"
-              value={subject.start_time}
-              onChange={(event) =>
-                onUpdate({
-                  start_time:
-                    event.target.value,
-                })
-              }
-              className="h-9 w-full rounded-[12px] border border-border/60 bg-background pl-9 pr-2 text-[11px] outline-none focus:border-violet-400"
-            />
-          </div>
+              setStartTimeOpen(false);
+            }}
+          />
         </Field>
+
+        {/* ------------------------------------------------------------------ */}
+        {/* End time                                                           */}
+        {/* ------------------------------------------------------------------ */}
 
         <Field label="End time">
-          <div className="relative">
-            <Clock3
-              size={13}
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
-            />
-
-            <input
-              type="time"
-              value={subject.end_time}
-              onChange={(event) =>
-                onUpdate({
-                  end_time:
-                    event.target.value,
-                })
+          <TimePicker
+            value={subject.end_time}
+            open={endTimeOpen}
+            onOpenChange={setEndTimeOpen}
+            minTime={
+              selectedStartTime
+                ? format(
+                    selectedStartTime,
+                    "HH:mm",
+                  )
+                : undefined
+            }
+            onChange={(value) => {
+              if (
+                subject.start_time &&
+                !isValidTimeRange(
+                  subject.start_time,
+                  value,
+                )
+              ) {
+                return;
               }
-              className="h-9 w-full rounded-[12px] border border-border/60 bg-background pl-9 pr-2 text-[11px] outline-none focus:border-violet-400"
-            />
-          </div>
+
+              onUpdate({
+                end_time: value,
+              });
+
+              setEndTimeOpen(false);
+            }}
+          />
         </Field>
       </div>
+
+      {/* -------------------------------------------------------------------- */}
+      {/* Syllabus                                                              */}
+      {/* -------------------------------------------------------------------- */}
 
       <div className="mt-3">
         <Field label="Syllabus">
@@ -746,6 +1182,10 @@ function SubjectFormCard({
         </Field>
       </div>
 
+      {/* -------------------------------------------------------------------- */}
+      {/* Teachers                                                              */}
+      {/* -------------------------------------------------------------------- */}
+
       <div className="mt-3">
         <div className="mb-2 flex items-center gap-1.5">
           <Users
@@ -758,7 +1198,8 @@ function SubjectFormCard({
           </span>
 
           <span className="text-[9px] text-muted-foreground">
-            ({subject.teacher_ids.length} selected)
+            ({subject.teacher_ids.length}{" "}
+            selected)
           </span>
         </div>
 
@@ -809,9 +1250,185 @@ function SubjectFormCard({
   );
 }
 
-/* -------------------------------------------------------------------------- */
+/* ========================================================================== */
+/* Time Picker                                                                */
+/* ========================================================================== */
+
+function TimePicker({
+  value,
+  onChange,
+  open,
+  onOpenChange,
+  minTime,
+}: {
+  value: string;
+  onChange: (value: string) => void;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  minTime?: string;
+}) {
+  const current =
+    parseTimeValue(value);
+
+  const currentHour =
+    current?.getHours() ?? 8;
+
+  const currentMinute =
+    current?.getMinutes() ?? 0;
+
+  const hours = Array.from(
+    { length: 24 },
+    (_, index) => index,
+  );
+
+  const minutes = [0, 15, 30, 45];
+
+  function isDisabled(
+    hour: number,
+    minute: number,
+  ) {
+    if (!minTime) return false;
+
+    const minimum =
+      parseTimeValue(minTime);
+
+    if (!minimum) return false;
+
+    const candidate =
+      hour * 60 + minute;
+
+    const minimumMinutes =
+      minimum.getHours() * 60 +
+      minimum.getMinutes();
+
+    return candidate <= minimumMinutes;
+  }
+
+  return (
+    <div className="relative">
+      <button
+        type="button"
+        onClick={() =>
+          onOpenChange(!open)
+        }
+        className={`flex h-9 w-full items-center gap-2 rounded-[12px] border bg-background px-3 text-left text-[11px] outline-none transition ${
+          open
+            ? "border-violet-400 ring-2 ring-violet-500/10"
+            : "border-border/60 hover:border-border"
+        }`}
+      >
+        <Clock3
+          size={13}
+          className="shrink-0 text-violet-500"
+        />
+
+        <span
+          className={
+            value
+              ? "text-foreground"
+              : "text-muted-foreground"
+          }
+        >
+          {current
+            ? format(
+                current,
+                "hh:mm a",
+              )
+            : "Select time"}
+        </span>
+
+        <ChevronDown
+          size={12}
+          className="ml-auto text-muted-foreground"
+        />
+      </button>
+
+      {open && (
+        <div className="absolute left-0 top-[calc(100%+6px)] z-50 w-[250px] rounded-[18px] border border-border/60 bg-card p-3 shadow-[0_18px_45px_rgba(15,23,42,0.15)]">
+
+          <div className="mb-2 flex items-center justify-between">
+            <span className="text-[10px] font-semibold">
+              Select time
+            </span>
+
+            {minTime && (
+              <span className="text-[9px] text-muted-foreground">
+                After {minTime}
+              </span>
+            )}
+          </div>
+
+          <div className="grid max-h-[230px] grid-cols-4 gap-1.5 overflow-y-auto">
+            {hours.flatMap((hour) =>
+              minutes.map(
+                (minute) => {
+                  const disabled =
+                    isDisabled(
+                      hour,
+                      minute,
+                    );
+
+                  const active =
+                    hour ===
+                      currentHour &&
+                    minute ===
+                      currentMinute;
+
+                  const date =
+                    new Date();
+
+                  date.setHours(
+                    hour,
+                    minute,
+                    0,
+                    0,
+                  );
+
+                  const formatted =
+                    format(
+                      date,
+                      "HH:mm",
+                    );
+
+                  return (
+                    <button
+                      key={formatted}
+                      type="button"
+                      disabled={
+                        disabled
+                      }
+                      onClick={() => {
+                        onChange(
+                          formatted,
+                        );
+                      }}
+                      className={`rounded-[9px] px-2 py-1.5 text-[9px] font-medium transition ${
+                        active
+                          ? "bg-violet-600 text-white"
+                          : disabled
+                            ? "cursor-not-allowed bg-muted/20 text-muted-foreground/30"
+                            : "bg-muted/35 text-foreground/70 hover:bg-violet-50 hover:text-violet-700"
+                      }`}
+                    >
+                      {format(
+                        date,
+                        "hh:mm a",
+                      )}
+                    </button>
+                  );
+                },
+              ),
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ========================================================================== */
 /* Shared Components                                                          */
-/* -------------------------------------------------------------------------- */
+/* ========================================================================== */
 
 function Field({
   label,
@@ -823,7 +1440,9 @@ function Field({
   className?: string;
 }) {
   return (
-    <label className={`block ${className}`}>
+    <label
+      className={`block ${className}`}
+    >
       <span className="mb-1.5 block text-[10px] font-medium text-foreground/70">
         {label}
       </span>
