@@ -1,4 +1,4 @@
-export type StaffAttendanceStatus = 'present' | 'absent' | 'partial_absence';
+export type StaffAttendanceStatus = 'present' | 'absent' | 'partial_absence' | 'on_leave';
 export type StaffAbsenceType = 'excused' | 'unexcused';
 
 export interface MissingPeriod {
@@ -10,12 +10,12 @@ export interface MissingPeriod {
 }
 
 export interface StaffAttendanceRecord {
-  id: number;
+  id: number | null; // null تعني حاضر حسب القاعدة الذهبية
   staff_id: number;
   attendance_date: string;
   status: StaffAttendanceStatus;
   absence_type?: StaffAbsenceType | null;
-  missing_periods?: MissingPeriod[];
+  missing_periods?: number[]; // أرقام الحصص في حالة الغياب الجزئي
 }
 
 export interface StaffDailyRosterRecord {
@@ -28,6 +28,7 @@ export interface StaffDailyRosterRecord {
     absence_type: StaffAbsenceType | null;
     attendance_date: string;
     staff_leave_id?: number | null;
+    missing_periods?: number[];
   };
   user: {
     id: number;
@@ -41,7 +42,7 @@ export interface CreateStaffAttendancePayload {
   attendance_date: string;
   status: StaffAttendanceStatus;
   absence_type?: StaffAbsenceType | null;
-  missing_periods?: number[]; 
+  missing_periods?: number[]; // يتم إرسالها عند الغياب الجزئي
 }
 
 export interface StaffLeave {

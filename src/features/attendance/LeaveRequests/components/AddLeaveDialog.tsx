@@ -1,5 +1,8 @@
 import { CalendarDays, Search, UserPlus } from "lucide-react";
 import { useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { axiosClient } from "@/services/axios/axiosClient";
+import { API_ENDPOINTS } from "@/services/api/endpoints";
 
 import { Button } from "@/shared/ui/button";
 import {
@@ -40,9 +43,28 @@ export function AddLeaveDialog({ staffList = [], leaveTypes = [] }: Props) {
 
   const createLeaveMutation = useCreateStaffLeave();
 
- const getStaffName = (staff: any) => {
-    if (!staff) return "Unknown";
+  // 1. جلب السنوات الأكاديمية الحقيقية ديناميكياً من السيرفر
+  const { data: academicYears = [] } = useQuery({
+    queryKey: ['active-academic-years'],
+    queryFn: async () => {
+      const response = await axiosClient.get(API_ENDPOINTS.SETTINGS.ACADEMIC_YEARS);
+      const data = response.data;
+      if (Array.isArray(data)) return data;
+      if (Array.isArray(data?.data)) return data.data;
+      if (Array.isArray(data?.data?.data)) return data.data.data;
+      return [];
+    },
+  });
 
+  // 2. تحديد السنة الأكاديمية الفعالة تلقائياً (التي تحتوي على is_active أو status نشط، أو كخيار أخير أول سنة متاحة)
+  const activeAcademicYearId = useMemo(() => {
+    if (!academicYears.length) return null;
+    const activeYear = academicYears.find((y: any) => y.is_active || y.status === "active" || y.isCurrent);
+    return activeYear ? activeYear.id : academicYears[0].id;
+  }, [academicYears]);
+
+  const getStaffName = (staff: any) => {
+    if (!staff) return "Unknown";
     const finalName = staff.fullName || staff.name || `${staff.firstName || ''} ${staff.lastName || ''}`.trim();
     return finalName ? finalName : `Staff #${staff.id}`;
   };
@@ -51,7 +73,6 @@ export function AddLeaveDialog({ staffList = [], leaveTypes = [] }: Props) {
     return staffList.filter((staff: any) => {
       const fullName = getStaffName(staff);
       const safeSearch = (employeeSearch || "").trim().toLowerCase();
-
       return (
         fullName.toLowerCase().includes(safeSearch) ||
         String(staff?.id || "").includes(safeSearch)
@@ -62,12 +83,13 @@ export function AddLeaveDialog({ staffList = [], leaveTypes = [] }: Props) {
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    if (!employeeId || !leaveTypeId || !startDate || !endDate) return;
+    if (!employeeId || !leaveTypeId || !startDate || !endDate || !activeAcademicYearId) return;
 
+    // استخدام الـ ID الحقيقي المستخرج من السيرفر بدلاً من الرقم الوهمي 1
     const payload: CreateStaffLeavePayload = {
       staff_id: Number(employeeId),
       leave_type_id: Number(leaveTypeId),
-      academic_year_id: 1,
+      academic_year_id: Number(activeAcademicYearId),
       start_date: startDate,
       end_date: endDate,
     };
@@ -80,8 +102,11 @@ export function AddLeaveDialog({ staffList = [], leaveTypes = [] }: Props) {
       setLeaveTypeId("");
       setStartDate("");
       setEndDate("");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Failed to create leave request", error);
+      if (error.response?.data?.errors) {
+        console.log("Validation Errors:", error.response.data.errors);
+      }
     }
   }
 
@@ -127,17 +152,16 @@ export function AddLeaveDialog({ staffList = [], leaveTypes = [] }: Props) {
               </SelectTrigger>
               <SelectContent>
                {filteredStaff.map((staff: any) => {
-               const fullName = getStaffName(staff);
+                 const fullName = getStaffName(staff);
+                 const roleString = Array.isArray(staff?.role) ? staff.role[0] : staff?.role;
+                 const roleDisplay = roleString ? ` · ${roleString}` : "";
 
-               const roleString = Array.isArray(staff?.role) ? staff.role[0] : staff?.role;
-               const roleDisplay = roleString ? ` · ${roleString}` : "";
-
-               return (
-                 <SelectItem key={staff.id} value={String(staff.id)}>
-                   {fullName}{roleDisplay}
-                 </SelectItem>
-    );
-  })}
+                 return (
+                   <SelectItem key={staff.id} value={String(staff.id)}>
+                     {fullName}{roleDisplay}
+                   </SelectItem>
+                 );
+               })}
               </SelectContent>
             </Select>
           </div>
@@ -157,7 +181,6 @@ export function AddLeaveDialog({ staffList = [], leaveTypes = [] }: Props) {
                     {type.name}
                   </SelectItem>
                 ))}
-                 
               </SelectContent>
             </Select>
           </div>
@@ -200,7 +223,7 @@ export function AddLeaveDialog({ staffList = [], leaveTypes = [] }: Props) {
             <Button
               type="submit"
               className="h-10 rounded-[13px]"
-              disabled={!employeeId || !leaveTypeId || !startDate || !endDate || createLeaveMutation.isPending}
+              disabled={!employeeId || !leaveTypeId || !startDate || !endDate || !activeAcademicYearId || createLeaveMutation.isPending}
             >
               {createLeaveMutation.isPending ? "Saving..." : "Add vacation"}
             </Button>

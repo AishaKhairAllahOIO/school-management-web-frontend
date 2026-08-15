@@ -5,7 +5,8 @@ export const useStaffLeaves = (staffId?: string | number) => {
   return useQuery({
     queryKey: ['staff-leaves', staffId],
     queryFn: async () => {
-      if (!staffId) return [];
+
+      if (!staffId) return []; 
       const response = await staffLeaveService.getStaffLeaves(staffId);
       const data = response.data;
       
@@ -14,6 +15,6 @@ export const useStaffLeaves = (staffId?: string | number) => {
       if (Array.isArray(data?.data?.data)) return data.data.data;
       return [];
     },
-    enabled: !!staffId, // ✅ لا ينفذ الطلب أبدًا إذا لم يكن هناك موظف محدد
+    enabled: !!staffId, // 👈 هذا السطر السحري يمنع الطلب التلقائي الخاطئ
   });
 };

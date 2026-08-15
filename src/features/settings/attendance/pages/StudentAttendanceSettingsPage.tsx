@@ -1,5 +1,4 @@
 import {
-  CalendarCheck2,
   RefreshCw,
   UserRoundCheck,
   UsersRound,
@@ -23,6 +22,7 @@ import {
 } from "../hooks/useStudentAttendanceSettings";
 import type { StudentAttendanceSetting } from "../types/student-attendance.types";
 
+import { LeaveTypesSettingsPage } from "../components/LeaveTypesSettingsPage";
 type ActiveSection = "students" | "staff";
 
 type WorkspaceItem = {
@@ -41,8 +41,8 @@ const workspaceItems: WorkspaceItem[] = [
   },
   {
     id: "staff",
-    title: "Staff",
-    description: "Define employee attendance and work rules",
+    title: "Staff Leave Types",
+    description: "Define allowed staff leave types and work rules",
     icon: <UsersRound size={18} strokeWidth={1.8} />,
   },
 ];
@@ -183,7 +183,8 @@ export function StudentAttendanceSettingsPage() {
             </div>
           </>
         ) : (
-          <StaffAttendancePlaceholder />
+          // هنا يتم عرض صفحة تهيئة إجازات الموظفين الحقيقية بدلاً من النص المؤقت
+          <LeaveTypesSettingsPage />
         )}
       </SettingsWorkspace>
 
@@ -273,37 +274,6 @@ export function StudentAttendanceSettingsPage() {
           );
         }}
       />
-    </div>
-  );
-}
-
-function StaffAttendancePlaceholder() {
-  return (
-    <div className="rounded-[22px] border border-dashed border-primary/20 bg-primary/[0.025] px-6 py-14 text-center">
-      <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-[18px] bg-primary/[0.08] text-primary">
-        <UsersRound
-          size={24}
-          strokeWidth={1.7}
-        />
-      </span>
-
-      <h3 className="mt-5 text-[17px] font-medium text-foreground">
-        Staff attendance configuration is not
-        connected yet
-      </h3>
-
-      <p className="mx-auto mt-2 max-w-lg text-[13px] leading-6 text-muted-foreground">
-        No temporary data has been added. Once
-        the staff attendance endpoints are
-        available, this area will use the same
-        clear tables, forms and confirmation
-        dialogs as student attendance.
-      </p>
-
-      <span className="mt-5 inline-flex items-center gap-2 rounded-full border border-primary/15 bg-card px-3.5 py-2 text-[12px] font-medium text-primary">
-        <CalendarCheck2 size={15} />
-        Waiting for staff attendance API
-      </span>
     </div>
   );
 }
