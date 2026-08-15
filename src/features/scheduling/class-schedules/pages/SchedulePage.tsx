@@ -208,7 +208,6 @@ export function ClassSchedulesPage() {
   }) {
     setSelectedClass(classItem);
 
-    // No period is selected when adding.
     setSelectedPeriod(undefined);
 
     setSelectedDay(day);
@@ -564,111 +563,155 @@ export function ClassSchedulesPage() {
       {schedule && (
         <section className="space-y-3">
           {classes.map(
-            (classItem, index) => (
-              <section
-                key={`${classItem.grade_name}-${classItem.class_room_name}`}
-                className={[
-                  "overflow-hidden rounded-[26px] border bg-card",
-                  "shadow-[0_10px_35px_rgba(30,20,70,0.035)]",
-                  "transition-all duration-300",
-                  "hover:-translate-y-[1px]",
-                  index % 5 === 0
-                    ? "border-violet-200/60"
-                    : index % 5 === 1
-                      ? "border-sky-200/60"
-                      : index % 5 === 2
-                        ? "border-emerald-200/60"
-                        : index % 5 === 3
-                          ? "border-amber-200/60"
-                          : "border-rose-200/60",
-                ].join(" ")}
-              >
-                <div
+            (classItem, index) => {
+              const colorIndex =
+                index % 5;
+
+              const cardColors =
+                colorIndex === 0
+                  ? {
+                      border:
+                        "border-violet-200/60",
+                      bg:
+                        "bg-violet-50/45",
+                      icon:
+                        "bg-violet-100 text-violet-600",
+                      button:
+                        "border-violet-200/70 bg-violet-100/80 text-violet-700 hover:bg-violet-100",
+                    }
+                  : colorIndex === 1
+                    ? {
+                        border:
+                          "border-sky-200/60",
+                        bg:
+                          "bg-sky-50/45",
+                        icon:
+                          "bg-sky-100 text-sky-600",
+                        button:
+                          "border-sky-200/70 bg-sky-100/80 text-sky-700 hover:bg-sky-100",
+                      }
+                    : colorIndex === 2
+                      ? {
+                          border:
+                            "border-emerald-200/60",
+                          bg:
+                            "bg-emerald-50/45",
+                          icon:
+                            "bg-emerald-100 text-emerald-600",
+                          button:
+                            "border-emerald-200/70 bg-emerald-100/80 text-emerald-700 hover:bg-emerald-100",
+                        }
+                      : colorIndex === 3
+                        ? {
+                            border:
+                              "border-amber-200/60",
+                            bg:
+                              "bg-amber-50/45",
+                            icon:
+                              "bg-amber-100 text-amber-600",
+                            button:
+                              "border-amber-200/70 bg-amber-100/80 text-amber-700 hover:bg-amber-100",
+                          }
+                        : {
+                            border:
+                              "border-rose-200/60",
+                            bg:
+                              "bg-rose-50/45",
+                            icon:
+                              "bg-rose-100 text-rose-600",
+                            button:
+                              "border-rose-200/70 bg-rose-100/80 text-rose-700 hover:bg-rose-100",
+                          };
+
+              return (
+                <section
+                  key={`${classItem.grade_name}-${classItem.class_room_name}`}
                   className={[
-                    "flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5",
-                    index % 5 === 0
-                      ? "bg-violet-50/45"
-                      : index % 5 === 1
-                        ? "bg-sky-50/45"
-                        : index % 5 === 2
-                          ? "bg-emerald-50/45"
-                          : index % 5 === 3
-                            ? "bg-amber-50/45"
-                            : "bg-rose-50/45",
+                    "overflow-hidden rounded-[26px] border bg-card",
+                    "shadow-[0_10px_35px_rgba(30,20,70,0.035)]",
+                    "transition-all duration-300",
+                    "hover:-translate-y-[1px]",
+                    cardColors.border,
                   ].join(" ")}
                 >
-                  <div className="flex min-w-0 items-center gap-3">
-                    <span
+                  <div
+                    className={[
+                      "flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5",
+                      cardColors.bg,
+                    ].join(" ")}
+                  >
+                    <div className="flex min-w-0 items-center gap-3">
+                      <span
+                        className={[
+                          "flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px]",
+                          cardColors.icon,
+                        ].join(" ")}
+                      >
+                        <CalendarDays size={18} />
+                      </span>
+
+                      <div className="min-w-0">
+                        <h2 className="truncate text-[15px] font-medium">
+                          {
+                            classItem.grade_name
+                          }{" "}
+                          ·{" "}
+                          {
+                            classItem.class_room_name
+                          }
+                        </h2>
+
+                        <p className="mt-1 text-[11px] text-muted-foreground">
+                          Weekly class timetable
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Table-level Add Lesson */}
+                    <button
+                      type="button"
+                      onClick={() =>
+                        openTableAddDialog(
+                          classItem,
+                        )
+                      }
+                      disabled={
+                        isAnyMutationPending
+                      }
                       className={[
-                        "flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px]",
-                        index % 5 === 0
-                          ? "bg-violet-100 text-violet-600"
-                          : index % 5 === 1
-                            ? "bg-sky-100 text-sky-600"
-                            : index % 5 === 2
-                              ? "bg-emerald-100 text-emerald-600"
-                              : index % 5 === 3
-                                ? "bg-amber-100 text-amber-600"
-                                : "bg-rose-100 text-rose-600",
+                        "inline-flex h-9 shrink-0 items-center justify-center gap-2 rounded-full border px-4",
+                        "text-[12px] font-medium shadow-sm",
+                        "transition-all duration-200",
+                        "hover:-translate-y-[1px]",
+                        "disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0",
+                        cardColors.button,
                       ].join(" ")}
                     >
-                      <CalendarDays size={18} />
-                    </span>
-
-                    <div className="min-w-0">
-                      <h2 className="truncate text-[15px] font-medium">
-                        {
-                          classItem.grade_name
-                        }{" "}
-                        ·{" "}
-                        {
-                          classItem.class_room_name
-                        }
-                      </h2>
-
-                      <p className="mt-1 text-[11px] text-muted-foreground">
-                        Weekly class timetable
-                      </p>
-                    </div>
+                      <Plus size={14} />
+                      Add Lesson
+                    </button>
                   </div>
 
-                  {/* Table-level Add Lesson */}
-                  <button
-                    type="button"
-                    onClick={() =>
-                      openTableAddDialog(
+                  <div className="border-t border-border/40 p-3 sm:p-4">
+                    <ScheduleGrid
+                      classes={[
                         classItem,
-                      )
-                    }
-                    disabled={
-                      isAnyMutationPending
-                    }
-                    className="inline-flex h-9 shrink-0 items-center justify-center gap-2 rounded-full bg-primary px-4 text-[12px] font-medium text-primary-foreground shadow-sm transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
-                  >
-                    <Plus size={14} />
-                    Add Lesson
-                  </button>
-                </div>
-
-                <div className="border-t border-border/40 p-3 sm:p-4">
-                  <ScheduleGrid
-                    classes={[
-                      classItem,
-                    ]}
-                    settings={
-                      settings.settings
-                        .scheduleSettings
-                    }
-                    onAdd={
-                      openAddDialog
-                    }
-                    onEdit={
-                      openEditDialog
-                    }
-                  />
-                </div>
-              </section>
-            ),
+                      ]}
+                      settings={
+                        settings.settings
+                          .scheduleSettings
+                      }
+                      onAdd={
+                        openAddDialog
+                      }
+                      onEdit={
+                        openEditDialog
+                      }
+                    />
+                  </div>
+                </section>
+              );
+            },
           )}
         </section>
       )}
@@ -737,10 +780,6 @@ export function ClassSchedulesPage() {
 /* Header                                                                     */
 /* -------------------------------------------------------------------------- */
 
-/* -------------------------------------------------------------------------- */
-/* Header                                                                     */
-/* -------------------------------------------------------------------------- */
-
 function PageHeader({
   academicYear,
   semester,
@@ -791,13 +830,13 @@ function PageHeader({
         {/* Actions + statistics                                             */}
         {/* ---------------------------------------------------------------- */}
 
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center gap-0">
           {hasSchedule && (
-            <div className="flex flex-wrap items-center gap-2.5">
+            <div className="flex flex-wrap items-center gap-1.5">
               <MetricCard
                 label="Lessons"
                 value={totalEntries ?? 0}
-                className="border-violet-200/60 bg-violet-50/70 text-violet-700"
+                className="border-violet-200/50 bg-violet-50/55 text-violet-700"
               />
 
               <MetricCard
@@ -805,8 +844,8 @@ function PageHeader({
                 value={teacherConflicts ?? 0}
                 className={
                   teacherConflicts
-                    ? "border-rose-200/60 bg-rose-50/70 text-rose-700"
-                    : "border-sky-200/60 bg-sky-50/70 text-sky-700"
+                    ? "border-rose-200/50 bg-rose-50/55 text-rose-700"
+                    : "border-sky-200/50 bg-sky-50/55 text-sky-700"
                 }
               />
 
@@ -815,18 +854,22 @@ function PageHeader({
                 value={classConflicts ?? 0}
                 className={
                   classConflicts
-                    ? "border-amber-200/60 bg-amber-50/70 text-amber-700"
-                    : "border-emerald-200/60 bg-emerald-50/70 text-emerald-700"
+                    ? "border-amber-200/50 bg-amber-50/55 text-amber-700"
+                    : "border-emerald-200/50 bg-emerald-50/55 text-emerald-700"
                 }
               />
 
               <MetricCard
                 label="Status"
-                value={isPerfect ? "Perfect" : "Review"}
+                value={
+                  isPerfect
+                    ? "Perfect"
+                    : "Review"
+                }
                 className={
                   isPerfect
-                    ? "border-emerald-200/60 bg-emerald-50/70 text-emerald-700"
-                    : "border-amber-200/60 bg-amber-50/70 text-amber-700"
+                    ? "border-emerald-200/50 bg-emerald-50/55 text-emerald-700"
+                    : "border-amber-200/50 bg-amber-50/55 text-amber-700"
                 }
               />
             </div>
@@ -836,11 +879,14 @@ function PageHeader({
           {/* Regenerate / Generate                                           */}
           {/* -------------------------------------------------------------- */}
 
-          <div className="ml-1.5 lg:ml-2">
+          <div className="ml-4 lg:ml-5">
             <button
               type="button"
               onClick={onGenerate}
-              disabled={!canGenerate || isGenerating}
+              disabled={
+                !canGenerate ||
+                isGenerating
+              }
               className="inline-flex h-9 items-center justify-center gap-2 rounded-full bg-primary px-4 text-[12px] font-medium text-primary-foreground shadow-sm transition-all duration-200 hover:-translate-y-[1px] hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0"
             >
               {isGenerating ? (
@@ -885,27 +931,30 @@ function MetricCard({
   return (
     <article
       className={[
-        "flex h-9 min-w-[88px] items-center justify-center",
-        "rounded-[12px] border px-3",
+        "flex h-8 min-w-[78px] items-center justify-center",
+        "rounded-[10px] border px-2.5",
         "transition-all duration-200",
         "hover:-translate-y-[1px]",
         className,
       ].join(" ")}
     >
       <div className="flex items-baseline gap-1.5 whitespace-nowrap">
-        {/* Label is intentionally larger */}
-        <p className="text-[10px] font-semibold leading-none tracking-[-0.01em]">
+        <p className="text-[9px] font-medium leading-none tracking-[-0.01em]">
           {label}
         </p>
 
-        {/* Number / status value is intentionally smaller */}
-        <p className="text-[11px] font-medium leading-none opacity-75">
+        <p className="text-[10px] font-medium leading-none opacity-70">
           {value}
         </p>
       </div>
     </article>
   );
 }
+
+/* -------------------------------------------------------------------------- */
+/* Empty Schedule State                                                       */
+/* -------------------------------------------------------------------------- */
+
 function EmptyScheduleState({
   error,
   onGenerate,
@@ -950,6 +999,10 @@ function EmptyScheduleState({
     </section>
   );
 }
+
+/* -------------------------------------------------------------------------- */
+/* Error State                                                                */
+/* -------------------------------------------------------------------------- */
 
 function ErrorState({
   title,

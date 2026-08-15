@@ -142,20 +142,26 @@ function PageHeader({
   semester: string;
 }) {
   return (
-    <section className="rounded-[26px] border border-border/45 bg-card p-4 shadow-[0_10px_35px_rgba(30,20,70,0.035)] sm:p-5">
-      <div className="flex items-start gap-3">
-        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[15px] bg-violet-50 text-violet-700">
-          <Award size={20} />
-        </span>
+    <section className="rounded-[24px] border border-border/45 bg-card px-4 py-3.5 shadow-[0_8px_30px_rgba(30,20,70,0.035)] sm:px-4.5 sm:py-4">
+      <div className="flex flex-col gap-3.5 lg:flex-row lg:items-center lg:justify-between">
+        {/* ---------------------------------------------------------------- */}
+        {/* Page identity                                                     */}
+        {/* ---------------------------------------------------------------- */}
 
-        <div className="min-w-0">
-          <h1 className="text-[17px] font-semibold tracking-[-0.02em]">
-            Student Marks
-          </h1>
+        <div className="flex items-center gap-3">
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[13px] bg-primary/[0.09] text-primary">
+            <Award size={19} />
+          </span>
 
-          <p className="mt-1 text-[12px] text-muted-foreground">
-            {academicYear} · {semester}
-          </p>
+          <div className="min-w-0">
+            <h1 className="text-[16px] font-semibold tracking-[-0.02em]">
+              Student Marks
+            </h1>
+
+            <p className="mt-0.5 text-[11px] text-muted-foreground">
+              {academicYear} · {semester}
+            </p>
+          </div>
         </div>
       </div>
     </section>

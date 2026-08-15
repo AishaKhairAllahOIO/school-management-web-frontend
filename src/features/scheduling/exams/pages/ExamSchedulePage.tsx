@@ -281,19 +281,19 @@ function PageHeader({
   }, [exams]);
 
   return (
-    <section className="rounded-[26px] border border-border/45 bg-card p-3.5 shadow-[0_10px_35px_rgba(30,20,70,0.035)] sm:p-4">
-      <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+    <section className="rounded-[24px] border border-border/45 bg-card px-4 py-3.5 shadow-[0_8px_30px_rgba(30,20,70,0.035)] sm:px-4.5 sm:py-4">
+      <div className="flex flex-col gap-3.5 lg:flex-row lg:items-center lg:justify-between">
 
         {/* ---------------------------------------------------------------- */}
-        {/* Title                                                             */}
+        {/* Page identity                                                     */}
         {/* ---------------------------------------------------------------- */}
 
         <div className="flex items-center gap-3">
-          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px] bg-violet-50 text-violet-600">
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[13px] bg-primary/[0.09] text-primary">
             <ClipboardList size={19} />
           </span>
 
-          <div>
+          <div className="min-w-0">
             <h1 className="text-[16px] font-semibold tracking-[-0.02em]">
               Exam Schedules
             </h1>
@@ -305,37 +305,49 @@ function PageHeader({
         </div>
 
         {/* ---------------------------------------------------------------- */}
-        {/* Statistics + Action                                               */}
+        {/* Actions + statistics                                             */}
         {/* ---------------------------------------------------------------- */}
 
-        <div className="flex flex-wrap items-center gap-2">
-          <MetricCard
-            label="Exams"
-            value={stats.exams}
-            className="border-violet-200/60 bg-violet-50/70 text-violet-700"
-          />
+        <div className="flex flex-wrap items-center gap-0">
+          <div className="flex flex-wrap items-center gap-1.5">
 
-          <MetricCard
-            label="Quizzes"
-            value={stats.quizzes}
-            className="border-cyan-200/60 bg-cyan-50/70 text-cyan-700"
-          />
+            <MetricCard
+              label="Exams"
+              value={stats.exams}
+              className="border-violet-200/50 bg-violet-50/55 text-violet-700"
+            />
 
-          <MetricCard
-            label="Subjects"
-            value={stats.subjects}
-            className="border-emerald-200/60 bg-emerald-50/70 text-emerald-700"
-          />
+            <MetricCard
+              label="Quizzes"
+              value={stats.quizzes}
+              className="border-sky-200/50 bg-sky-50/55 text-sky-700"
+            />
 
-          <button
-            type="button"
-            onClick={onCreate}
-            disabled={isCreating}
-            className="inline-flex h-9 items-center justify-center gap-2 rounded-full bg-violet-600 px-4 text-[12px] font-medium text-white shadow-[0_6px_16px_rgba(124,58,237,0.14)] transition hover:bg-violet-700 disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            <Plus size={14} />
-            Create Exam
-          </button>
+            <MetricCard
+              label="Subjects"
+              value={stats.subjects}
+              className="border-emerald-200/50 bg-emerald-50/55 text-emerald-700"
+            />
+          </div>
+
+          {/* -------------------------------------------------------------- */}
+          {/* Create Exam                                                     */}
+          {/* -------------------------------------------------------------- */}
+
+          <div className="ml-4 lg:ml-5">
+            <button
+              type="button"
+              onClick={onCreate}
+              disabled={isCreating}
+              className="inline-flex h-9 items-center justify-center gap-2 rounded-full bg-primary px-4 text-[12px] font-medium text-primary-foreground shadow-sm transition-all duration-200 hover:-translate-y-[1px] hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0"
+            >
+              <Plus size={14} />
+
+              {isCreating
+                ? "Creating..."
+                : "Create Exam"}
+            </button>
+          </div>
         </div>
       </div>
     </section>
@@ -357,14 +369,20 @@ function MetricCard({
 }) {
   return (
     <article
-      className={`flex h-9 min-w-[82px] items-center rounded-[13px] border px-3 ${className}`}
+      className={[
+        "flex h-8 min-w-[78px] items-center justify-center",
+        "rounded-[10px] border px-2.5",
+        "transition-all duration-200",
+        "hover:-translate-y-[1px]",
+        className,
+      ].join(" ")}
     >
-      <div className="flex min-w-0 flex-col justify-center">
-        <p className="text-[9px] font-medium uppercase leading-none tracking-[0.04em] opacity-65">
+      <div className="flex items-baseline gap-1.5 whitespace-nowrap">
+        <p className="text-[9px] font-medium leading-none tracking-[-0.01em]">
           {label}
         </p>
 
-        <p className="mt-1 text-[12px] font-semibold leading-none">
+        <p className="text-[10px] font-medium leading-none opacity-70">
           {value}
         </p>
       </div>

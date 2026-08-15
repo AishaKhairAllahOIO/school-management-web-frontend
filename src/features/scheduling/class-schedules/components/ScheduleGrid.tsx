@@ -47,11 +47,23 @@ const dayLabels: Record<SchoolDay, string> = {
   saturday: "Saturday",
 };
 
+export type ScheduleGridTheme = {
+  border: string;
+  bg: string;
+  icon: string;
+};
+
 type Props = {
   classes: ScheduleClass[];
   settings: SchoolScheduleSettings;
 
   defaultOpen?: boolean;
+
+  /**
+   * Keeps the timetable toggle visually connected
+   * to the parent classroom card.
+   */
+  theme?: ScheduleGridTheme;
 
   onAdd?: (args: {
     classItem: ScheduleClass;
@@ -70,6 +82,7 @@ export function ScheduleGrid({
   classes,
   settings,
   defaultOpen = true,
+  theme,
   onAdd,
   onEdit,
 }: Props) {
@@ -106,6 +119,15 @@ export function ScheduleGrid({
 
   const gridTemplateColumns = `110px repeat(${workingDays.length}, minmax(150px, 1fr))`;
 
+  /*
+   * Fallback keeps ScheduleGrid reusable elsewhere.
+   */
+  const toggleTheme = theme ?? {
+    border: "border-primary/15",
+    bg: "bg-primary/[0.035]",
+    icon: "bg-primary/[0.08] text-primary",
+  };
+
   return (
     <div className="space-y-3">
       {/* Schedule toggle */}
@@ -115,14 +137,21 @@ export function ScheduleGrid({
           setIsOpen((value) => !value)
         }
         className={[
-          "flex w-full items-center justify-between gap-3 rounded-[17px] border px-3.5 py-3 text-left transition-all duration-200",
+          "flex w-full items-center justify-between gap-3",
+          "rounded-[17px] border px-3.5 py-3 text-left",
+          "transition-all duration-200",
           isOpen
-            ? "border-primary/15 bg-primary/[0.035]"
+            ? `${toggleTheme.border} ${toggleTheme.bg}`
             : "border-border/50 bg-background hover:border-primary/15 hover:bg-muted/[0.22]",
         ].join(" ")}
       >
         <div className="flex items-center gap-2.5">
-          <span className="flex h-8 w-8 items-center justify-center rounded-[10px] bg-primary/[0.08] text-primary">
+          <span
+            className={[
+              "flex h-8 w-8 items-center justify-center rounded-[10px]",
+              toggleTheme.icon,
+            ].join(" ")}
+          >
             {isOpen ? (
               <ChevronUp size={15} />
             ) : (
@@ -142,7 +171,15 @@ export function ScheduleGrid({
           </div>
         </div>
 
-        <span className="rounded-full border border-border/60 bg-background px-2.5 py-1 text-[9px] font-medium text-muted-foreground">
+        <span
+          className={[
+            "rounded-full border px-2.5 py-1",
+            "text-[9px] font-medium",
+            toggleTheme.border,
+            toggleTheme.bg,
+            "text-muted-foreground",
+          ].join(" ")}
+        >
           {isOpen
             ? "Hide timetable"
             : "View timetable"}
