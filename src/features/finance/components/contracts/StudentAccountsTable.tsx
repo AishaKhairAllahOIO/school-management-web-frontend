@@ -65,15 +65,15 @@ export function StudentAccountsTable({
   onEdit,
 }: Props) {
   return (
-    <div className="overflow-hidden rounded-[20px] border border-border/45 bg-card shadow-[0_12px_34px_rgba(31,22,73,0.045)]">
+    <div className="overflow-hidden rounded-[24px] border border-border/40 bg-background/65 shadow-[0_12px_34px_rgba(31,22,73,0.045)]">
       <Table>
         <TableHeader>
-          <TableRow className="border-border/40 bg-muted/22 hover:bg-muted/22">
+          <TableRow className="border-border/35 bg-muted/[0.16] hover:bg-muted/[0.16]">
             {["Student", "Financial setup", "Total", "Balance", "Status"].map(
               (label) => (
                 <TableHead
                   key={label}
-                  className="h-12 px-5 text-[11.5px] font-semibold uppercase tracking-[0.045em] text-muted-foreground/75"
+                  className="h-12 px-5 text-[10.5px] font-semibold uppercase tracking-[0.075em] text-muted-foreground/65"
                 >
                   {label}
                 </TableHead>
@@ -90,11 +90,11 @@ export function StudentAccountsTable({
             return (
               <TableRow
                 key={String(row.studentId)}
-                className="border-border/30 transition-colors hover:bg-primary/[0.018]"
+                className="border-border/25 transition-all duration-200 hover:bg-primary/[0.022] hover:shadow-[0_6px_20px_rgba(31,22,73,0.025)]"
               >
                 <TableCell className="px-5 py-4">
                   <div className="flex min-w-0 items-center gap-3">
-                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px] border border-primary/12 bg-primary/[0.06] text-primary">
+                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[15px] border border-primary/12 bg-primary/[0.06] text-primary shadow-[0_5px_15px_rgba(99,78,181,0.06)]">
                       <GraduationCap className="h-[17px] w-[17px]" strokeWidth={1.75} />
                     </span>
                     <div className="min-w-0">

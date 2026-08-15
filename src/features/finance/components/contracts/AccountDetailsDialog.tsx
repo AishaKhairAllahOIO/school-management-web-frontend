@@ -105,8 +105,8 @@ export function AccountDetailsDialog({ open, onOpenChange, studentId }: Props) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[92vh] overflow-y-auto rounded-[24px] border-border/55 p-0 sm:max-w-[620px]">
-        <DialogHeader className="border-b border-border/40 px-6 py-5 text-start">
+      <DialogContent className="max-h-[92vh] overflow-y-auto rounded-[28px] border-border/45 bg-background/95 p-0 shadow-[0_24px_80px_rgba(31,22,73,0.14)] backdrop-blur-xl sm:max-w-[620px]">
+        <DialogHeader className="border-b border-border/30 bg-background/70 px-6 py-5 text-start">
           <div className="flex items-center gap-3">
             <span className="flex h-11 w-11 items-center justify-center rounded-[15px] border border-primary/16 bg-primary/[0.07] text-primary">
               <WalletCards className="h-[19px] w-[19px]" strokeWidth={1.8} />
@@ -137,7 +137,7 @@ export function AccountDetailsDialog({ open, onOpenChange, studentId }: Props) {
           ) : (
             <div className="space-y-5">
               <div className="grid gap-3 sm:grid-cols-2">
-                <div className="rounded-[19px] border border-border/45 bg-card p-5">
+                <div className="rounded-[21px] border border-border/40 bg-card/80 p-5 shadow-[0_8px_24px_rgba(31,22,73,0.03)]">
                   <div className="flex items-center gap-2 text-muted-foreground/75">
                     <CircleDollarSign className="h-4 w-4" strokeWidth={1.8} />
                     <span className="text-[11px] font-medium uppercase tracking-[0.06em]">
@@ -152,7 +152,7 @@ export function AccountDetailsDialog({ open, onOpenChange, studentId }: Props) {
                   </p>
                 </div>
 
-                <div className="rounded-[19px] border border-primary/14 bg-primary/[0.045] p-5">
+                <div className="rounded-[21px] border border-primary/14 bg-primary/[0.045] p-5 shadow-[0_8px_24px_rgba(99,78,181,0.045)]">
                   <div className="flex items-center justify-between gap-3">
                     <span className="text-[11px] font-medium uppercase tracking-[0.06em] text-primary/75">
                       Remaining balance
@@ -178,7 +178,7 @@ export function AccountDetailsDialog({ open, onOpenChange, studentId }: Props) {
                 {details.map(({ icon: Icon, label, value }) => (
                   <div
                     key={label}
-                    className="rounded-[16px] border border-border/45 bg-card px-4 py-3.5"
+                    className="rounded-[17px] border border-border/40 bg-card/75 px-4 py-3.5 transition-colors hover:bg-muted/[0.16]"
                   >
                     <div className="flex items-center gap-2 text-muted-foreground/70">
                       <Icon className="h-3.5 w-3.5" strokeWidth={1.8} />

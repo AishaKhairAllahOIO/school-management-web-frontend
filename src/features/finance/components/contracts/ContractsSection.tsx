@@ -233,20 +233,15 @@ export function ContractsSection({
   function handleUpdateContract(
     accountId: string | number,
     targetStudentId: string | number,
-    values: any,
+    values: { feePlanId: number; installmentPolicyId: number },
   ) {
     updateContract.mutate(
       {
         accountId,
         studentId: targetStudentId,
         payload: {
-          academicYearId: Number(values.academicYearId),
           feePlanId: Number(values.feePlanId),
           installmentPolicyId: Number(values.installmentPolicyId),
-          selectedExtraServiceIds:
-            values.selectedExtraServiceIds?.length > 0
-              ? values.selectedExtraServiceIds.map(Number)
-              : null,
         },
       },
       {
@@ -353,7 +348,6 @@ export function ContractsSection({
           if (!open) setSelectedAccountToEdit(null);
         }}
         account={selectedAccountToEdit}
-        students={students}
         feePlans={feePlans}
         installmentPolicies={installmentPolicies}
         isLoading={updateContract.isPending}

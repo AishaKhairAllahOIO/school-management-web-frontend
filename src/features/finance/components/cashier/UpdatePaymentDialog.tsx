@@ -75,15 +75,15 @@ export function UpdatePaymentDialog({ open, onOpenChange, payment, isLoading, on
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="floating-card sm:max-w-md rounded-3xl border border-border p-6 shadow-2xl">
-        <DialogHeader className="space-y-1.5 text-left">
+      <DialogContent className="rounded-[28px] border-border/45 bg-background/95 p-0 shadow-[0_24px_80px_rgba(31,22,73,0.16)] backdrop-blur-xl sm:max-w-md">
+        <DialogHeader className="space-y-1.5 px-6 pt-6 text-left sm:px-7">
           <DialogTitle className="text-xl font-bold tracking-tight text-foreground">Update Payment Details</DialogTitle>
           <DialogDescription className="text-sm text-muted-foreground">
             Modify the payment method or reference numbers. The paid amount cannot be changed.
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-5 mt-4">
+        <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-5 px-6 pb-6 pt-5 sm:px-7">
           {/* Read-Only Receipt Amount Reminder */}
           <div className="soft-purple-gradient flex items-center justify-between rounded-2xl border border-primary/20 p-4 text-sm">
             <span className="font-medium text-muted-foreground">Receipt Amount:</span>

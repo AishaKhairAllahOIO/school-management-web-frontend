@@ -87,7 +87,7 @@ export function FullFinancialStatementDialog({
   return (
     <>
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[92vh] overflow-y-auto rounded-[24px] border-border/55 p-0 sm:max-w-[900px]">
+      <DialogContent className="max-h-[92vh] overflow-y-auto rounded-[28px] border-border/45 bg-background/95 p-0 shadow-[0_24px_80px_rgba(31,22,73,0.14)] backdrop-blur-xl sm:max-w-[900px]">
         <DialogHeader className="border-b border-border/40 px-5 py-5 text-start sm:px-6">
           <div className="flex items-start gap-3 pe-9">
             <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[15px] border border-success/15 bg-success/[0.07] text-success">
