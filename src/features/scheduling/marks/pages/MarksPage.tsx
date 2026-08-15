@@ -1,15 +1,16 @@
+import { useState } from "react";
 import {
   AlertCircle,
   Award,
-  BookOpen,
   CheckCircle2,
+  ChevronDown,
+  ChevronRight,
   GraduationCap,
   RefreshCw,
   Users,
 } from "lucide-react";
 
 import { useAcademicSettings } from "@/features/settings/academic/hooks/useAcademicSettings";
-
 import { useAllMarks } from "../hooks/useMarks";
 
 import type {
@@ -75,8 +76,10 @@ export function MarksPage() {
     semesterId === null
   ) {
     return (
-      <section className="rounded-[26px] border border-amber-200/60 bg-amber-50/60 p-8 text-center">
-        <AlertCircle className="mx-auto text-amber-600" size={24} />
+      <section className="rounded-[26px] border border-amber-200/60 bg-amber-50/65 p-8 text-center">
+        <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-[16px] bg-amber-100 text-amber-700">
+          <AlertCircle size={23} />
+        </span>
 
         <h2 className="mt-3 text-sm font-semibold text-foreground">
           No active academic period
@@ -111,34 +114,6 @@ export function MarksPage() {
     return null;
   }
 
-  const totalGrades = marks.grades.length;
-
-  const totalClasses = marks.grades.reduce(
-    (total, grade) => total + grade.classes.length,
-    0,
-  );
-
-  const totalSubjects = marks.grades.reduce(
-    (total, grade) =>
-      total +
-      grade.classes.reduce(
-        (classTotal, classItem) => classTotal + classItem.subjects.length,
-        0,
-      ),
-    0,
-  );
-
-  const totalStudents = marks.grades.reduce(
-    (total, grade) =>
-      total +
-      grade.classes.reduce((classTotal, classItem) => {
-        const students = classItem.subjects[0]?.students.length ?? 0;
-
-        return classTotal + students;
-      }, 0),
-    0,
-  );
-
   return (
     <div className="space-y-5">
       <PageHeader
@@ -146,95 +121,12 @@ export function MarksPage() {
         semester={currentTerm.semesterName}
       />
 
-      <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        <MetricCard
-          label="Grades"
-          value={totalGrades}
-          icon={GraduationCap}
-          className="border-violet-200/60 bg-violet-50/65 text-violet-700"
-        />
-
-        <MetricCard
-          label="Classes"
-          value={totalClasses}
-          icon={Users}
-          className="border-sky-200/60 bg-sky-50/65 text-sky-700"
-        />
-
-        <MetricCard
-          label="Subjects"
-          value={totalSubjects}
-          icon={BookOpen}
-          className="border-emerald-200/60 bg-emerald-50/65 text-emerald-700"
-        />
-
-        <MetricCard
-          label="Students"
-          value={totalStudents}
-          icon={Award}
-          className="border-amber-200/60 bg-amber-50/65 text-amber-700"
-        />
-      </section>
-
       {marks.grades.length === 0 ? (
         <EmptyMarksState onRetry={() => void marksQuery.refetch()} />
       ) : (
-        <div className="space-y-5">
+        <div className="space-y-3">
           {marks.grades.map((grade) => (
-            <section
-              key={grade.id}
-              className="rounded-[26px] border border-border/45 bg-card p-4 shadow-[0_10px_35px_rgba(30,20,70,0.035)] sm:p-5"
-            >
-              <div className="mb-5 flex items-start gap-3">
-                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[15px] bg-primary/[0.09] text-primary">
-                  <GraduationCap size={20} />
-                </span>
-
-                <div>
-                  <h2 className="text-[16px] font-semibold tracking-[-0.02em]">
-                    {grade.name}
-                  </h2>
-
-                  <p className="mt-1 text-[12px] text-muted-foreground">
-                    Student marks and assessment results
-                  </p>
-                </div>
-              </div>
-
-              <div className="space-y-5">
-                {grade.classes.map((classItem) => (
-                  <section
-                    key={classItem.class_room.id}
-                    className="rounded-[22px] border border-border/45 bg-background/60 p-4"
-                  >
-                    <div className="mb-4 flex items-center gap-3">
-                      <span className="flex h-9 w-9 items-center justify-center rounded-[12px] bg-primary/[0.08] text-primary">
-                        <Users size={16} />
-                      </span>
-
-                      <div>
-                        <h3 className="text-[14px] font-semibold">
-                          {classItem.class_room.name}
-                        </h3>
-
-                        <p className="mt-0.5 text-[11px] text-muted-foreground">
-                          {classItem.subjects.length} subjects
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="space-y-5">
-                      {classItem.subjects.map((subject) => (
-                        <MarksSubjectTable
-                          key={subject.subject_info.grade_subject_id}
-                          subject={subject}
-                        />
-                      ))}
-                    </div>
-                  </section>
-                ))}
-              </div>
-            </section>
+            <GradeSection key={grade.id} grade={grade} />
           ))}
         </div>
       )}
@@ -251,120 +143,239 @@ function PageHeader({
 }) {
   return (
     <section className="rounded-[26px] border border-border/45 bg-card p-4 shadow-[0_10px_35px_rgba(30,20,70,0.035)] sm:p-5">
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-        <div className="flex items-start gap-3">
-          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[15px] bg-primary/[0.09] text-primary">
-            <Award size={20} />
-          </span>
+      <div className="flex items-start gap-3">
+        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[15px] bg-violet-50 text-violet-700">
+          <Award size={20} />
+        </span>
 
-          <div>
-            <h1 className="text-[17px] font-semibold tracking-[-0.02em]">
-              Student Marks
-            </h1>
+        <div className="min-w-0">
+          <h1 className="text-[17px] font-semibold tracking-[-0.02em]">
+            Student Marks
+          </h1>
 
-            <p className="mt-1 text-[12px] text-muted-foreground">
-              {academicYear} · {semester}
-            </p>
-          </div>
+          <p className="mt-1 text-[12px] text-muted-foreground">
+            {academicYear} · {semester}
+          </p>
         </div>
       </div>
     </section>
   );
 }
 
-function MetricCard({
-  label,
-  value,
-  icon: Icon,
-  className,
+function GradeSection({
+  grade,
 }: {
-  label: string;
-  value: string | number;
-  icon: typeof Award;
-  className: string;
+  grade: {
+    id: number;
+    name: string;
+    classes: Array<{
+      class_room: {
+        id: number;
+        name: string;
+      };
+      subjects: MarkSubject[];
+    }>;
+  };
 }) {
-  return (
-    <article className={`rounded-[22px] border p-4 ${className}`}>
-      <div className="flex items-center justify-between">
-        <p className="text-[11px] font-medium opacity-75">{label}</p>
+  const [isOpen, setIsOpen] = useState(false);
 
-        <Icon size={17} />
-      </div>
-
-      <p className="mt-2 text-[23px] font-semibold tracking-[-0.03em]">
-        {value}
-      </p>
-    </article>
+  const totalSubjects = grade.classes.reduce(
+    (total, classItem) => total + classItem.subjects.length,
+    0,
   );
-}
-
-function MarksSubjectTable({ subject }: { subject: MarkSubject }) {
-  const columns = subject.columns;
-
-  const students = subject.students;
 
   return (
-    <section className="overflow-hidden rounded-[20px] border border-border/50 bg-card">
-      <div className="flex flex-col gap-2 border-b border-border/45 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h4 className="text-[13px] font-semibold">
-            {subject.subject_info.subject_name}
-          </h4>
+    <section className="overflow-hidden rounded-[24px] border border-border/45 bg-card shadow-[0_8px_28px_rgba(30,20,70,0.025)]">
+      <button
+        type="button"
+        onClick={() => setIsOpen((value) => !value)}
+        className="flex w-full items-center gap-3 px-4 py-4 text-left transition-colors hover:bg-violet-50/35 sm:px-5"
+      >
+        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[13px] bg-violet-50 text-violet-700">
+          <GraduationCap size={19} />
+        </span>
+
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-center gap-2">
+            <h2 className="text-[14px] font-semibold tracking-[-0.01em]">
+              {grade.name}
+            </h2>
+
+            <span className="rounded-full bg-violet-50 px-2 py-0.5 text-[9px] font-medium text-violet-700">
+              {totalSubjects} {totalSubjects === 1 ? "subject" : "subjects"}
+            </span>
+          </div>
 
           <p className="mt-0.5 text-[11px] text-muted-foreground">
-            {students.length} students · {columns.length} assessments
+            {grade.classes.length}{" "}
+            {grade.classes.length === 1 ? "class" : "classes"}
           </p>
         </div>
 
-        <span className="inline-flex w-fit items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-1 text-[10px] font-medium text-emerald-700">
-          <CheckCircle2 size={12} />
-          Marks
+        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-violet-50 text-violet-700 transition-colors">
+          {isOpen ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
         </span>
-      </div>
+      </button>
 
-      {columns.length === 0 ? (
-        <div className="p-6 text-center text-[12px] text-muted-foreground">
-          No assessment components available.
+      {isOpen && (
+        <div className="border-t border-violet-100/70 bg-violet-50/[0.22] p-3 sm:p-4">
+          <div className="space-y-2">
+            {grade.classes.map((classItem) => (
+              <ClassSection
+                key={classItem.class_room.id}
+                classItem={classItem}
+              />
+            ))}
+          </div>
         </div>
-      ) : students.length === 0 ? (
-        <div className="p-6 text-center text-[12px] text-muted-foreground">
-          No students found in this class.
+      )}
+    </section>
+  );
+}
+function ClassSection({
+  classItem,
+}: {
+  classItem: {
+    class_room: {
+      id: number;
+      name: string;
+    };
+    subjects: MarkSubject[];
+  };
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <section className="overflow-hidden rounded-[20px] border border-sky-200/60 bg-card">
+      <button
+        type="button"
+        onClick={() => setIsOpen((value) => !value)}
+        className="flex w-full items-center gap-3 px-4 py-3.5 text-left transition-colors hover:bg-sky-50/45"
+      >
+        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[11px] bg-sky-50 text-sky-700">
+          <Users size={16} />
+        </span>
+
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-center gap-2">
+            <h3 className="text-[13px] font-semibold">
+              {classItem.class_room.name}
+            </h3>
+
+            <span className="rounded-full bg-sky-50 px-2 py-0.5 text-[9px] font-medium text-sky-700">
+              {classItem.subjects.length}{" "}
+              {classItem.subjects.length === 1 ? "subject" : "subjects"}
+            </span>
+          </div>
         </div>
-      ) : (
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[650px] border-collapse text-left">
-            <thead>
-              <tr className="border-b border-border/45 bg-muted/25">
-                <th className="sticky left-0 z-10 min-w-[220px] bg-muted/25 px-4 py-3 text-[11px] font-semibold text-foreground/70">
-                  Student
-                </th>
 
-                {columns.map((column) => (
-                  <th
-                    key={column.id}
-                    className="min-w-[120px] px-3 py-3 text-center text-[11px] font-semibold text-foreground/70"
-                  >
-                    <div>{column.name}</div>
+        <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-sky-50 text-sky-700">
+          {isOpen ? <ChevronDown size={15} /> : <ChevronRight size={15} />}
+        </span>
+      </button>
 
-                    <div className="mt-0.5 text-[10px] font-normal text-muted-foreground">
-                      Max {formatNumber(column.max_mark)}
-                    </div>
-                  </th>
-                ))}
-              </tr>
-            </thead>
-
-            <tbody>
-              {students.map((student, index) => (
-                <MarksStudentRow
-                  key={student.enrollment_id}
-                  student={student}
-                  columns={columns}
-                  index={index}
+      {isOpen && (
+        <div className="border-t border-sky-100/70 bg-sky-50/[0.16] p-3">
+          {classItem.subjects.length === 0 ? (
+            <div className="rounded-[16px] bg-muted/25 px-4 py-6 text-center text-[11px] text-muted-foreground">
+              No subjects available.
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {classItem.subjects.map((subject) => (
+                <SubjectSection
+                  key={subject.subject_info.grade_subject_id}
+                  subject={subject}
                 />
               ))}
-            </tbody>
-          </table>
+            </div>
+          )}
+        </div>
+      )}
+    </section>
+  );
+}
+
+function SubjectSection({ subject }: { subject: MarkSubject }) {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const columns = subject.columns;
+  const students = subject.students;
+
+  return (
+    <section className="overflow-hidden rounded-[18px] border border-emerald-200/60 bg-background">
+      <button
+        type="button"
+        onClick={() => setIsOpen((value) => !value)}
+        className="flex w-full items-center gap-3 px-3.5 py-3 text-left transition-colors hover:bg-emerald-50/35"
+      >
+        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[10px] bg-emerald-50 text-emerald-700">
+          <Award size={14} />
+        </span>
+
+        <div className="min-w-0 flex-1">
+          <h4 className="truncate text-[12px] font-semibold">
+            {subject.subject_info.subject_name}
+          </h4>
+        </div>
+
+        <span className="hidden items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-1 text-[9px] font-medium text-emerald-700 sm:inline-flex">
+          <CheckCircle2 size={11} />
+          Marks
+        </span>
+
+        <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-emerald-50 text-emerald-700">
+          {isOpen ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+        </span>
+      </button>
+
+      {isOpen && (
+        <div className="border-t border-emerald-100/70">
+          {columns.length === 0 ? (
+            <div className="p-6 text-center text-[11px] text-muted-foreground">
+              No assessment components available.
+            </div>
+          ) : students.length === 0 ? (
+            <div className="p-6 text-center text-[11px] text-muted-foreground">
+              No students found in this class.
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[620px] border-collapse text-left">
+                <thead>
+                  <tr className="border-b border-border/45 bg-muted/25">
+                    <th className="sticky left-0 z-10 min-w-[220px] bg-muted/25 px-4 py-3 text-[10px] font-semibold text-foreground/70">
+                      Student
+                    </th>
+
+                    {columns.map((column) => (
+                      <th
+                        key={column.id}
+                        className="min-w-[115px] px-3 py-3 text-center text-[10px] font-semibold text-foreground/70"
+                      >
+                        <div>{column.name}</div>
+
+                        <div className="mt-0.5 text-[9px] font-normal text-muted-foreground">
+                          Max {formatNumber(column.max_mark)}
+                        </div>
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+
+                <tbody>
+                  {students.map((student, index) => (
+                    <MarksStudentRow
+                      key={student.enrollment_id}
+                      student={student}
+                      columns={columns}
+                      index={index}
+                    />
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
       )}
     </section>
@@ -388,19 +399,13 @@ function MarksStudentRow({
     >
       <td className="sticky left-0 z-10 bg-inherit px-4 py-3">
         <div className="flex items-center gap-3">
-          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/[0.09] text-[10px] font-semibold text-primary">
+          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-violet-50 text-[10px] font-semibold text-violet-700">
             {getInitials(student.student_name)}
           </span>
 
-          <div className="min-w-0">
-            <p className="truncate text-[12px] font-medium">
-              {student.student_name}
-            </p>
-
-            <p className="mt-0.5 text-[10px] text-muted-foreground">
-              ID #{student.student_id}
-            </p>
-          </div>
+          <p className="truncate text-[12px] font-medium">
+            {student.student_name}
+          </p>
         </div>
       </td>
 
@@ -478,8 +483,8 @@ function MarkCell({
 
 function EmptyMarksState({ onRetry }: { onRetry: () => void }) {
   return (
-    <section className="rounded-[26px] border border-dashed border-border/60 bg-card p-10 text-center">
-      <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-[16px] bg-primary/[0.08] text-primary">
+    <section className="rounded-[26px] border border-dashed border-violet-200/70 bg-violet-50/[0.35] p-10 text-center">
+      <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-[16px] bg-violet-50 text-violet-700">
         <Award size={21} />
       </span>
 
@@ -493,7 +498,7 @@ function EmptyMarksState({ onRetry }: { onRetry: () => void }) {
       <button
         type="button"
         onClick={onRetry}
-        className="mt-5 inline-flex h-9 items-center gap-2 rounded-full bg-primary px-4 text-[12px] font-medium text-primary-foreground"
+        className="mt-5 inline-flex h-9 items-center gap-2 rounded-full bg-primary px-4 text-[12px] font-medium text-primary-foreground transition hover:opacity-90"
       >
         <RefreshCw size={14} />
         Refresh
@@ -512,8 +517,10 @@ function ErrorState({
   onRetry: () => void;
 }) {
   return (
-    <section className="rounded-[26px] border border-destructive/15 bg-card p-8 text-center">
-      <AlertCircle className="mx-auto text-destructive" size={24} />
+    <section className="rounded-[26px] border border-rose-200/60 bg-rose-50/[0.35] p-8 text-center">
+      <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-[16px] bg-rose-50 text-rose-700">
+        <AlertCircle size={24} />
+      </span>
 
       <h2 className="mt-3 text-sm font-semibold">{title}</h2>
 
@@ -524,7 +531,7 @@ function ErrorState({
       <button
         type="button"
         onClick={onRetry}
-        className="mt-4 inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-[12px] font-medium text-primary-foreground"
+        className="mt-4 inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-[12px] font-medium text-primary-foreground transition hover:opacity-90"
       >
         <RefreshCw size={14} />
         Try again
@@ -536,36 +543,40 @@ function ErrorState({
 function MarksPageSkeleton() {
   return (
     <div className="space-y-5">
-      <section className="h-[91px] animate-pulse rounded-[26px] border border-border/45 bg-card" />
+      {/* Header */}
+      <section className="rounded-[26px] border border-border/45 bg-card p-4 shadow-[0_10px_35px_rgba(30,20,70,0.035)] sm:p-5">
+        <div className="flex items-center gap-3">
+          <div className="h-11 w-11 animate-pulse rounded-[15px] bg-violet-100" />
 
-      <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        {Array.from({ length: 4 }).map((_, index) => (
-          <div
-            key={index}
-            className="h-[92px] animate-pulse rounded-[22px] bg-muted/50"
-          />
-        ))}
+          <div className="space-y-2">
+            <div className="h-4 w-32 animate-pulse rounded-md bg-violet-100" />
+
+            <div className="h-3 w-48 animate-pulse rounded-md bg-violet-50" />
+          </div>
+        </div>
       </section>
 
-      {Array.from({ length: 2 }).map((_, gradeIndex) => (
-        <section
-          key={gradeIndex}
-          className="rounded-[26px] border border-border/45 bg-card p-5"
-        >
-          <div className="h-10 w-48 animate-pulse rounded-xl bg-muted/50" />
+      {/* Grades */}
+      <div className="space-y-3">
+        {Array.from({ length: 4 }).map((_, index) => (
+          <section
+            key={index}
+            className="rounded-[24px] border border-border/45 bg-card shadow-[0_8px_28px_rgba(30,20,70,0.025)]"
+          >
+            <div className="flex items-center gap-3 px-4 py-4 sm:px-5">
+              <div className="h-10 w-10 animate-pulse rounded-[13px] bg-violet-100" />
 
-          <div className="mt-5 space-y-4">
-            {Array.from({
-              length: 2,
-            }).map((_, classIndex) => (
-              <div
-                key={classIndex}
-                className="h-[220px] animate-pulse rounded-[22px] bg-muted/30"
-              />
-            ))}
-          </div>
-        </section>
-      ))}
+              <div className="flex-1 space-y-2">
+                <div className="h-3.5 w-28 animate-pulse rounded-md bg-violet-100" />
+
+                <div className="h-2.5 w-36 animate-pulse rounded-md bg-muted/40" />
+              </div>
+
+              <div className="h-8 w-8 animate-pulse rounded-full bg-violet-50" />
+            </div>
+          </section>
+        ))}
+      </div>
     </div>
   );
 }
