@@ -7,7 +7,7 @@ type Props = { open: boolean; onOpenChange: (open: boolean) => void; isLoading?:
 export function DeletePaymentDialog({ open, onOpenChange, isLoading, onConfirm }: Props) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="overflow-hidden rounded-[22px] border-border/55 p-0 sm:max-w-[430px]">
+      <DialogContent className="overflow-hidden rounded-[28px] border-border/45 bg-background/95 p-0 shadow-[0_24px_80px_rgba(31,22,73,0.14)] backdrop-blur-xl sm:max-w-[430px]">
         <div className="px-6 pt-6">
           <DialogHeader className="text-left">
             <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-[15px] border border-destructive/18 bg-destructive/[0.07] text-destructive"><AlertTriangle className="h-5 w-5" strokeWidth={1.8}/></div>

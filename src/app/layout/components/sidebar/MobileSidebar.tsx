@@ -4,12 +4,11 @@ import {
   PanelLeftClose,
   Sparkles,
 } from "lucide-react";
-
+import { NavLink } from "react-router-dom";
 import { SidebarMenu } from "@/app/layout/components/sidebar/SidebarMenu";
 import { SidebarSectionSeparator } from "@/app/layout/components/sidebar/SidebarSectionSeparator";
 import { useLayoutStore } from "@/app/layout/store/layoutStore";
 import { useLocale } from "@/app/providers/locale";
-import { useGeneralSettings } from "@/features/settings/general/hooks/useGeneralSettings";
 
 function formatMobileSidebarDate(
   locale: string,
@@ -73,11 +72,6 @@ export function MobileSidebar() {
     t,
   } = useLocale();
 
-  const { data: generalSettings } =
-  useGeneralSettings();
-
-  const websiteUrl =
-  generalSettings?.website?.trim() || "#";
 
   const dateLocale =
   language === "ar"
@@ -380,73 +374,49 @@ export function MobileSidebar() {
                 className="mb-1 mt-1"
               />
 
-              <a
-                data-onboarding-target="website"
-                href={websiteUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={
-                  t.layout.sidebar
-                    .ManageWebsite
-                }
-                title={
-                  t.layout.sidebar
-                    .ManageWebsite
-                }
-                className="
-                  group
-                  flex
-                  h-[48px]
-                  w-full
-                  items-center
-                  rounded-[17px]
-                  px-3
-                  text-sidebar-muted
-                  transition-colors
-                  duration-200
-                  hover:bg-sidebar-foreground/[0.045]
-                  hover:text-sidebar-foreground
-                  focus-visible:outline-none
-                  focus-visible:ring-2
-                  focus-visible:ring-sidebar-foreground/25
-                "
-              >
-                <span
-                  className="
-                    flex
-                    h-8
-                    w-8
-                    shrink-0
-                    items-center
-                    justify-center
-                    text-current
-                  "
-                >
-                  <Globe2
-                    aria-hidden="true"
-                    size={18}
-                    strokeWidth={1.8}
-                  />
-                </span>
+    <NavLink
+  data-onboarding-target="content"
+  to="/manage-content"
+  onClick={closeMobileSidebar}
+  aria-label="Manage Content"
+  title="Manage Content"
+  className="
+    group flex h-[48px] w-full
+    items-center rounded-[17px]
+    px-3
+    text-sidebar-muted
+    transition-colors duration-200
+    hover:bg-sidebar-foreground/[0.045]
+    hover:text-sidebar-foreground
+    focus-visible:outline-none
+    focus-visible:ring-2
+    focus-visible:ring-sidebar-foreground/25
+  "
+>
+  <span
+    className="
+      flex h-8 w-8 shrink-0
+      items-center justify-center
+      text-current
+    "
+  >
+    <Globe2
+      aria-hidden="true"
+      size={18}
+      strokeWidth={1.8}
+    />
+  </span>
 
-                <span
-                  className="
-                    ms-3
-                    min-w-0
-                    flex-1
-                    truncate
-                    text-start
-                    text-[13px]
-                    font-medium
-                    tracking-[-0.004em]
-                  "
-                >
-                  {
-                    t.layout.sidebar
-                      .ManageWebsite
-                  }
-                </span>
-              </a>
+  <span
+    className="
+      ms-3 min-w-0 flex-1 truncate
+      text-start text-[13px]
+      font-medium tracking-[-0.004em]
+    "
+  >
+    Manage Content
+  </span>
+</NavLink>
             </div>
           </div>
         </div>

@@ -1,3 +1,5 @@
+// features/finance/components/cashier/PaymentsTable.tsx
+
 import type { ReactNode } from "react";
 import {
   Table,
@@ -9,6 +11,7 @@ import {
 } from "@/shared/ui/table";
 import { Banknote, Edit2, Eye, ReceiptText, Trash2 } from "lucide-react";
 import type { PaymentReceipt } from "../../types/finance.types";
+import { cn } from "@/shared/lib/utils";
 
 type Props = {
   payments: PaymentReceipt[];
@@ -25,6 +28,24 @@ const methodLabel = (method: string) =>
     cheque: "Cheque",
     electronic_wallet: "E-wallet",
   })[method] ?? method;
+
+const statusLabel = (status?: string) => {
+  if (!status) return "Completed";
+  return status.charAt(0).toUpperCase() + status.slice(1);
+};
+
+const statusColor = (status?: string) => {
+  switch (status) {
+    case "completed":
+      return "bg-success/[0.08] text-success";
+    case "pending":
+      return "bg-warning/[0.08] text-warning";
+    case "failed":
+      return "bg-destructive/[0.08] text-destructive";
+    default:
+      return "bg-muted/35 text-muted-foreground";
+  }
+};
 
 export function PaymentsTable({
   payments,
@@ -46,7 +67,7 @@ export function PaymentsTable({
           No payments recorded
         </h3>
         <p className="mt-1.5 text-[12.5px] text-muted-foreground/78">
-          Process a payment to generate the first official receipt.
+          No payment records found for this account.
         </p>
       </div>
     );
@@ -57,7 +78,7 @@ export function PaymentsTable({
       <Table>
         <TableHeader>
           <TableRow className="border-border/40 bg-muted/22 hover:bg-muted/22">
-            {["Payment", "Amount", "Method", "Reference", "Date"].map((label) => (
+            {["Payment", "Amount", "Method", "Reference", "Date", "Status", "Cashier"].map((label) => (
               <TableHead
                 key={label}
                 className="h-12 px-5 text-[11.5px] font-semibold uppercase tracking-[0.045em] text-muted-foreground/75"
@@ -65,7 +86,7 @@ export function PaymentsTable({
                 {label}
               </TableHead>
             ))}
-            <TableHead className="h-12 w-36 px-4 text-right text-[11.5px] font-semibold uppercase tracking-[0.045em] text-muted-foreground/75">
+            <TableHead className="h-12 w-28 px-4 text-right text-[11.5px] font-semibold uppercase tracking-[0.045em] text-muted-foreground/75">
               <div className="flex items-center justify-end gap-2.5">
                 <span>Actions</span>
                 {headerAction}
@@ -90,7 +111,7 @@ export function PaymentsTable({
                       {payment.studentName || "Student payment"}
                     </p>
                     <p className="mt-0.5 text-[10.5px] text-muted-foreground/65">
-                      Official receipt
+                      #{payment.id} • {payment.installmentTitle || "Payment"}
                     </p>
                   </div>
                 </div>
@@ -111,7 +132,7 @@ export function PaymentsTable({
                 </span>
               </TableCell>
 
-              <TableCell className="max-w-[190px] px-5 py-4 text-[12.5px] text-muted-foreground">
+              <TableCell className="max-w-[150px] px-5 py-4 text-[12.5px] text-muted-foreground">
                 <span className="block truncate">
                   {payment.paperReceiptNo || payment.digitalReference || "—"}
                 </span>
@@ -121,6 +142,20 @@ export function PaymentsTable({
                 {payment.paymentDate
                   ? new Date(payment.paymentDate).toLocaleDateString()
                   : "—"}
+              </TableCell>
+
+              <TableCell className="px-5 py-4">
+                <span className={cn(
+                  "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-medium",
+                  statusColor(payment.status)
+                )}>
+                  <span className="h-1.5 w-1.5 rounded-full bg-current" />
+                  {statusLabel(payment.status)}
+                </span>
+              </TableCell>
+
+              <TableCell className="px-5 py-4 text-[12.5px] text-muted-foreground">
+                {payment.cashierName || "—"}
               </TableCell>
 
               <TableCell className="px-5 py-4 text-right">

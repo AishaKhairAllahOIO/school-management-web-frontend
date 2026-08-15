@@ -61,8 +61,8 @@ export function TimeSlotsPage() {
           </h1>
 
           <p className="mt-2 max-w-md text-sm leading-6 text-muted-foreground">
-            Please configure the current academic year and semester to view
-            the teacher schedule.
+            Please configure the current academic year and semester to view the
+            teacher schedule.
           </p>
         </div>
       </section>
@@ -82,8 +82,8 @@ export function TimeSlotsPage() {
           </h1>
 
           <p className="mt-2 max-w-md text-sm leading-6 text-muted-foreground">
-            No teacher schedule is available for the current academic year
-            and semester.
+            No teacher schedule is available for the current academic year and
+            semester.
           </p>
         </div>
       </section>
@@ -94,12 +94,12 @@ export function TimeSlotsPage() {
    * The API returns the teacher schedule grouped by teacher.
    * We flatten the entries here only for presentation.
    */
-const teachers = Object.entries(teacherSchedule).map(
-  ([teacher_name, schedule]) => ({
-    teacher_name,
-    schedule,
-  }),
-);
+  const teachers = Object.entries(teacherSchedule).map(
+    ([teacher_name, schedule]) => ({
+      teacher_name,
+      schedule,
+    }),
+  );
   return (
     <section className="space-y-6">
       {/* Header */}
@@ -144,10 +144,7 @@ const teachers = Object.entries(teacherSchedule).map(
       ) : (
         <div className="space-y-5">
           {teachers.map((teacher) => (
-            <TeacherScheduleCard
-              key={teacher.teacher_name}
-              teacher={teacher}
-            />
+            <TeacherScheduleCard key={teacher.teacher_name} teacher={teacher} />
           ))}
         </div>
       )}
@@ -169,9 +166,7 @@ function TeacherScheduleCard({ teacher }: { teacher: any }) {
             {teacher.teacher_name}
           </h2>
 
-          <p className="text-xs text-muted-foreground">
-            Weekly Schedule
-          </p>
+          <p className="text-xs text-muted-foreground">Weekly Schedule</p>
         </div>
       </div>
 
@@ -236,10 +231,7 @@ function TeacherScheduleCard({ teacher }: { teacher: any }) {
 function TeacherDesktopGrid({ teacher }: { teacher: any }) {
   const maxPeriods = Math.max(
     0,
-    ...days.map(
-      (day) =>
-        (teacher.schedule?.[day.key] ?? []).length,
-    ),
+    ...days.map((day) => (teacher.schedule?.[day.key] ?? []).length),
   );
 
   return (
@@ -270,17 +262,12 @@ function TeacherDesktopGrid({ teacher }: { teacher: any }) {
             </div>
 
             {days.map((day) => {
-              const entry = (
-                teacher.schedule?.[day.key] ?? []
-              ).find(
+              const entry = (teacher.schedule?.[day.key] ?? []).find(
                 (item: any) => item.period_index === period,
               );
 
               return (
-                <div
-                  key={day.key}
-                  className="border-l border-border/60 p-2"
-                >
+                <div key={day.key} className="border-l border-border/60 p-2">
                   {entry ? (
                     <ScheduleCell entry={entry} />
                   ) : (

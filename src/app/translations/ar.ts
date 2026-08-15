@@ -29,7 +29,8 @@ export const ar: TranslationDictionary = {
     reports: "التقارير",
     settings: "الإعدادات",
     profile: "الملف الشخصي",
-    notifications: "الإشعارات"
+    notifications: "الإشعارات",
+    content: "إدارة المحتوى",
   },
 
   auth: {
@@ -83,7 +84,7 @@ export const ar: TranslationDictionary = {
       staff: "الموظفون",
       classes: "الحصص",
       exams: "الامتحانات",
-      quizzes: "الاختبارات القصيرة",
+      mark: "العلامات",
       holidays: "العطل",
       studentFinance: "مالية الطلاب",
       staffPayroll: "رواتب الموظفين",

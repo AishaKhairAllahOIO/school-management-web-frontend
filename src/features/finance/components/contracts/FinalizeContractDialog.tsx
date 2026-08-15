@@ -42,16 +42,21 @@ export function FinalizeContractDialog({
 }: Props) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90vh] overflow-y-auto rounded-[22px] border-border/45 sm:max-w-2xl">
-        <DialogHeader>
-          <DialogTitle className="font-medium text-foreground/88">
-            New Financial Contract
-          </DialogTitle>
-          <DialogDescription className="font-normal">
-            Choose the fee plan, installment policy, and optional services.
-            The student and academic year are sent automatically from the active enrollment.
-          </DialogDescription>
-        </DialogHeader>
+      <DialogContent className="max-h-[92vh] overflow-y-auto overflow-x-hidden rounded-[28px] border-border/45 bg-background/95 p-0 shadow-[0_24px_80px_rgba(31,22,73,0.16)] backdrop-blur-xl sm:max-w-2xl">
+        <div className="relative overflow-hidden px-6 pb-5 pt-6 sm:px-7">
+          <div className="pointer-events-none absolute -right-20 -top-24 h-52 w-52 rounded-full bg-primary/[0.08] blur-3xl" />
+          <div className="pointer-events-none absolute -left-24 top-20 h-40 w-40 rounded-full bg-info/[0.06] blur-3xl" />
+          <DialogHeader className="relative text-start">
+            <DialogTitle className="text-[19px] font-semibold tracking-[-0.025em] text-foreground/92">
+              New financial contract
+            </DialogTitle>
+            <DialogDescription className="mt-1 max-w-xl text-[12px] leading-5 text-muted-foreground/75">
+              Set the student's fee plan, payment policy and optional services. The active enrollment supplies the academic year automatically.
+            </DialogDescription>
+          </DialogHeader>
+        </div>
+
+        <div className="px-6 pb-6 sm:px-7 sm:pb-7">
 
         <ContractForm
           students={students}
@@ -68,6 +73,7 @@ export function FinalizeContractDialog({
           isLoading={isLoading}
           onSubmit={onSubmit}
         />
+        </div>
       </DialogContent>
     </Dialog>
   );

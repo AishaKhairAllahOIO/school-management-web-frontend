@@ -1,3 +1,5 @@
+// features/finance/components/cashier/PaymentForm.tsx
+
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { paymentSchema, type PaymentFormValues } from "../../schemas/payment.schema";
@@ -44,7 +46,6 @@ export function PaymentForm({ students, initialStudentId, onSubmit, isLoading = 
   return (
     <form onSubmit={handleSubmit((data) => onSubmit(data as PaymentFormValues))} className="space-y-6">
       <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-        
         {/* Student Selection */}
         <div className="space-y-2 md:col-span-2">
           <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Student Account</label>
@@ -72,10 +73,10 @@ export function PaymentForm({ students, initialStudentId, onSubmit, isLoading = 
         {/* Paid Amount */}
         <div className="space-y-2">
           <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Amount to Pay ($)</label>
-          <Input 
-            type="number" 
-            className="h-11 rounded-xl border-border bg-card text-lg font-bold text-primary focus-visible:ring-ring" 
-            {...register("paidAmount")} 
+          <Input
+            type="number"
+            className="h-11 rounded-xl border-border bg-card text-lg font-bold text-primary focus-visible:ring-ring"
+            {...register("paidAmount")}
           />
           {errors.paidAmount && <p className="text-xs font-medium text-destructive">{String(errors.paidAmount.message)}</p>}
         </div>
@@ -106,11 +107,11 @@ export function PaymentForm({ students, initialStudentId, onSubmit, isLoading = 
         {/* Paper Receipt */}
         <div className="space-y-2">
           <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Paper Receipt No. (Optional)</label>
-          <Input 
-            type="text" 
-            className="h-11 rounded-xl border-border bg-card text-foreground placeholder:text-muted-foreground/60 focus-visible:ring-ring" 
+          <Input
+            type="text"
+            className="h-11 rounded-xl border-border bg-card text-foreground placeholder:text-muted-foreground/60 focus-visible:ring-ring"
             placeholder="e.g. REC-12345"
-            {...register("paperReceiptNo")} 
+            {...register("paperReceiptNo")}
           />
         </div>
 
@@ -118,11 +119,11 @@ export function PaymentForm({ students, initialStudentId, onSubmit, isLoading = 
         {selectedMethod !== "cash" && (
           <div className="space-y-2">
             <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Digital Reference (Optional)</label>
-            <Input 
-              type="text" 
-              className="h-11 rounded-xl border-border bg-card text-foreground placeholder:text-muted-foreground/60 focus-visible:ring-ring" 
+            <Input
+              type="text"
+              className="h-11 rounded-xl border-border bg-card text-foreground placeholder:text-muted-foreground/60 focus-visible:ring-ring"
               placeholder="e.g. TXN-987654321"
-              {...register("digitalReference")} 
+              {...register("digitalReference")}
             />
           </div>
         )}

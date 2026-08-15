@@ -135,13 +135,13 @@ export function ContractForm({
       onSubmit={handleSubmit((data) =>
         onSubmit(data as ContractFormValues),
       )}
-      className="space-y-6"
+      className="space-y-5"
     >
-      <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+      <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
         {!lockStudent ? (
           <>
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-foreground/85">
+        <div className="space-y-2.5">
+          <label className="text-[11.5px] font-semibold text-foreground/78">
             Student
           </label>
           <Controller
@@ -158,7 +158,7 @@ export function ContractForm({
                   });
                 }}
               >
-                <SelectTrigger className="h-11 rounded-xl border-border/50 bg-white font-normal">
+                <SelectTrigger className="h-11 rounded-[13px] border-border/45 bg-background/80 font-normal shadow-none focus:ring-2 focus:ring-primary/10">
                   <SelectValue placeholder="Select student" />
                 </SelectTrigger>
                 <SelectContent>
@@ -181,8 +181,8 @@ export function ContractForm({
           ) : null}
         </div>
 
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-foreground/85">
+        <div className="space-y-2.5">
+          <label className="text-[11.5px] font-semibold text-foreground/78">
             Academic Year
           </label>
           <div
@@ -217,8 +217,8 @@ export function ContractForm({
           </>
         ) : null}
 
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-foreground/85">
+        <div className="space-y-2.5">
+          <label className="text-[11.5px] font-semibold text-foreground/78">
             Fee Plan
           </label>
           <Controller
@@ -232,7 +232,7 @@ export function ContractForm({
                   setValue("selectedExtraServiceIds", []);
                 }}
               >
-                <SelectTrigger className="h-11 rounded-xl border-border/50 bg-white font-normal">
+                <SelectTrigger className="h-11 rounded-[13px] border-border/45 bg-background/80 font-normal shadow-none focus:ring-2 focus:ring-primary/10">
                   <SelectValue placeholder="Select fee plan" />
                 </SelectTrigger>
                 <SelectContent>
@@ -252,8 +252,8 @@ export function ContractForm({
           ) : null}
         </div>
 
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-foreground/85">
+        <div className="space-y-2.5">
+          <label className="text-[11.5px] font-semibold text-foreground/78">
             Installment Policy
           </label>
           <Controller
@@ -264,7 +264,7 @@ export function ContractForm({
                 value={field.value ? String(field.value) : ""}
                 onValueChange={(value) => field.onChange(Number(value))}
               >
-                <SelectTrigger className="h-11 rounded-xl border-border/50 bg-white font-normal">
+                <SelectTrigger className="h-11 rounded-[13px] border-border/45 bg-background/80 font-normal shadow-none focus:ring-2 focus:ring-primary/10">
                   <SelectValue placeholder="Select installment policy" />
                 </SelectTrigger>
                 <SelectContent>
@@ -286,8 +286,8 @@ export function ContractForm({
       </div>
 
       {currentFeePlan?.extraServices?.length ? (
-        <div className="space-y-3 rounded-2xl border border-border/40 bg-muted/15 p-5">
-          <h3 className="text-sm font-medium text-foreground/85">
+        <div className="space-y-3 rounded-[21px] border border-border/40 bg-muted/[0.14] p-4 shadow-[0_8px_24px_rgba(31,22,73,0.025)]">
+          <h3 className="text-[11.5px] font-semibold text-foreground/78">
             Optional Extra Services
           </h3>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -298,10 +298,10 @@ export function ContractForm({
                 <label
                   key={service.id}
                   className={[
-                    "flex cursor-pointer items-center justify-between rounded-xl border p-3 transition-colors",
+                    "flex cursor-pointer items-center justify-between rounded-[15px] border p-3 transition-all duration-200",
                     selected
-                      ? "border-primary/25 bg-primary/[0.045]"
-                      : "border-border/40 bg-white hover:bg-muted/20",
+                      ? "border-primary/25 bg-primary/[0.055] shadow-[0_6px_18px_rgba(99,78,181,0.06)]"
+                      : "border-border/40 bg-background/75 hover:-translate-y-0.5 hover:bg-muted/20",
                   ].join(" ")}
                 >
                   <div className="flex items-center gap-3">
@@ -328,7 +328,7 @@ export function ContractForm({
       <Button
         type="submit"
         variant="outline"
-        className="h-11 w-full rounded-xl border-primary/35 bg-white font-medium text-primary hover:border-primary/50 hover:bg-primary/[0.045] hover:text-primary"
+        className="h-11 w-full rounded-[14px] border-primary/20 bg-primary text-[12px] font-semibold text-primary-foreground shadow-[0_9px_24px_rgba(99,78,181,0.18)] hover:bg-primary/90"
         disabled={
           isLoading ||
           isLoadingStudentProfile ||

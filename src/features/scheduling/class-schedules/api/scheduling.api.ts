@@ -1,4 +1,4 @@
-import {axiosClient} from "@/services/axios/axiosClient";
+import { axiosClient } from "@/services/axios/axiosClient";
 
 import { API_ENDPOINTS } from "@/services/api/endpoints";
 
@@ -8,18 +8,14 @@ import type {
 } from "../types/schedule.types";
 
 export const schedulingApi = {
-  generate: async (
-    params: GenerateScheduleParams,
-  ) => {
+  generate: async (params: GenerateScheduleParams) => {
     const response = await axiosClient.post(
       API_ENDPOINTS.SCHEDULING.GENERATE,
       null,
       {
         params: {
-          academic_year_id:
-            params.academic_year_id,
-          semester_id:
-            params.semester_id,
+          academic_year_id: params.academic_year_id,
+          semester_id: params.semester_id,
         },
       },
     );
@@ -27,18 +23,14 @@ export const schedulingApi = {
     return response.data;
   },
 
-  regenerate: async (
-    params: GenerateScheduleParams,
-  ) => {
+  regenerate: async (params: GenerateScheduleParams) => {
     const response = await axiosClient.post(
       API_ENDPOINTS.SCHEDULING.REGENERATE,
       null,
       {
         params: {
-          academic_year_id:
-            params.academic_year_id,
-          semester_id:
-            params.semester_id,
+          academic_year_id: params.academic_year_id,
+          semester_id: params.semester_id,
         },
       },
     );
@@ -46,22 +38,18 @@ export const schedulingApi = {
     return response.data;
   },
 
- getAdminSchedule: async (
-  params: GenerateScheduleParams,
-) => {
-  const response = await axiosClient.get(
-    API_ENDPOINTS.SCHEDULING.ADMIN_VIEW(
-      params.academic_year_id,
-      params.semester_id,
-    ),
-  );
+  getAdminSchedule: async (params: GenerateScheduleParams) => {
+    const response = await axiosClient.get(
+      API_ENDPOINTS.SCHEDULING.ADMIN_VIEW(
+        params.academic_year_id,
+        params.semester_id,
+      ),
+    );
 
-  return response.data.data;
-},
+    return response.data.data;
+  },
 
- getTeachersSchedule: async (
-    params: GenerateScheduleParams,
-  ) => {
+  getTeachersSchedule: async (params: GenerateScheduleParams) => {
     const response = await axiosClient.get(
       API_ENDPOINTS.SCHEDULING.TEACHER_VIEW(
         params.academic_year_id,
@@ -77,9 +65,7 @@ export const schedulingApi = {
     payload: UpdateScheduleEntryPayload,
   ) => {
     const response = await axiosClient.put(
-      API_ENDPOINTS.SCHEDULING.UPDATE_ENTRY(
-        entryId,
-      ),
+      API_ENDPOINTS.SCHEDULING.UPDATE_ENTRY(entryId),
       payload,
     );
 

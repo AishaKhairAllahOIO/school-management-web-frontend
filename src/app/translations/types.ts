@@ -28,6 +28,7 @@ export type TranslationDictionary = {
     settings: string;
     profile: string;
     notifications: string;
+    content: string;
   };
 
   auth: {
@@ -81,7 +82,7 @@ export type TranslationDictionary = {
       staff: string;
       classes: string;
       exams: string;
-      quizzes: string;
+      mark: string;
       holidays: string;
       studentFinance: string;
       staffPayroll: string;

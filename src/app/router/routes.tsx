@@ -11,6 +11,7 @@ import { schedulingRoutes } from "@/features/scheduling/routes";
 import { settingsRoutes } from "@/features/settings/routes";
 import { usersRoutes } from "@/features/users/routes";
 import { notificationCenterRoutes } from "@/features/unified-notifications/routes";
+import { contentRoutes } from "@/features/content/routes";
 
 export const appRoutes = [
   ...dashboardRoutes,
@@ -24,4 +25,5 @@ export const appRoutes = [
   ...settingsRoutes,
   ...profileRoutes,
   ...notificationCenterRoutes,
+  ...contentRoutes,
 ] satisfies RouteObject[];

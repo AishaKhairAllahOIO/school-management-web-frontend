@@ -8,10 +8,24 @@ export type ScheduleDay =
   | "saturday";
 
 export type ScheduleViolation = {
+  type: string;
+
+  subject?: number | string;
+
   class?: number | string;
+
   class_room_id?: number | string;
+
+  day?: ScheduleDay;
+
+  count?: number;
+
+  limit?: number;
+
   grade_name?: string;
+
   class_room_name?: string;
+
   [key: string]: unknown;
 };
 
@@ -27,6 +41,7 @@ export type ScheduleQualityReport = {
 };
 
 export type SchedulePeriod = {
+  entry_id : number | string;
   period_index: number;
   subject_name: string | null;
   teacher_name: string | null;

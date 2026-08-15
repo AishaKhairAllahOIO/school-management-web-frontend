@@ -12,12 +12,15 @@ import type {
 } from "../types/finance.payloads";
 
 export const paymentsQueryKey = ["payments-ledger"] as const;
-const accountsQueryKey = ["financial-accounts"] as const;
+export const installmentsQueryKey = ["installments-list"] as const;
+
+const financialAccountsQueryKey = ["financial-accounts"] as const;
 
 function errorMessage(error: unknown, fallback: string) {
   const candidate = error as {
     response?: { data?: { message?: string } };
   };
+
   return candidate.response?.data?.message || fallback;
 }
 
@@ -27,8 +30,8 @@ async function invalidatePaymentDependencies(
 ) {
   await Promise.all([
     queryClient.invalidateQueries({ queryKey: paymentsQueryKey }),
-    queryClient.invalidateQueries({ queryKey: accountsQueryKey }),
-    queryClient.invalidateQueries({ queryKey: ["installments-list"] }),
+    queryClient.invalidateQueries({ queryKey: financialAccountsQueryKey }),
+    queryClient.invalidateQueries({ queryKey: installmentsQueryKey }),
     studentId !== undefined
       ? queryClient.invalidateQueries({
           queryKey: ["financial-account", studentId],
@@ -60,7 +63,6 @@ export function usePayments() {
   const updatePayment = useMutation({
     mutationFn: ({
       id,
-     
       payload,
     }: {
       id: string | number;
@@ -82,10 +84,7 @@ export function usePayments() {
   });
 
   const deletePayment = useMutation({
-    mutationFn: ({
-      id,
-     
-    }: {
+    mutationFn: ({ id }: {
       id: string | number;
       studentId?: string | number;
     }) => financeOperationsService.deletePayment(id),
