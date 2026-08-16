@@ -61,6 +61,7 @@ export const API_ENDPOINTS = {
         UPDATE: (settingId: ApiId) => `/staff-attendance-settings/${settingId}`,
         DELETE: (settingId: ApiId) => `/staff-attendance-settings/${settingId}`,
       },
+      
     },
   },
 
@@ -253,25 +254,29 @@ export const API_ENDPOINTS = {
       DELETE: (settingId: ApiId) => `/attendance-settings/${settingId}`,
     },
 
-    STAFF_RECORDS: {
-      FILTER: "/admin/staff/filter",
-      CREATE: "/admin/staff-attendances",
-      DETAILS: (id: string | number) => `/admin/staff-attendances/${id}`,
-      UPDATE: (id: string | number) => `/admin/staff-attendances/${id}`,
-      DELETE: (id: string | number) => `/admin/staff-attendances/${id}`,
-      HISTORY: (staffId: string | number) =>
-        `/admin/staff-attendances/staff/${staffId}`,
+   STAFF_RECORDS: {
+      FILTER: "/admin/staff/filter",  
+      CREATE: "/admin/staff-attendances",  
+      DETAILS: (id: string | number) => `/admin/staff-attendances/${id}`, 
+      UPDATE: (id: string | number) => `/admin/staff-attendances/${id}`,  
+      DELETE: (id: string | number) => `/admin/staff-attendances/${id}`,  
+      HISTORY: (id: string | number) => `/admin/staff-attendances/${id}`,  
     },
-
     STAFF_LEAVES: {
-      CREATE: "/admin/staff-leaves",
-      GET_BY_STAFF: (staffId: string | number) =>
-        `/admin/staff-leaves/${staffId}`,
-      DETAILS: (leaveId: string | number) =>
-        `/admin/staff-leaves/${leaveId}/staff`,
+
+      CREATE: "/admin/staff-leaves",  
+      GET_BY_STAFF: (staffId: string | number) => `/admin/staff-leaves/${staffId}`,  
+      DETAILS: (leaveId: string | number) => `/admin/staff-leaves/${leaveId}/staff`,
       UPDATE: (id: string | number) => `/admin/staff-leaves/${id}`,
       DELETE: (id: string | number) => `/admin/staff-leaves/${id}`,
     },
+  },
+  LEAVE_TYPES: {
+    LIST: "/admin/leave/leaves",
+    CREATE: "/admin/leave",
+    DETAILS: (id: ApiId) => `/admin/leave/${id}`,
+    UPDATE: (id: ApiId) => `/admin/leave/${id}`,
+    DELETE: (id: ApiId) => `/admin/leave/${id}`,
   },
 
   SCHEDULING: {

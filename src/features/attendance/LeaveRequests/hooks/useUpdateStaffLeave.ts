@@ -11,7 +11,7 @@ export const useUpdateStaffLeave = () => {
       return response.data.data;
     },
     onSuccess: () => {
-      // تحديث كل الجداول المرتبطة بالإجازات فوراً
+
       queryClient.invalidateQueries({ queryKey: ['staff-leaves'] });
       queryClient.invalidateQueries({ queryKey: ['staff-attendances'] });
     },

@@ -3,10 +3,13 @@ import { axiosClient } from "@/services/axios/axiosClient";
 import type { CreateStaffLeavePayload } from '../../staff/types/staffAttendance.types';
 
 export const staffLeaveService = {
-  // ✅ جلب إجازات موظف محدد حصرياً (يجب أن يتم تمرير staffId)
-  getStaffLeaves: (staffId: string | number) => {
-    if (!staffId) return Promise.resolve({ data: [] });
-    return axiosClient.get(API_ENDPOINTS.ATTENDANCE.STAFF_LEAVES.GET_BY_STAFF(staffId));
+  // ✅ تعديل لجلب كل الإجازات عامة أو إجازات موظف محدد إذا تم تمريره
+  getStaffLeaves: (staffId?: string | number) => {
+    if (staffId) {
+      return axiosClient.get(API_ENDPOINTS.ATTENDANCE.STAFF_LEAVES.GET_BY_STAFF(staffId));
+    }
+    // مسار عام لجلب كافة إجازات الموظفين (حسب الـ Endpoint الأساسي للإضافة POST /admin/staff-leaves)
+    return axiosClient.get(API_ENDPOINTS.ATTENDANCE.STAFF_LEAVES.CREATE);
   },
 
   getLeaveDetails: (leaveId: string | number) => 
