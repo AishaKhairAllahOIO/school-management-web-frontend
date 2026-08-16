@@ -35,19 +35,19 @@ export function FinanceChart({ data }: FinanceChartProps) {
   ];
 
   return (
-    <div className="group rounded-[1.5rem] border border-border/60 bg-card p-5 shadow-[0_8px_30px_rgba(148,163,184,0.07)] transition-all duration-300 hover:shadow-[0_16px_40px_rgba(148,163,184,0.12)]">
-      <div className="mb-4 flex items-center justify-between">
+    <div className="group rounded-2xl border border-border/60 bg-card p-4 shadow-[0_6px_24px_rgba(148,163,184,0.06)] transition-all duration-300 hover:shadow-[0_12px_32px_rgba(148,163,184,0.10)]">
+      <div className="mb-2 flex items-center justify-between">
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
             Financial overview
           </p>
 
-          <h3 className="mt-1 text-lg font-bold tracking-tight text-foreground">
+          <h3 className="mt-0.5 text-lg font-bold tracking-tight text-foreground">
             Finance Summary
           </h3>
         </div>
 
-        <div className="rounded-xl bg-sky-50 px-3 py-1.5 text-xs font-semibold text-sky-600">
+        <div className="rounded-lg bg-sky-50 px-2.5 py-1 text-[11px] font-semibold text-sky-600">
           Overview
         </div>
       </div>
@@ -93,11 +93,21 @@ export function FinanceChart({ data }: FinanceChartProps) {
               contentStyle={{
                 backgroundColor: "rgba(255,255,255,0.96)",
                 border: "1px solid rgba(226,232,240,0.8)",
-                borderRadius: "14px",
-                boxShadow: "0 12px 30px rgba(15,23,42,0.08)",
+                borderRadius: "10px",
+                boxShadow: "0 6px 18px rgba(15,23,42,0.07)",
+                padding: "6px 9px",
+                fontSize: "11px",
               }}
-              formatter={(value: number) => [
-                value.toLocaleString(),
+              itemStyle={{
+                fontSize: "11px",
+                padding: "0",
+              }}
+              labelStyle={{
+                fontSize: "10px",
+                marginBottom: "2px",
+              }}
+              formatter={(value) => [
+                Number(value).toLocaleString(),
                 "Amount",
               ]}
             />

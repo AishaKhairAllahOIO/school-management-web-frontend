@@ -26,12 +26,25 @@ const COLORS = [
   "#F29AA3",
 ];
 
+const STAFF_TYPE_NAMES: Record<string, string> = {
+  teacher: "Teachers",
+  admin: "Administrators",
+  adviser: "Advisers",
+  secretary: "Secretaries",
+  supervisor: "Supervisors",
+  employee: "Employees",
+};
+
+function getStaffLabel(item: StaffTypeData) {
+  return STAFF_TYPE_NAMES[item.type] ?? item.label;
+}
+
 export function StaffByTypeChart({ data }: StaffByTypeChartProps) {
   return (
     <div className="group rounded-[1.5rem] border border-border/60 bg-card p-5 shadow-[0_8px_30px_rgba(148,163,184,0.07)] transition-all duration-300 hover:shadow-[0_16px_40px_rgba(148,163,184,0.12)]">
       <div className="mb-4">
         <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-          Workforce overview
+          Workforce Overview
         </p>
 
         <h3 className="mt-1 text-lg font-bold tracking-tight text-foreground">
@@ -71,22 +84,48 @@ export function StaffByTypeChart({ data }: StaffByTypeChartProps) {
                 fill: "var(--color-muted-foreground)",
                 fontSize: 11,
               }}
+              tickFormatter={(value) => {
+                const item = data.find(
+                  (staff) => staff.label === value,
+                );
+
+                return item ? getStaffLabel(item) : value;
+              }}
             />
 
             <Tooltip
               cursor={{
-                fill: "rgba(148,163,184,0.06)",
+                fill: "rgba(148,163,184,0.04)",
               }}
               contentStyle={{
-                backgroundColor: "rgba(255,255,255,0.96)",
+                backgroundColor: "rgba(255,255,255,0.98)",
                 border: "1px solid rgba(226,232,240,0.8)",
-                borderRadius: "14px",
-                boxShadow: "0 12px 30px rgba(15,23,42,0.08)",
+                borderRadius: "10px",
+                padding: "7px 10px",
+                boxShadow: "0 6px 18px rgba(15,23,42,0.08)",
+                fontSize: "11px",
               }}
-              formatter={(value: number) => [
-                `${value.toLocaleString()} staff`,
-                "Count",
-              ]}
+              labelStyle={{
+                fontSize: "11px",
+                fontWeight: 600,
+                marginBottom: "2px",
+              }}
+              itemStyle={{
+                fontSize: "11px",
+                padding: 0,
+              }}
+               formatter={(value) => [
+                  `${Number(value).toLocaleString()} staff`,
+                  "Count",
+                ]}
+            
+              labelFormatter={(value) => {
+                const item = data.find(
+                  (staff) => staff.label === value,
+                );
+
+                return item ? getStaffLabel(item) : value;
+              }}
             />
 
             <Bar
