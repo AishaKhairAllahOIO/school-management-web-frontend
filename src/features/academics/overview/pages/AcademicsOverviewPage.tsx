@@ -4,8 +4,14 @@ import { Link } from "react-router-dom";
 import { CurriculumOverviewLink } from "../../shared/components/CurriculumOverviewLink";
 
 import { academicNavigationGroups } from "../../shared/config/academic-navigation";
+import { academicOverviewPalette } from "../../shared/hooks/useAcademicTheme";
+
 import { useAcademicStatistics } from "../hooks/useAcademicStatistics";
 import type { AcademicStatistics } from "../types/academic-statistics.types";
+
+// =========================================================
+// Group Visual Styles
+// =========================================================
 
 const groupVisualStyles = {
   structure: {
@@ -29,6 +35,10 @@ const groupVisualStyles = {
     divider: "border-success/[0.11]",
   },
 } as const;
+
+// =========================================================
+// Statistics
+// =========================================================
 
 type StatisticsItemKey =
   | "grades"
@@ -73,6 +83,10 @@ function shouldShowStatistics(label: string) {
   );
 }
 
+// =========================================================
+// Statistics Value
+// =========================================================
+
 function StatisticsValue({
   value,
   isLoading,
@@ -112,6 +126,36 @@ function StatisticsValue({
   );
 }
 
+// =========================================================
+// Academic Overview Visual Style
+// =========================================================
+
+const overviewVisualStyle = {
+  topAccent: {
+    backgroundColor: academicOverviewPalette.accent,
+  },
+
+  border: {
+    borderColor: academicOverviewPalette.border,
+  },
+
+  background: {
+    backgroundColor: academicOverviewPalette.soft,
+  },
+
+  softBackground: {
+    backgroundColor: academicOverviewPalette.softHover,
+  },
+
+  shadow: {
+    boxShadow: `0 10px 30px ${academicOverviewPalette.shadow}`,
+  },
+};
+
+// =========================================================
+// Page
+// =========================================================
+
 export function AcademicsOverviewPage() {
   const {
     data: statistics,
@@ -129,6 +173,7 @@ export function AcademicsOverviewPage() {
         {/* =========================================================
             Academic Navigation Groups
         ========================================================= */}
+
         {academicNavigationGroups.map((group) => {
           const GroupIcon = group.icon;
 
@@ -157,6 +202,7 @@ export function AcademicsOverviewPage() {
               {/* =====================================================
                   Group Header
               ===================================================== */}
+
               <header
                 className={[
                   "flex min-h-[70px] items-center gap-3.5",
@@ -165,6 +211,7 @@ export function AcademicsOverviewPage() {
                 ].join(" ")}
               >
                 {/* Group Icon */}
+
                 <span
                   className={[
                     "flex h-10 w-10 shrink-0 items-center justify-center",
@@ -180,6 +227,7 @@ export function AcademicsOverviewPage() {
                 </span>
 
                 {/* Group Information */}
+
                 <div className="min-w-0">
                   <h2
                     className={[
@@ -207,6 +255,7 @@ export function AcademicsOverviewPage() {
               {/* =====================================================
                   Group Items
               ===================================================== */}
+
               <div
                 className={[
                   "grid min-w-0 grid-cols-1 divide-y bg-card",
@@ -240,6 +289,7 @@ export function AcademicsOverviewPage() {
                       {/* =================================================
                           Item Content
                       ================================================= */}
+
                       <div
                         className="
                           flex
@@ -254,6 +304,7 @@ export function AcademicsOverviewPage() {
                         "
                       >
                         {/* Item Icon */}
+
                         <span
                           className={[
                             "flex h-10 w-10 shrink-0",
@@ -270,6 +321,7 @@ export function AcademicsOverviewPage() {
                         </span>
 
                         {/* Item Information */}
+
                         <div className="min-w-0 flex-1">
                           <h3
                             className="
@@ -300,6 +352,7 @@ export function AcademicsOverviewPage() {
                         {/* =================================================
                             Statistics
                         ================================================= */}
+
                         {showStatistics ? (
                           <div
                             className={[
@@ -339,6 +392,7 @@ export function AcademicsOverviewPage() {
                       {/* =================================================
                           Manage Button
                       ================================================= */}
+
                       <Link
                         to={item.path}
                         className={[
@@ -384,19 +438,23 @@ export function AcademicsOverviewPage() {
             Academic Overview
             Pastel Yellow Section
         ============================================================= */}
+
         <div
           className="
             relative
+            min-w-0
             overflow-hidden
             rounded-[22px]
             border
-            border-yellow-200/70
-            bg-yellow-50/50
-            p-[1px]
-            shadow-[0_10px_30px_rgba(234,179,8,0.04)]
+            shadow-[0_10px_30px_rgba(148,113,24,0.055)]
           "
+          style={{
+            ...overviewVisualStyle.border,
+            ...overviewVisualStyle.shadow,
+          }}
         >
-          {/* Soft Yellow Accent */}
+          {/* Top Accent */}
+
           <span
             aria-hidden="true"
             className="
@@ -405,11 +463,36 @@ export function AcademicsOverviewPage() {
               top-0
               z-10
               h-[3px]
-              bg-yellow-300
             "
+            style={overviewVisualStyle.topAccent}
           />
 
-          <div className="rounded-[21px] bg-yellow-50/30">
+          {/* Soft Decorative Glow */}
+
+          <span
+            aria-hidden="true"
+            className="
+              pointer-events-none
+              absolute
+              -right-16
+              -top-20
+              h-48
+              w-48
+              rounded-full
+              blur-3xl
+            "
+            style={overviewVisualStyle.softBackground}
+          />
+
+          {/* Content */}
+
+          <div
+            className="
+              relative
+              rounded-[21px]
+            "
+            style={overviewVisualStyle.background}
+          >
             <CurriculumOverviewLink />
           </div>
         </div>
