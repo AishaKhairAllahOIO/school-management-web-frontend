@@ -2,9 +2,8 @@ import { useState } from "react";
 import {
   Banknote,
   CalendarRange,
-  CircleDollarSign,
   ReceiptText,
-  UsersRound,
+
 } from "lucide-react";
 
 import { SectionHeader } from "@/features/settings/academic/components/shared/SectionHeader";
@@ -36,14 +35,13 @@ const studentWorkspaceItems = [
 }>;
 
 export function FinancialSettingsPage() {
-  const [audience, setAudience] = useState<FinancialAudience>("students");
+  const [audience, ] = useState<FinancialAudience>("students");
   const [activeSection, setActiveSection] =
     useState<FinancialSection>("fee-plans");
 
   return (
     <div className="mx-auto w-full max-w-[1500px] space-y-4">
-      <FinancialAudienceSwitch value={audience} onChange={setAudience} />
-
+    
       {audience === "students" ? (
         <FinancialWorkspace
           items={studentWorkspaceItems}
@@ -60,70 +58,6 @@ export function FinancialSettingsPage() {
   );
 }
 
-function FinancialAudienceSwitch({
-  value,
-  onChange,
-}: {
-  value: FinancialAudience;
-  onChange: (value: FinancialAudience) => void;
-}) {
-  const options = [
-    {
-      id: "students" as const,
-      title: "Student Finance",
-      description: "Tuition, services and family payment schedules",
-      icon: CircleDollarSign,
-    },
-    {
-      id: "staff" as const,
-      title: "Staff Finance",
-      description: "Payroll rules, allowances and deductions",
-      icon: UsersRound,
-    },
-  ];
-
-  return (
-    <div className="grid gap-2 rounded-[20px] border border-border/55 bg-card p-2 shadow-[0_8px_26px_rgba(30,20,70,0.04)] sm:grid-cols-2">
-      {options.map((option) => {
-        const active = option.id === value;
-        const Icon = option.icon;
-
-        return (
-          <button
-            key={option.id}
-            type="button"
-            onClick={() => onChange(option.id)}
-            aria-pressed={active}
-            className={[
-              "flex min-w-0 items-center gap-3 rounded-[15px] px-4 py-3 text-left",
-              "transition-all duration-200 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/10",
-              active
-                ? "bg-primary/[0.07] text-primary"
-                : "text-muted-foreground hover:bg-muted/30 hover:text-foreground",
-            ].join(" ")}
-          >
-            <span
-              className={[
-                "flex h-10 w-10 shrink-0 items-center justify-center rounded-[13px]",
-                active ? "bg-primary/10 text-primary" : "bg-muted/45",
-              ].join(" ")}
-            >
-              <Icon size={19} strokeWidth={1.75} />
-            </span>
-            <span className="min-w-0">
-              <span className="block text-[14px] font-medium text-foreground">
-                {option.title}
-              </span>
-              <span className="mt-0.5 block truncate text-[12px] leading-5 text-muted-foreground">
-                {option.description}
-              </span>
-            </span>
-          </button>
-        );
-      })}
-    </div>
-  );
-}
 
 function StaffFinancialSettings() {
   return (
