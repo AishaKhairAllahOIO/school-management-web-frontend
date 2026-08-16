@@ -19,14 +19,6 @@ import type {
 
 import { ScheduleClassCard } from "./ScheduleClassCard";
 
-const dayColors = [
-  "bg-violet-50/55",
-  "bg-sky-50/55",
-  "bg-emerald-50/55",
-  "bg-amber-50/55",
-  "bg-rose-50/55",
-];
-
 const dayOrder: SchoolDay[] = [
   "sunday",
   "monday",
@@ -59,10 +51,6 @@ type Props = {
 
   defaultOpen?: boolean;
 
-  /**
-   * Keeps the timetable toggle visually connected
-   * to the parent classroom card.
-   */
   theme?: ScheduleGridTheme;
 
   onAdd?: (args: {
@@ -81,15 +69,18 @@ type Props = {
 export function ScheduleGrid({
   classes,
   settings,
-  defaultOpen = true,
+  defaultOpen = false,
   theme,
   onAdd,
   onEdit,
 }: Props) {
-  const [isOpen, setIsOpen] = useState(defaultOpen);
+  const [isOpen, setIsOpen] =
+    useState(defaultOpen);
 
   const workingDays = settings.workingDays
-    .filter((day) => day.periodsCount > 0)
+    .filter(
+      (day) => day.periodsCount > 0,
+    )
     .sort(
       (a, b) =>
         dayOrder.indexOf(a.day) -
@@ -105,7 +96,7 @@ export function ScheduleGrid({
 
   if (!workingDays.length) {
     return (
-      <div className="rounded-[22px] border border-dashed border-border/60 p-6 text-center sm:p-10">
+      <div className="rounded-[22px] border border-dashed border-border/60 bg-card p-6 text-center sm:p-10">
         <p className="text-sm font-medium">
           No working days configured.
         </p>
@@ -120,12 +111,13 @@ export function ScheduleGrid({
   const gridTemplateColumns = `110px repeat(${workingDays.length}, minmax(150px, 1fr))`;
 
   /*
-   * Fallback keeps ScheduleGrid reusable elsewhere.
+   * Keep the theme support for the parent card,
+   * but the dropdown icon itself is intentionally neutral.
    */
   const toggleTheme = theme ?? {
-    border: "border-primary/15",
-    bg: "bg-primary/[0.035]",
-    icon: "bg-primary/[0.08] text-primary",
+    border: "border-border/55",
+    bg: "bg-card",
+    icon: "bg-card text-muted-foreground",
   };
 
   return (
@@ -139,23 +131,32 @@ export function ScheduleGrid({
         className={[
           "flex w-full items-center justify-between gap-3",
           "rounded-[17px] border px-3.5 py-3 text-left",
+          "bg-card",
           "transition-all duration-200",
-          isOpen
-            ? `${toggleTheme.border} ${toggleTheme.bg}`
-            : "border-border/50 bg-background hover:border-primary/15 hover:bg-muted/[0.22]",
+          toggleTheme.border,
         ].join(" ")}
       >
         <div className="flex items-center gap-2.5">
+          {/* Dropdown icon */}
           <span
-            className={[
-              "flex h-8 w-8 items-center justify-center rounded-[10px]",
-              toggleTheme.icon,
-            ].join(" ")}
+            className="
+              flex h-8 w-8
+              items-center justify-center
+              rounded-[10px]
+              bg-card
+              text-muted-foreground
+            "
           >
             {isOpen ? (
-              <ChevronUp size={15} />
+              <ChevronUp
+                size={15}
+                strokeWidth={1.8}
+              />
             ) : (
-              <ChevronDown size={15} />
+              <ChevronDown
+                size={15}
+                strokeWidth={1.8}
+              />
             )}
           </span>
 
@@ -174,9 +175,9 @@ export function ScheduleGrid({
         <span
           className={[
             "rounded-full border px-2.5 py-1",
+            "bg-card",
             "text-[9px] font-medium",
             toggleTheme.border,
-            toggleTheme.bg,
             "text-muted-foreground",
           ].join(" ")}
         >
@@ -189,57 +190,67 @@ export function ScheduleGrid({
       {isOpen && (
         <div
           className="
-            w-full min-w-0 overflow-x-auto overflow-y-hidden
-            rounded-[20px] border border-border/55
+            w-full min-w-0
+            overflow-x-auto
+            overflow-y-hidden
+            rounded-[20px]
+            border border-border/55
+            bg-card
             overscroll-x-contain
             [scrollbar-width:thin]
           "
         >
           <div
-            className="min-w-max"
+            className="min-w-max bg-card"
             style={{
               minWidth: `${110 + workingDays.length * 150}px`,
             }}
           >
             {/* Header */}
             <div
-              className="grid bg-muted/[0.18]"
+              className="grid bg-card"
               style={{
                 gridTemplateColumns,
               }}
             >
+              {/* Period header */}
               <div
                 className="
                   sticky left-0 z-20
                   border-r border-border/45
-                  bg-muted/[0.18]
+                  bg-card
                   px-2 py-2.5
-                  text-[10px] font-medium
-                  uppercase tracking-[0.08em]
+                  text-[10px]
+                  font-medium
+                  uppercase
+                  tracking-[0.08em]
                   text-muted-foreground
-                  sm:px-3 sm:py-3 sm:text-[11px]
+                  sm:px-3
+                  sm:py-3
+                  sm:text-[11px]
                 "
               >
                 Period
               </div>
 
+              {/* Days */}
               {workingDays.map(
-                (day, index) => (
+                (day) => (
                   <div
                     key={day.day}
-                    className={[
-                      `
-                        border-r border-border/45
-                        px-2 py-2.5
-                        text-center
-                        text-[11px] font-medium
-                        last:border-r-0
-                        sm:px-3 sm:py-3 sm:text-[12px]
-                      `,
-                      dayColors[
-                        index % dayColors.length
-                      ],
-                    ].join(" ")}
+                    className="
+                      border-r border-border/45
+                      bg-card
+                      px-2 py-2.5
+                      text-center
+                      text-[11px]
+                      font-medium
+                      text-muted-foreground
+                      last:border-r-0
+                      sm:px-3
+                      sm:py-3
+                      sm:text-[12px]
+                    "
                   >
                     {dayLabels[day.day]}
                   </div>
@@ -259,21 +270,28 @@ export function ScheduleGrid({
                 return (
                   <div
                     key={periodIndex}
-                    className="grid border-t border-border/45"
+                    className="
+                      grid
+                      border-t border-border/45
+                      bg-card
+                    "
                     style={{
                       gridTemplateColumns,
                     }}
                   >
+                    {/* Period number */}
                     <div
                       className="
                         sticky left-0 z-10
                         flex min-h-[92px]
-                        flex-col justify-center
+                        flex-col
+                        justify-center
                         border-r border-border/45
-                        bg-muted/[0.10]
+                        bg-card
                         px-2 py-2
                         sm:min-h-[112px]
-                        sm:px-3 sm:py-3
+                        sm:px-3
+                        sm:py-3
                       "
                     >
                       <span className="text-[11px] font-medium sm:text-[12px]">
@@ -281,6 +299,7 @@ export function ScheduleGrid({
                       </span>
                     </div>
 
+                    {/* Day cells */}
                     {workingDays.map(
                       (day) => (
                         <ScheduleCell
@@ -345,6 +364,7 @@ function ScheduleCell({
       className="
         min-h-[92px]
         border-r border-border/45
+        bg-card
         p-1.5
         last:border-r-0
         sm:min-h-[112px]
@@ -364,15 +384,22 @@ function ScheduleCell({
           }
           className="
             group
-            flex h-full min-h-[78px] w-full
-            flex-col items-center justify-center
+            flex h-full
+            min-h-[78px]
+            w-full
+            flex-col
+            items-center
+            justify-center
             rounded-[12px]
-            border border-dashed border-border/45
+            border border-dashed
+            border-border/45
+            bg-card
             px-2
             text-center
             text-[10px]
             text-muted-foreground
-            transition-all duration-200
+            transition-all
+            duration-200
             hover:border-primary/30
             hover:bg-primary/[0.035]
             hover:text-primary
@@ -382,14 +409,19 @@ function ScheduleCell({
         >
           <span
             className="
-              flex h-7 w-7 items-center justify-center
+              flex h-7 w-7
+              items-center justify-center
               rounded-full
-              bg-muted/50
+              border border-border/40
+              bg-card
               transition-all
               group-hover:bg-primary/10
             "
           >
-            <Plus size={13} />
+            <Plus
+              size={13}
+              strokeWidth={1.8}
+            />
           </span>
 
           <span className="mt-1">
