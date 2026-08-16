@@ -1,9 +1,5 @@
 import { useCurrentUser } from "@/app/layout/hooks/useCurrentUser";
-import { AdviserDashboard } from "@/features/dashboard/adviser/AdviserDashboard";
-import {
-  DashboardLoadingState,
-  UnsupportedDashboardRole,
-} from "@/features/dashboard/components/DashboardRoleState";
+import { AdviserDashboard } from "@/features/dashboard/supervisor/SupervisorDashboard";
 import { resolveDashboardRole } from "@/features/dashboard/lib/dashboard-role";
 import { SecretaryDashboard } from "@/features/dashboard/secretary/SecretaryDashboard";
 import { SuperAdminDashboard } from "@/features/dashboard/super-admin/SuperAdminDashboard";
@@ -28,10 +24,12 @@ export function DashboardPage() {
   const currentUserState = useCurrentUser();
 
   if (isLoadingCurrentUser(currentUserState)) {
-    return <DashboardLoadingState />;
+    return <div className="space-y-5">
+      <h1>loding</h1>
+    </div>;
   }
 
-  const { role, rawRole } =
+  const { role } =
     resolveDashboardRole(currentUserState);
 
   switch (role) {
@@ -46,9 +44,9 @@ export function DashboardPage() {
 
     default:
       return (
-        <UnsupportedDashboardRole
-          rawRole={rawRole}
-        />
+         <div className="space-y-5">
+      <h1>unsupport</h1>
+    </div>
       );
   }
 }
