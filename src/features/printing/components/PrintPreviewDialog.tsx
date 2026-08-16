@@ -94,7 +94,7 @@ export function PrintPreviewDialog({
     useState<PreviewMode>("fit-page");
 
   const [documentHeight, setDocumentHeight] =
-    useState(pageSize.height);
+    useState<number>(pageSize.height);
 
   const [isReady, setIsReady] =
     useState(false);
