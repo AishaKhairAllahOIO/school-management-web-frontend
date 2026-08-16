@@ -61,7 +61,6 @@ export const API_ENDPOINTS = {
         UPDATE: (settingId: ApiId) => `/staff-attendance-settings/${settingId}`,
         DELETE: (settingId: ApiId) => `/staff-attendance-settings/${settingId}`,
       },
-      
     },
   },
 
@@ -254,19 +253,20 @@ export const API_ENDPOINTS = {
       DELETE: (settingId: ApiId) => `/attendance-settings/${settingId}`,
     },
 
-   STAFF_RECORDS: {
-      FILTER: "/admin/staff/filter",  
-      CREATE: "/admin/staff-attendances",  
-      DETAILS: (id: string | number) => `/admin/staff-attendances/${id}`, 
-      UPDATE: (id: string | number) => `/admin/staff-attendances/${id}`,  
-      DELETE: (id: string | number) => `/admin/staff-attendances/${id}`,  
-      HISTORY: (id: string | number) => `/admin/staff-attendances/${id}`,  
+    STAFF_RECORDS: {
+      FILTER: "/admin/staff/filter",
+      CREATE: "/admin/staff-attendances",
+      DETAILS: (id: string | number) => `/admin/staff-attendances/${id}`,
+      UPDATE: (id: string | number) => `/admin/staff-attendances/${id}`,
+      DELETE: (id: string | number) => `/admin/staff-attendances/${id}`,
+      HISTORY: (id: string | number) => `/admin/staff-attendances/${id}`,
     },
     STAFF_LEAVES: {
-
-      CREATE: "/admin/staff-leaves",  
-      GET_BY_STAFF: (staffId: string | number) => `/admin/staff-leaves/${staffId}`,  
-      DETAILS: (leaveId: string | number) => `/admin/staff-leaves/${leaveId}/staff`,
+      CREATE: "/admin/staff-leaves",
+      GET_BY_STAFF: (staffId: string | number) =>
+        `/admin/staff-leaves/${staffId}`,
+      DETAILS: (leaveId: string | number) =>
+        `/admin/staff-leaves/${leaveId}/staff`,
       UPDATE: (id: string | number) => `/admin/staff-leaves/${id}`,
       DELETE: (id: string | number) => `/admin/staff-leaves/${id}`,
     },
@@ -308,5 +308,19 @@ export const API_ENDPOINTS = {
   MARKS: {
     ALL: (academicYearId: ApiId, semesterId: ApiId) =>
       `/auth/all/marks/show/${academicYearId}/${semesterId}`,
+  },
+
+  STAFF_PAYROLL: {
+    CONTRACTS: "/admin/staff/contract",
+    CONTRACT: (contractId: ApiId) => `/admin/staff/contract/${contractId}`,
+
+    PAYROLL_PREVIEW: "/staff/payroll/preview",
+    PAYROLL_COMMIT: "/staff/payroll/commit",
+
+    PAYROLL_MONTH: "/staff/payroll/month",
+
+    PAYROLL_BY_STAFF: (staffId: ApiId) => `/staff/payroll/staff/${staffId}`,
+
+    PAYROLL: (payrollId: ApiId) => `/staff/payroll/${payrollId}`,
   },
 } as const;
