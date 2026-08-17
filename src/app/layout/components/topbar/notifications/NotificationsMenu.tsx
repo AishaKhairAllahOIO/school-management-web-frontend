@@ -118,8 +118,37 @@ export function NotificationsMenu({
                 }
               : undefined
           }
-          className="topbar-menu-shadow fixed inset-x-3 z-[100] mt-0 max-h-[calc(100dvh-88px)] overflow-hidden rounded-[18px] border border-topbar-border/80 bg-topbar-surface/95 backdrop-blur-2xl origin-top animate-in fade-in-0 zoom-in-95 slide-in-from-top-1 duration-150 sm:inset-x-auto sm:end-3 sm:w-[320px] lg:absolute lg:inset-x-auto lg:end-0 lg:top-full lg:mt-2 lg:w-[278px] lg:max-h-[calc(100dvh-88px)]"
-        >
+className="
+  topbar-menu-shadow
+  fixed
+  inset-x-3
+  z-[100]
+  mt-0
+  max-h-[calc(100dvh-88px)]
+  overflow-hidden
+  rounded-[18px]
+  border
+  border-topbar-border/80
+  bg-topbar-surface/95
+  backdrop-blur-2xl
+  origin-top
+  animate-in
+  fade-in-0
+  zoom-in-95
+  slide-in-from-top-1
+  duration-150
+
+  sm:inset-x-auto
+  sm:end-3
+  sm:w-[320px]
+
+  lg:fixed
+  lg:inset-x-auto
+  lg:end-auto
+  lg:mt-0
+  lg:w-[278px]
+  lg:max-h-[calc(100dvh-88px)]
+"        >
           <div className="flex items-start justify-between gap-3 border-b border-topbar-divider px-4 py-3">
             <div className="min-w-0">
               <h2 className="text-[14px] font-semibold text-topbar-title">
