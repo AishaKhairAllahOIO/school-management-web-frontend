@@ -1,13 +1,36 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { GraduationCap, Loader2, AlertTriangle, ArrowLeft } from "lucide-react";
 import { usePromoteStudents } from "../hooks/useReportCards";
+import { useAcademicYears } from "../../settings/academic/hooks/useAcademicSettings"; // 🌟 استيراد الهوك الجديد 🌟
 
 export function PromoteStudentsDialog({ onClose }: { onClose: () => void }) {
-  const [fromYear, setFromYear] = useState("1"); // يفضل ربطها بـ API الأعوام لاحقاً
-  const [toYear, setToYear] = useState("2");
+  // 🌟 جلب الأعوام الدراسية الحقيقية من الـ API 🌟
+  const { data: academicYears = [], isLoading: isLoadingYears } = useAcademicYears();
+
+  const [fromYear, setFromYear] = useState(""); 
+  const [toYear, setToYear] = useState("");
+  
   const promoteMutation = usePromoteStudents();
 
+  // 🌟 اختيار العام الحالي والقادم تلقائياً عند تحميل البيانات 🌟
+  useEffect(() => {
+    if (academicYears.length > 0) {
+      // البحث عن العام الدراسي الحالي (الذي يحمل صفة isCurrent: true)
+      const currentYear = academicYears.find(y => y.isCurrent) || academicYears[0];
+      setFromYear(currentYear.id);
+      
+      // محاولة إيجاد العام الدراسي القادم (الذي تم إنشاؤه بعد العام الحالي)
+      const nextYear = academicYears.find(y => Number(y.id) > Number(currentYear.id)) || academicYears[1];
+      if (nextYear) {
+        setToYear(nextYear.id);
+      }
+    }
+  }, [academicYears]);
+
   const handlePromote = () => {
+    // التأكد من اختيار عامين مختلفين قبل الإرسال
+    if (!fromYear || !toYear || fromYear === toYear) return;
+
     promoteMutation.mutate(
       { from_academic_year_id: fromYear, to_academic_year_id: toYear },
       { onSuccess: () => onClose() }
@@ -32,10 +55,10 @@ export function PromoteStudentsDialog({ onClose }: { onClose: () => void }) {
         </header>
 
         <div className="space-y-5 p-6">
-          <div className="flex items-center gap-3 rounded-[12px] border border-warning/20 bg-warning/5 p-3 text-warning">
-            <AlertTriangle size={16} className="shrink-0" />
+          <div className="flex items-start gap-3 rounded-[12px] border border-warning/20 bg-warning/5 p-3 text-warning">
+            <AlertTriangle size={16} className="shrink-0 mt-0.5" />
             <p className="text-[11px] leading-relaxed font-medium">
-              هذه العملية لا يمكن التراجع عنها بسهولة. تأكد من إكمال جميع إدخالات العلامات وتوليد الجلاءات النهائية قبل الترفيع.
+              هذه العملية لا يمكن التراجع عنها بسهولة. تأكد من إكمال جميع إدخالات العلامات وتوليد الجلاءات النهائية لجميع الطلاب قبل البدء بعملية الترفيع.
             </p>
           </div>
 
@@ -45,9 +68,18 @@ export function PromoteStudentsDialog({ onClose }: { onClose: () => void }) {
               <select 
                 value={fromYear} 
                 onChange={(e) => setFromYear(e.target.value)}
-                className="mt-2 block h-10 w-full rounded-[12px] border border-border/65 bg-background px-3 text-[12px] outline-none focus:border-warning/50"
+                disabled={isLoadingYears}
+                className="mt-2 block h-10 w-full rounded-[12px] border border-border/65 bg-background px-3 text-[12px] outline-none focus:border-warning/50 disabled:opacity-50"
               >
-                <option value="1">2025-2026</option>
+                {isLoadingYears ? (
+                  <option value="">جاري التحميل...</option>
+                ) : (
+                  academicYears.map((year) => (
+                    <option key={year.id} value={year.id}>
+                      {year.name} {year.isCurrent ? "(الحالي)" : ""}
+                    </option>
+                  ))
+                )}
               </select>
             </label>
 
@@ -58,12 +90,28 @@ export function PromoteStudentsDialog({ onClose }: { onClose: () => void }) {
               <select 
                 value={toYear} 
                 onChange={(e) => setToYear(e.target.value)}
-                className="mt-2 block h-10 w-full rounded-[12px] border border-border/65 bg-background px-3 text-[12px] outline-none focus:border-warning/50"
+                disabled={isLoadingYears}
+                className="mt-2 block h-10 w-full rounded-[12px] border border-border/65 bg-background px-3 text-[12px] outline-none focus:border-warning/50 disabled:opacity-50"
               >
-                <option value="2">2026-2027</option>
+                {isLoadingYears ? (
+                  <option value="">جاري التحميل...</option>
+                ) : (
+                  academicYears.map((year) => (
+                    <option key={year.id} value={year.id}>
+                      {year.name}
+                    </option>
+                  ))
+                )}
               </select>
             </label>
           </div>
+          
+          {/* تحذير يظهر إذا اختار المستخدم نفس العام */}
+          {fromYear && toYear && fromYear === toYear && (
+            <p className="text-[10px] text-destructive text-center font-bold">
+              لا يمكن الترفيع لنفس العام الدراسي! الرجاء اختيار عام دراسي قادم.
+            </p>
+          )}
         </div>
 
         <footer className="flex items-center justify-end gap-3 border-t border-border/45 px-6 py-4">
@@ -76,8 +124,8 @@ export function PromoteStudentsDialog({ onClose }: { onClose: () => void }) {
           </button>
           <button
             onClick={handlePromote}
-            disabled={promoteMutation.isPending}
-            className="inline-flex h-9 items-center justify-center gap-2 rounded-[10px] bg-warning px-5 text-[12px] font-semibold text-warning-foreground shadow-sm transition hover:bg-warning/90 disabled:opacity-50"
+            disabled={promoteMutation.isPending || isLoadingYears || fromYear === toYear || !toYear}
+            className="inline-flex h-9 items-center justify-center gap-2 rounded-[10px] bg-warning px-5 text-[12px] font-semibold text-warning-foreground shadow-sm transition hover:bg-warning/90 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {promoteMutation.isPending ? <Loader2 size={16} className="animate-spin" /> : <GraduationCap size={16} />}
             تأكيد الترفيع
