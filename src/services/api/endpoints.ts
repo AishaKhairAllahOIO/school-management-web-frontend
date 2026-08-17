@@ -165,19 +165,25 @@ export const API_ENDPOINTS = {
 
   FINANCE_OPERATIONS: {
     ACCOUNTS: "/admin/finance/contracts/accounts",
+
     ACCOUNT: (studentId: ApiId) =>
       `/admin/finance/contracts/accounts/${studentId}`,
+
     FINALIZE_CONTRACT: "/admin/finance/contracts/finalize",
+
     UPDATE_CONTRACT: (accountId: ApiId) =>
       `/admin/finance/contracts/${accountId}`,
+
     INSTALLMENTS: "/admin/finance/contracts/installments",
+
     INSTALLMENT: (installmentId: ApiId) =>
       `/admin/finance/contracts/installments/${installmentId}`,
+
     PAYMENTS: "/admin/finance/contracts/payments",
+
     PAYMENT: (paymentId: ApiId) =>
       `/admin/finance/contracts/payments/${paymentId}`,
   },
-
   COMMUNICATIONS: {
     BELL_UNREAD_COUNT: "/auth/bell/count/unread",
     BELL_MARK_ALL_READ: "/auth/bell/mark/all/read",
