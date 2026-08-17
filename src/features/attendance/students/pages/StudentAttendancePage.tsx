@@ -194,7 +194,7 @@ export function StudentAttendancePage() {
 
         <div className="border-t border-border/45 bg-muted/[0.10] p-4">
           <AttendanceFilters
-            data={records}
+            //data={records}
             search={search}
             setSearch={setSearch}
             gradeFilter={gradeFilter}
@@ -217,7 +217,6 @@ export function StudentAttendancePage() {
         </p>
       )}
 
-      <AttendanceTable data={filteredData} isLoading={isInitialLoading} onUpdate={updateRecord as any} />
-    </section>
+<AttendanceTable data={filteredData} isLoading={isInitialLoading} onUpdate={updateRecord} />    </section>
   );
 }

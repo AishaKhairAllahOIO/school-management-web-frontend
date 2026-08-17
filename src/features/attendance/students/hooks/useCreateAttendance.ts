@@ -1,7 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { studentAttendanceService } from '../api/attendance.api';
+import { studentAttendanceService } from '../api/studendAttendance.service';
 import type { AttendanceStatus, AbsenceType } from '../types/attendance.types';
-
 
 export interface CreateAttendancePayload {
   enrollment_id: number;
@@ -15,13 +14,15 @@ export const useCreateAttendance = () => {
 
   return useMutation({
     mutationFn: async (payload: CreateAttendancePayload) => {
-      const response = await studentAttendanceService.createRecord(payload);
-      // نستخرج البيانات من غلاف Axios ومن غلاف ApiResponse
+      // استخدام storeRecord بدلاً من storeBulk
+      const response = await studentAttendanceService.storeRecord(payload);
       return response.data.data; 
     },
     onSuccess: () => {
-      // إجبار React Query على تحديث الجداول والعدادات فوراً بعد نجاح الإضافة
+      // إجبار React Query على تحديث الجداول
       queryClient.invalidateQueries({ queryKey: ['student-attendance'] });
+      // تحديث صفحة الـ History الخاصة بالطالب
+      queryClient.invalidateQueries({ queryKey: ['student-attendance-history'] });
     },
   });
 };

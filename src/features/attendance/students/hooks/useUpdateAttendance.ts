@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { studentAttendanceService } from '../api/attendance.api';
+import { studentAttendanceService } from '../api/studendAttendance.service';
 import type { UpdateAttendancePayload } from '../types/attendance.types';
 
 export const useUpdateAttendance = () => {
@@ -12,6 +12,7 @@ export const useUpdateAttendance = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['student-attendance'] });
+      queryClient.invalidateQueries({ queryKey: ['student-attendance-history'] });
     },
   });
 };

@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { studentAttendanceService } from '../api/attendance.api';
+import { studentAttendanceService } from '../api/studendAttendance.service';
 import type { BulkAttendancePayload } from '../types/attendance.types';
 
 export const useBulkAttendance = () => {
