@@ -148,79 +148,73 @@ export function FeePlansSection({
       </div>
     );
   }
-
-  return (
+return (
+  <div>
     <div>
-      <div className="p-5 sm:p-6">
-        <FinancialSectionHeader
-          title="Student Fee Plans"
-          description="Set the tuition and optional service charges that will be applied when a student is enrolled in a specific academic year and grade level."
-          actionLabel="Add Fee Plan"
-          onAction={() => setCreateOpen(true)}
-        />
-
-        <FeePlansTable
-          feePlans={feePlans}
-          onEdit={(plan) => {
-            setSelectedPlan(plan);
-            setEditOpen(true);
-          }}
-          onDelete={(plan) => {
-            setSelectedPlan(plan);
-            setDeleteOpen(true);
-          }}
-        />
-      </div>
-
-      <CreateFeePlanDialog
-        open={createOpen}
-        onOpenChange={setCreateOpen}
-        academicYears={academicYears}
-        gradeLevels={gradeLevels}
-        isLoading={createFeePlan.isPending}
-        onSubmit={handleCreate}
+      <FinancialSectionHeader
+        title="Student Fee Plans"
+        description="Set the tuition and optional service charges that will be applied when a student is enrolled in a specific academic year and grade level."
+        actionLabel="Add Fee Plan"
+        onAction={() => setCreateOpen(true)}
       />
 
-      {selectedPlan ? (
-        <EditFeePlanDialog
-          open={editOpen}
-          onOpenChange={setEditOpen}
-          academicYears={academicYears}
-          gradeLevels={gradeLevels}
-          defaultValues={{
-            academicYearId:
-              selectedPlan.academicYearId,
-            gradeLevelId:
-              selectedPlan.gradeLevelId,
-            name: selectedPlan.name,
-            baseAmount:
-              selectedPlan.baseAmount,
-            extraServices:
-              selectedPlan.extraServices?.map(
-                (service) => ({
-                  type: service.type,
-                  name: service.name,
-                  amount: service.amount,
-                }),
-              ) ?? [],
-          }}
-          isLoading={updateFeePlan.isPending}
-          onSubmit={handleEdit}
-        />
-      ) : null}
-
-      <ConfirmationDialog
-        open={deleteOpen}
-        onOpenChange={(open) => {
-          setDeleteOpen(open);
-          if (!open) setSelectedPlan(null);
+      <FeePlansTable
+        feePlans={feePlans}
+        onEdit={(plan) => {
+          setSelectedPlan(plan);
+          setEditOpen(true);
         }}
-        title="Delete fee plan?"
-        description="Students already assigned to this plan may keep existing invoices, but the plan will no longer be available for future enrollment. This action cannot be undone."
-        itemName={selectedPlan?.name}
-        isPending={deleteFeePlan.isPending}
-        onConfirm={handleDelete}
+        onDelete={(plan) => {
+          setSelectedPlan(plan);
+          setDeleteOpen(true);
+        }}
       />
     </div>
-  );
+
+    <CreateFeePlanDialog
+      open={createOpen}
+      onOpenChange={setCreateOpen}
+      academicYears={academicYears}
+      gradeLevels={gradeLevels}
+      isLoading={createFeePlan.isPending}
+      onSubmit={handleCreate}
+    />
+
+    {selectedPlan ? (
+      <EditFeePlanDialog
+        open={editOpen}
+        onOpenChange={setEditOpen}
+        academicYears={academicYears}
+        gradeLevels={gradeLevels}
+        defaultValues={{
+          academicYearId: selectedPlan.academicYearId,
+          gradeLevelId: selectedPlan.gradeLevelId,
+          name: selectedPlan.name,
+          baseAmount: selectedPlan.baseAmount,
+          extraServices:
+            selectedPlan.extraServices?.map((service) => ({
+              type: service.type,
+              name: service.name,
+              amount: service.amount,
+            })) ?? [],
+        }}
+        isLoading={updateFeePlan.isPending}
+        onSubmit={handleEdit}
+      />
+    ) : null}
+
+    <ConfirmationDialog
+      open={deleteOpen}
+      onOpenChange={(open) => {
+        setDeleteOpen(open);
+        if (!open) setSelectedPlan(null);
+      }}
+      title="Delete fee plan?"
+      description="Students already assigned to this plan may keep existing invoices, but the plan will no longer be available for future enrollment. This action cannot be undone."
+      itemName={selectedPlan?.name}
+      isPending={deleteFeePlan.isPending}
+      onConfirm={handleDelete}
+    />
+  </div>
+);
 }

@@ -1,12 +1,5 @@
-import {
-  Check,
-  Flag,
-  Layers3,
-} from "lucide-react";
-import {
-  useMemo,
-  useState,
-} from "react";
+import { Layers3 } from "lucide-react";
+import { useMemo, useState } from "react";
 
 import { ConfirmationDialog } from "@/shared/ui/confirmation-dialog";
 import {
@@ -30,11 +23,7 @@ import { formatDateTime } from "../../utils/academic-settings.utils";
 
 import { AcademicTermDialog } from "../dialogs/AcademicTermDialog";
 import { ActionMenu } from "../shared/ActionMenu";
-import {
-  EntityTable,
-  EntityTd,
-  EntityTh,
-} from "../shared/EntityTable";
+import { EntityTable, EntityTd, EntityTh } from "../shared/EntityTable";
 import { SectionHeader } from "../shared/SectionHeader";
 
 type Props = {
@@ -48,77 +37,38 @@ export function AcademicTermsSection({
   academicTerms,
   currentAcademicYearId,
 }: Props) {
-  const [selectedYearId, setSelectedYearId] =
-    useState(
-      currentAcademicYearId ||
-        academicYears[0]?.id ||
-        "",
-    );
+  const [selectedYearId, setSelectedYearId] = useState(
+    currentAcademicYearId || academicYears[0]?.id || "",
+  );
 
-  const [dialogValue, setDialogValue] =
-    useState<AcademicTerm | "new" | null>(
-      null,
-    );
+  const [dialogValue, setDialogValue] = useState<AcademicTerm | "new" | null>(
+    null,
+  );
 
-  const [openMenuId, setOpenMenuId] =
-    useState<string | null>(null);
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
 
-  const [pendingDelete, setPendingDelete] =
-    useState<AcademicTerm | null>(null);
+  const [pendingDelete, setPendingDelete] = useState<AcademicTerm | null>(null);
 
-  const createTerm =
-    useCreateAcademicTerm();
+  const createTerm = useCreateAcademicTerm();
 
-  const updateTerm =
-    useUpdateAcademicTerm();
+  const updateTerm = useUpdateAcademicTerm();
 
-  const deleteTerm =
-    useDeleteAcademicTerm();
+  const deleteTerm = useDeleteAcademicTerm();
 
   const filteredTerms = useMemo(
     () =>
       academicTerms
-        .filter(
-          (item) =>
-            item.academicYearId ===
-            selectedYearId,
-        )
-        .sort(
-          (firstTerm, secondTerm) =>
-            firstTerm.order -
-            secondTerm.order,
-        ),
+        .filter((item) => item.academicYearId === selectedYearId)
+        .sort((firstTerm, secondTerm) => firstTerm.order - secondTerm.order),
     [academicTerms, selectedYearId],
   );
 
   const selectedYear = useMemo(
-    () =>
-      academicYears.find(
-        (year) =>
-          year.id === selectedYearId,
-      ),
+    () => academicYears.find((year) => year.id === selectedYearId),
     [academicYears, selectedYearId],
   );
 
-  const currentTermsCount = useMemo(
-    () =>
-      filteredTerms.filter(
-        (term) => term.isCurrent,
-      ).length,
-    [filteredTerms],
-  );
-
-  const finalTermsCount = useMemo(
-    () =>
-      filteredTerms.filter(
-        (term) => term.isFinalTerm,
-      ).length,
-    [filteredTerms],
-  );
-
-  function handleDelete(
-    term: AcademicTerm,
-  ) {
+  function handleDelete(term: AcademicTerm) {
     setPendingDelete(term);
     setOpenMenuId(null);
   }
@@ -129,9 +79,7 @@ export function AcademicTermsSection({
         title="Academic Terms"
         description="Arrange semesters within each academic year and mark the current or final term."
         actionLabel="Add Term"
-        onAction={() =>
-          setDialogValue("new")
-        }
+        onAction={() => setDialogValue("new")}
       >
         <div className="mt-5 max-w-md">
           <label className="block">
@@ -142,9 +90,7 @@ export function AcademicTermsSection({
               value={selectedYearId || "none"}
               disabled={academicYears.length === 0}
               onValueChange={(value) =>
-                setSelectedYearId(
-                  value === "none" ? "" : value,
-                )
+                setSelectedYearId(value === "none" ? "" : value)
               }
             >
               <SelectTrigger className="h-11 rounded-[14px] px-4">
@@ -158,10 +104,7 @@ export function AcademicTermsSection({
                 ) : null}
 
                 {academicYears.map((year) => (
-                  <SelectItem
-                    key={year.id}
-                    value={year.id}
-                  >
+                  <SelectItem key={year.id} value={year.id}>
                     {year.name}
                   </SelectItem>
                 ))}
@@ -183,9 +126,7 @@ export function AcademicTermsSection({
             <EntityTh>Created</EntityTh>
             <EntityTh>Updated</EntityTh>
 
-            <EntityTh align="right">
-              Actions
-            </EntityTh>
+            <EntityTh align="right">Actions</EntityTh>
           </tr>
         </thead>
 
@@ -193,10 +134,7 @@ export function AcademicTermsSection({
           {filteredTerms.map((term) => (
             <tr key={term.id}>
               <EntityTd strong>
-                {term.semesterName.replaceAll(
-                  "_",
-                  " ",
-                )}
+                {term.semesterName.replaceAll("_", " ")}
               </EntityTd>
 
               <EntityTd>
@@ -205,20 +143,13 @@ export function AcademicTermsSection({
                 </span>
               </EntityTd>
 
-              <EntityTd>
-                {term.startDate}
-              </EntityTd>
+              <EntityTd>{term.startDate}</EntityTd>
 
-              <EntityTd>
-                {term.endDate}
-              </EntityTd>
+              <EntityTd>{term.endDate}</EntityTd>
 
               <EntityTd>
                 {term.isCurrent ? (
-                  <StatusBadge
-                    label="Current"
-                    tone="success"
-                  />
+                  <StatusBadge label="Current" tone="success" />
                 ) : (
                   <MutedValue />
                 )}
@@ -226,46 +157,25 @@ export function AcademicTermsSection({
 
               <EntityTd>
                 {term.isFinalTerm ? (
-                  <StatusBadge
-                    label="Final"
-                    tone="primary"
-                  />
+                  <StatusBadge label="Final" tone="primary" />
                 ) : (
                   <MutedValue />
                 )}
               </EntityTd>
 
-              <EntityTd>
-                {formatDateTime(
-                  term.createdAt,
-                )}
-              </EntityTd>
+              <EntityTd>{formatDateTime(term.createdAt)}</EntityTd>
 
-              <EntityTd>
-                {formatDateTime(
-                  term.updatedAt,
-                )}
-              </EntityTd>
+              <EntityTd>{formatDateTime(term.updatedAt)}</EntityTd>
 
               <EntityTd align="right">
                 <ActionMenu
-                  isOpen={
-                    openMenuId === term.id
-                  }
-                  onOpenChange={(open) =>
-                    setOpenMenuId(
-                      open
-                        ? term.id
-                        : null,
-                    )
-                  }
+                  isOpen={openMenuId === term.id}
+                  onOpenChange={(open) => setOpenMenuId(open ? term.id : null)}
                   onEdit={() => {
                     setDialogValue(term);
                     setOpenMenuId(null);
                   }}
-                  onDelete={() =>
-                    handleDelete(term)
-                  }
+                  onDelete={() => handleDelete(term)}
                 />
               </EntityTd>
             </tr>
@@ -285,50 +195,18 @@ export function AcademicTermsSection({
 
           <p className="mt-1 text-[13px] font-normal text-muted-foreground">
             Add the first term for{" "}
-            {selectedYear?.name ??
-              "the selected academic year"}.
+            {selectedYear?.name ?? "the selected academic year"}.
           </p>
         </div>
       ) : null}
 
-      <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-        <TermStat
-          icon={<Layers3 size={18} />}
-          value={filteredTerms.length}
-          label="Terms"
-          description="Saved for this year"
-        />
-
-        <TermStat
-          icon={<Check size={18} />}
-          value={currentTermsCount}
-          label="Current"
-          description="Active semester"
-        />
-
-        <TermStat
-          icon={<Flag size={18} />}
-          value={finalTermsCount}
-          label="Final Terms"
-          description="Marked as year ending"
-        />
-      </div>
-
       {dialogValue ? (
         <AcademicTermDialog
-          value={
-            dialogValue === "new"
-              ? null
-              : dialogValue
-          }
+          value={dialogValue === "new" ? null : dialogValue}
           academicYearId={
-            dialogValue === "new"
-              ? selectedYearId
-              : dialogValue.academicYearId
+            dialogValue === "new" ? selectedYearId : dialogValue.academicYearId
           }
-          onClose={() =>
-            setDialogValue(null)
-          }
+          onClose={() => setDialogValue(null)}
           onSave={(payload) => {
             if (dialogValue === "new") {
               createTerm.mutate(payload);
@@ -351,7 +229,11 @@ export function AcademicTermsSection({
         }}
         title="Delete academic term?"
         description="This action cannot be undone."
-        itemName={pendingDelete ? pendingDelete.semesterName.replaceAll("_", " ") : undefined}
+        itemName={
+          pendingDelete
+            ? pendingDelete.semesterName.replaceAll("_", " ")
+            : undefined
+        }
         isPending={deleteTerm.isPending}
         onConfirm={() => {
           if (!pendingDelete) return;
@@ -385,9 +267,7 @@ function StatusBadge({
       <span
         className={[
           "h-1.5 w-1.5 rounded-full",
-          tone === "success"
-            ? "bg-emerald-500"
-            : "bg-primary",
+          tone === "success" ? "bg-emerald-500" : "bg-primary",
         ].join(" ")}
       />
 
@@ -397,51 +277,5 @@ function StatusBadge({
 }
 
 function MutedValue() {
-  return (
-    <span className="text-muted-foreground/60">
-      —
-    </span>
-  );
-}
-
-function TermStat({
-  value,
-  label,
-  description,
-  icon,
-}: {
-  value: number | string;
-  label: string;
-  description: string;
-  icon: React.ReactNode;
-}) {
-  return (
-    <div
-      className={[
-        "rounded-[20px]",
-        "border border-border/60",
-        "bg-card p-4",
-        "transition-all duration-200",
-        "hover:-translate-y-0.5",
-        "hover:border-primary/15",
-        "hover:shadow-[0_12px_30px_rgba(30,20,70,0.06)]",
-      ].join(" ")}
-    >
-      <span className="flex h-10 w-10 items-center justify-center rounded-[14px] bg-primary/[0.075] text-primary">
-        {icon}
-      </span>
-
-      <p className="mt-5 text-xl font-semibold tracking-[-0.025em] text-foreground">
-        {value}
-      </p>
-
-      <p className="mt-1 text-[13px] font-medium text-foreground">
-        {label}
-      </p>
-
-      <p className="mt-1 text-[11px] font-normal text-muted-foreground">
-        {description}
-      </p>
-    </div>
-  );
+  return <span className="text-muted-foreground/60">—</span>;
 }

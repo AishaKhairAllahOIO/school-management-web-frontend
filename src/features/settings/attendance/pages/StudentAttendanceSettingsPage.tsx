@@ -143,44 +143,7 @@ export function StudentAttendanceSettingsPage() {
               onDelete={setPendingDelete}
             />
 
-            <div className="mt-5 grid gap-3 sm:grid-cols-3">
-              <SummaryCard
-                value={items.length}
-                label="Configured Semesters"
-                description="Semesters with attendance rules"
-              />
-              <SummaryCard
-                value={
-                  items.length > 0
-                    ? `${Math.round(
-                        items.reduce(
-                          (sum, item) =>
-                            sum +
-                            item.requiredAttendancePercentage,
-                          0,
-                        ) / items.length,
-                      )}%`
-                    : "—"
-                }
-                label="Average Requirement"
-                description="Across configured semesters"
-              />
-              <SummaryCard
-                value={
-                  items.length > 0
-                    ? Math.round(
-                        items.reduce(
-                          (sum, item) =>
-                            sum + item.workingDays,
-                          0,
-                        ) / items.length,
-                      )
-                    : "—"
-                }
-                label="Average Working Days"
-                description="Per configured semester"
-              />
-            </div>
+         
           </>
         ) : (
           // هنا يتم عرض صفحة تهيئة إجازات الموظفين الحقيقية بدلاً من النص المؤقت
@@ -278,31 +241,6 @@ export function StudentAttendanceSettingsPage() {
   );
 }
 
-function SummaryCard({
-  value,
-  label,
-  description,
-}: {
-  value: number | string;
-  label: string;
-  description: string;
-}) {
-  return (
-    <div className="rounded-[18px] border border-border/65 bg-card px-5 py-4 shadow-[var(--shadow-card)]">
-      <div className="text-[24px] font-semibold tracking-[-0.03em] text-foreground">
-        {value}
-      </div>
-
-      <div className="mt-1 text-[12px] font-semibold text-foreground">
-        {label}
-      </div>
-
-      <p className="mt-1 text-[11px] leading-5 text-muted-foreground">
-        {description}
-      </p>
-    </div>
-  );
-}
 
 function AttendanceErrorState({
   isRetrying,

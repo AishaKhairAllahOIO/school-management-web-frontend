@@ -67,65 +67,65 @@ export function InstallmentPoliciesSection() {
     return <InstallmentPoliciesSkeleton />;
   }
 
-  return (
-    <div>
-      <div className="p-5 sm:p-6">
-        <FinancialSectionHeader
-          title="Student Installment Policies"
-          description="Define reusable payment schedules so tuition invoices are divided into clear percentages and due dates for families."
-          actionLabel="Add Installment Policy"
-          onAction={() => setCreateOpen(true)}
-        />
-
-        <InstallmentPoliciesTable
-          policies={policies}
-          onEdit={(policy) => {
-            setSelectedPolicy(policy);
-            setEditOpen(true);
-          }}
-          onDelete={(policy) => {
-            setSelectedPolicy(policy);
-            setDeleteOpen(true);
-          }}
-        />
-      </div>
-
-      <CreateInstallmentPolicyDialog
-        open={createOpen}
-        onOpenChange={setCreateOpen}
-        isLoading={createPolicy.isPending}
-        onSubmit={handleCreate}
+return (
+  <div>
+    <div className="p-0">
+      <FinancialSectionHeader
+        title="Student Installment Policies"
+        description="Define reusable payment schedules so tuition invoices are divided into clear percentages and due dates for families."
+        actionLabel="Add Installment Policy"
+        onAction={() => setCreateOpen(true)}
       />
 
-      {editOpen && selectedPolicy ? (
-        <EditInstallmentPolicyDialog
-          open={editOpen}
-          onOpenChange={(open) => {
-            setEditOpen(open);
-            if (!open) setSelectedPolicy(null);
-          }}
-          defaultValues={{
-            name: selectedPolicy.name,
-            items:
-              selectedPolicy.items?.map((item) => ({ ...item })) ?? [],
-          }}
-          isLoading={updatePolicy.isPending}
-          onSubmit={handleEdit}
-        />
-      ) : null}
-
-      <ConfirmationDialog
-        open={deleteOpen}
-        onOpenChange={(open) => {
-          setDeleteOpen(open);
-          if (!open) setSelectedPolicy(null);
+      <InstallmentPoliciesTable
+        policies={policies}
+        onEdit={(policy) => {
+          setSelectedPolicy(policy);
+          setEditOpen(true);
         }}
-        title="Delete installment policy?"
-        description="This payment schedule will no longer be available for new student invoices. Existing invoices may still retain their saved installments. This action cannot be undone."
-        itemName={selectedPolicy?.name}
-        isPending={deletePolicy.isPending}
-        onConfirm={handleDelete}
+        onDelete={(policy) => {
+          setSelectedPolicy(policy);
+          setDeleteOpen(true);
+        }}
       />
     </div>
-  );
+
+    <CreateInstallmentPolicyDialog
+      open={createOpen}
+      onOpenChange={setCreateOpen}
+      isLoading={createPolicy.isPending}
+      onSubmit={handleCreate}
+    />
+
+    {editOpen && selectedPolicy ? (
+      <EditInstallmentPolicyDialog
+        open={editOpen}
+        onOpenChange={(open) => {
+          setEditOpen(open);
+          if (!open) setSelectedPolicy(null);
+        }}
+        defaultValues={{
+          name: selectedPolicy.name,
+          items:
+            selectedPolicy.items?.map((item) => ({ ...item })) ?? [],
+        }}
+        isLoading={updatePolicy.isPending}
+        onSubmit={handleEdit}
+      />
+    ) : null}
+
+    <ConfirmationDialog
+      open={deleteOpen}
+      onOpenChange={(open) => {
+        setDeleteOpen(open);
+        if (!open) setSelectedPolicy(null);
+      }}
+      title="Delete installment policy?"
+      description="This payment schedule will no longer be available for new student invoices. Existing invoices may still retain their saved installments. This action cannot be undone."
+      itemName={selectedPolicy?.name}
+      isPending={deletePolicy.isPending}
+      onConfirm={handleDelete}
+    />
+  </div>
+);
 }

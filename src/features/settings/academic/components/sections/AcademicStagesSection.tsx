@@ -1,10 +1,9 @@
 import {
   GraduationCap,
-  Layers3,
-  Sparkles,
+
 } from "lucide-react";
 import {
-  useMemo,
+
   useState,
 } from "react";
 
@@ -57,15 +56,7 @@ export function AcademicStagesSection({
   const deleteStage =
     useDeleteAcademicStage();
 
-  const latestStage = useMemo(
-    () =>
-      academicStages.length > 0
-        ? academicStageLabels[
-            academicStages[0].type
-          ] ?? academicStages[0].type
-        : "—",
-    [academicStages],
-  );
+
 
   function handleDelete(
     stage: AcademicStage,
@@ -176,22 +167,6 @@ export function AcademicStagesSection({
         </div>
       ) : null}
 
-      <div className="mt-5 grid gap-4 sm:grid-cols-2">
-        <StageStat
-          icon={<Layers3 size={18} />}
-          value={academicStages.length}
-          label="Total Stages"
-          description="Available school levels"
-        />
-
-        <StageStat
-          icon={<Sparkles size={18} />}
-          value={latestStage}
-          label="Latest Entry"
-          description="Most recently listed stage"
-        />
-      </div>
-
       {dialogValue ? (
         <AcademicStageDialog
           value={
@@ -234,47 +209,5 @@ export function AcademicStagesSection({
         }}
       />
     </>
-  );
-}
-
-function StageStat({
-  value,
-  label,
-  description,
-  icon,
-}: {
-  value: number | string;
-  label: string;
-  description: string;
-  icon: React.ReactNode;
-}) {
-  return (
-    <div
-      className={[
-        "rounded-[20px]",
-        "border border-border/60",
-        "bg-card p-4",
-        "transition-all duration-200",
-        "hover:-translate-y-0.5",
-        "hover:border-primary/15",
-        "hover:shadow-[0_12px_30px_rgba(30,20,70,0.06)]",
-      ].join(" ")}
-    >
-      <span className="flex h-10 w-10 items-center justify-center rounded-[14px] bg-primary/[0.075] text-primary">
-        {icon}
-      </span>
-
-      <p className="mt-5 truncate text-xl font-semibold tracking-[-0.025em] text-foreground">
-        {value}
-      </p>
-
-      <p className="mt-1 text-[13px] font-medium text-foreground">
-        {label}
-      </p>
-
-      <p className="mt-1 text-[11px] font-normal text-muted-foreground">
-        {description}
-      </p>
-    </div>
   );
 }
