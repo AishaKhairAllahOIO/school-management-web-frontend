@@ -260,7 +260,7 @@ export const API_ENDPOINTS = {
       DETAILS: (id: string | number) => `/admin/staff-attendances/${id}`, 
       UPDATE: (id: string | number) => `/admin/staff-attendances/${id}`,  
       DELETE: (id: string | number) => `/admin/staff-attendances/${id}`,  
-      HISTORY: (id: string | number) => `/admin/staff-attendances/${id}`,  
+     // HISTORY: (id: string | number) => `/admin/staff-attendances/${id}`,  
     },
     STAFF_LEAVES: {
 
@@ -308,5 +308,46 @@ export const API_ENDPOINTS = {
   MARKS: {
     ALL: (academicYearId: ApiId, semesterId: ApiId) =>
       `/auth/all/marks/show/${academicYearId}/${semesterId}`,
+  },
+  // --- REPORTS MODULE ---
+  REPORTS: {
+    ATTENDANCE: {
+      STUDENTS: "/admin/reports/attendance/students",
+      STAFF: "/admin/reports/attendance/staff",
+    },
+    FINANCE: {
+      STUDENTS: "/admin/reports/finance/students",
+      STAFF: "/admin/reports/finance/staff",
+    },
+  },
+
+  // --- REPORT CARDS & PROMOTION (الجلاءات والترفيع) ---
+  REPORT_CARDS: {
+    LIST: "/admin/report-cards",
+    GENERATE: "/admin/report-cards/generate",
+    TOGGLE_PUBLISH: "/admin/report-cards/toggle-publish", // تم التحديث هنا
+   // PUBLISH: "/admin/report-cards/publish",
+    PROMOTE: "/admin/report-cards/promote",
+  },
+  // --- STAFF CONTRACTS MODULE ---
+  CONTRACTS: {
+    CREATE: "/admin/staff/contract", // POST[cite: 2]
+    DETAILS: (contractId: ApiId) => `/admin/staff/contract/${contractId}`, // GET[cite: 2]
+    UPDATE: (contractId: ApiId) => `/admin/staff/contract/${contractId}`, // POST (للتعديل حسب الدوكيوينت)[cite: 2]
+    DELETE: (contractId: ApiId) => `/admin/staff/contract/${contractId}`, // DELETE[cite: 2]
+  },
+
+  // --- PAYROLL MODULE ---
+  PAYROLL: {
+    PREVIEW: "/staff/payroll/preview", // POST[cite: 2]
+    COMMIT: "/staff/payroll/commit", // POST[cite: 2]
+    
+    // GET (يحتاج لتمرير query params مثل ?year=2026&month=8)[cite: 2]
+    BY_MONTH: "/staff/payroll/month", 
+    
+    STAFF_HISTORY: (staffId: ApiId) => `/staff/payroll/staff/${staffId}`, // GET[cite: 2]
+    DETAILS: (payrollId: ApiId) => `/staff/payroll/${payrollId}`, // GET[cite: 2]
+    UPDATE: (payrollId: ApiId) => `/staff/payroll/${payrollId}`, // POST (للتعديل)[cite: 2]
+    DELETE: (payrollId: ApiId) => `/staff/payroll/${payrollId}`, // DELETE[cite: 2]
   },
 } as const;

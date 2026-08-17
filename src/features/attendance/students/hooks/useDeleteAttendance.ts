@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { studentAttendanceService } from '../api/attendance.api';
+import { studentAttendanceService } from '../api/studendAttendance.service';
 
 export const useDeleteAttendance = () => {
   const queryClient = useQueryClient();
@@ -10,8 +10,8 @@ export const useDeleteAttendance = () => {
       return response.data; 
     },
     onSuccess: () => {
-
-        queryClient.invalidateQueries({ queryKey: ['student-attendance'] });
+      queryClient.invalidateQueries({ queryKey: ['student-attendance'] });
+      queryClient.invalidateQueries({ queryKey: ['student-attendance-history'] });
     },
   });
 };

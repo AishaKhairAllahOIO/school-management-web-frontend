@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { studentAttendanceService } from '../api/attendance.api';
+import { studentAttendanceService } from '../api/studendAttendance.service';
 import type { AttendanceRecord } from '../types/attendance.types';
 
 export const useStudentAttendanceHistory = (studentId: string | number) => {

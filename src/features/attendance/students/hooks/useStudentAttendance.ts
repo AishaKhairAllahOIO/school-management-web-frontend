@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { studentAttendanceService } from '../api/attendance.api';
+import { studentAttendanceService } from '../api/studendAttendance.service';
 
 export const useStudentAttendance = (date: string, classroomId: number = 1) => {
   return useQuery({

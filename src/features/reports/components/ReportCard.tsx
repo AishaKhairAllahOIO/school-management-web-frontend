@@ -1,6 +1,6 @@
 import {
   ArrowUpRight,
-  FileSpreadsheet,
+  FileJson,
   FileText,
   Table2,
 } from "lucide-react";
@@ -40,7 +40,7 @@ const toneClasses: Record<ReportTone, { icon: string; category: string }> = {
 
 const formatIcon: Record<ReportFormat, typeof FileText> = {
   PDF: FileText,
-  Excel: FileSpreadsheet,
+  JSON: FileJson,
   CSV: Table2,
 };
 

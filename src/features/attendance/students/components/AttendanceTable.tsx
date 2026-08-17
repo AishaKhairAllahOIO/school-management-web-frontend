@@ -2,6 +2,7 @@ import { Eye } from "lucide-react";
 import { Link } from "react-router-dom";
 
 import { Button } from "@/shared/ui/button";
+
 import {
   Select,
   SelectContent,
@@ -19,23 +20,36 @@ import type {
 type Props = {
   data: StudentAttendance[];
   isLoading?: boolean;
+
   onUpdate: (
     student: StudentAttendance,
-    patch: { status: AttendanceStatus; absence_type?: AbsenceType }
+    patch: {
+      status: AttendanceStatus;
+      absence_type: AbsenceType | null; // تم إضافة | null هنا لحل المشكلة النمطية
+    }
   ) => void;
 };
 
 const inlineControlClass =
   "h-9 rounded-[11px] border-border/55 bg-background/80 text-[12px] shadow-none";
 
-export function AttendanceTable({ data, isLoading = false, onUpdate }: Props) {
+export function AttendanceTable({
+  data,
+  isLoading = false,
+  onUpdate,
+}: Props) {
   return (
     <div className="overflow-hidden rounded-[20px] border border-border/60 bg-card shadow-[0_8px_28px_rgba(30,20,70,0.04)]">
       <div className="flex items-center justify-between border-b border-border/50 px-5 py-4">
         <div>
-          <h3 className="text-[15px] font-semibold text-foreground">Student attendance</h3>
+          <h3 className="text-[15px] font-semibold text-foreground">
+            Student attendance
+          </h3>
+
           <p className="mt-0.5 text-[12px] text-muted-foreground">
-            {isLoading ? "Loading records..." : `${data.length} students for the selected date`}
+            {isLoading
+              ? "Loading records..."
+              : `${data.length} students for the selected date`}
           </p>
         </div>
       </div>
@@ -48,6 +62,7 @@ export function AttendanceTable({ data, isLoading = false, onUpdate }: Props) {
             <col className="w-[20%]" />
             <col className="w-[15%]" />
           </colgroup>
+
           <thead className="bg-muted/[0.28]">
             <tr className="text-[11px] font-semibold uppercase tracking-[0.075em] text-muted-foreground">
               <th className="h-11 px-5 text-start">Student</th>
@@ -78,15 +93,20 @@ export function AttendanceTable({ data, isLoading = false, onUpdate }: Props) {
                       <td className="px-5 py-3.5">
                         <div className="flex items-center gap-3">
                           {student.photo_url ? (
-                            <img src={student.photo_url} alt={student.full_name} className="h-9 w-9 rounded-[12px] object-cover" />
+                            <img
+                              src={student.photo_url}
+                              alt={student.full_name}
+                              className="h-9 w-9 rounded-[12px] object-cover"
+                            />
                           ) : (
                             <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[12px] bg-primary/[0.08] text-[13px] font-semibold text-primary">
                               {student.full_name.charAt(0)}
                             </span>
                           )}
                           <div className="min-w-0">
-                            {/* تم الاكتفاء بالاسم فقط لتكون الواجهة مريحة ونظيفة */}
-                            <p className="truncate font-medium text-foreground">{student.full_name}</p>
+                            <p className="truncate font-medium text-foreground">
+                              {student.full_name}
+                            </p>
                           </div>
                         </div>
                       </td>
@@ -116,7 +136,10 @@ export function AttendanceTable({ data, isLoading = false, onUpdate }: Props) {
                           <Select
                             value={currentAbsenceType ?? "excused"}
                             onValueChange={(value) =>
-                              onUpdate(student, { status: currentStatus, absence_type: value as AbsenceType })
+                              onUpdate(student, {
+                                status: currentStatus,
+                                absence_type: value as AbsenceType,
+                              })
                             }
                           >
                             <SelectTrigger className={inlineControlClass}>
@@ -153,7 +176,10 @@ export function AttendanceTable({ data, isLoading = false, onUpdate }: Props) {
 
             {!isLoading && data.length === 0 && (
               <tr>
-                <td colSpan={4} className="px-5 py-14 text-center text-[13px] text-muted-foreground">
+                <td
+                  colSpan={4}
+                  className="px-5 py-14 text-center text-[13px] text-muted-foreground"
+                >
                   No student attendance records match the selected filters.
                 </td>
               </tr>

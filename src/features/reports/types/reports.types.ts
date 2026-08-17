@@ -1,62 +1,180 @@
 import type { LucideIcon } from "lucide-react";
 
-export type ReportStatus = "Ready" | "Processing" | "Scheduled";
-export type ReportFormat = "PDF" | "Excel" | "CSV";
-export type ReportTone = "primary" | "info" | "success" | "warning" | "destructive" | "secondary";
+/* -------------------------------------------------------------------------- */
+/*                                  Category                                  */
+/* -------------------------------------------------------------------------- */
 
 export type ReportCategory =
-  | "Students"
-  | "Academics"
   | "Attendance"
   | "Staff"
   | "Finance"
-  | "Communications";
+  | "Academics";
+
+/* -------------------------------------------------------------------------- */
+/*                                    Tone                                    */
+/* -------------------------------------------------------------------------- */
+
+export type ReportTone =
+  | "primary"
+  | "info"
+  | "success"
+  | "warning"
+  | "destructive"
+  | "secondary";
+
+/* -------------------------------------------------------------------------- */
+/*                                   Format                                   */
+/* -------------------------------------------------------------------------- */
+
+export type ReportFormat =
+  | "JSON"
+  | "CSV"
+  | "PDF";
+
+/* -------------------------------------------------------------------------- */
+/*                                   Status                                   */
+/* -------------------------------------------------------------------------- */
+
+export type ReportStatus =
+  | "Ready"
+  | "Error";
+
+/* -------------------------------------------------------------------------- */
+/*                                  Metrics                                   */
+/* -------------------------------------------------------------------------- */
 
 export type ReportMetric = {
   title: string;
-  value: string;
-  description: string;
-  icon: LucideIcon;
-  tone: ReportTone;
+  value: string | number;
   change?: string;
+  tone: ReportTone;
+  icon: LucideIcon;
+
+  /**
+   * Used to decide which metric is visible
+   * when a category is selected.
+   */
+  category?: ReportCategory;
 };
+
+/* -------------------------------------------------------------------------- */
+/*                              Report Template                               */
+/* -------------------------------------------------------------------------- */
+
+export type ReportTemplateId =
+  | "student-attendance-summary"
+  | "staff-attendance-report"
+  | "student-finance-revenue"
+  | "staff-payroll-summary";
 
 export type ReportTemplate = {
-  id: string;
-  category: ReportCategory;
+  id: ReportTemplateId;
   title: string;
   description: string;
-  icon: LucideIcon;
-  tone: ReportTone;
+  category: ReportCategory;
   formats: ReportFormat[];
-  filters: string[];
+  tone: ReportTone;
+  icon: LucideIcon;
   featured?: boolean;
-  /**
-   * Optional permission key used by the UI before rendering this report.
-   * Connect it later to the application's existing permission checker.
-   */
-  permission?: string;
+  endpoint: string;
 };
 
-export type RecentReport = {
+/* -------------------------------------------------------------------------- */
+/*                         Student Attendance Report                           */
+/* -------------------------------------------------------------------------- */
+
+export type StudentAttendanceClassroomSummary = {
+  class_room_id: number;
+  class_room_name: string;
+  student_count: number;
+  attendance_rate: number;
+  absence_rate: number;
+  unexcused_absences: number;
+  excused_absences: number;
+};
+
+export type StudentAttendanceReportResponse = {
+  total_students: number;
+  overall_attendance_rate: number;
+  overall_absence_rate: number;
+  total_unexcused_absences: number;
+  total_excused_absences: number;
+  classrooms_summary: StudentAttendanceClassroomSummary[];
+};
+
+/* -------------------------------------------------------------------------- */
+/*                           Staff Attendance Report                           */
+/* -------------------------------------------------------------------------- */
+
+export type StaffAttendanceSubjectSummary = {
+  subject_name: string;
+  missed_periods_count: number;
+};
+
+export type StaffAttendanceReportResponse = {
+  total_staff: number;
+  overall_attendance_rate: number;
+  overall_absence_rate: number;
+  total_unexcused_days: number;
+  total_excused_days: number;
+  total_leave_days: number;
+  total_missed_periods_count: number;
+  missed_periods_by_subject: StaffAttendanceSubjectSummary[];
+};
+
+/* -------------------------------------------------------------------------- */
+/*                            Student Finance Report                           */
+/* -------------------------------------------------------------------------- */
+
+export type StudentFinanceReportResponse = {
+  total_expected_revenue: number;
+  total_collected_revenue: number;
+  total_outstanding_amount: number;
+  overall_collection_rate: number;
+  total_payments_count: number;
+};
+
+/* -------------------------------------------------------------------------- */
+/*                             Staff Finance Report                            */
+/* -------------------------------------------------------------------------- */
+
+export type StaffFinanceReportResponse = {
+  total_payrolls_processed: number;
+  total_net_salaries_paid: number;
+  average_salary_paid: number;
+};
+
+/* -------------------------------------------------------------------------- */
+/*                            Reports Workspace                               */
+/* -------------------------------------------------------------------------- */
+
+export type ReportsWorkspaceData = {
+  metrics: ReportMetric[];
+
+  templates: ReportTemplate[];
+
+  studentAttendance: StudentAttendanceReportResponse | null;
+
+  staffAttendance: StaffAttendanceReportResponse | null;
+
+  studentFinance: StudentFinanceReportResponse | null;
+
+  staffFinance: StaffFinanceReportResponse | null;
+
+  recentReports?: any[];
+};
+
+/* -------------------------------------------------------------------------- */
+/*                             Generated Report                               */
+/* -------------------------------------------------------------------------- */
+
+export type GeneratedReport = {
   id: string;
   title: string;
-  category: ReportCategory;
+  format: ReportFormat;
+  createdAt: string;
   status: ReportStatus;
-  date: string;
-  format: ReportFormat;
-  size?: string;
+  blob: Blob;
+  filename: string;
 };
 
-export type ReportsResponse = {
-  metrics: ReportMetric[];
-  templates: ReportTemplate[];
-  recentReports: RecentReport[];
-};
-
-export type ReportBuilderSelection = {
-  template: ReportTemplate;
-  format: ReportFormat;
-  academicYear: string;
-  dateRange: string;
-};
