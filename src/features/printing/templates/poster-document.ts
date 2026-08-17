@@ -24,7 +24,10 @@ type PosterPalette = {
   muted: string;
 };
 
-const toneMap: Record<PosterTone, PosterPalette> = {
+const toneMap: Record<
+  PosterTone,
+  PosterPalette
+> = {
   violet: {
     background: "rgb(251 250 255)",
     primary: "rgb(103 58 244)",
@@ -84,6 +87,11 @@ function posterCssVariables(
   `;
 }
 
+
+/* =========================================================
+   CREATE POSTER DOCUMENT
+   ========================================================= */
+
 export function createPosterDocument({
   title,
   identity,
@@ -96,28 +104,40 @@ export function createPosterDocument({
   tone = "violet",
 }: {
   title: string;
+
   identity: PrintIdentity;
+
   eyebrow: string;
+
   headline: string;
+
   description?: string;
+
   details?: Array<{
     label: string;
     value: string;
   }>;
+
   bodyHtml?: string;
+
   footer?: string;
+
   tone?: PosterTone;
 }): PrintableDocument {
-  const palette = toneMap[tone];
+  const palette =
+    toneMap[tone];
 
   /*
-   * عندما يكون هناك bodyHtml فهذا يعني أن لدينا محتوى إضافياً
-   * مثل قوانين المدرسة.
+   * عندما يكون هناك bodyHtml فهذا يعني أن لدينا
+   * محتوى إضافياً مثل قوانين المدرسة.
    *
-   * عندها نستخدم layout مضغوط حتى نحاول إبقاء كل شيء
-   * ضمن صفحة A4 واحدة.
+   * عندها نستخدم layout مضغوط حتى نحاول إبقاء
+   * كل شيء ضمن صفحة A4 واحدة.
    */
-  const hasContent = Boolean(bodyHtml.trim());
+  const hasContent =
+    Boolean(
+      bodyHtml.trim(),
+    );
 
   const detailsHtml =
     details.length > 0
@@ -126,34 +146,45 @@ export function createPosterDocument({
           class="poster-details"
           aria-label="Poster details"
         >
+
           ${details
             .map(
               (item) => `
                 <div class="poster-detail">
+
                   <span>
-                    ${escapePrintHtml(item.label)}
+                    ${escapePrintHtml(
+                      item.label,
+                    )}
                   </span>
 
                   <strong dir="auto">
-                    ${escapePrintHtml(item.value)}
+                    ${escapePrintHtml(
+                      item.value,
+                    )}
                   </strong>
+
                 </div>
               `,
             )
             .join("")}
+
         </section>
       `
       : "";
 
-  const logo = identity.logoUrl
-    ? `
+  const logo =
+    identity.logoUrl
+      ? `
         <img
           class="poster-logo"
-          src="${escapePrintHtml(identity.logoUrl)}"
+          src="${escapePrintHtml(
+            identity.logoUrl,
+          )}"
           alt=""
         />
       `
-    : `
+      : `
         <div class="poster-logo-fallback">
           ${escapePrintHtml(
             (
@@ -169,9 +200,13 @@ export function createPosterDocument({
   const body = `
     <main
       class="print-page poster-page ${
-        hasContent ? "poster-page-compact" : ""
+        hasContent
+          ? "poster-page-compact"
+          : ""
       }"
-      style="${posterCssVariables(palette)}"
+      style="${posterCssVariables(
+        palette,
+      )}"
       dir="auto"
     >
 
@@ -188,7 +223,9 @@ export function createPosterDocument({
           <div class="poster-brand-copy">
 
             <strong>
-              ${escapePrintHtml(identity.schoolName)}
+              ${escapePrintHtml(
+                identity.schoolName,
+              )}
             </strong>
 
             ${
@@ -216,11 +253,15 @@ export function createPosterDocument({
         <section class="poster-hero">
 
           <p class="poster-eyebrow">
-            ${escapePrintHtml(eyebrow)}
+            ${escapePrintHtml(
+              eyebrow,
+            )}
           </p>
 
           <h1 dir="auto">
-            ${escapePrintHtml(headline)}
+            ${escapePrintHtml(
+              headline,
+            )}
           </h1>
 
           ${
@@ -230,7 +271,9 @@ export function createPosterDocument({
                   class="poster-description"
                   dir="auto"
                 >
-                  ${escapePrintHtml(description)}
+                  ${escapePrintHtml(
+                    description,
+                  )}
                 </p>
               `
               : ""
@@ -268,7 +311,9 @@ export function createPosterDocument({
               <footer class="poster-footer">
 
                 <span>
-                  ${escapePrintHtml(footer)}
+                  ${escapePrintHtml(
+                    footer,
+                  )}
                 </span>
 
                 ${
@@ -298,8 +343,13 @@ export function createPosterDocument({
 
   const styles = `
     /* =========================================================
-       BASE
+       BASE — A4 PORTRAIT
        ========================================================= */
+
+    @page {
+      size: A4 portrait;
+      margin: 0;
+    }
 
     .poster-page {
       position: relative;
@@ -322,7 +372,8 @@ export function createPosterDocument({
           var(--poster-secondary) 100%
         );
 
-      color: var(--poster-ink);
+      color:
+        var(--poster-ink);
 
       font-family:
         var(--print-font-family);
@@ -346,9 +397,12 @@ export function createPosterDocument({
       box-sizing: border-box;
 
       display: flex;
+
       flex-direction: column;
 
-      padding: 8mm 10mm;
+      padding:
+        8mm
+        10mm;
 
       background:
         rgba(255, 255, 255, 0.95);
@@ -387,7 +441,6 @@ export function createPosterDocument({
       break-inside: avoid;
     }
 
-
     .poster-brand-mark {
       display: grid;
 
@@ -406,7 +459,6 @@ export function createPosterDocument({
         var(--poster-secondary);
     }
 
-
     .poster-logo,
     .poster-logo-fallback {
       width: 8mm;
@@ -415,11 +467,9 @@ export function createPosterDocument({
       object-fit: contain;
     }
 
-
     .poster-logo {
       display: block;
     }
-
 
     .poster-logo-fallback {
       display: grid;
@@ -437,7 +487,6 @@ export function createPosterDocument({
       font-weight: 400;
     }
 
-
     .poster-brand-copy strong {
       display: block;
 
@@ -453,7 +502,6 @@ export function createPosterDocument({
 
       font-weight: 400;
     }
-
 
     .poster-brand-copy span {
       display: block;
@@ -489,7 +537,6 @@ export function createPosterDocument({
       break-inside: avoid;
     }
 
-
     .poster-eyebrow {
       margin: 0;
 
@@ -506,7 +553,6 @@ export function createPosterDocument({
 
       text-transform: uppercase;
     }
-
 
     .poster-hero h1 {
       max-width: 160mm;
@@ -533,7 +579,6 @@ export function createPosterDocument({
       text-wrap: balance;
     }
 
-
     .poster-description {
       max-width: 130mm;
 
@@ -557,18 +602,18 @@ export function createPosterDocument({
 
     /* =========================================================
        COMPACT HERO
-       يستخدم عندما يكون لدينا محتوى طويل مثل القوانين
        ========================================================= */
 
-    .poster-page-compact .poster-hero {
+    .poster-page-compact
+      .poster-hero {
       padding:
         8mm
         5mm
         6mm;
     }
 
-
-    .poster-page-compact .poster-hero h1 {
+    .poster-page-compact
+      .poster-hero h1 {
       margin-top: 3mm;
 
       font-size: 7.5mm;
@@ -576,8 +621,8 @@ export function createPosterDocument({
       line-height: 1.08;
     }
 
-
-    .poster-page-compact .poster-description {
+    .poster-page-compact
+      .poster-description {
       margin-top: 2.5mm;
 
       font-size: 2.45mm;
@@ -620,7 +665,6 @@ export function createPosterDocument({
       break-inside: avoid;
     }
 
-
     .poster-detail {
       padding:
         0
@@ -636,13 +680,12 @@ export function createPosterDocument({
       break-inside: avoid;
     }
 
-
     .poster-detail:last-child {
       border-right: none;
     }
 
-
-    [dir="rtl"] .poster-detail {
+    [dir="rtl"]
+      .poster-detail {
       border-right: none;
 
       border-left:
@@ -650,11 +693,10 @@ export function createPosterDocument({
         rgba(103, 58, 244, 0.1);
     }
 
-
-    [dir="rtl"] .poster-detail:last-child {
+    [dir="rtl"]
+      .poster-detail:last-child {
       border-left: none;
     }
-
 
     .poster-detail span {
       display: block;
@@ -672,7 +714,6 @@ export function createPosterDocument({
 
       text-transform: uppercase;
     }
-
 
     .poster-detail strong {
       display: block;
@@ -757,10 +798,6 @@ export function createPosterDocument({
     .poster-grid {
       display: grid;
 
-      /*
-       * أهم تعديل:
-       * القوانين أصبحت عمودين بدلاً من عمود واحد.
-       */
       grid-template-columns:
         repeat(2, minmax(0, 1fr));
 
@@ -908,13 +945,11 @@ export function createPosterDocument({
       break-inside: avoid;
     }
 
-
     .poster-footer span {
       min-width: 0;
 
       overflow-wrap: anywhere;
     }
-
 
     .poster-footer span:first-child {
       color:
@@ -933,7 +968,6 @@ export function createPosterDocument({
 
         margin: 0;
       }
-
 
       .poster-page {
         width: 210mm;
@@ -954,7 +988,6 @@ export function createPosterDocument({
         break-after: avoid;
       }
 
-
       .poster-frame {
         width: 100%;
 
@@ -972,7 +1005,6 @@ export function createPosterDocument({
         break-inside: avoid;
       }
 
-
       .poster-brand,
       .poster-hero,
       .poster-details,
@@ -987,13 +1019,21 @@ export function createPosterDocument({
 
   return {
     title,
+
+    /*
+     * Poster is ALWAYS A4 portrait.
+     */
     orientation: "portrait",
+
     kind: "poster",
 
     html: createPrintableHtml({
       title,
+
       body,
+
       styles,
+
       orientation: "portrait",
     }),
   };
