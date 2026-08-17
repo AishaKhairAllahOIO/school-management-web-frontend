@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { GraduationCap, Loader2, AlertTriangle, ArrowLeft } from "lucide-react";
 import { usePromoteStudents } from "../hooks/useReportCards";
-import { useAcademicYears } from "../../settings/academic/hooks/useAcademicSettings"; // 🌟 استيراد الهوك الجديد 🌟
+import { useAcademicYears } from "../../settings/academic/hooks/useAcademicSettings.ts"; // 🌟 استيراد الهوك الجديد 🌟
 
 export function PromoteStudentsDialog({ onClose }: { onClose: () => void }) {
   // 🌟 جلب الأعوام الدراسية الحقيقية من الـ API 🌟
