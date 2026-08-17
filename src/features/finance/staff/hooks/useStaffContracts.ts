@@ -45,6 +45,17 @@ export function useStaffContracts(params?: {
   });
 }
 
+export function useContract(id?: ApiId) {
+  return useQuery({
+    queryKey: contractKeys.detail(id ?? "none"),
+
+    queryFn: () =>
+      payrollApi.getContract(id!),
+
+    enabled: Boolean(id),
+  });
+}
+
 export function useCreateContract() {
   const queryClient = useQueryClient();
 
@@ -74,9 +85,15 @@ export function useUpdateContract() {
     }) =>
       payrollApi.updateContract(id, payload),
 
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
         queryKey: contractKeys.all,
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: contractKeys.detail(
+          variables.id,
+        ),
       });
     },
   });

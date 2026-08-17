@@ -3,8 +3,6 @@ import { Navigate } from "react-router-dom";
 
 import { AcademicSettingsPage } from "@/features/settings/academic/pages/AcademicSettingsPage";
 import { GeneralSettingsPage } from "@/features/settings/general/pages/GeneralSettingsPage";
-import { PermissionsPage } from "@/features/settings/permissions/pages/PermissionsPage";
-import { RolesPage } from "@/features/settings/roles/pages/RolesPage";
 import { FinancialSettingsPage } from "@/features/settings/financial/pages/FinancialSettingsPage";
 import { StudentAttendanceSettingsPage } from "@/features/settings/attendance/pages/StudentAttendanceSettingsPage";
 
@@ -32,14 +30,7 @@ export const settingsRoutes = [
         path: "attendance",
         element: <StudentAttendanceSettingsPage />
       },
-      {
-        path: "roles",
-        element: <RolesPage />,
-      },
-      {
-        path: "permissions",
-        element: <PermissionsPage />,
-      },
+  
       
     ],
   },

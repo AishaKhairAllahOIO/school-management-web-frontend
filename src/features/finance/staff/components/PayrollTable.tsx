@@ -1,140 +1,314 @@
 import {
   CheckCircle2,
   Clock3,
+  CreditCard,
 } from "lucide-react";
 
-import {
-  formatSalary,
-  getStaffName,
-} from "../utils/payroll.utils";
+import { formatSalary, getStaffName } from "../utils/payroll.utils";
 
 import type { Payroll } from "../types/payroll.types";
+
+type Props = {
+  payrolls: Payroll[];
+  loading: boolean;
+
+  onSelect: (payroll: Payroll) => void;
+
+  /**
+   * Called when the user clicks Generate.
+   * The actual preview logic remains in the profile page.
+   */
+  onGenerate?: () => void;
+
+  /**
+   * Used while generating payroll preview.
+   */
+  generateLoading?: boolean;
+
+  /**
+   * Disable Generate when there is no active contract.
+   */
+  generateDisabled?: boolean;
+};
 
 export function PayrollTable({
   payrolls,
   loading,
   onSelect,
-}: {
-  payrolls: Payroll[];
-  loading: boolean;
-  onSelect: (payroll: Payroll) => void;
-}) {
-  if (loading) {
-    return (
-      <div className="soft-card rounded-2xl p-10 text-center text-sm text-muted-foreground">
-        Loading payroll...
-      </div>
-    );
-  }
-
+  onGenerate,
+  generateLoading = false,
+  generateDisabled = false,
+}: Props) {
   return (
-    <section className="soft-card overflow-hidden rounded-2xl">
-      <div className="border-b border-border/70 p-4">
-        <h2 className="text-sm font-bold text-foreground">
-          Monthly Payroll
-        </h2>
-
-        <p className="mt-1 text-xs text-muted-foreground">
-          Staff payments for the selected month.
-        </p>
-      </div>
-
+    <section className="overflow-hidden rounded-[22px] border border-border/45 bg-card shadow-[0_10px_30px_rgba(31,22,73,0.035)]">
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[760px] text-sm">
+        <table className="w-full min-w-[650px] text-sm">
           <thead>
-            <tr className="border-b border-border/60 bg-muted/30">
-              <th className="px-5 py-3 text-start text-xs text-muted-foreground">
-                Staff
+            {/* ============================================================
+                PAYROLL TITLE ROW
+                This is INSIDE the table.
+                Generate is on the far right of the same row.
+               ============================================================ */}
+            <tr className="border-b border-border/45">
+              <th
+                colSpan={4}
+                className="px-4 py-3.5 text-start sm:px-5"
+              >
+                <div className="flex w-full items-center justify-between gap-4">
+                  {/* Left side */}
+                  <div className="min-w-0">
+                    <h2 className="text-sm font-bold text-foreground">
+                      Payroll history
+                    </h2>
+
+                    <p className="mt-0.5 text-[11px] font-normal text-muted-foreground">
+                      Employee payment records
+                    </p>
+                  </div>
+
+                  {/* Right side */}
+                  {onGenerate ? (
+                    <button
+                      type="button"
+                      disabled={
+                        generateDisabled ||
+                        generateLoading
+                      }
+                      onClick={onGenerate}
+                      className="
+                        inline-flex
+                        h-8
+                        shrink-0
+                        items-center
+                        gap-1.5
+                        rounded-lg
+                        bg-primary
+                        px-3
+                        text-xs
+                        font-semibold
+                        text-primary-foreground
+                        shadow-sm
+                        transition-all
+                        duration-200
+                        hover:-translate-y-0.5
+                        hover:opacity-90
+                        focus-visible:outline-none
+                        focus-visible:ring-2
+                        focus-visible:ring-primary/30
+                        disabled:pointer-events-none
+                        disabled:opacity-50
+                      "
+                    >
+                      <CreditCard
+                        className="size-3.5"
+                        strokeWidth={1.9}
+                      />
+
+                      {generateLoading
+                        ? "Generating..."
+                        : "Generate"}
+                    </button>
+                  ) : null}
+                </div>
+              </th>
+            </tr>
+
+            {/* ============================================================
+                COLUMN HEADERS
+               ============================================================ */}
+            <tr className="border-b border-border/40 bg-muted/15">
+              <th
+                className="
+                  px-4
+                  py-2.5
+                  text-start
+                  text-[10px]
+                  font-semibold
+                  uppercase
+                  tracking-wide
+                  text-muted-foreground
+                "
+              >
+                Period
               </th>
 
-              <th className="px-5 py-3 text-start text-xs text-muted-foreground">
+              <th
+                className="
+                  px-4
+                  py-2.5
+                  text-start
+                  text-[10px]
+                  font-semibold
+                  uppercase
+                  tracking-wide
+                  text-muted-foreground
+                "
+              >
                 Salary
               </th>
 
-              <th className="px-5 py-3 text-start text-xs text-muted-foreground">
+              <th
+                className="
+                  px-4
+                  py-2.5
+                  text-start
+                  text-[10px]
+                  font-semibold
+                  uppercase
+                  tracking-wide
+                  text-muted-foreground
+                "
+              >
                 Payment date
               </th>
 
-              <th className="px-5 py-3 text-start text-xs text-muted-foreground">
+              <th
+                className="
+                  px-4
+                  py-2.5
+                  text-start
+                  text-[10px]
+                  font-semibold
+                  uppercase
+                  tracking-wide
+                  text-muted-foreground
+                "
+              >
                 Status
               </th>
             </tr>
           </thead>
 
-          <tbody>
-            {payrolls.map((payroll) => {
-              const paid =
-                Boolean(
+          {/* ==============================================================
+              LOADING
+             ============================================================== */}
+          {loading ? (
+            <tbody>
+              <tr>
+                <td
+                  colSpan={4}
+                  className="p-10 text-center"
+                >
+                  <p className="text-xs text-muted-foreground">
+                    Loading payroll...
+                  </p>
+                </td>
+              </tr>
+            </tbody>
+          ) : payrolls.length > 0 ? (
+            /* ============================================================
+               PAYROLL DATA
+               ============================================================ */
+            <tbody>
+              {payrolls.map((payroll) => {
+                const paid = Boolean(
                   payroll.payment_date,
                 );
 
-              return (
-                <tr
-                  key={payroll.id}
-                  onClick={() =>
-                    onSelect(payroll)
-                  }
-                  className="cursor-pointer border-b border-border/50 last:border-0 hover:bg-muted/30"
-                >
-                  <td className="px-5 py-4 font-semibold text-foreground">
-                    {getStaffName(
-                      payroll.staff,
-                    )}
-                  </td>
+                return (
+                  <tr
+                    key={String(payroll.id)}
+                    onClick={() =>
+                      onSelect(payroll)
+                    }
+                    className="
+                      cursor-pointer
+                      border-b
+                      border-border/40
+                      last:border-0
+                      transition-colors
+                      hover:bg-primary/[0.025]
+                    "
+                  >
+                    {/* Period */}
+                    <td className="px-4 py-3.5">
+                      <p className="font-semibold text-foreground">
+                        {payroll.month}/
+                        {payroll.year}
+                      </p>
 
-                  <td className="px-5 py-4 font-bold">
-                    {formatSalary(
-                      payroll.net_salary,
-                    )}
-                  </td>
+                      <p className="mt-0.5 text-[10px] text-muted-foreground">
+                        {getStaffName(
+                          payroll.staff,
+                        )}
+                      </p>
+                    </td>
 
-                  <td className="px-5 py-4 text-muted-foreground">
-                    {payroll.payment_date ??
-                      "—"}
-                  </td>
+                    {/* Salary */}
+                    <td className="px-4 py-3.5 font-bold text-foreground">
+                      {formatSalary(
+                        payroll.net_salary,
+                      )}
+                    </td>
 
-                  <td className="px-5 py-4">
-                    <span
-                      className={`
-                        inline-flex items-center gap-1.5
-                        rounded-full px-2.5 py-1
-                        text-xs font-semibold
-                        ${
+                    {/* Payment date */}
+                    <td className="px-4 py-3.5 text-xs text-muted-foreground">
+                      {payroll.payment_date ??
+                        "—"}
+                    </td>
+
+                    {/* Status */}
+                    <td className="px-4 py-3.5">
+                      <span
+                        className={[
+                          "inline-flex",
+                          "items-center",
+                          "gap-1.5",
+                          "rounded-full",
+                          "px-2.5",
+                          "py-1",
+                          "text-[10px]",
+                          "font-semibold",
                           paid
                             ? "bg-success/10 text-success"
-                            : "bg-warning/10 text-warning"
-                        }
-                      `}
-                    >
-                      {paid ? (
-                        <CheckCircle2 className="size-3.5" />
-                      ) : (
-                        <Clock3 className="size-3.5" />
-                      )}
+                            : "bg-warning/10 text-warning",
+                        ].join(" ")}
+                      >
+                        {paid ? (
+                          <CheckCircle2 className="size-3" />
+                        ) : (
+                          <Clock3 className="size-3" />
+                        )}
 
-                      {paid
-                        ? "Paid"
-                        : "Pending"}
-                    </span>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
+                        {paid
+                          ? "Paid"
+                          : "Pending"}
+                      </span>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          ) : (
+            /* ============================================================
+               EMPTY STATE
+               ============================================================ */
+            <tbody>
+              <tr>
+                <td
+                  colSpan={4}
+                  className="px-6 py-12 text-center"
+                >
+                  <div className="mx-auto flex size-11 items-center justify-center rounded-[14px] bg-primary/[0.07] text-primary">
+                    <CreditCard
+                      className="size-5"
+                      strokeWidth={1.8}
+                    />
+                  </div>
+
+                  <p className="mt-3 text-xs font-semibold text-foreground">
+                    No payroll records
+                  </p>
+
+                  <p className="mx-auto mt-1 max-w-xs text-[11px] leading-5 text-muted-foreground">
+                    No payments have been committed yet.
+                  </p>
+                </td>
+              </tr>
+            </tbody>
+          )}
         </table>
       </div>
-
-      {!payrolls.length && (
-        <div className="p-12 text-center">
-          <p className="text-sm font-semibold text-foreground">
-            No payroll records
-          </p>
-
-          <p className="mt-1 text-xs text-muted-foreground">
-            No payments have been committed for this month.
-          </p>
-        </div>
-      )}
     </section>
   );
 }

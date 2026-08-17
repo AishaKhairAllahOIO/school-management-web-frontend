@@ -6,10 +6,8 @@ import {
   CalendarDays,
   CalendarRange,
   FileText,
-  LockKeyhole,
   Megaphone,
   Scale,
-  ShieldCheck,
   UserCheck,
   Users,
   Wallet,
@@ -162,16 +160,7 @@ const subNavigationSections: SubNavigationSection[] = [
         path: "/settings/attendance",
         icon: CalendarDays,
       },
-      {
-        titleKey: "roles",
-        path: "/settings/roles",
-        icon: ShieldCheck,
-      },
-      {
-        titleKey: "permissions",
-        path: "/settings/permissions",
-        icon: LockKeyhole,
-      },
+     
     ],
   },
 ];
