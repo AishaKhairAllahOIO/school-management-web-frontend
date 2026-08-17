@@ -1,30 +1,21 @@
 import {
-  CalendarDays,
   CheckCircle2,
   Clock3,
   Loader2,
-  Trash2,
   X,
 } from "lucide-react";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-import { Button } from "@/shared/ui/button";
-
-import {
-  useDeletePayroll,
-  usePayroll,
-  useUpdatePayroll,
-} from "../hooks/usePayroll";
+import { usePayroll, useUpdatePayroll } from "../hooks/usePayroll";
 
 import {
-  formatSalary,
   getStaffName,
 } from "../utils/payroll.utils";
 
 import type { ApiId } from "../types/payroll.types";
 
-import { ConfirmDialog } from "./ConfirmDialog";
+import { DatePicker } from "@/shared/ui/date-picker/DatePicker";
 
 type Props = {
   payrollId: ApiId | null;
@@ -42,17 +33,24 @@ export function PayrollDetailDialog({
   const updateMutation =
     useUpdatePayroll();
 
-  const deleteMutation =
-    useDeletePayroll();
-
   const [paymentDate, setPaymentDate] =
     useState("");
 
-  const [deleteOpen, setDeleteOpen] =
-    useState(false);
-
   const payroll =
     query.data?.data;
+
+  /*
+   * Keep payment date synchronized
+   * whenever another payroll is opened.
+   */
+  useEffect(() => {
+    setPaymentDate(
+      payroll?.payment_date ?? "",
+    );
+  }, [
+    payroll?.id,
+    payroll?.payment_date,
+  ]);
 
   async function saveDate() {
     if (!payroll || !paymentDate) {
@@ -61,25 +59,10 @@ export function PayrollDetailDialog({
 
     await updateMutation.mutateAsync({
       id: payroll.id,
-
       payload: {
-        payment_date:
-          paymentDate,
+        payment_date: paymentDate,
       },
     });
-  }
-
-  async function deletePayroll() {
-    if (!payroll) {
-      return;
-    }
-
-    await deleteMutation.mutateAsync(
-      payroll.id,
-    );
-
-    setDeleteOpen(false);
-    onClose();
   }
 
   if (!payrollId) {
@@ -87,227 +70,622 @@ export function PayrollDetailDialog({
   }
 
   return (
-    <>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-        <button
-          type="button"
-          aria-label="Close"
-          onClick={onClose}
-          className="absolute inset-0 bg-black/30 backdrop-blur-[2px]"
-        />
+    <div
+      className="
+        fixed
+        inset-0
+        z-50
+        flex
+        items-center
+        justify-center
+        p-4
+      "
+    >
+      {/* =====================================================
+          BACKDROP
+         ===================================================== */}
 
-        <div className="relative z-10 w-full max-w-md overflow-hidden rounded-[24px] border border-border/50 bg-card shadow-2xl">
-          <div className="flex items-center justify-between border-b border-border/50 px-5 py-4">
-            <div>
-              <h2 className="text-sm font-bold">
-                Payroll details
-              </h2>
+      <button
+        type="button"
+        aria-label="Close"
+        onClick={onClose}
+        disabled={
+          updateMutation.isPending
+        }
+        className="
+          absolute
+          inset-0
+          cursor-default
+          bg-black/25
+          backdrop-blur-[2px]
+        "
+      />
 
-              <p className="mt-1 text-xs text-muted-foreground">
-                Payment information
-              </p>
-            </div>
+      {/* =====================================================
+          DIALOG
+         ===================================================== */}
 
-            <button
-              type="button"
-              onClick={onClose}
-              className="flex size-8 items-center justify-center rounded-xl text-muted-foreground hover:bg-muted"
+      <div
+        className="
+          relative
+          z-10
+          w-full
+          max-w-[440px]
+          overflow-hidden
+          rounded-[22px]
+          border
+          border-border/50
+          bg-card
+          shadow-[0_20px_60px_rgba(31,22,73,0.16)]
+        "
+      >
+        {/* =====================================================
+            HEADER
+           ===================================================== */}
+
+        <div
+          className="
+            flex
+            items-center
+            justify-between
+            border-b
+            border-border/40
+            px-5
+            py-4
+          "
+        >
+          <div>
+            <h2
+              className="
+                text-[14px]
+                font-semibold
+                leading-tight
+                text-foreground
+              "
             >
-              <X className="size-4" />
-            </button>
+              Payroll details
+            </h2>
+
+            <p
+              className="
+                mt-1
+                text-[10.5px]
+                font-medium
+                text-muted-foreground
+              "
+            >
+              Payment information
+            </p>
           </div>
 
-          {query.isLoading && (
-            <div className="p-10 text-center">
-              <Loader2 className="mx-auto size-5 animate-spin text-primary" />
+          <button
+            type="button"
+            onClick={onClose}
+            disabled={
+              updateMutation.isPending
+            }
+            className="
+              flex
+              size-8
+              items-center
+              justify-center
+              rounded-xl
+              text-muted-foreground
+              transition-all
+              duration-200
+              hover:bg-muted
+              hover:text-foreground
+              focus-visible:outline-none
+              focus-visible:ring-2
+              focus-visible:ring-primary/20
+              focus-visible:ring-offset-2
+              disabled:pointer-events-none
+              disabled:opacity-50
+            "
+          >
+            <X
+              className="size-4"
+              strokeWidth={1.8}
+            />
+          </button>
+        </div>
 
-              <p className="mt-3 text-xs text-muted-foreground">
-                Loading payroll...
-              </p>
-            </div>
-          )}
+        {/* =====================================================
+            LOADING
+           ===================================================== */}
 
-          {query.isError && (
-            <div className="p-8 text-center">
-              <p className="text-sm font-semibold text-destructive">
-                Failed to load payroll.
-              </p>
-            </div>
-          )}
+        {query.isLoading && (
+          <div
+            className="
+              flex
+              flex-col
+              items-center
+              justify-center
+              px-5
+              py-12
+            "
+          >
+            <Loader2
+              className="
+                size-5
+                animate-spin
+                text-primary
+              "
+              strokeWidth={1.8}
+            />
 
-          {payroll && (
-            <div className="p-5">
-              <div className="rounded-2xl bg-muted/30 p-4">
-                <p className="text-sm font-bold">
+            <p
+              className="
+                mt-3
+                text-[11px]
+                text-muted-foreground
+              "
+            >
+              Loading payroll...
+            </p>
+          </div>
+        )}
+
+        {/* =====================================================
+            ERROR
+           ===================================================== */}
+
+        {query.isError && (
+          <div
+            className="
+              px-5
+              py-10
+              text-center
+            "
+          >
+            <p
+              className="
+                text-[12px]
+                font-semibold
+                text-destructive
+              "
+            >
+              Failed to load payroll.
+            </p>
+
+            <p
+              className="
+                mt-1
+                text-[10.5px]
+                text-muted-foreground
+              "
+            >
+              Please try again.
+            </p>
+          </div>
+        )}
+
+        {/* =====================================================
+            CONTENT
+           ===================================================== */}
+
+        {payroll && (
+          <div className="px-5 py-5">
+
+            {/* =================================================
+                EMPLOYEE / PERIOD
+               ================================================= */}
+
+            <div
+              className="
+                flex
+                items-center
+                justify-between
+                gap-4
+                rounded-[15px]
+                border
+                border-border/40
+                bg-muted/[0.18]
+                px-4
+                py-3
+              "
+            >
+              <div className="min-w-0">
+                <p
+                  className="
+                    truncate
+                    text-[13px]
+                    font-semibold
+                    text-foreground
+                  "
+                >
                   {getStaffName(
                     payroll.staff,
                   )}
                 </p>
 
-                <p className="mt-1 text-xs text-muted-foreground">
-                  {payroll.month}/{payroll.year}
+                <p
+                  className="
+                    mt-1
+                    text-[10px]
+                    font-medium
+                    text-muted-foreground
+                  "
+                >
+                  Payroll period
                 </p>
               </div>
 
-              <div className="mt-4 grid grid-cols-2 gap-2">
-                <Info
-                  label="Net salary"
-                  value={formatSalary(
-                    payroll.net_salary,
-                  )}
-                />
-
-                <Info
-                  label="Contract"
-                  value={`#${payroll.contract_id}`}
-                />
-
-                <Info
-                  label="Status"
-                  value={
-                    payroll.payment_date
-                      ? "Paid"
-                      : "Pending"
-                  }
-                  icon={
-                    payroll.payment_date
-                      ? CheckCircle2
-                      : Clock3
-                  }
-                />
-
-                <Info
-                  label="Payroll ID"
-                  value={`#${payroll.id}`}
-                />
-              </div>
-
-              <div className="mt-5">
-                <label className="text-xs font-semibold">
-                  Payment date
-                </label>
-
-                <div className="mt-1.5 flex gap-2">
-                  <div className="relative flex-1">
-                    <CalendarDays className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-
-                    <input
-                      type="date"
-                      value={
-                        paymentDate ||
-                        payroll.payment_date ||
-                        ""
-                      }
-                      onChange={(event) =>
-                        setPaymentDate(
-                          event.target.value,
-                        )
-                      }
-                      className="
-                        h-10 w-full rounded-xl
-                        border border-border/60
-                        bg-background pl-9 pr-3
-                        text-sm outline-none
-                        focus:border-primary
-                        focus:ring-2
-                        focus:ring-primary/10
-                      "
-                    />
-                  </div>
-
-                  <Button
-                    type="button"
-                    className="h-10 rounded-xl"
-                    onClick={saveDate}
-                    disabled={
-                      updateMutation.isPending ||
-                      !(
-                        paymentDate ||
-                        payroll.payment_date
-                      )
-                    }
-                  >
-                    {updateMutation.isPending && (
-                      <Loader2 className="mr-2 size-4 animate-spin" />
-                    )}
-
-                    Save
-                  </Button>
-                </div>
-
-                {updateMutation.isError && (
-                  <p className="mt-2 text-xs text-destructive">
-                    Failed to update payment date.
-                  </p>
+              <p
+                dir="ltr"
+                className="
+                  shrink-0
+                  text-[12px]
+                  font-semibold
+                  text-foreground
+                "
+              >
+                {formatEnglishNumber(
+                  payroll.month,
                 )}
-              </div>
-
-              <div className="mt-5 flex justify-between border-t border-border/50 pt-4">
-                <Button
-                  type="button"
-                  variant="ghost"
-                  className="rounded-xl text-destructive hover:bg-destructive/10 hover:text-destructive"
-                  onClick={() =>
-                    setDeleteOpen(true)
-                  }
-                >
-                  <Trash2 className="mr-2 size-4" />
-
-                  Delete
-                </Button>
-
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="rounded-xl"
-                  onClick={onClose}
-                >
-                  Close
-                </Button>
-              </div>
+                /
+                {formatEnglishNumber(
+                  payroll.year,
+                )}
+              </p>
             </div>
-          )}
-        </div>
-      </div>
 
-      <ConfirmDialog
-        open={deleteOpen}
-        title="Delete payroll?"
-        description="This payment record will be permanently removed."
-        loading={
-          deleteMutation.isPending
-        }
-        onClose={() =>
-          setDeleteOpen(false)
-        }
-        onConfirm={deletePayroll}
-      />
-    </>
+            {/* =================================================
+                DETAILS
+               ================================================= */}
+
+            <div
+              className="
+                mt-3
+                overflow-hidden
+                rounded-[15px]
+                border
+                border-border/40
+                bg-background
+              "
+            >
+              <InfoRow
+                label="Net salary"
+                value={formatEnglishSalary(
+                  payroll.net_salary,
+                )}
+              />
+
+              
+
+              <InfoRow
+                label="Status"
+                value={
+                  payroll.payment_date
+                    ? "Paid"
+                    : "Pending"
+                }
+                icon={
+                  payroll.payment_date
+                    ? CheckCircle2
+                    : Clock3
+                }
+                iconClassName={
+                  payroll.payment_date
+                    ? "text-success"
+                    : "text-warning"
+                }
+              />
+
+            
+            </div>
+
+            {/* =================================================
+                PAYMENT DATE
+               ================================================= */}
+
+            <div className="mt-4">
+
+              <DatePicker
+                value={paymentDate}
+                onChange={setPaymentDate}
+                label="Payment date"
+                placeholder="Select payment date"
+                disabled={
+                  updateMutation.isPending
+                }
+                className="w-full"
+              />
+
+              {/* =================================================
+                  SAVE
+                 ================================================= */}
+
+              <div
+                className="
+                  mt-2
+                  flex
+                  items-center
+                  justify-end
+                "
+              >
+                <button
+                  type="button"
+                  onClick={saveDate}
+                  disabled={
+                    updateMutation.isPending ||
+                    !paymentDate
+                  }
+                  className="
+                    inline-flex
+                    items-center
+                    gap-1.5
+                    px-1
+                    py-1
+                    text-[11.5px]
+                    font-semibold
+                    text-primary
+                    underline
+                    underline-offset-4
+                    decoration-primary/30
+                    transition-all
+                    duration-200
+                    hover:text-primary/70
+                    hover:decoration-primary
+                    focus-visible:outline-none
+                    focus-visible:ring-2
+                    focus-visible:ring-primary/20
+                    focus-visible:ring-offset-2
+                    disabled:pointer-events-none
+                    disabled:opacity-50
+                  "
+                >
+                  {updateMutation.isPending && (
+                    <Loader2
+                      className="
+                        size-3.5
+                        animate-spin
+                      "
+                      strokeWidth={2}
+                    />
+                  )}
+
+                  Save
+                </button>
+              </div>
+
+              {/* ERROR */}
+
+              {updateMutation.isError && (
+                <p
+                  className="
+                    mt-2
+                    text-[10.5px]
+                    font-medium
+                    text-destructive
+                  "
+                >
+                  Failed to update payment
+                  date.
+                </p>
+              )}
+
+            </div>
+
+            {/* =================================================
+                FOOTER
+               ================================================= */}
+
+            <div
+              className="
+                mt-5
+                flex
+                items-center
+                justify-end
+                border-t
+                border-border/35
+                pt-4
+              "
+            >
+              <button
+                type="button"
+                onClick={onClose}
+                disabled={
+                  updateMutation.isPending
+                }
+                className="
+                  px-1
+                  py-1
+                  text-[11.5px]
+                  font-medium
+                  text-muted-foreground
+                  underline
+                  underline-offset-4
+                  decoration-muted-foreground/25
+                  transition-all
+                  duration-200
+                  hover:text-foreground
+                  hover:decoration-foreground/40
+                  focus-visible:outline-none
+                  focus-visible:ring-2
+                  focus-visible:ring-primary/20
+                  focus-visible:ring-offset-2
+                  disabled:pointer-events-none
+                  disabled:opacity-50
+                "
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
   );
 }
 
-function Info({
+/* =========================================================
+   INFO ROW
+   ========================================================= */
+
+function InfoRow({
   label,
   value,
   icon: Icon,
+  iconClassName = "text-success",
+  last = false,
 }: {
   label: string;
   value: string;
   icon?: typeof CheckCircle2;
+  iconClassName?: string;
+  last?: boolean;
 }) {
   return (
-    <div className="rounded-xl border border-border/50 p-3">
-      <p className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
+    <div
+      className={[
+        "flex",
+        "items-center",
+        "justify-between",
+        "gap-4",
+        "px-4",
+        "py-2.5",
+        !last
+          ? "border-b border-border/35"
+          : "",
+      ].join(" ")}
+    >
+      <span
+        className="
+          text-[10.5px]
+          font-medium
+          text-muted-foreground
+        "
+      >
         {label}
-      </p>
+      </span>
 
-      <div className="mt-1.5 flex items-center gap-1.5 text-sm font-bold">
+      <div
+        dir="ltr"
+        className="
+          flex
+          items-center
+          gap-1.5
+          text-[12px]
+          font-semibold
+          text-foreground
+        "
+      >
         {Icon && (
-          <Icon className="size-3.5 text-success" />
+          <Icon
+            className={[
+              "size-3.5",
+              iconClassName,
+            ].join(" ")}
+            strokeWidth={1.9}
+          />
         )}
 
-        {value}
+        <span>{value}</span>
       </div>
     </div>
   );
+}
+
+/* =========================================================
+   ENGLISH NUMBER
+   ========================================================= */
+
+function toEnglishDigits(
+  value: string,
+): string {
+  return value
+    .replace(/[٠-٩]/g, (digit) =>
+      String(
+        "٠١٢٣٤٥٦٧٨٩".indexOf(
+          digit,
+        ),
+      ),
+    )
+    .replace(/[۰-۹]/g, (digit) =>
+      String(
+        "۰۱۲۳۴۵۶۷۸۹".indexOf(
+          digit,
+        ),
+      ),
+    );
+}
+
+function formatEnglishNumber(
+  value:
+    | number
+    | string
+    | null
+    | undefined,
+): string {
+  if (
+    value === null ||
+    value === undefined ||
+    value === ""
+  ) {
+    return "—";
+  }
+
+  const normalized =
+    toEnglishDigits(
+      String(value),
+    );
+
+  const numericValue =
+    Number(normalized);
+
+  if (
+    Number.isNaN(
+      numericValue,
+    )
+  ) {
+    return normalized;
+  }
+
+  return new Intl.NumberFormat(
+    "en-US",
+    {
+      maximumFractionDigits: 2,
+    },
+  ).format(numericValue);
+}
+
+function formatEnglishSalary(
+  value:
+    | number
+    | string
+    | null
+    | undefined,
+): string {
+  if (
+    value === null ||
+    value === undefined ||
+    value === ""
+  ) {
+    return "—";
+  }
+
+  const normalized =
+    toEnglishDigits(
+      String(value),
+    );
+
+  const numericValue =
+    Number(normalized);
+
+  if (
+    Number.isNaN(
+      numericValue,
+    )
+  ) {
+    return normalized;
+  }
+
+  return new Intl.NumberFormat(
+    "en-US",
+    {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 2,
+    },
+  ).format(numericValue);
 }

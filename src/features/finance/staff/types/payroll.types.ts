@@ -90,6 +90,8 @@ export interface Payroll {
   contract?: StaffFinancialContract;
 }
 
+
+
 export interface UpdatePayrollPayload {
   payment_date: string;
 }

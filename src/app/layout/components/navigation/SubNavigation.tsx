@@ -102,7 +102,7 @@ const subNavigationSections: SubNavigationSection[] = [
       },
       {
         titleKey: "staffPayroll",
-        path: "/finance/payroll",
+        path: "/finance/staff",
         icon: Banknote,
         group: "staff",
       },

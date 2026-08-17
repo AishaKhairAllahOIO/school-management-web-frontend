@@ -5,28 +5,150 @@ import {
   X,
 } from "lucide-react";
 
-import { Button } from "@/shared/ui/button";
-
 import { useCommitPayroll } from "../hooks/usePayroll";
+
 import type {
   ApiId,
   PayrollPreview,
 } from "../types/payroll.types";
 
-import { formatSalary } from "../utils/payroll.utils";
 
 type Props = {
   open: boolean;
   staffId: ApiId;
   year: number;
   month: number;
+
   preview: PayrollPreview | null;
   previewLoading: boolean;
   previewError: boolean;
+
   onPreview: () => void;
   onClose: () => void;
   onCommitted: () => void;
 };
+
+/* =========================================================
+   ARABIC / PERSIAN DIGITS → ENGLISH DIGITS
+   ========================================================= */
+
+function toEnglishDigits(
+  value: string | number | null | undefined,
+): string {
+  if (
+    value === null ||
+    value === undefined
+  ) {
+    return "";
+  }
+
+  return String(value)
+    .replace(/[٠-٩]/g, (digit) =>
+      String(
+        "٠١٢٣٤٥٦٧٨٩".indexOf(digit),
+      ),
+    )
+    .replace(/[۰-۹]/g, (digit) =>
+      String(
+        "۰۱۲۳۴۵۶۷۸۹".indexOf(digit),
+      ),
+    );
+}
+
+/* =========================================================
+   ENGLISH NUMBER FORMAT
+   ========================================================= */
+
+function formatEnglishNumber(
+  value:
+    | number
+    | string
+    | null
+    | undefined,
+): string {
+  if (
+    value === null ||
+    value === undefined ||
+    value === ""
+  ) {
+    return "—";
+  }
+
+  const normalized =
+    toEnglishDigits(value);
+
+  const numericValue =
+    Number(normalized);
+
+  if (
+    Number.isNaN(
+      numericValue,
+    )
+  ) {
+    return normalized;
+  }
+
+  return new Intl.NumberFormat(
+    "en-US",
+    {
+      maximumFractionDigits: 2,
+    },
+  ).format(numericValue);
+}
+
+/* =========================================================
+   ENGLISH SALARY FORMAT
+   ========================================================= */
+
+function formatEnglishSalary(
+  value:
+    | number
+    | string
+    | null
+    | undefined,
+): string {
+  if (
+    value === null ||
+    value === undefined ||
+    value === ""
+  ) {
+    return "—";
+  }
+
+  /*
+   * First convert Arabic/Persian digits
+   * to English digits.
+   */
+  const normalized =
+    toEnglishDigits(value);
+
+  /*
+   * Convert to number so Intl.NumberFormat
+   * always uses English digits.
+   */
+  const numericValue =
+    Number(normalized);
+
+  if (
+    Number.isNaN(
+      numericValue,
+    )
+  ) {
+    return normalized;
+  }
+
+  return new Intl.NumberFormat(
+    "en-US",
+    {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 2,
+    },
+  ).format(numericValue);
+}
+
+/* =========================================================
+   COMPONENT
+   ========================================================= */
 
 export function PayrollPreviewDialog({
   open,
@@ -52,10 +174,9 @@ export function PayrollPreviewDialog({
       staff_id: staffId,
       year,
       month,
-      payment_date:
-        new Date()
-          .toISOString()
-          .slice(0, 10),
+      payment_date: new Date()
+        .toISOString()
+        .slice(0, 10),
     });
 
     onCommitted();
@@ -63,148 +184,576 @@ export function PayrollPreviewDialog({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div
+      className="
+        fixed
+        inset-0
+        z-50
+        flex
+        items-center
+        justify-center
+        p-4
+      "
+    >
+      {/* =====================================================
+          BACKDROP
+         ===================================================== */}
+
       <button
         type="button"
         aria-label="Close"
         onClick={onClose}
-        className="absolute inset-0 bg-black/30 backdrop-blur-[2px]"
+        disabled={
+          commitMutation.isPending
+        }
+        className="
+          absolute
+          inset-0
+          cursor-default
+          bg-black/25
+          backdrop-blur-[2px]
+        "
       />
 
-      <div className="relative z-10 w-full max-w-lg overflow-hidden rounded-[24px] border border-border/50 bg-card shadow-2xl">
-        <div className="flex items-center justify-between border-b border-border/50 px-5 py-4">
-          <div>
-            <h2 className="text-sm font-bold">
-              Payroll preview
-            </h2>
+      {/* =====================================================
+          DIALOG
+         ===================================================== */}
 
-            <p className="mt-1 text-xs text-muted-foreground">
-              {month}/{year}
-            </p>
+      <div
+        className="
+          relative
+          z-10
+          w-full
+          max-w-[440px]
+          overflow-hidden
+          rounded-[22px]
+          border
+          border-border/50
+          bg-card
+          shadow-[0_20px_60px_rgba(31,22,73,0.16)]
+        "
+      >
+        {/* ===================================================
+            HEADER
+           =================================================== */}
+
+        <div
+          className="
+            flex
+            items-center
+            justify-between
+            border-b
+            border-border/40
+            px-5
+            py-4
+          "
+        >
+          <div className="flex items-center gap-3">
+            {/* Icon */}
+
+            <div
+              className="
+                flex
+                size-9
+                shrink-0
+                items-center
+                justify-center
+                rounded-xl
+                bg-primary/[0.08]
+                text-primary
+              "
+            >
+              <CircleDollarSign
+                className="size-[18px]"
+                strokeWidth={1.8}
+              />
+            </div>
+
+            {/* Title */}
+
+            <div>
+              <h2
+                className="
+                  text-[14px]
+                  font-semibold
+                  leading-tight
+                  text-foreground
+                "
+              >
+                Payroll preview
+              </h2>
+
+              <p
+                dir="ltr"
+                className="
+                  mt-1
+                  text-[10.5px]
+                  font-medium
+                  text-muted-foreground
+                "
+              >
+                {toEnglishDigits(month)}
+                /
+                {toEnglishDigits(year)}
+              </p>
+            </div>
           </div>
+
+          {/* Close */}
 
           <button
             type="button"
             onClick={onClose}
-            className="flex size-8 items-center justify-center rounded-xl text-muted-foreground hover:bg-muted"
+            disabled={
+              commitMutation.isPending
+            }
+            className="
+              flex
+              size-8
+              items-center
+              justify-center
+              rounded-xl
+              text-muted-foreground
+              transition-all
+              duration-200
+              hover:bg-muted
+              hover:text-foreground
+              focus-visible:outline-none
+              focus-visible:ring-2
+              focus-visible:ring-primary/20
+              focus-visible:ring-offset-2
+              disabled:pointer-events-none
+              disabled:opacity-50
+            "
           >
-            <X className="size-4" />
+            <X
+              className="size-4"
+              strokeWidth={1.8}
+            />
           </button>
         </div>
 
-        <div className="p-5">
+        {/* ===================================================
+            CONTENT
+           =================================================== */}
+
+        <div className="px-5 py-5">
+          {/* =================================================
+              BEFORE PREVIEW
+             ================================================= */}
+
           {!preview && (
-            <div className="rounded-2xl border border-dashed border-border/70 p-7 text-center">
-              <div className="mx-auto flex size-11 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-                <CircleDollarSign className="size-5" />
+            <div className="py-3 text-center">
+              {/* Icon */}
+
+              <div
+                className="
+                  mx-auto
+                  flex
+                  size-11
+                  items-center
+                  justify-center
+                  rounded-[14px]
+                  bg-primary/[0.07]
+                  text-primary
+                "
+              >
+                <CircleDollarSign
+                  className="size-5"
+                  strokeWidth={1.7}
+                />
               </div>
 
-              <p className="mt-3 text-sm font-semibold">
+              {/* Title */}
+
+              <h3
+                className="
+                  mt-3
+                  text-[13px]
+                  font-semibold
+                  text-foreground
+                "
+              >
                 Calculate payroll
+              </h3>
+
+              {/* Description */}
+
+              <p
+                className="
+                  mx-auto
+                  mt-1.5
+                  max-w-[280px]
+                  text-[10.5px]
+                  leading-5
+                  text-muted-foreground
+                "
+              >
+                Calculate the employee salary
+                before confirming the payment.
               </p>
 
-              <p className="mt-1 text-xs text-muted-foreground">
-                Preview the salary before committing the payment.
-              </p>
+              {/* Generate */}
 
-              <Button
+              <button
                 type="button"
-                className="mt-4 rounded-xl"
                 onClick={onPreview}
                 disabled={previewLoading}
+                className="
+                  mt-4
+                  inline-flex
+                  h-9
+                  items-center
+                  gap-1.5
+                  rounded-xl
+                  border
+                  border-border/50
+                  bg-background
+                  px-3.5
+                  text-[11.5px]
+                  font-semibold
+                  text-foreground
+                  shadow-sm
+                  transition-all
+                  duration-200
+                  hover:border-primary/30
+                  hover:bg-primary/[0.035]
+                  hover:text-primary
+                  focus-visible:outline-none
+                  focus-visible:ring-2
+                  focus-visible:ring-primary/20
+                  focus-visible:ring-offset-2
+                  disabled:pointer-events-none
+                  disabled:opacity-50
+                "
               >
-                {previewLoading && (
-                  <Loader2 className="mr-2 size-4 animate-spin" />
+                {previewLoading ? (
+                  <Loader2
+                    className="
+                      size-3.5
+                      animate-spin
+                    "
+                    strokeWidth={2}
+                  />
+                ) : (
+                  <CircleDollarSign
+                    className="size-3.5"
+                    strokeWidth={1.9}
+                  />
                 )}
 
                 Generate preview
-              </Button>
+              </button>
+
+              {/* Error */}
 
               {previewError && (
-                <p className="mt-3 text-xs text-destructive">
-                  Unable to generate payroll preview.
+                <p
+                  className="
+                    mt-3
+                    text-[10.5px]
+                    font-medium
+                    text-destructive
+                  "
+                >
+                  Unable to generate payroll
+                  preview.
                 </p>
               )}
             </div>
           )}
 
+          {/* =================================================
+              PREVIEW
+             ================================================= */}
+
           {preview && (
             <>
-              <div className="grid grid-cols-2 gap-2">
-                <Metric
+              {/* =================================================
+                  SUMMARY
+                 ================================================= */}
+
+              <div
+                className="
+                  flex
+                  items-center
+                  justify-between
+                  gap-4
+                  rounded-[15px]
+                  border
+                  border-border/40
+                  bg-muted/[0.18]
+                  px-4
+                  py-3
+                "
+              >
+                <div>
+                  <p
+                    className="
+                      text-[10px]
+                      font-medium
+                      text-muted-foreground
+                    "
+                  >
+                    Payroll period
+                  </p>
+
+                  <p
+                    dir="ltr"
+                    className="
+                      mt-0.5
+                      text-[12px]
+                      font-semibold
+                      text-foreground
+                    "
+                  >
+                    {toEnglishDigits(month)}
+                    /
+                    {toEnglishDigits(year)}
+                  </p>
+                </div>
+
+                <div
+                  className="
+                    flex
+                    items-center
+                    gap-1.5
+                    text-[10px]
+                    font-medium
+                    text-success
+                  "
+                >
+                  <CheckCircle2
+                    className="size-3.5"
+                    strokeWidth={2}
+                  />
+
+                  Preview ready
+                </div>
+              </div>
+
+              {/* =================================================
+                  DETAILS
+                 ================================================= */}
+
+              <div
+                className="
+                  mt-3
+                  overflow-hidden
+                  rounded-[15px]
+                  border
+                  border-border/40
+                  bg-background
+                "
+              >
+                <PreviewRow
                   label="Contract rate"
-                  value={formatSalary(
+                  value={formatEnglishSalary(
                     preview.contract_rate,
                   )}
                 />
 
-                <Metric
+                <PreviewRow
                   label="Expected units"
-                  value={preview.expected_units}
+                  value={formatEnglishNumber(
+                    preview.expected_units,
+                  )}
                 />
 
-                <Metric
+                <PreviewRow
                   label="Missed units"
-                  value={preview.missed_units}
+                  value={formatEnglishNumber(
+                    preview.missed_units,
+                  )}
                 />
 
-                <Metric
+                <PreviewRow
                   label="Deductions"
-                  value={formatSalary(
+                  value={formatEnglishSalary(
                     preview.deductions,
                   )}
+                  last
                 />
               </div>
 
-              <div className="mt-4 rounded-2xl bg-primary/[0.06] p-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-medium text-muted-foreground">
-                    Net salary
-                  </span>
+              {/* =================================================
+                  NET SALARY
+                 ================================================= */}
 
-                  <span className="text-xl font-bold text-primary">
-                    {formatSalary(
+              <div
+                className="
+                  mt-3
+                  rounded-[16px]
+                  bg-primary/[0.065]
+                  px-4
+                  py-3.5
+                "
+              >
+                <div
+                  className="
+                    flex
+                    items-center
+                    justify-between
+                    gap-4
+                  "
+                >
+                  <div>
+                    <p
+                      className="
+                        text-[10px]
+                        font-medium
+                        text-muted-foreground
+                      "
+                    >
+                      Net salary
+                    </p>
+
+                    <p
+                      className="
+                        mt-0.5
+                        text-[9.5px]
+                        text-muted-foreground
+                      "
+                    >
+                      Final payment amount
+                    </p>
+                  </div>
+
+                  <span
+                    dir="ltr"
+                    className="
+                      whitespace-nowrap
+                      text-[20px]
+                      font-bold
+                      tracking-tight
+                      text-primary
+                    "
+                  >
+                    {formatEnglishSalary(
                       preview.net_salary,
                     )}
                   </span>
                 </div>
               </div>
 
+              {/* =================================================
+                  ERROR
+                 ================================================= */}
+
               {commitMutation.isError && (
-                <div className="mt-3 rounded-xl bg-destructive/8 px-3 py-2.5 text-xs text-destructive">
+                <div
+                  className="
+                    mt-3
+                    rounded-xl
+                    bg-destructive/[0.07]
+                    px-3
+                    py-2.5
+                    text-[10.5px]
+                    font-medium
+                    text-destructive
+                  "
+                >
                   Failed to commit payroll.
+                  Please try again.
                 </div>
               )}
 
-              <div className="mt-5 flex justify-end gap-2">
-                <Button
+              {/* =================================================
+                  ACTIONS
+                 ================================================= */}
+
+              <div
+                className="
+                  mt-5
+                  flex
+                  items-center
+                  justify-between
+                  border-t
+                  border-border/35
+                  pt-4
+                "
+              >
+                {/* Cancel */}
+
+                <button
                   type="button"
-                  variant="outline"
-                  className="rounded-xl"
                   onClick={onClose}
                   disabled={
                     commitMutation.isPending
                   }
+                  className="
+                    px-1
+                    py-1
+                    text-[11.5px]
+                    font-medium
+                    text-muted-foreground
+                    underline
+                    underline-offset-4
+                    decoration-muted-foreground/25
+                    transition-all
+                    duration-200
+                    hover:text-foreground
+                    hover:decoration-foreground/40
+                    focus-visible:outline-none
+                    focus-visible:ring-2
+                    focus-visible:ring-primary/20
+                    focus-visible:ring-offset-2
+                    disabled:pointer-events-none
+                    disabled:opacity-50
+                  "
                 >
                   Cancel
-                </Button>
+                </button>
 
-                <Button
+                {/* Confirm */}
+
+                <button
                   type="button"
-                  className="rounded-xl"
                   onClick={commit}
                   disabled={
                     commitMutation.isPending
                   }
+                  className="
+                    inline-flex
+                    items-center
+                    gap-1.5
+                    px-1
+                    py-1
+                    text-[11.5px]
+                    font-semibold
+                    text-primary
+                    underline
+                    underline-offset-4
+                    decoration-primary/30
+                    transition-all
+                    duration-200
+                    hover:text-primary/70
+                    hover:decoration-primary
+                    focus-visible:outline-none
+                    focus-visible:ring-2
+                    focus-visible:ring-primary/20
+                    focus-visible:ring-offset-2
+                    disabled:pointer-events-none
+                    disabled:opacity-50
+                  "
                 >
-                  {commitMutation.isPending && (
-                    <Loader2 className="mr-2 size-4 animate-spin" />
+                  {commitMutation.isPending ? (
+                    <Loader2
+                      className="
+                        size-3.5
+                        animate-spin
+                      "
+                      strokeWidth={2}
+                    />
+                  ) : (
+                    <CheckCircle2
+                      className="size-3.5"
+                      strokeWidth={2}
+                    />
                   )}
 
-                  <CheckCircle2 className="mr-2 size-4" />
-
                   Confirm payment
-                </Button>
+                </button>
               </div>
             </>
           )}
@@ -214,22 +763,54 @@ export function PayrollPreviewDialog({
   );
 }
 
-function Metric({
+/* =========================================================
+   PREVIEW ROW
+   ========================================================= */
+
+function PreviewRow({
   label,
   value,
+  last = false,
 }: {
   label: string;
   value: string | number;
+  last?: boolean;
 }) {
   return (
-    <div className="rounded-xl border border-border/50 bg-background p-3">
-      <p className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
+    <div
+      className={[
+        "flex",
+        "items-center",
+        "justify-between",
+        "gap-4",
+        "px-4",
+        "py-2.5",
+        !last
+          ? "border-b border-border/35"
+          : "",
+      ].join(" ")}
+    >
+      <span
+        className="
+          text-[10.5px]
+          font-medium
+          text-muted-foreground
+        "
+      >
         {label}
-      </p>
+      </span>
 
-      <p className="mt-1.5 text-sm font-bold">
-        {value}
-      </p>
+      <span
+        dir="ltr"
+        className="
+          whitespace-nowrap
+          text-[12px]
+          font-semibold
+          text-foreground
+        "
+      >
+        {toEnglishDigits(value)}
+      </span>
     </div>
   );
 }

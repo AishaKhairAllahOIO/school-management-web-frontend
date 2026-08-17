@@ -2,13 +2,10 @@ import {
   useMemo,
   useState,
 } from "react";
-
 import { useQuery } from "@tanstack/react-query";
 
 import {
   ArrowLeft,
-  Plus,
-  UserRound,
 } from "lucide-react";
 
 import {
@@ -48,12 +45,300 @@ import type {
   StaffFinancialContract,
 } from "../types/payroll.types";
 
+/* =========================================================
+   SKELETON
+========================================================= */
+
+function Skeleton({
+  className = "",
+}: {
+  className?: string;
+}) {
+  return (
+    <div
+      aria-hidden="true"
+      className={[
+        "animate-pulse",
+        "rounded-md",
+        "bg-muted/70",
+        className,
+      ].join(" ")}
+    />
+  );
+}
+
+/* =========================================================
+   PROFILE PAGE SKELETON
+========================================================= */
+
+function StaffPayrollProfileSkeleton() {
+  return (
+    <div
+      className="
+        space-y-4
+        pb-8
+        pt-2
+        sm:pt-3
+        lg:pt-4
+      "
+      aria-busy="true"
+      aria-label="Loading employee payroll"
+    >
+      {/* HEADER */}
+
+      <header
+        className="
+          flex
+          items-center
+          gap-1.5
+        "
+      >
+        <Skeleton
+          className="
+            size-7
+            shrink-0
+            rounded-lg
+          "
+        />
+
+        <div
+          className="
+            min-w-0
+            space-y-1.5
+          "
+        >
+          <Skeleton
+            className="
+              h-4
+              w-32
+              rounded-md
+            "
+          />
+
+          <Skeleton
+            className="
+              h-2.5
+              w-56
+              rounded-md
+            "
+          />
+        </div>
+      </header>
+
+      {/* CONTRACT SKELETON */}
+
+      <section
+        className="
+          overflow-hidden
+          rounded-[18px]
+          border
+          border-border/50
+          bg-card
+          shadow-[0_8px_28px_rgba(38,24,84,0.035)]
+        "
+      >
+        <div
+          className="
+            flex
+            items-center
+            justify-between
+            gap-3
+            border-b
+            border-border/40
+            px-4
+            py-3.5
+          "
+        >
+          <div className="space-y-1.5">
+            <Skeleton
+              className="h-3.5 w-28"
+            />
+
+            <Skeleton
+              className="h-2.5 w-40"
+            />
+          </div>
+
+          <Skeleton
+            className="
+              h-8
+              w-20
+              rounded-xl
+            "
+          />
+        </div>
+
+        <div
+          className="
+            grid
+            grid-cols-1
+            gap-2
+            p-3
+            sm:grid-cols-2
+            lg:grid-cols-4
+          "
+        >
+          {Array.from({
+            length: 4,
+          }).map((_, index) => (
+            <div
+              key={index}
+              className="
+                rounded-[14px]
+                border
+                border-border/35
+                bg-muted/[0.12]
+                px-3.5
+                py-3
+              "
+            >
+              <Skeleton
+                className="h-2.5 w-20"
+              />
+
+              <Skeleton
+                className="
+                  mt-2
+                  h-3.5
+                  w-28
+                "
+              />
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* PAYROLL SKELETON */}
+
+      <section
+        className="
+          overflow-hidden
+          rounded-[18px]
+          border
+          border-border/50
+          bg-card
+          shadow-[0_8px_28px_rgba(38,24,84,0.035)]
+        "
+      >
+        <div
+          className="
+            flex
+            items-center
+            justify-between
+            gap-3
+            border-b
+            border-border/40
+            px-4
+            py-3.5
+          "
+        >
+          <div className="space-y-1.5">
+            <Skeleton
+              className="h-3.5 w-24"
+            />
+
+            <Skeleton
+              className="h-2.5 w-44"
+            />
+          </div>
+
+          <Skeleton
+            className="
+              h-8
+              w-28
+              rounded-xl
+            "
+          />
+        </div>
+
+        <div className="p-3">
+          <div
+            className="
+              hidden
+              grid-cols-5
+              gap-4
+              border-b
+              border-border/35
+              px-3
+              py-2.5
+              sm:grid
+            "
+          >
+            {Array.from({
+              length: 5,
+            }).map((_, index) => (
+              <Skeleton
+                key={index}
+                className="
+                  h-2.5
+                  w-16
+                "
+              />
+            ))}
+          </div>
+
+          <div className="space-y-1">
+            {Array.from({
+              length: 4,
+            }).map((_, rowIndex) => (
+              <div
+                key={rowIndex}
+                className="
+                  grid
+                  grid-cols-2
+                  gap-3
+                  rounded-[12px]
+                  px-3
+                  py-3
+                  sm:grid-cols-5
+                  sm:items-center
+                "
+              >
+                {Array.from({
+                  length: 5,
+                }).map(
+                  (_, columnIndex) => (
+                    <Skeleton
+                      key={columnIndex}
+                      className={[
+                        "h-3",
+                        columnIndex === 0
+                          ? "w-24"
+                          : "w-16",
+                      ].join(" ")}
+                    />
+                  ),
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+/* =========================================================
+   PAGE
+========================================================= */
+
 export function StaffPayrollProfilePage() {
-  const { staffId } = useParams<{
+  const {
+    staffId: routeStaffId,
+  } = useParams<{
     staffId: string;
   }>();
 
   const navigate = useNavigate();
+
+  /*
+   * Route params are strings.
+   *
+   * We keep the route value separate from the validated
+   * ApiId used by the API.
+   */
+  const staffId: ApiId | undefined =
+    routeStaffId;
 
   /* ============================================================
      Contract state
@@ -116,9 +401,7 @@ export function StaffPayrollProfilePage() {
         staffId!,
       ),
 
-    enabled: Boolean(
-      staffId,
-    ),
+    enabled: Boolean(staffId),
 
     retry: false,
   });
@@ -197,21 +480,19 @@ export function StaffPayrollProfilePage() {
   }
 
   /* ============================================================
-     Loading
+     STAFF LOADING
      ============================================================ */
 
   if (
     staffQuery.isLoading
   ) {
     return (
-      <div className="p-10 text-center text-xs text-muted-foreground">
-        Loading employee...
-      </div>
+      <StaffPayrollProfileSkeleton />
     );
   }
 
   /* ============================================================
-     Error
+     ERROR
      ============================================================ */
 
   if (
@@ -219,12 +500,30 @@ export function StaffPayrollProfilePage() {
     !staffQuery.data
   ) {
     return (
-      <div className="mx-auto mt-6 max-w-xl rounded-[24px] border border-destructive/15 bg-card p-8 text-center">
+      <div
+        className="
+          mx-auto
+          mt-6
+          max-w-xl
+          rounded-[24px]
+          border
+          border-destructive/15
+          bg-card
+          p-8
+          text-center
+        "
+      >
         <h2 className="text-sm font-semibold">
           Employee unavailable
         </h2>
 
-        <p className="mt-2 text-xs text-muted-foreground">
+        <p
+          className="
+            mt-2
+            text-xs
+            text-muted-foreground
+          "
+        >
           The employee details could not be loaded.
         </p>
 
@@ -237,7 +536,13 @@ export function StaffPayrollProfilePage() {
             )
           }
         >
-          <ArrowLeft className="mr-2 size-4" />
+          <ArrowLeft
+            className="
+              mr-2
+              size-4
+              rtl:rotate-180
+            "
+          />
 
           Staff accounts
         </Button>
@@ -246,7 +551,7 @@ export function StaffPayrollProfilePage() {
   }
 
   /* ============================================================
-     Data
+     DATA
      ============================================================ */
 
   const staff =
@@ -262,40 +567,34 @@ export function StaffPayrollProfilePage() {
       []
     ) as Payroll[];
 
-  /*
-   * The employee should have only one active financial contract.
-   */
   const activeContract =
     contracts[0] ?? null;
 
   /* ============================================================
-     Payroll preview
+     PAYROLL PREVIEW
      ============================================================ */
 
-  async function handlePreview() {
-    const now =
-      new Date();
-
-    const result =
-      await previewMutation.mutateAsync(
-        {
-          staff_id: staffId,
-
-          year:
-            now.getFullYear(),
-
-          month:
-            now.getMonth() + 1,
-        },
-      );
-
-    setPreview(
-      result.data,
-    );
+ async function handlePreview() {
+  if (staffId === undefined) {
+    return;
   }
 
+  const now = new Date();
+
+  const result =
+    await previewMutation.mutateAsync({
+      staff_id: staffId,
+
+      year: now.getFullYear(),
+
+      month: now.getMonth() + 1,
+    });
+
+  setPreview(result.data);
+}
+
   /* ============================================================
-     Contract actions
+     CONTRACT ACTIONS
      ============================================================ */
 
   function openCreateContract() {
@@ -335,11 +634,7 @@ export function StaffPayrollProfilePage() {
   }
 
   /* ============================================================
-     Generate button
-     
-     IMPORTANT:
-     This function is passed to PayrollTable.
-     The button itself is rendered INSIDE PayrollTable.
+     GENERATE PAYROLL
      ============================================================ */
 
   function handleGeneratePayroll() {
@@ -353,97 +648,97 @@ export function StaffPayrollProfilePage() {
   }
 
   /* ============================================================
-     Render
+     PAYROLL SELECT
+     ============================================================ */
+
+  function handleSelectPayroll(
+    payroll: Payroll,
+  ) {
+    setSelectedPayrollId(
+      payroll.id,
+    );
+  }
+
+  /* ============================================================
+     RENDER
      ============================================================ */
 
   return (
-    <div className="space-y-5 pb-10 pt-4 sm:pt-5 lg:pt-6">
+    <div
+      className="
+        space-y-4
+        pb-8
+        pt-2
+        sm:pt-3
+        lg:pt-4
+      "
+    >
+      {/* PROFILE HEADER */}
 
-      {/* ========================================================
-          PROFILE HEADER
-         ======================================================== */}
-
-      <header className="flex items-center gap-3">
-
-        {/* Back */}
+      <header
+        className="
+          flex
+          items-center
+          gap-1.5
+        "
+      >
         <Button
           type="button"
           variant="ghost"
           size="icon"
-          className="size-9 rounded-xl"
+          className="
+            size-7
+            shrink-0
+            rounded-lg
+            p-0
+            text-muted-foreground
+            hover:bg-muted/60
+            hover:text-foreground
+          "
           onClick={() =>
             navigate(
               "/finance/staff",
             )
           }
         >
-          <ArrowLeft className="size-4 rtl:rotate-180" />
+          <ArrowLeft
+            className="
+              size-3.5
+              rtl:rotate-180
+            "
+          />
         </Button>
 
-        {/* Photo */}
-        <div className="flex size-11 shrink-0 items-center justify-center overflow-hidden rounded-[14px] bg-primary/[0.07] text-primary">
-
-          {staff.photoUrl ? (
-            <img
-              src={
-                staff.photoUrl
-              }
-              alt=""
-              className="size-full object-cover"
-            />
-          ) : (
-            <UserRound className="size-[19px]" />
-          )}
-
-        </div>
-
-        {/* Employee info */}
-        <div className="min-w-0 flex-1">
-
-          <h1 className="truncate text-[17px] font-semibold">
-            {staff.fullName}
+        <div
+          className="
+            min-w-0
+            -translate-y-px
+          "
+        >
+          <h1
+            className="
+              text-[14px]
+              font-semibold
+              leading-5
+              text-foreground
+            "
+          >
+            Employee payroll
           </h1>
 
-          <p className="mt-0.5 text-[11px] capitalize text-muted-foreground">
-            {staff.role?.replace(
-              "_",
-              " ",
-            ) ?? "Staff"}
-          </p>
-
-        </div>
-
-        {/* ====================================================
-            Add Contract
-
-            Only visible when employee has NO contract.
-           ==================================================== */}
-
-        {!activeContract ? (
-          <Button
-            type="button"
-            className="h-9 rounded-xl"
-            onClick={
-              openCreateContract
-            }
+          <p
+            className="
+              text-[10px]
+              leading-4
+              text-muted-foreground
+            "
           >
-            <Plus className="mr-1.5 size-4" />
-
-            <span className="hidden sm:inline">
-              Contract
-            </span>
-
-            <span className="sm:hidden">
-              Add
-            </span>
-          </Button>
-        ) : null}
-
+            Financial contract and payroll history
+          </p>
+        </div>
       </header>
 
-      {/* ========================================================
-          FINANCIAL CONTRACT
-         ======================================================== */}
+      {/* FINANCIAL CONTRACT */}
 
       <ContractsTable
         contracts={
@@ -467,69 +762,46 @@ export function StaffPayrollProfilePage() {
         academicYearsById={
           academicYearsById
         }
+        staff={
+          staff
+        }
       />
 
-      {/* ========================================================
-          PAYROLL
-
-          Generate button is now INSIDE PayrollTable.
-         ======================================================== */}
+      {/* PAYROLL */}
 
       <PayrollTable
         payrolls={
           payrolls
         }
-
         loading={
           payrollQuery.isLoading
         }
-
-        onSelect={(payroll) =>
-          setSelectedPayrollId(
-            payroll.id,
-          )
+        onSelect={
+          handleSelectPayroll
         }
-
-        /*
-         * This causes the Generate button to appear
-         * inside the Payroll history header.
-         */
         onGenerate={
           handleGeneratePayroll
         }
-
-        /*
-         * Loading state for Generate button.
-         */
         generateLoading={
           previewMutation.isPending
         }
-
-        /*
-         * No contract = Generate disabled.
-         */
         generateDisabled={
           !activeContract
         }
       />
 
-      {/* ========================================================
-          CONTRACT DIALOG
-         ======================================================== */}
+      {/* CONTRACT DIALOG */}
 
       <ContractDialog
         open={
           contractDialogOpen
         }
-
         staffId={
           staff.id
         }
-
         contract={
           editingContract
         }
-
         onClose={() => {
           setContractDialogOpen(
             false,
@@ -541,9 +813,7 @@ export function StaffPayrollProfilePage() {
         }}
       />
 
-      {/* ========================================================
-          DELETE CONTRACT
-         ======================================================== */}
+      {/* DELETE CONTRACT */}
 
       <ConfirmDialog
         open={
@@ -551,63 +821,50 @@ export function StaffPayrollProfilePage() {
             deleteContract,
           )
         }
-
         title="Delete contract?"
-
-        description="This financial contract will be permanently removed."
-
+        description="
+          This financial contract will be permanently removed.
+        "
         loading={
           deleteContractMutation.isPending
         }
-
         onClose={() =>
           setDeleteContract(
             null,
           )
         }
-
         onConfirm={
           confirmDeleteContract
         }
       />
 
-      {/* ========================================================
-          PAYROLL PREVIEW
-         ======================================================== */}
+      {/* PAYROLL PREVIEW */}
 
       <PayrollPreviewDialog
         open={
           previewOpen
         }
-
         staffId={
           staff.id
         }
-
         year={
           new Date().getFullYear()
         }
-
         month={
           new Date().getMonth() + 1
         }
-
         preview={
           preview
         }
-
         previewLoading={
           previewMutation.isPending
         }
-
         previewError={
           previewMutation.isError
         }
-
         onPreview={
           handlePreview
         }
-
         onClose={() => {
           setPreviewOpen(
             false,
@@ -619,28 +876,23 @@ export function StaffPayrollProfilePage() {
 
           previewMutation.reset();
         }}
-
         onCommitted={() => {
           void payrollQuery.refetch();
         }}
       />
 
-      {/* ========================================================
-          PAYROLL DETAIL
-         ======================================================== */}
+      {/* PAYROLL DETAIL */}
 
       <PayrollDetailDialog
         payrollId={
           selectedPayrollId
         }
-
         onClose={() =>
           setSelectedPayrollId(
             null,
           )
         }
       />
-
     </div>
   );
 }
