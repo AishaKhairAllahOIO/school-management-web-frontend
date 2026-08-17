@@ -26,6 +26,9 @@ export const OFFICIAL_DOCUMENT_STYLES = `
   position: relative;
 
   width: 148mm;
+  min-width: 148mm;
+
+  height: 210mm;
   min-height: 210mm;
 
   box-sizing: border-box;
