@@ -264,15 +264,25 @@ export function createPrintableHtml({
   styles?: string;
   orientation?: PrintOrientation;
 }): string {
+  /*
+   * The printable format is A5.
+   *
+   * Portrait:
+   *   148mm × 210mm
+   *
+   * Landscape:
+   *   210mm × 148mm
+   */
+
   const pageWidth =
     orientation === "landscape"
-      ? "297mm"
-      : "210mm";
+      ? "210mm"
+      : "148mm";
 
   const pageHeight =
     orientation === "landscape"
-      ? "210mm"
-      : "297mm";
+      ? "148mm"
+      : "210mm";
 
   return `<!doctype html>
 <html lang="en">
@@ -289,9 +299,9 @@ export function createPrintableHtml({
   </title>
 
   <style>
-    @page {
-      size: A4 ${orientation};
 
+    @page {
+      size: A5 ${orientation};
       margin: 0;
     }
 
@@ -310,9 +320,13 @@ export function createPrintableHtml({
 
       min-width: ${pageWidth};
 
+      height: ${pageHeight};
+
       min-height: ${pageHeight};
 
       margin: 0 auto;
+
+      box-sizing: border-box;
 
       background: #ffffff;
 
@@ -351,6 +365,10 @@ export function createPrintableHtml({
 
         min-width: ${pageWidth};
 
+        height: ${pageHeight};
+
+        min-height: ${pageHeight};
+
         margin: 0;
 
         padding: 0;
@@ -365,6 +383,8 @@ export function createPrintableHtml({
 
         min-width: ${pageWidth};
 
+        height: ${pageHeight};
+
         min-height: ${pageHeight};
 
         margin: 0;
@@ -376,6 +396,7 @@ export function createPrintableHtml({
 
 
     ${styles}
+
   </style>
 </head>
 

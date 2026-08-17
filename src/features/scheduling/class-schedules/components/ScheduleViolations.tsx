@@ -13,6 +13,8 @@ import type {
   ScheduleViolation,
 } from "../types/schedule.types";
 
+import { useSubjects } from "@/features/academics/subjects/hooks/useSubjects";
+
 type Props = {
   violations: ScheduleViolation[];
 };
@@ -94,11 +96,55 @@ export function ScheduleViolations({
 
   const [expanded, setExpanded] = useState(false);
 
+  /*
+   * Fetch subjects so the raw subject ID
+   * can be displayed as the subject name.
+   */
+  const { data: subjectsData } = useSubjects();
+
+  /*
+   * Create a quick lookup map:
+   *
+   * subject id -> subject name
+   */
+ const subjectMap = new Map<string, string>();
+
+if (Array.isArray(subjectsData)) {
+  subjectsData.forEach((subject) => {
+    if (
+      subject.id !== undefined &&
+      subject.id !== null
+    ) {
+      subjectMap.set(
+        String(subject.id),
+        subject.name ?? String(subject.id),
+      );
+    }
+  });
+}
+
+function getSubjectName(
+  subjectId?: string | number,
+) {
+  if (
+    subjectId === undefined ||
+    subjectId === null ||
+    subjectId === ""
+  ) {
+    return null;
+  }
+
+  return (
+    subjectMap.get(String(subjectId)) ??
+    "Unknown subject"
+  );
+}
+
   if (!violations.length) {
     return (
-      <section className="overflow-hidden rounded-[26px] border border-emerald-200/60 bg-emerald-50/45 shadow-[0_10px_35px_rgba(30,20,70,0.025)]">
+      <section className="overflow-hidden rounded-[26px] border border-emerald-200/50 bg-card shadow-[0_8px_30px_rgba(30,20,70,0.025)]">
         <div className="flex items-center gap-3 p-4 sm:p-5">
-          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px] bg-emerald-100 text-emerald-600">
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px] bg-emerald-50 text-emerald-600">
             <AlertTriangle size={18} />
           </span>
 
@@ -108,8 +154,8 @@ export function ScheduleViolations({
             </h2>
 
             <p className="mt-1 text-[12px] leading-5 text-emerald-700/75">
-              The generated schedule satisfies all detected
-              scheduling constraints.
+              The generated schedule satisfies all
+              detected scheduling constraints.
             </p>
           </div>
         </div>
@@ -129,9 +175,9 @@ export function ScheduleViolations({
   }
 
   return (
-    <section className="overflow-hidden rounded-[26px] border border-amber-200/60 bg-card shadow-[0_10px_35px_rgba(30,20,70,0.035)]">
+    <section className="overflow-hidden rounded-[26px] border border-border/50 bg-card shadow-[0_8px_30px_rgba(30,20,70,0.025)]">
       {/* Header */}
-      <div className="flex items-center justify-between gap-3 border-b border-border/45 px-4 py-4 sm:px-5">
+      <div className="flex items-center justify-between gap-3 border-b border-border/40 px-4 py-4 sm:px-5">
         <div className="flex items-center gap-3">
           <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px] bg-amber-50 text-amber-600">
             <AlertTriangle size={18} />
@@ -139,11 +185,11 @@ export function ScheduleViolations({
 
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-[14px] font-semibold">
+              <h2 className="text-[14px] font-semibold text-foreground">
                 Schedule violations
               </h2>
 
-              <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-700">
+              <span className="rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-semibold text-amber-700">
                 {violations.length}
               </span>
             </div>
@@ -157,132 +203,157 @@ export function ScheduleViolations({
         {violations.length > 3 && (
           <button
             type="button"
-            onClick={() => setExpanded((value) => !value)}
-            className="shrink-0 rounded-full border border-border/60 bg-background px-3 py-1.5 text-[10px] font-medium text-foreground/70 transition hover:bg-muted/50"
+            onClick={() =>
+              setExpanded((value) => !value)
+            }
+            className="shrink-0 rounded-full border border-border/50 bg-card px-3 py-1.5 text-[10px] font-medium text-foreground/70 transition hover:bg-muted/40"
           >
-            {expanded ? "Show less" : `Show all (${violations.length})`}
+            {expanded
+              ? "Show less"
+              : `Show all (${violations.length})`}
           </button>
         )}
       </div>
 
       {/* Violations */}
       <div className="space-y-2 p-3 sm:p-4">
-        {visibleViolations.map((violation, index) => {
-          const isOpen = openViolations[index] ?? false;
-          const dayLabel = getDayLabel(violation.day);
+        {visibleViolations.map(
+          (violation, index) => {
+            const isOpen =
+              openViolations[index] ?? false;
 
-          return (
-            <article
-              key={getViolationKey(violation, index)}
-              className={[
-                "overflow-hidden rounded-[17px] border transition-all duration-200",
-                isOpen
-                  ? "border-amber-200/80 bg-amber-50/35"
-                  : "border-border/50 bg-background hover:border-amber-200/70 hover:bg-amber-50/20",
-              ].join(" ")}
-            >
-              {/* Compact row */}
-              <button
-                type="button"
-                onClick={() => toggleViolation(index)}
-                className="flex w-full items-center gap-3 p-3 text-left sm:p-3.5"
+            const dayLabel = getDayLabel(
+              violation.day,
+            );
+
+            const subjectName = getSubjectName(
+              violation.subject,
+            );
+
+            return (
+              <article
+                key={getViolationKey(
+                  violation,
+                  index,
+                )}
+                className={[
+                  "overflow-hidden rounded-[17px] border transition-all duration-200",
+                  isOpen
+                    ? "border-amber-200/60 bg-card"
+                    : "border-border/45 bg-card hover:border-border/70 hover:bg-muted/[0.12]",
+                ].join(" ")}
               >
-                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[10px] bg-amber-100 text-amber-600">
-                  <AlertTriangle size={14} />
-                </span>
+                {/* Compact row */}
+                <button
+                  type="button"
+                  onClick={() =>
+                    toggleViolation(index)
+                  }
+                  className="flex w-full items-center gap-3 p-3 text-left sm:p-3.5"
+                >
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[10px] bg-amber-50 text-amber-600">
+                    <AlertTriangle size={14} />
+                  </span>
 
-                <div className="min-w-0 flex-1">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <h3 className="truncate text-[12px] font-semibold text-foreground">
-                      {getViolationTitle(violation.type)}
-                    </h3>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <h3 className="truncate text-[12px] font-semibold text-foreground">
+                        {getViolationTitle(
+                          violation.type,
+                        )}
+                      </h3>
 
-                    {violation.class_room_name && (
-                      <span className="max-w-[180px] truncate rounded-full bg-muted/60 px-2 py-0.5 text-[9px] font-medium text-muted-foreground">
-                        {violation.class_room_name}
-                      </span>
-                    )}
-
-                    {dayLabel && (
-                      <span className="rounded-full bg-muted/60 px-2 py-0.5 text-[9px] font-medium text-muted-foreground">
-                        {dayLabel}
-                      </span>
-                    )}
-                  </div>
-
-                  {!isOpen && (
-                    <p className="mt-0.5 truncate text-[10px] text-muted-foreground">
-                      {getViolationDescription(violation)}
-                    </p>
-                  )}
-                </div>
-
-                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-border/60 bg-background text-muted-foreground">
-                  {isOpen ? (
-                    <ChevronUp size={14} />
-                  ) : (
-                    <ChevronDown size={14} />
-                  )}
-                </span>
-              </button>
-
-              {/* Expanded details */}
-              {isOpen && (
-                <div className="border-t border-amber-200/50 px-3 pb-3 pt-3 sm:px-4 sm:pb-4">
-                  <p className="text-[10px] leading-4 text-muted-foreground">
-                    {getViolationDescription(violation)}
-                  </p>
-
-                  <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
-                    {violation.grade_name && (
-                      <InfoItem
-                        label="Grade"
-                        value={violation.grade_name}
-                      />
-                    )}
-
-                    {violation.class_room_name && (
-                      <InfoItem
-                        label="Classroom"
-                        value={violation.class_room_name}
-                        icon={<Users size={11} />}
-                      />
-                    )}
-
-                    {dayLabel && (
-                      <InfoItem
-                        label="Day"
-                        value={dayLabel}
-                        icon={<CalendarDays size={11} />}
-                      />
-                    )}
-
-                    {violation.subject !== undefined && (
-                      <InfoItem
-                        label="Subject ID"
-                        value={String(violation.subject)}
-                        icon={<BookOpen size={11} />}
-                      />
-                    )}
-                  </div>
-
-                  {(violation.count !== undefined ||
-                    violation.limit !== undefined) && (
-                    <div className="mt-3 flex flex-wrap gap-2">
-                      {violation.count !== undefined && (
-                        <div className="rounded-[12px] border border-rose-200/60 bg-rose-50 px-3 py-2">
-                          <p className="text-[9px] font-medium text-rose-600/70">
-                            Scheduled
-                          </p>
-
-                          <p className="mt-0.5 text-[14px] font-semibold text-rose-700">
-                            {violation.count}
-                          </p>
-                        </div>
+                      {violation.class_room_name && (
+                        <span className="max-w-[180px] truncate rounded-full bg-muted/50 px-2 py-0.5 text-[9px] font-medium text-muted-foreground">
+                          {violation.class_room_name}
+                        </span>
                       )}
 
-                      {violation.limit !== undefined && (
-                        <div className="rounded-[12px] border border-emerald-200/60 bg-emerald-50 px-3 py-2">
+                      {dayLabel && (
+                        <span className="rounded-full bg-muted/50 px-2 py-0.5 text-[9px] font-medium text-muted-foreground">
+                          {dayLabel}
+                        </span>
+                      )}
+                    </div>
+
+                    {!isOpen && (
+                      <p className="mt-0.5 truncate text-[10px] text-muted-foreground">
+                        {getViolationDescription(
+                          violation,
+                        )}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Dropdown icon */}
+                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-border/50 bg-card text-muted-foreground">
+                    {isOpen ? (
+                      <ChevronUp size={14} />
+                    ) : (
+                      <ChevronDown size={14} />
+                    )}
+                  </span>
+                </button>
+
+                {/* Expanded details */}
+                {isOpen && (
+                  <div className="border-t border-border/40 px-3 pb-3 pt-3 sm:px-4 sm:pb-4">
+                    <p className="text-[10px] leading-4 text-muted-foreground">
+                      {getViolationDescription(
+                        violation,
+                      )}
+                    </p>
+
+                    <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+                      {violation.grade_name && (
+                        <InfoItem
+                          label="Grade"
+                          value={
+                            violation.grade_name
+                          }
+                        />
+                      )}
+
+                      {violation.class_room_name && (
+                        <InfoItem
+                          label="Classroom"
+                          value={
+                            violation.class_room_name
+                          }
+                          icon={
+                            <Users size={11} />
+                          }
+                        />
+                      )}
+
+                      {dayLabel && (
+                        <InfoItem
+                          label="Day"
+                          value={dayLabel}
+                          icon={
+                            <CalendarDays
+                              size={11}
+                            />
+                          }
+                        />
+                      )}
+
+                      {subjectName && (
+                        <InfoItem
+                          label="Subject"
+                          value={subjectName}
+                          icon={
+                            <BookOpen size={11} />
+                          }
+                        />
+                      )}
+                    </div>
+
+                    {(violation.limit !==
+                      undefined) && (
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        {/* Allowed */}
+                        <div className="rounded-[12px] border border-emerald-200/50 bg-emerald-50/60 px-3 py-2">
                           <p className="text-[9px] font-medium text-emerald-600/70">
                             Allowed
                           </p>
@@ -291,11 +362,11 @@ export function ScheduleViolations({
                             {violation.limit}
                           </p>
                         </div>
-                      )}
 
-                      {violation.count !== undefined &&
-                        violation.limit !== undefined && (
-                          <div className="flex items-center rounded-[12px] border border-amber-200/60 bg-background px-3 py-2">
+                        {/* Exceeds limit by */}
+                        {violation.count !==
+                          undefined && (
+                          <div className="flex items-center rounded-[12px] border border-border/50 bg-card px-3 py-2">
                             <p className="text-[11px] text-muted-foreground">
                               Exceeds limit by{" "}
                               <span className="font-semibold text-amber-700">
@@ -308,13 +379,14 @@ export function ScheduleViolations({
                             </p>
                           </div>
                         )}
-                    </div>
-                  )}
-                </div>
-              )}
-            </article>
-          );
-        })}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </article>
+            );
+          },
+        )}
       </div>
     </section>
   );
@@ -330,7 +402,7 @@ function InfoItem({
   icon?: React.ReactNode;
 }) {
   return (
-    <div className="rounded-[13px] border border-border/50 bg-background/70 px-3 py-2.5">
+    <div className="rounded-[13px] border border-border/45 bg-muted/[0.18] px-3 py-2.5">
       <p className="text-[9px] font-medium uppercase tracking-[0.06em] text-muted-foreground">
         {label}
       </p>

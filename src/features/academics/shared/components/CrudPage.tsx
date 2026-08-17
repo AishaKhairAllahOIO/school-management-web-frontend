@@ -153,7 +153,7 @@ type CrudPageProps<
   pageSizeOptions?: number[];
 };
 
-function BackToAcademicsOverview() {
+export function BackToAcademicsOverview() {
   return (
     <Link
       to="/academics"

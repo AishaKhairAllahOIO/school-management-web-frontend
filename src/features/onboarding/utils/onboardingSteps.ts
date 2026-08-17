@@ -21,6 +21,12 @@ export interface OnboardingStep {
   content: string;
   placement?: "top" | "bottom" | "left" | "right" | "center";
   icon: LucideIcon;
+
+  /**
+   * Optional horizontal arrow adjustment.
+   * Mainly used for the mobile navigation-menu step.
+   */
+  mobileArrowOffset?: number;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -72,7 +78,8 @@ export const DESKTOP_ONBOARDING_STEPS: OnboardingStep[] = [
   {
     target: "#sidebar-finance",
     title: "Finance",
-    content: "Track payments, manage fees, handle invoices, and view reports.",
+    content:
+      "Track payments, manage fees, handle invoices, and view reports.",
     placement: "right",
     icon: Wallet,
   },
@@ -106,7 +113,8 @@ export const DESKTOP_ONBOARDING_STEPS: OnboardingStep[] = [
   {
     target: "#sidebar-content",
     title: "Manage Website",
-    content: "Manage public content and information for your school website.",
+    content:
+      "Manage public content and information for your school website.",
     placement: "right",
     icon: Globe,
   },
@@ -144,6 +152,9 @@ export const MOBILE_ONBOARDING_STEPS: OnboardingStep[] = [
       "Tap here to open the navigation menu and access all school sections.",
     placement: "bottom",
     icon: LayoutDashboard,
+
+  
+    mobileArrowOffset: 12,
   },
 
   /* ---------------------------- Sidebar Dialogs --------------------------- */
@@ -192,7 +203,8 @@ export const MOBILE_ONBOARDING_STEPS: OnboardingStep[] = [
   {
     target: "",
     title: "Finance",
-    content: "Track payments, manage fees, handle invoices, and view reports.",
+    content:
+      "Track payments, manage fees, handle invoices, and view reports.",
     placement: "center",
     icon: Wallet,
   },
@@ -200,7 +212,8 @@ export const MOBILE_ONBOARDING_STEPS: OnboardingStep[] = [
   {
     target: "",
     title: "Communications",
-    content: "Send announcements, alerts, and share school policies.",
+    content:
+      "Send announcements, alerts, and share school policies.",
     placement: "center",
     icon: MessageCircle,
   },
@@ -226,7 +239,8 @@ export const MOBILE_ONBOARDING_STEPS: OnboardingStep[] = [
   {
     target: "",
     title: "Manage Website",
-    content: "Manage public content and information for your school website.",
+    content:
+      "Manage public content and information for your school website.",
     placement: "center",
     icon: Globe,
   },
@@ -245,10 +259,15 @@ export const MOBILE_ONBOARDING_STEPS: OnboardingStep[] = [
   {
     target: "#topbar-profile",
     title: "Your Profile",
-    content: "View your account details and access your profile settings.",
+    content:
+      "View your account details and access your profile settings.",
     placement: "bottom",
     icon: UserCircle,
   },
 ];
+
+/* -------------------------------------------------------------------------- */
+/* Default                                                                    */
+/* -------------------------------------------------------------------------- */
 
 export const ONBOARDING_STEPS = DESKTOP_ONBOARDING_STEPS;

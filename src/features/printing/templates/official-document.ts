@@ -1,6 +1,5 @@
 import type {
   PrintIdentity,
-  PrintOrientation,
   PrintableDocument,
 } from "../types/print.types";
 
@@ -9,19 +8,35 @@ import {
   escapePrintHtml,
 } from "../utils/print-html";
 
+/* =========================================================
+   OFFICIAL DOCUMENT — A5 PORTRAIT
+   ========================================================= */
+
 export const OFFICIAL_DOCUMENT_STYLES = `
+/* =========================================================
+   A5 PAGE
+   ========================================================= */
+
+@page {
+  size: A5 portrait;
+  margin: 0;
+}
 
 .official-document {
   position: relative;
 
-  width: 210mm;
+  width: 148mm;
+  min-width: 148mm;
 
-  min-height: 297mm;
+  height: 210mm;
+  min-height: 210mm;
+
+  box-sizing: border-box;
 
   padding:
-    13mm
-    15mm
-    12mm;
+    10mm
+    11mm
+    9mm;
 
   color:
     var(--print-foreground);
@@ -36,12 +51,16 @@ export const OFFICIAL_DOCUMENT_STYLES = `
 }
 
 
+/* =========================================================
+   OUTER BORDER
+   ========================================================= */
+
 .official-document::before {
   content: "";
 
   position: absolute;
 
-  inset: 5mm;
+  inset: 4mm;
 
   pointer-events: none;
 
@@ -51,6 +70,10 @@ export const OFFICIAL_DOCUMENT_STYLES = `
 }
 
 
+/* =========================================================
+   HEADER
+   ========================================================= */
+
 .official-header {
   position: relative;
 
@@ -59,32 +82,29 @@ export const OFFICIAL_DOCUMENT_STYLES = `
   display: grid;
 
   grid-template-columns:
-    18mm
+    15mm
     minmax(0, 1fr)
     auto;
 
   align-items: center;
 
-  gap: 4mm;
+  gap: 3mm;
 
   padding:
     0
     1mm
-    5mm;
+    4mm;
 
   border-bottom:
     0.45mm solid
     var(--print-primary);
 }
 
-
 .official-logo,
 .official-logo-fallback {
-  width: 16mm;
-
-  height: 16mm;
+  width: 13mm;
+  height: 13mm;
 }
-
 
 .official-logo {
   display: block;
@@ -96,7 +116,6 @@ export const OFFICIAL_DOCUMENT_STYLES = `
     contrast(1.08);
 }
 
-
 .official-logo-fallback {
   display: grid;
 
@@ -106,7 +125,7 @@ export const OFFICIAL_DOCUMENT_STYLES = `
     0.35mm solid
     var(--print-primary);
 
-  border-radius: 3mm;
+  border-radius: 2.5mm;
 
   color:
     var(--print-primary);
@@ -117,11 +136,15 @@ export const OFFICIAL_DOCUMENT_STYLES = `
   font-family:
     var(--print-font-brand);
 
-  font-size: 5.2mm;
+  font-size: 4.5mm;
 
   font-weight: 800;
 }
 
+
+/* =========================================================
+   SCHOOL INFORMATION
+   ========================================================= */
 
 .official-school-name {
   margin: 0;
@@ -132,7 +155,7 @@ export const OFFICIAL_DOCUMENT_STYLES = `
   font-family:
     var(--print-font-brand);
 
-  font-size: 5.1mm;
+  font-size: 4.2mm;
 
   line-height: 1.08;
 
@@ -141,10 +164,9 @@ export const OFFICIAL_DOCUMENT_STYLES = `
   letter-spacing: -0.015em;
 }
 
-
 .official-school-meta {
   margin:
-    1.2mm
+    1mm
     0
     0;
 
@@ -154,23 +176,25 @@ export const OFFICIAL_DOCUMENT_STYLES = `
   font-family:
     var(--print-font-family);
 
-  font-size: 2.35mm;
+  font-size: 2mm;
 
-  line-height: 1.45;
+  line-height: 1.4;
 }
 
 
+/* =========================================================
+   DOCUMENT META
+   ========================================================= */
+
 .official-document-meta {
-  min-width: 39mm;
+  min-width: 31mm;
 
   text-align: right;
 }
 
-
 [dir="rtl"] .official-document-meta {
   text-align: left;
 }
-
 
 .official-document-meta strong {
   display: block;
@@ -181,13 +205,17 @@ export const OFFICIAL_DOCUMENT_STYLES = `
   font-family:
     var(--print-font-brand);
 
-  font-size: 3.35mm;
+  font-size: 2.8mm;
 
   text-transform: uppercase;
 
-  letter-spacing: 0.08em;
+  letter-spacing: 0.07em;
 }
 
+
+/* =========================================================
+   TITLE
+   ========================================================= */
 
 .official-title-block {
   display: flex;
@@ -196,14 +224,13 @@ export const OFFICIAL_DOCUMENT_STYLES = `
 
   justify-content: space-between;
 
-  gap: 8mm;
+  gap: 5mm;
 
   padding:
-    7mm
+    5mm
     1mm
-    5mm;
+    4mm;
 }
-
 
 .official-kicker {
   margin: 0;
@@ -211,19 +238,18 @@ export const OFFICIAL_DOCUMENT_STYLES = `
   color:
     var(--print-primary);
 
-  font-size: 2.25mm;
+  font-size: 1.9mm;
 
   font-weight: 700;
 
   text-transform: uppercase;
 
-  letter-spacing: 0.14em;
+  letter-spacing: 0.12em;
 }
-
 
 .official-title {
   margin:
-    1.2mm
+    1mm
     0
     0;
 
@@ -233,45 +259,48 @@ export const OFFICIAL_DOCUMENT_STYLES = `
   font-family:
     var(--print-font-brand);
 
-  font-size: 6.8mm;
+  font-size: 5.5mm;
 
   line-height: 1.04;
 
   font-weight: 700;
 
-  letter-spacing: -0.025em;
+  letter-spacing: -0.02em;
 }
 
-
 .official-description {
-  max-width: 125mm;
+  max-width: 88mm;
 
   margin:
-    2mm
+    1.5mm
     0
     0;
 
   color:
     var(--print-muted-foreground);
 
-  font-size: 2.65mm;
+  font-size: 2.15mm;
 
-  line-height: 1.55;
+  line-height: 1.45;
 }
 
 
+/* =========================================================
+   HIGHLIGHT
+   ========================================================= */
+
 .official-highlight {
-  min-width: 43mm;
+  min-width: 33mm;
 
   border:
-    0.4mm solid
+    0.35mm solid
     var(--print-primary);
 
-  border-radius: 3mm;
+  border-radius: 2.5mm;
 
   padding:
-    3.5mm
-    4.5mm;
+    2.7mm
+    3.2mm;
 
   text-align: right;
 
@@ -279,11 +308,9 @@ export const OFFICIAL_DOCUMENT_STYLES = `
     var(--print-secondary);
 }
 
-
 [dir="rtl"] .official-highlight {
   text-align: left;
 }
-
 
 .official-highlight small {
   display: block;
@@ -291,18 +318,17 @@ export const OFFICIAL_DOCUMENT_STYLES = `
   color:
     var(--print-muted-foreground);
 
-  font-size: 2.15mm;
+  font-size: 1.8mm;
 
   text-transform: uppercase;
 
-  letter-spacing: 0.09em;
+  letter-spacing: 0.07em;
 }
-
 
 .official-highlight strong {
   display: block;
 
-  margin-top: 1mm;
+  margin-top: 0.8mm;
 
   color:
     var(--print-primary);
@@ -310,11 +336,15 @@ export const OFFICIAL_DOCUMENT_STYLES = `
   font-family:
     var(--print-font-brand);
 
-  font-size: 6.3mm;
+  font-size: 5.2mm;
 
   line-height: 1;
 }
 
+
+/* =========================================================
+   INFORMATION GRID
+   ========================================================= */
 
 .official-grid {
   display: grid;
@@ -322,27 +352,25 @@ export const OFFICIAL_DOCUMENT_STYLES = `
   grid-template-columns:
     repeat(2, minmax(0, 1fr));
 
-  gap: 2.5mm;
+  gap: 2mm;
 }
 
-
 .official-field {
-  min-height: 15mm;
+  min-height: 12mm;
 
   border:
     0.28mm solid
     var(--print-border);
 
-  border-radius: 2.5mm;
+  border-radius: 2mm;
 
   padding:
-    3mm
-    3.3mm;
+    2.5mm
+    2.8mm;
 
   background:
     var(--print-card);
 }
-
 
 .official-field span {
   display: block;
@@ -350,20 +378,19 @@ export const OFFICIAL_DOCUMENT_STYLES = `
   color:
     var(--print-primary);
 
-  font-size: 2.1mm;
+  font-size: 1.8mm;
 
   font-weight: 650;
 
   text-transform: uppercase;
 
-  letter-spacing: 0.075em;
+  letter-spacing: 0.06em;
 }
-
 
 .official-field strong {
   display: block;
 
-  margin-top: 1.25mm;
+  margin-top: 1mm;
 
   color:
     var(--print-foreground);
@@ -371,20 +398,23 @@ export const OFFICIAL_DOCUMENT_STYLES = `
   font-family:
     var(--print-font-family);
 
-  font-size: 3.15mm;
+  font-size: 2.7mm;
 
-  line-height: 1.35;
+  line-height: 1.3;
 
   overflow-wrap: anywhere;
 }
 
 
+/* =========================================================
+   SECTION
+   ========================================================= */
+
 .official-section {
-  margin-top: 5.5mm;
+  margin-top: 4mm;
 
   break-inside: avoid;
 }
-
 
 .official-section-title {
   display: grid;
@@ -395,12 +425,12 @@ export const OFFICIAL_DOCUMENT_STYLES = `
 
   align-items: center;
 
-  gap: 3mm;
+  gap: 2.5mm;
 
   margin:
     0
     0
-    2.8mm;
+    2.2mm;
 
   color:
     var(--print-primary);
@@ -408,21 +438,24 @@ export const OFFICIAL_DOCUMENT_STYLES = `
   font-family:
     var(--print-font-brand);
 
-  font-size: 3.65mm;
+  font-size: 3mm;
 
   font-weight: 700;
 }
 
-
 .official-section-title::after {
   content: "";
 
-  height: 0.35mm;
+  height: 0.3mm;
 
   background:
     rgba(103, 58, 244, 0.28);
 }
 
+
+/* =========================================================
+   TABLE
+   ========================================================= */
 
 .official-table {
   width: 100%;
@@ -432,21 +465,18 @@ export const OFFICIAL_DOCUMENT_STYLES = `
   table-layout: fixed;
 }
 
-
 .official-table thead {
   display: table-header-group;
 }
-
 
 .official-table tr {
   break-inside: avoid;
 }
 
-
 .official-table th {
   padding:
-    2.5mm
-    2.7mm;
+    2mm
+    2.2mm;
 
   border:
     0.3mm solid
@@ -461,7 +491,7 @@ export const OFFICIAL_DOCUMENT_STYLES = `
   font-family:
     var(--print-font-family);
 
-  font-size: 2.3mm;
+  font-size: 1.9mm;
 
   font-weight: 750;
 
@@ -469,19 +499,17 @@ export const OFFICIAL_DOCUMENT_STYLES = `
 
   text-transform: uppercase;
 
-  letter-spacing: 0.045em;
+  letter-spacing: 0.04em;
 }
-
 
 [dir="rtl"] .official-table th {
   text-align: right;
 }
 
-
 .official-table td {
   padding:
-    2.65mm
-    2.7mm;
+    2.1mm
+    2.2mm;
 
   border:
     0.3mm solid
@@ -493,9 +521,9 @@ export const OFFICIAL_DOCUMENT_STYLES = `
   font-family:
     var(--print-font-family);
 
-  font-size: 2.55mm;
+  font-size: 2.1mm;
 
-  line-height: 1.35;
+  line-height: 1.3;
 
   vertical-align: top;
 
@@ -503,50 +531,52 @@ export const OFFICIAL_DOCUMENT_STYLES = `
 }
 
 
+/* =========================================================
+   SUMMARY
+   ========================================================= */
+
 .official-summary {
   display: grid;
 
   grid-template-columns:
     repeat(3, minmax(0, 1fr));
 
-  gap: 2.5mm;
+  gap: 2mm;
 
-  margin-top: 4mm;
+  margin-top: 3.2mm;
 }
-
 
 .official-summary-card {
   border:
-    0.35mm solid
+    0.3mm solid
     rgba(103, 58, 244, 0.28);
 
-  border-radius: 3mm;
+  border-radius: 2.5mm;
 
-  padding: 3.3mm;
+  padding:
+    2.6mm;
 
   background:
     var(--print-secondary);
 }
 
-
 .official-summary-card span {
   color:
     var(--print-muted-foreground);
 
-  font-size: 2.15mm;
+  font-size: 1.8mm;
 
   font-weight: 650;
 
   text-transform: uppercase;
 
-  letter-spacing: 0.06em;
+  letter-spacing: 0.05em;
 }
-
 
 .official-summary-card strong {
   display: block;
 
-  margin-top: 1.15mm;
+  margin-top: 0.9mm;
 
   color:
     var(--print-primary);
@@ -554,34 +584,42 @@ export const OFFICIAL_DOCUMENT_STYLES = `
   font-family:
     var(--print-font-brand);
 
-  font-size: 4.8mm;
+  font-size: 3.8mm;
 }
 
 
+/* =========================================================
+   NOTE
+   ========================================================= */
+
 .official-note {
-  margin-top: 5mm;
+  margin-top: 3.5mm;
 
   border-left:
-    0.8mm solid
+    0.7mm solid
     var(--print-primary);
 
-  border-radius: 2mm;
+  border-radius: 1.5mm;
 
   background:
     var(--print-muted);
 
   padding:
-    3.5mm
-    4mm;
+    2.7mm
+    3.2mm;
 
   color:
     var(--print-muted-foreground);
 
-  font-size: 2.45mm;
+  font-size: 1.95mm;
 
-  line-height: 1.5;
+  line-height: 1.4;
 }
 
+
+/* =========================================================
+   SIGNATURE
+   ========================================================= */
 
 .official-signatures {
   display: grid;
@@ -589,16 +627,15 @@ export const OFFICIAL_DOCUMENT_STYLES = `
   grid-template-columns:
     minmax(0, 1fr);
 
-  margin-top: 18mm;
+  margin-top: 10mm;
 
   break-inside: avoid;
 }
 
-
 .official-signature {
-  min-height: 24mm;
+  min-height: 17mm;
 
-  padding-top: 14mm;
+  padding-top: 9mm;
 
   border-top:
     0.3mm solid
@@ -609,9 +646,8 @@ export const OFFICIAL_DOCUMENT_STYLES = `
   color:
     var(--print-muted-foreground);
 
-  font-size: 2.4mm;
+  font-size: 1.9mm;
 }
-
 
 .official-signature strong {
   display: block;
@@ -622,32 +658,35 @@ export const OFFICIAL_DOCUMENT_STYLES = `
   font-family:
     var(--print-font-brand);
 
-  font-size: 2.9mm;
+  font-size: 2.4mm;
 
   font-weight: 700;
 }
 
-
 .official-signature span {
   display: block;
 
-  margin-top: 1.5mm;
+  margin-top: 1mm;
 
-  font-size: 2.2mm;
+  font-size: 1.8mm;
 }
 
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
 
 .official-footer {
   display: flex;
 
   justify-content: space-between;
 
-  gap: 8mm;
+  gap: 5mm;
 
-  margin-top: 9mm;
+  margin-top: 6mm;
 
   padding:
-    3.5mm
+    2.8mm
     1mm
     0;
 
@@ -658,19 +697,36 @@ export const OFFICIAL_DOCUMENT_STYLES = `
   color:
     var(--print-muted-foreground);
 
-  font-size: 2.1mm;
+  font-size: 1.7mm;
 
-  line-height: 1.4;
+  line-height: 1.35;
 }
 
 
+/* =========================================================
+   PRINT
+   ========================================================= */
+
 @media print {
+  @page {
+    size: A5 portrait;
+    margin: 0;
+  }
+
   .official-document {
+    width: 148mm;
+    height: 210mm;
+    min-height: 210mm;
+
     break-after: page;
   }
 }
 `;
 
+
+/* =========================================================
+   IDENTITY
+   ========================================================= */
 
 function compactIdentity(
   identity: PrintIdentity,
@@ -688,6 +744,10 @@ function compactIdentity(
 }
 
 
+/* =========================================================
+   HEADER
+   ========================================================= */
+
 export function buildOfficialHeader(
   identity: PrintIdentity,
   documentTitle: string,
@@ -695,15 +755,18 @@ export function buildOfficialHeader(
 ): string {
   void reference;
 
-  const logo = identity.logoUrl
-    ? `
+  const logo =
+    identity.logoUrl
+      ? `
         <img
           class="official-logo"
-          src="${escapePrintHtml(identity.logoUrl)}"
+          src="${escapePrintHtml(
+            identity.logoUrl,
+          )}"
           alt=""
         />
       `
-    : `
+      : `
         <div class="official-logo-fallback">
           ${escapePrintHtml(
             (
@@ -722,9 +785,11 @@ export function buildOfficialHeader(
 
   return `
     <header class="official-header">
+
       ${logo}
 
       <div>
+
         <h1 class="official-school-name">
           ${escapePrintHtml(
             identity.schoolName,
@@ -734,19 +799,27 @@ export function buildOfficialHeader(
         <p class="official-school-meta">
           ${identityMeta}
         </p>
+
       </div>
 
       <div class="official-document-meta">
+
         <strong>
           ${escapePrintHtml(
             documentTitle,
           )}
         </strong>
+
       </div>
+
     </header>
   `;
 }
 
+
+/* =========================================================
+   CREATE OFFICIAL DOCUMENT
+   ========================================================= */
 
 export function createOfficialDocument({
   title,
@@ -754,7 +827,6 @@ export function createOfficialDocument({
   documentTitle,
   reference,
   content,
-  orientation = "portrait",
   signatureLabel,
 }: {
   title: string;
@@ -767,8 +839,6 @@ export function createOfficialDocument({
 
   content: string;
 
-  orientation?: PrintOrientation;
-
   signatureLabel?: string;
 }): PrintableDocument {
   void reference;
@@ -779,7 +849,9 @@ export function createOfficialDocument({
 
   const signatureHtml = `
     <section class="official-signatures">
+
       <div class="official-signature">
+
         <strong>
           ${escapePrintHtml(
             resolvedSignatureLabel,
@@ -789,7 +861,9 @@ export function createOfficialDocument({
         <span>
           Signature and date
         </span>
+
       </div>
+
     </section>
   `;
 
@@ -798,6 +872,7 @@ export function createOfficialDocument({
       class="print-page official-document"
       dir="auto"
     >
+
       ${buildOfficialHeader(
         identity,
         documentTitle,
@@ -806,13 +881,18 @@ export function createOfficialDocument({
       ${content}
 
       ${signatureHtml}
+
     </main>
   `;
 
   return {
     title,
 
-    orientation,
+    /*
+     * Official documents are ALWAYS
+     * A5 portrait.
+     */
+    orientation: "portrait",
 
     kind: "official-document",
 
@@ -824,7 +904,7 @@ export function createOfficialDocument({
       styles:
         OFFICIAL_DOCUMENT_STYLES,
 
-      orientation,
+      orientation: "portrait",
     }),
   };
 }

@@ -301,7 +301,6 @@ function ClassSection({
     </section>
   );
 }
-
 function SubjectSection({ subject }: { subject: MarkSubject }) {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -346,18 +345,35 @@ function SubjectSection({ subject }: { subject: MarkSubject }) {
               No students found in this class.
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[620px] border-collapse text-left">
+            <div className="relative w-full overflow-x-auto overscroll-x-contain">
+              <table className="w-max min-w-full border-separate border-spacing-0 text-left">
                 <thead>
-                  <tr className="border-b border-border/45 bg-muted/25">
-                    <th className="sticky left-0 z-10 min-w-[220px] bg-muted/25 px-4 py-3 text-[10px] font-semibold text-foreground/70">
+                  <tr>
+                    <th
+                      className="
+                        sticky left-0 z-30
+                        w-[180px] min-w-[180px]
+                        border-b border-r border-border/45
+                        bg-muted
+                        px-3 py-3
+                        text-[10px] font-semibold text-foreground/70
+                        sm:w-[220px] sm:min-w-[220px] sm:px-4
+                      "
+                    >
                       Student
                     </th>
 
                     {columns.map((column) => (
                       <th
                         key={column.id}
-                        className="min-w-[115px] px-3 py-3 text-center text-[10px] font-semibold text-foreground/70"
+                        className="
+                          w-[115px] min-w-[115px]
+                          border-b border-border/45
+                          bg-muted/25
+                          px-3 py-3
+                          text-center
+                          text-[10px] font-semibold text-foreground/70
+                        "
                       >
                         <div>{column.name}</div>
 
@@ -387,7 +403,6 @@ function SubjectSection({ subject }: { subject: MarkSubject }) {
     </section>
   );
 }
-
 function MarksStudentRow({
   student,
   columns,
@@ -397,13 +412,24 @@ function MarksStudentRow({
   columns: MarkColumn[];
   index: number;
 }) {
+  const isAlternate = index % 2 === 1;
+
+  const studentCellBackground = isAlternate
+    ? "bg-muted"
+    : "bg-background";
+
   return (
-    <tr
-      className={`border-b border-border/35 last:border-b-0 ${
-        index % 2 === 1 ? "bg-muted/[0.12]" : "bg-background"
-      }`}
-    >
-      <td className="sticky left-0 z-10 bg-inherit px-4 py-3">
+    <tr className="border-b border-border/35 last:border-b-0">
+      <td
+        className={`
+          sticky left-0 z-20
+          w-[180px] min-w-[180px]
+          border-b border-r border-border/35
+          ${studentCellBackground}
+          px-3 py-3
+          sm:w-[220px] sm:min-w-[220px] sm:px-4
+        `}
+      >
         <div className="flex items-center gap-3">
           <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-violet-50 text-[10px] font-semibold text-violet-700">
             {getInitials(student.student_name)}
@@ -426,7 +452,15 @@ function MarksStudentRow({
             : null;
 
         return (
-          <td key={column.id} className="px-3 py-3 text-center">
+          <td
+            key={column.id}
+            className={`
+              border-b border-border/35
+              px-3 py-3
+              text-center
+              ${isAlternate ? "bg-muted/[0.12]" : "bg-background"}
+            `}
+          >
             <MarkCell
               value={value}
               maxMark={column.max_mark}
@@ -439,7 +473,6 @@ function MarksStudentRow({
     </tr>
   );
 }
-
 function MarkCell({
   value,
   maxMark,

@@ -61,7 +61,6 @@ export const API_ENDPOINTS = {
         UPDATE: (settingId: ApiId) => `/staff-attendance-settings/${settingId}`,
         DELETE: (settingId: ApiId) => `/staff-attendance-settings/${settingId}`,
       },
-      
     },
   },
 
@@ -166,19 +165,25 @@ export const API_ENDPOINTS = {
 
   FINANCE_OPERATIONS: {
     ACCOUNTS: "/admin/finance/contracts/accounts",
+
     ACCOUNT: (studentId: ApiId) =>
       `/admin/finance/contracts/accounts/${studentId}`,
+
     FINALIZE_CONTRACT: "/admin/finance/contracts/finalize",
+
     UPDATE_CONTRACT: (accountId: ApiId) =>
       `/admin/finance/contracts/${accountId}`,
+
     INSTALLMENTS: "/admin/finance/contracts/installments",
+
     INSTALLMENT: (installmentId: ApiId) =>
       `/admin/finance/contracts/installments/${installmentId}`,
+
     PAYMENTS: "/admin/finance/contracts/payments",
+
     PAYMENT: (paymentId: ApiId) =>
       `/admin/finance/contracts/payments/${paymentId}`,
   },
-
   COMMUNICATIONS: {
     BELL_UNREAD_COUNT: "/auth/bell/count/unread",
     BELL_MARK_ALL_READ: "/auth/bell/mark/all/read",
@@ -254,19 +259,20 @@ export const API_ENDPOINTS = {
       DELETE: (settingId: ApiId) => `/attendance-settings/${settingId}`,
     },
 
-   STAFF_RECORDS: {
-      FILTER: "/admin/staff/filter",  
-      CREATE: "/admin/staff-attendances",  
-      DETAILS: (id: string | number) => `/admin/staff-attendances/${id}`, 
-      UPDATE: (id: string | number) => `/admin/staff-attendances/${id}`,  
-      DELETE: (id: string | number) => `/admin/staff-attendances/${id}`,  
-     // HISTORY: (id: string | number) => `/admin/staff-attendances/${id}`,  
+    STAFF_RECORDS: {
+      FILTER: "/admin/staff/filter",
+      CREATE: "/admin/staff-attendances",
+      DETAILS: (id: string | number) => `/admin/staff-attendances/${id}`,
+      UPDATE: (id: string | number) => `/admin/staff-attendances/${id}`,
+      DELETE: (id: string | number) => `/admin/staff-attendances/${id}`,
+      HISTORY: (id: string | number) => `/admin/staff-attendances/${id}`,
     },
     STAFF_LEAVES: {
-
-      CREATE: "/admin/staff-leaves",  
-      GET_BY_STAFF: (staffId: string | number) => `/admin/staff-leaves/${staffId}`,  
-      DETAILS: (leaveId: string | number) => `/admin/staff-leaves/${leaveId}/staff`,
+      CREATE: "/admin/staff-leaves",
+      GET_BY_STAFF: (staffId: string | number) =>
+        `/admin/staff-leaves/${staffId}`,
+      DETAILS: (leaveId: string | number) =>
+        `/admin/staff-leaves/${leaveId}/staff`,
       UPDATE: (id: string | number) => `/admin/staff-leaves/${id}`,
       DELETE: (id: string | number) => `/admin/staff-leaves/${id}`,
     },
@@ -309,45 +315,18 @@ export const API_ENDPOINTS = {
     ALL: (academicYearId: ApiId, semesterId: ApiId) =>
       `/auth/all/marks/show/${academicYearId}/${semesterId}`,
   },
-  // --- REPORTS MODULE ---
-  REPORTS: {
-    ATTENDANCE: {
-      STUDENTS: "/admin/reports/attendance/students",
-      STAFF: "/admin/reports/attendance/staff",
-    },
-    FINANCE: {
-      STUDENTS: "/admin/reports/finance/students",
-      STAFF: "/admin/reports/finance/staff",
-    },
-  },
 
-  // --- REPORT CARDS & PROMOTION (الجلاءات والترفيع) ---
-  REPORT_CARDS: {
-    LIST: "/admin/report-cards",
-    GENERATE: "/admin/report-cards/generate",
-    TOGGLE_PUBLISH: "/admin/report-cards/toggle-publish", // تم التحديث هنا
-   // PUBLISH: "/admin/report-cards/publish",
-    PROMOTE: "/admin/report-cards/promote",
-  },
-  // --- STAFF CONTRACTS MODULE ---
-  CONTRACTS: {
-    CREATE: "/admin/staff/contract", // POST[cite: 2]
-    DETAILS: (contractId: ApiId) => `/admin/staff/contract/${contractId}`, // GET[cite: 2]
-    UPDATE: (contractId: ApiId) => `/admin/staff/contract/${contractId}`, // POST (للتعديل حسب الدوكيوينت)[cite: 2]
-    DELETE: (contractId: ApiId) => `/admin/staff/contract/${contractId}`, // DELETE[cite: 2]
-  },
+  STAFF_PAYROLL: {
+    CONTRACTS: "/admin/staff/contract",
+    CONTRACT: (contractId: ApiId) => `/admin/staff/contract/${contractId}`,
 
-  // --- PAYROLL MODULE ---
-  PAYROLL: {
-    PREVIEW: "/staff/payroll/preview", // POST[cite: 2]
-    COMMIT: "/staff/payroll/commit", // POST[cite: 2]
-    
-    // GET (يحتاج لتمرير query params مثل ?year=2026&month=8)[cite: 2]
-    BY_MONTH: "/staff/payroll/month", 
-    
-    STAFF_HISTORY: (staffId: ApiId) => `/staff/payroll/staff/${staffId}`, // GET[cite: 2]
-    DETAILS: (payrollId: ApiId) => `/staff/payroll/${payrollId}`, // GET[cite: 2]
-    UPDATE: (payrollId: ApiId) => `/staff/payroll/${payrollId}`, // POST (للتعديل)[cite: 2]
-    DELETE: (payrollId: ApiId) => `/staff/payroll/${payrollId}`, // DELETE[cite: 2]
+    PAYROLL_PREVIEW: "/staff/payroll/preview",
+    PAYROLL_COMMIT: "/staff/payroll/commit",
+
+    PAYROLL_MONTH: "/staff/payroll/month",
+
+    PAYROLL_BY_STAFF: (staffId: ApiId) => `/staff/payroll/staff/${staffId}`,
+
+    PAYROLL: (payrollId: ApiId) => `/staff/payroll/${payrollId}`,
   },
 } as const;

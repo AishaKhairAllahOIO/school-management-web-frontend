@@ -3,7 +3,13 @@ import {
   useMemo,
   useState,
 } from "react";
-
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/shared/ui/select";
 import {
   AlertCircle,
   CalendarDays,
@@ -133,6 +139,7 @@ export function ExamFormDialog({
   grades,
   onClose,
 }: ExamFormDialogProps) {
+    useBodyScrollLock(open);
   const isEditing = Boolean(exam);
 
   const createMutation =
@@ -584,6 +591,55 @@ export function ExamFormDialog({
     return true;
   }
 
+  /* ========================================================================== */
+/* Body Scroll Lock                                                           */
+/* ========================================================================== */
+
+function useBodyScrollLock(locked: boolean) {
+  useEffect(() => {
+    if (!locked) {
+      return;
+    }
+
+    const body = document.body;
+    const html = document.documentElement;
+
+    // Save current values
+    const previousBodyOverflow = body.style.overflow;
+    const previousBodyPaddingRight =
+      body.style.paddingRight;
+
+    const previousHtmlOverflow =
+      html.style.overflow;
+
+    // Calculate scrollbar width
+    const scrollbarWidth =
+      window.innerWidth -
+      document.documentElement.clientWidth;
+
+    // Prevent background scrolling
+    html.style.overflow = "hidden";
+    body.style.overflow = "hidden";
+
+    // Prevent layout shift caused by disappearing scrollbar
+    if (scrollbarWidth > 0) {
+      body.style.paddingRight = `${scrollbarWidth}px`;
+    }
+
+    // Cleanup when dialog closes/unmounts
+    return () => {
+      html.style.overflow =
+        previousHtmlOverflow;
+
+      body.style.overflow =
+        previousBodyOverflow;
+
+      body.style.paddingRight =
+        previousBodyPaddingRight;
+    };
+  }, [locked]);
+}
+
   /* ======================================================================== */
   /* Submit                                                                   */
   /* ======================================================================== */
@@ -786,47 +842,34 @@ export function ExamFormDialog({
                   </div>
                 </Field>
 
-                <Field
-                  label="Grade"
-                  className="md:col-span-2"
-                >
-                  <div className="relative">
-                    <select
-                      value={
-                        gradeLevelId ?? ""
-                      }
-                      onChange={(event) =>
-                        handleGradeChange(
-                          event.target
-                            .value,
-                        )
-                      }
-                      className="h-10 w-full appearance-none rounded-[13px] border border-border/60 bg-background px-3 pr-9 text-[12px] outline-none transition focus:border-violet-400 focus:ring-2 focus:ring-violet-500/10"
-                    >
-                      <option value="">
-                        Select grade
-                      </option>
+            <Field
+  label="Grade"
+  className="md:col-span-2"
+>
+  <Select
+    value={
+      gradeLevelId !== null
+        ? String(gradeLevelId)
+        : undefined
+    }
+    onValueChange={handleGradeChange}
+  >
+    <SelectTrigger>
+      <SelectValue placeholder="Select grade" />
+    </SelectTrigger>
 
-                      {grades.map(
-                        (grade) => (
-                          <option
-                            key={grade.id}
-                            value={
-                              grade.id
-                            }
-                          >
-                            {grade.name}
-                          </option>
-                        ),
-                      )}
-                    </select>
-
-                    <ChevronDown
-                      size={14}
-                      className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
-                    />
-                  </div>
-                </Field>
+    <SelectContent>
+      {grades.map((grade) => (
+        <SelectItem
+          key={grade.id}
+          value={String(grade.id)}
+        >
+          {grade.name}
+        </SelectItem>
+      ))}
+    </SelectContent>
+  </Select>
+</Field>
               </div>
 
               {/* Subjects */}
@@ -1069,27 +1112,27 @@ export function ExamFormDialog({
                 Cancel
               </button>
 
-              <button
-                type="submit"
-                disabled={
-                  isPending ||
-                  !title.trim() ||
-                  gradeLevelId === null ||
-                  subjects.length === 0
-                }
-                className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 px-4 py-2 text-[11px] font-medium text-white transition disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                {isPending && (
-                  <Loader2
-                    size={13}
-                    className="animate-spin"
-                  />
-                )}
+            <button
+  type="submit"
+  disabled={
+    isPending ||
+    !title.trim() ||
+    gradeLevelId === null ||
+    subjects.length === 0
+  }
+  className="inline-flex h-9 items-center justify-center gap-2 rounded-full bg-primary px-4 text-[12px] font-medium text-primary-foreground shadow-sm transition-all duration-200 hover:-translate-y-[1px] hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0"
+>
+  {isPending && (
+    <Loader2
+      size={13}
+      className="animate-spin"
+    />
+  )}
 
-                {isEditing
-                  ? "Save Changes"
-                  : "Create Schedule"}
-              </button>
+  {isEditing
+    ? "Save Changes"
+    : "Create Schedule"}
+</button>
             </footer>
           </form>
         </section>

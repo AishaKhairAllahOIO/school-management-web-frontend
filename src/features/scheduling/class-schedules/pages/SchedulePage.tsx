@@ -830,9 +830,13 @@ function PageHeader({
         {/* Actions + statistics                                             */}
         {/* ---------------------------------------------------------------- */}
 
-        <div className="flex flex-wrap items-center gap-0">
+        <div className="flex w-full flex-col gap-3 lg:w-auto lg:flex-row lg:items-center lg:gap-0">
+          {/* -------------------------------------------------------------- */}
+          {/* Statistics                                                     */}
+          {/* -------------------------------------------------------------- */}
+
           {hasSchedule && (
-            <div className="flex flex-wrap items-center gap-1.5">
+            <div className="grid w-full grid-cols-2 gap-1.5 sm:grid-cols-4 lg:flex lg:w-auto lg:flex-wrap lg:items-center">
               <MetricCard
                 label="Lessons"
                 value={totalEntries ?? 0}
@@ -879,7 +883,7 @@ function PageHeader({
           {/* Regenerate / Generate                                           */}
           {/* -------------------------------------------------------------- */}
 
-          <div className="ml-4 lg:ml-5">
+          <div className="w-full lg:ml-5 lg:w-auto">
             <button
               type="button"
               onClick={onGenerate}
@@ -887,7 +891,7 @@ function PageHeader({
                 !canGenerate ||
                 isGenerating
               }
-              className="inline-flex h-9 items-center justify-center gap-2 rounded-full bg-primary px-4 text-[12px] font-medium text-primary-foreground shadow-sm transition-all duration-200 hover:-translate-y-[1px] hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0"
+              className="inline-flex h-9 w-full items-center justify-center gap-2 rounded-full bg-primary px-4 text-[12px] font-medium text-primary-foreground shadow-sm transition-all duration-200 hover:-translate-y-[1px] hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0 sm:w-auto"
             >
               {isGenerating ? (
                 <Loader2

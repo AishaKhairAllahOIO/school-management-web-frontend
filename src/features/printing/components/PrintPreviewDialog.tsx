@@ -25,7 +25,11 @@ import type { PrintableDocument } from "../types/print.types";
 
 type PrintPreviewDialogProps = {
   open: boolean;
-  onOpenChange: (open: boolean) => void;
+
+  onOpenChange: (
+    open: boolean,
+  ) => void;
+
   document: PrintableDocument | null;
 };
 
@@ -38,25 +42,65 @@ type PrintSettings = {
   monochrome: boolean;
 };
 
+type PageSize = {
+  width: number;
+  height: number;
+};
+
 const MIN_ZOOM = 0.35;
 const MAX_ZOOM = 1.8;
 const ZOOM_STEP = 0.1;
 
-const A4_PIXELS = {
-  portrait: {
-    width: 794,
-    height: 1123,
+/*
+ * =========================================================
+ * PRINT PAGE PIXELS
+ * =========================================================
+ *
+ * These are preview dimensions, not CSS physical dimensions.
+ *
+ * A4 = 210 × 297 mm
+ * A5 = 148 × 210 mm
+ *
+ * Approximate 96 DPI preview sizes:
+ *
+ * A4 portrait = 794 × 1123
+ * A5 portrait = 559 × 794
+ */
+const PAGE_PIXELS = {
+  A4: {
+    portrait: {
+      width: 794,
+      height: 1123,
+    },
+
+    landscape: {
+      width: 1123,
+      height: 794,
+    },
   },
-  landscape: {
-    width: 1123,
-    height: 794,
+
+  A5: {
+    portrait: {
+      width: 559,
+      height: 794,
+    },
+
+    landscape: {
+      width: 794,
+      height: 559,
+    },
   },
 } as const;
 
-function clampZoom(value: number) {
+function clampZoom(
+  value: number,
+): number {
   return Math.min(
     MAX_ZOOM,
-    Math.max(MIN_ZOOM, value),
+    Math.max(
+      MIN_ZOOM,
+      value,
+    ),
   );
 }
 
@@ -66,35 +110,63 @@ export function PrintPreviewDialog({
   document,
 }: PrintPreviewDialogProps) {
   const iframeRef =
-    useRef<HTMLIFrameElement | null>(null);
+    useRef<HTMLIFrameElement | null>(
+      null,
+    );
 
   const viewportRef =
-    useRef<HTMLDivElement | null>(null);
+    useRef<HTMLDivElement | null>(
+      null,
+    );
 
-  /**
-   * Used to invalidate old iframe callbacks.
-   *
-   * When a new printable document is opened,
-   * callbacks belonging to the previous iframe
-   * must no longer update the state.
-   */
   const previewGenerationRef =
     useRef(0);
 
-  const orientation =
-    document?.orientation ?? "portrait";
+  /*
+   * =======================================================
+   * PAPER / ORIENTATION
+   * =======================================================
+   *
+   * Official documents:
+   *   A5 Portrait
+   *
+   * Posters:
+   *   A4 Portrait
+   *
+   * Other future document types:
+   *   use their own orientation and default to A5.
+   */
+  const paperSize =
+    document?.kind === "poster"
+      ? "A4"
+      : "A5";
 
-  const pageSize =
-    A4_PIXELS[orientation];
+  const orientation =
+    document?.kind === "official-document" ||
+    document?.kind === "poster"
+      ? "portrait"
+      : (
+          document?.orientation ??
+          "portrait"
+        );
+
+  const pageSize: PageSize =
+    PAGE_PIXELS[paperSize][
+      orientation
+    ];
 
   const [zoom, setZoom] =
     useState(0.8);
 
   const [mode, setMode] =
-    useState<PreviewMode>("fit-page");
+    useState<PreviewMode>(
+      "fit-page",
+    );
 
   const [documentHeight, setDocumentHeight] =
-    useState(pageSize.height);
+    useState<number>(
+      pageSize.height,
+    );
 
   const [isReady, setIsReady] =
     useState(false);
@@ -109,13 +181,12 @@ export function PrintPreviewDialog({
         "official-document",
     });
 
-  /**
-   * ---------------------------------------------------------
+  /*
+   * =======================================================
    * SAFE IFRAME DOCUMENT
-   * ---------------------------------------------------------
-   *
-   * Never assume contentDocument/documentElement/body exists.
+   * =======================================================
    */
+
   const getFrameDocument =
     useCallback(() => {
       const iframe =
@@ -132,11 +203,12 @@ export function PrintPreviewDialog({
       }
     }, []);
 
-  /**
-   * ---------------------------------------------------------
+  /*
+   * =======================================================
    * MEASURE DOCUMENT
-   * ---------------------------------------------------------
+   * =======================================================
    */
+
   const measureDocument =
     useCallback(() => {
       const frameDocument =
@@ -157,11 +229,13 @@ export function PrintPreviewDialog({
           ".print-page",
         );
 
-      /**
-       * Posters are always exactly one A4 page.
+      /*
+       * Official A5 documents use
+       * a fixed A5 page height.
        */
       if (
-        document?.kind === "poster"
+        document?.kind ===
+        "official-document"
       ) {
         setDocumentHeight(
           pageSize.height,
@@ -170,6 +244,24 @@ export function PrintPreviewDialog({
         return true;
       }
 
+      /*
+       * Posters use a fixed A4 page.
+       */
+      if (
+        document?.kind ===
+        "poster"
+      ) {
+        setDocumentHeight(
+          pageSize.height,
+        );
+
+        return true;
+      }
+
+      /*
+       * Future/custom documents can
+       * have dynamic height.
+       */
       const measuredHeight =
         Math.max(
           pageSize.height,
@@ -185,7 +277,9 @@ export function PrintPreviewDialog({
         );
 
       setDocumentHeight(
-        Math.ceil(measuredHeight),
+        Math.ceil(
+          measuredHeight,
+        ),
       );
 
       return true;
@@ -195,11 +289,12 @@ export function PrintPreviewDialog({
       pageSize.height,
     ]);
 
-  /**
-   * ---------------------------------------------------------
+  /*
+   * =======================================================
    * FIT
-   * ---------------------------------------------------------
+   * =======================================================
    */
+
   const applyFit =
     useCallback(
       (
@@ -242,16 +337,6 @@ export function PrintPreviewDialog({
           availableWidth /
           pageSize.width;
 
-        /**
-         * Posters:
-         *
-         * Always fit one A4 page.
-         *
-         * Official documents:
-         *
-         * fit-page uses the actual document height,
-         * but never less than A4.
-         */
         const effectiveHeight =
           Math.max(
             pageSize.height,
@@ -263,7 +348,8 @@ export function PrintPreviewDialog({
           effectiveHeight;
 
         const nextZoom =
-          nextMode === "fit-width"
+          nextMode ===
+          "fit-width"
             ? widthScale
             : Math.min(
                 widthScale,
@@ -273,7 +359,9 @@ export function PrintPreviewDialog({
         setMode(nextMode);
 
         setZoom(
-          clampZoom(nextZoom),
+          clampZoom(
+            nextZoom,
+          ),
         );
       },
       [
@@ -283,11 +371,12 @@ export function PrintPreviewDialog({
       ],
     );
 
-  /**
-   * ---------------------------------------------------------
+  /*
+   * =======================================================
    * IFRAME LOAD
-   * ---------------------------------------------------------
+   * =======================================================
    */
+
   const handleFrameLoad =
     useCallback(() => {
       const currentGeneration =
@@ -309,9 +398,6 @@ export function PrintPreviewDialog({
 
       const apply =
         () => {
-          /**
-           * Ignore callbacks from an old iframe.
-           */
           if (
             currentGeneration !==
             previewGenerationRef.current
@@ -340,49 +426,34 @@ export function PrintPreviewDialog({
 
       apply();
 
-      const raf =
-        window.requestAnimationFrame(
-          apply,
-        );
+      window.requestAnimationFrame(
+        apply,
+      );
 
-      const timeout100 =
-        window.setTimeout(
-          apply,
-          100,
-        );
+      window.setTimeout(
+        apply,
+        100,
+      );
 
-      const timeout400 =
-        window.setTimeout(
-          apply,
-          400,
-        );
+      window.setTimeout(
+        apply,
+        400,
+      );
 
-      const timeout800 =
-        window.setTimeout(
-          apply,
-          800,
-        );
-
-      /**
-       * There is no need to return this cleanup
-       * from the event handler itself.
-       *
-       * The generation mechanism invalidates
-       * stale callbacks safely.
-       */
-      void raf;
-      void timeout100;
-      void timeout400;
-      void timeout800;
+      window.setTimeout(
+        apply,
+        800,
+      );
     }, [
       measureDocument,
     ]);
 
-  /**
-   * ---------------------------------------------------------
+  /*
+   * =======================================================
    * BODY SCROLL LOCK
-   * ---------------------------------------------------------
+   * =======================================================
    */
+
   useEffect(() => {
     if (!open) {
       return;
@@ -401,11 +472,12 @@ export function PrintPreviewDialog({
     };
   }, [open]);
 
-  /**
-   * ---------------------------------------------------------
+  /*
+   * =======================================================
    * KEYBOARD SHORTCUTS
-   * ---------------------------------------------------------
+   * =======================================================
    */
+
   useEffect(() => {
     if (!open) {
       return;
@@ -414,30 +486,39 @@ export function PrintPreviewDialog({
     function handleKeyDown(
       event: KeyboardEvent,
     ) {
-      if (event.key === "Escape") {
+      if (
+        event.key ===
+        "Escape"
+      ) {
         if (showSettings) {
           setShowSettings(false);
+
           return;
         }
 
         onOpenChange(false);
+
         return;
       }
 
       if (
         (event.ctrlKey ||
           event.metaKey) &&
-        (event.key === "+" ||
-          event.key === "=")
+        (
+          event.key === "+" ||
+          event.key === "="
+        )
       ) {
         event.preventDefault();
 
         setMode("custom");
 
-        setZoom((current) =>
-          clampZoom(
-            current + ZOOM_STEP,
-          ),
+        setZoom(
+          (current) =>
+            clampZoom(
+              current +
+                ZOOM_STEP,
+            ),
         );
 
         return;
@@ -452,10 +533,12 @@ export function PrintPreviewDialog({
 
         setMode("custom");
 
-        setZoom((current) =>
-          clampZoom(
-            current - ZOOM_STEP,
-          ),
+        setZoom(
+          (current) =>
+            clampZoom(
+              current -
+                ZOOM_STEP,
+            ),
         );
 
         return;
@@ -469,6 +552,7 @@ export function PrintPreviewDialog({
         event.preventDefault();
 
         setMode("custom");
+
         setZoom(1);
       }
     }
@@ -490,20 +574,20 @@ export function PrintPreviewDialog({
     showSettings,
   ]);
 
-  /**
-   * ---------------------------------------------------------
-   * RESET WHEN DOCUMENT CHANGES
-   * ---------------------------------------------------------
+  /*
+   * =======================================================
+   * RESET DOCUMENT
+   * =======================================================
    */
+
   useEffect(() => {
-    if (!open || !document) {
+    if (
+      !open ||
+      !document
+    ) {
       return;
     }
 
-    /**
-     * Invalidate every callback associated
-     * with the previous iframe.
-     */
     previewGenerationRef.current += 1;
 
     setIsReady(false);
@@ -512,7 +596,9 @@ export function PrintPreviewDialog({
       pageSize.height,
     );
 
-    setMode("fit-page");
+    setMode(
+      "fit-page",
+    );
 
     setZoom(0.8);
 
@@ -524,10 +610,6 @@ export function PrintPreviewDialog({
         "official-document",
     });
 
-    /**
-     * Clear old iframe reference before the
-     * new srcDoc is mounted/loaded.
-     */
     iframeRef.current = null;
   }, [
     document,
@@ -535,28 +617,35 @@ export function PrintPreviewDialog({
     pageSize.height,
   ]);
 
-  /**
-   * ---------------------------------------------------------
-   * APPLY INITIAL FIT
-   * ---------------------------------------------------------
+  /*
+   * =======================================================
+   * INITIAL FIT
+   * =======================================================
    */
+
   useEffect(() => {
-    if (!open || !isReady) {
+    if (
+      !open ||
+      !isReady
+    ) {
       return;
     }
 
-    applyFit("fit-page");
+    applyFit(
+      "fit-page",
+    );
   }, [
     applyFit,
     isReady,
     open,
   ]);
 
-  /**
-   * ---------------------------------------------------------
+  /*
+   * =======================================================
    * RESIZE
-   * ---------------------------------------------------------
+   * =======================================================
    */
+
   useEffect(() => {
     if (!open) {
       return;
@@ -564,8 +653,10 @@ export function PrintPreviewDialog({
 
     function handleResize() {
       if (
-        mode === "fit-page" ||
-        mode === "fit-width"
+        mode ===
+          "fit-page" ||
+        mode ===
+          "fit-width"
       ) {
         applyFit(mode);
       }
@@ -588,21 +679,17 @@ export function PrintPreviewDialog({
     open,
   ]);
 
-  /**
-   * ---------------------------------------------------------
-   * SAFE MONOCHROME
-   * ---------------------------------------------------------
-   *
-   * THIS IS THE IMPORTANT FIX.
-   *
-   * Previously:
-   *
-   * frameDocument.documentElement.classList.toggle(...)
-   *
-   * could crash when documentElement was null.
+  /*
+   * =======================================================
+   * MONOCHROME
+   * =======================================================
    */
+
   useEffect(() => {
-    if (!open || !isReady) {
+    if (
+      !open ||
+      !isReady
+    ) {
       return;
     }
 
@@ -635,12 +722,11 @@ export function PrintPreviewDialog({
       return;
     }
 
-    /**
-     * Now classList is guaranteed to exist.
-     */
     root.classList.toggle(
       "print-monochrome",
-      Boolean(settings.monochrome),
+      Boolean(
+        settings.monochrome,
+      ),
     );
   }, [
     open,
@@ -648,42 +734,53 @@ export function PrintPreviewDialog({
     isReady,
   ]);
 
-  /**
-   * ---------------------------------------------------------
+  /*
+   * =======================================================
    * SCALED SIZE
-   * ---------------------------------------------------------
+   * =======================================================
    */
-  const scaledSize = useMemo(
-    () => ({
-      width: Math.ceil(
-        pageSize.width * zoom,
-      ),
 
-      height: Math.ceil(
-        documentHeight * zoom,
-      ),
-    }),
-    [
-      documentHeight,
-      pageSize.width,
-      zoom,
-    ],
-  );
+  const scaledSize =
+    useMemo(
+      () => ({
+        width: Math.ceil(
+          pageSize.width *
+            zoom,
+        ),
 
-  if (!open || !document) {
+        height: Math.ceil(
+          documentHeight *
+            zoom,
+        ),
+      }),
+      [
+        documentHeight,
+        pageSize.width,
+        zoom,
+      ],
+    );
+
+  if (
+    !open ||
+    !document
+  ) {
     return null;
   }
 
-  /**
-   * ---------------------------------------------------------
+  /*
+   * =======================================================
    * PRINT
-   * ---------------------------------------------------------
+   * =======================================================
    */
+
   function handlePrint() {
     const frame =
       iframeRef.current;
 
-    if (!frame || !isReady) {
+    if (
+      !frame ||
+      !isReady
+    ) {
       return;
     }
 
@@ -696,12 +793,9 @@ export function PrintPreviewDialog({
       }
 
       frameWindow.focus();
+
       frameWindow.print();
     } catch {
-      /**
-       * Never let a print failure crash
-       * the React tree.
-       */
       return;
     }
   }
@@ -712,35 +806,47 @@ export function PrintPreviewDialog({
     setMode("custom");
 
     setZoom(
-      clampZoom(nextZoom),
+      clampZoom(
+        nextZoom,
+      ),
     );
   }
 
   const kindLabel =
-    document.kind === "poster"
+    document.kind ===
+    "poster"
       ? "Poster"
       : "Official document";
 
+  const paperLabel =
+    paperSize === "A4"
+      ? "A4"
+      : "A5";
+
   const orientationLabel =
-    orientation === "landscape"
-      ? "A4 Landscape"
-      : "A4 Portrait";
+    orientation ===
+    "landscape"
+      ? `${paperLabel} Landscape`
+      : `${paperLabel} Portrait`;
 
   return createPortal(
     <section
       role="dialog"
       aria-modal="true"
-      aria-label={document.title}
+      aria-label={
+        document.title
+      }
       className="fixed inset-0 z-[120] flex min-h-0 flex-col bg-background"
     >
       {/* =====================================================
           HEADER
-          ===================================================== */}
+         ===================================================== */}
 
       <header className="relative z-10 shrink-0 border-b border-border/70 bg-card shadow-[0_8px_28px_rgb(31_25_78_/_0.08)]">
         <div className="flex min-h-[64px] items-center gap-3 px-3 py-2 sm:px-5 lg:px-7">
 
           <div className="flex min-w-0 flex-1 items-center gap-2.5">
+
             <Button
               type="button"
               variant="ghost"
@@ -755,6 +861,7 @@ export function PrintPreviewDialog({
             </Button>
 
             <div className="min-w-0">
+
               <div className="flex min-w-0 items-center gap-2">
 
                 <p className="truncate text-[14px] font-semibold tracking-[-0.02em] text-foreground sm:text-[15px]">
@@ -770,10 +877,14 @@ export function PrintPreviewDialog({
               <p className="mt-0.5 hidden text-[10px] text-muted-foreground md:block">
                 Review the page, adjust the view, then print or save as PDF.
               </p>
+
             </div>
+
           </div>
 
-          {/* Desktop controls */}
+          {/* =================================================
+              DESKTOP CONTROLS
+             ================================================= */}
 
           <div className="hidden items-center gap-1.5 md:flex">
 
@@ -785,11 +896,13 @@ export function PrintPreviewDialog({
                 size="icon"
                 onClick={() =>
                   updateZoom(
-                    zoom - ZOOM_STEP,
+                    zoom -
+                      ZOOM_STEP,
                   )
                 }
                 disabled={
-                  zoom <= MIN_ZOOM
+                  zoom <=
+                  MIN_ZOOM
                 }
                 className="h-8 w-8 rounded-[8px]"
                 aria-label="Zoom out"
@@ -816,11 +929,13 @@ export function PrintPreviewDialog({
                 size="icon"
                 onClick={() =>
                   updateZoom(
-                    zoom + ZOOM_STEP,
+                    zoom +
+                      ZOOM_STEP,
                   )
                 }
                 disabled={
-                  zoom >= MAX_ZOOM
+                  zoom >=
+                  MAX_ZOOM
                 }
                 className="h-8 w-8 rounded-[8px]"
                 aria-label="Zoom in"
@@ -833,7 +948,8 @@ export function PrintPreviewDialog({
             <Button
               type="button"
               variant={
-                mode === "fit-page"
+                mode ===
+                "fit-page"
                   ? "secondary"
                   : "ghost"
               }
@@ -853,7 +969,8 @@ export function PrintPreviewDialog({
             <Button
               type="button"
               variant={
-                mode === "fit-width"
+                mode ===
+                "fit-width"
                   ? "secondary"
                   : "ghost"
               }
@@ -872,7 +989,9 @@ export function PrintPreviewDialog({
 
           </div>
 
-          {/* Right controls */}
+          {/* =================================================
+              RIGHT CONTROLS
+             ================================================= */}
 
           <div className="relative flex shrink-0 items-center gap-1.5">
 
@@ -890,7 +1009,8 @@ export function PrintPreviewDialog({
               size="icon"
               onClick={() =>
                 setShowSettings(
-                  (value) => !value,
+                  (value) =>
+                    !value,
                 )
               }
               className="h-9 w-9 rounded-[11px]"
@@ -904,7 +1024,9 @@ export function PrintPreviewDialog({
 
             <Button
               type="button"
-              onClick={handlePrint}
+              onClick={
+                handlePrint
+              }
               disabled={!isReady}
               className="h-9 rounded-[11px] px-3 sm:h-10 sm:px-3.5"
             >
@@ -932,7 +1054,9 @@ export function PrintPreviewDialog({
               <X className="h-4 w-4" />
             </Button>
 
-            {/* Settings */}
+            {/* =================================================
+                SETTINGS
+               ================================================= */}
 
             {showSettings ? (
               <div className="absolute end-0 top-full z-20 mt-2 w-[260px] rounded-[16px] border border-border/80 bg-card p-3 shadow-[0_20px_60px_rgb(31_25_78_/_0.16)]">
@@ -944,26 +1068,30 @@ export function PrintPreviewDialog({
                 <div className="mt-3 space-y-2">
 
                   <div className="flex items-center justify-between rounded-[11px] border border-border/60 bg-muted/20 px-3 py-2.5">
+
                     <span className="text-[11px] font-medium text-foreground">
                       Paper
                     </span>
 
-                    <span className="text-[10px] text-muted-foreground">
-                      A4
+                    <span className="text-[10px] font-semibold text-primary">
+                      {paperLabel}
                     </span>
+
                   </div>
 
                   <div className="flex items-center justify-between rounded-[11px] border border-border/60 bg-muted/20 px-3 py-2.5">
+
                     <span className="text-[11px] font-medium text-foreground">
                       Orientation
                     </span>
 
                     <span className="text-[10px] text-muted-foreground">
-                      {orientationLabel.replace(
-                        "A4 ",
-                        "",
-                      )}
+                      {orientation ===
+                      "landscape"
+                        ? "Landscape"
+                        : "Portrait"}
                     </span>
+
                   </div>
 
                   <button
@@ -979,7 +1107,9 @@ export function PrintPreviewDialog({
                     }
                     className="flex w-full items-center justify-between rounded-[11px] border border-border/60 bg-muted/20 px-3 py-2.5 text-start transition-colors hover:bg-muted/40"
                   >
+
                     <span>
+
                       <span className="block text-[11px] font-medium text-foreground">
                         Black &amp; white
                       </span>
@@ -987,25 +1117,31 @@ export function PrintPreviewDialog({
                       <span className="mt-0.5 block text-[9px] text-muted-foreground">
                         Official documents are monochrome by default.
                       </span>
+
                     </span>
 
                     <span
                       className={[
                         "relative h-5 w-9 shrink-0 rounded-full transition-colors",
+
                         settings.monochrome
                           ? "bg-primary"
                           : "bg-muted-foreground/25",
                       ].join(" ")}
                     >
+
                       <span
                         className={[
                           "absolute top-0.5 h-4 w-4 rounded-full bg-white shadow-sm transition-transform",
+
                           settings.monochrome
                             ? "translate-x-4"
                             : "translate-x-0.5",
                         ].join(" ")}
                       />
+
                     </span>
+
                   </button>
 
                   <p className="px-1 pt-1 text-[9px] leading-4 text-muted-foreground">
@@ -1013,13 +1149,17 @@ export function PrintPreviewDialog({
                   </p>
 
                 </div>
+
               </div>
             ) : null}
 
           </div>
+
         </div>
 
-        {/* Mobile controls */}
+        {/* ===================================================
+            MOBILE CONTROLS
+           =================================================== */}
 
         <div className="flex items-center justify-center gap-1 border-t border-border/50 px-3 py-1.5 md:hidden">
 
@@ -1031,11 +1171,13 @@ export function PrintPreviewDialog({
               size="icon"
               onClick={() =>
                 updateZoom(
-                  zoom - ZOOM_STEP,
+                  zoom -
+                    ZOOM_STEP,
                 )
               }
               disabled={
-                zoom <= MIN_ZOOM
+                zoom <=
+                MIN_ZOOM
               }
               className="h-7 w-7 rounded-[7px]"
               aria-label="Zoom out"
@@ -1062,11 +1204,13 @@ export function PrintPreviewDialog({
               size="icon"
               onClick={() =>
                 updateZoom(
-                  zoom + ZOOM_STEP,
+                  zoom +
+                    ZOOM_STEP,
                 )
               }
               disabled={
-                zoom >= MAX_ZOOM
+                zoom >=
+                MAX_ZOOM
               }
               className="h-7 w-7 rounded-[7px]"
               aria-label="Zoom in"
@@ -1079,13 +1223,16 @@ export function PrintPreviewDialog({
           <Button
             type="button"
             variant={
-              mode === "fit-page"
+              mode ===
+              "fit-page"
                 ? "secondary"
                 : "ghost"
             }
             size="icon"
             onClick={() =>
-              applyFit("fit-page")
+              applyFit(
+                "fit-page",
+              )
             }
             className="h-8 w-8 rounded-[9px]"
             title="Fit page"
@@ -1097,13 +1244,16 @@ export function PrintPreviewDialog({
           <Button
             type="button"
             variant={
-              mode === "fit-width"
+              mode ===
+              "fit-width"
                 ? "secondary"
                 : "ghost"
             }
             size="icon"
             onClick={() =>
-              applyFit("fit-width")
+              applyFit(
+                "fit-width",
+              )
             }
             className="h-8 w-8 rounded-[9px]"
             title="Fit width"
@@ -1117,16 +1267,18 @@ export function PrintPreviewDialog({
           </span>
 
         </div>
+
       </header>
 
       {/* =====================================================
           PREVIEW
-          ===================================================== */}
+         ===================================================== */}
 
       <div
         ref={viewportRef}
         className="relative min-h-0 flex-1 overflow-auto overscroll-contain bg-muted/20"
       >
+
         <div className="flex min-h-full min-w-full items-start justify-center px-3 py-7 sm:px-7 sm:py-9 lg:px-10 lg:py-10">
 
           <div
@@ -1134,6 +1286,7 @@ export function PrintPreviewDialog({
             style={{
               width:
                 scaledSize.width,
+
               height:
                 scaledSize.height,
             }}
@@ -1162,7 +1315,9 @@ export function PrintPreviewDialog({
               ref={iframeRef}
               title={document.title}
               srcDoc={document.html}
-              onLoad={handleFrameLoad}
+              onLoad={
+                handleFrameLoad
+              }
               scrolling="no"
               className="absolute left-0 top-0 origin-top-left border-0 bg-white shadow-[0_24px_80px_rgb(35_25_70_/_0.16)]"
               style={{
@@ -1178,8 +1333,11 @@ export function PrintPreviewDialog({
             />
 
           </div>
+
         </div>
+
       </div>
+
     </section>,
     window.document.body,
   );
