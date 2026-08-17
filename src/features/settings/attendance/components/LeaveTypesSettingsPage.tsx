@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Plus, Palmtree } from "lucide-react";
-
+import { Skeleton } from "@/shared/ui/skeleton";
 import { Button } from "@/shared/ui/button";
 import { ConfirmationDialog } from "@/shared/ui/confirmation-dialog";
 
