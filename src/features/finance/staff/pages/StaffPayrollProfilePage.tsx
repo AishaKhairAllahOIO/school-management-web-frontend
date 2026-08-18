@@ -1,23 +1,13 @@
-import {
-  useMemo,
-  useState,
-} from "react";
+// features/finance/pages/StaffPayrollProfilePage.tsx
+
+import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-
-import {
-  ArrowLeft,
-} from "lucide-react";
-
-import {
-  Navigate,
-  useNavigate,
-  useParams,
-} from "react-router-dom";
+import { ArrowLeft } from "lucide-react";
+import { Navigate, useNavigate, useParams } from "react-router-dom";
 
 import { Button } from "@/shared/ui/button";
 
 import { staffApi } from "../../../users/staff/api/staff.api";
-
 import { useAcademicYears } from "../../../settings/academic/hooks/useAcademicSettings";
 
 import {
@@ -75,58 +65,14 @@ function StaffPayrollProfileSkeleton() {
   return (
     <div
       className="
-        space-y-4
+        space-y-3
         pb-8
-        pt-2
-        sm:pt-3
-        lg:pt-4
+        pt-0
+        sm:space-y-4
       "
       aria-busy="true"
       aria-label="Loading employee payroll"
     >
-      {/* HEADER */}
-
-      <header
-        className="
-          flex
-          items-center
-          gap-1.5
-        "
-      >
-        <Skeleton
-          className="
-            size-7
-            shrink-0
-            rounded-lg
-          "
-        />
-
-        <div
-          className="
-            min-w-0
-            space-y-1.5
-          "
-        >
-          <Skeleton
-            className="
-              h-4
-              w-32
-              rounded-md
-            "
-          />
-
-          <Skeleton
-            className="
-              h-2.5
-              w-56
-              rounded-md
-            "
-          />
-        </div>
-      </header>
-
-      {/* CONTRACT SKELETON */}
-
       <section
         className="
           overflow-hidden
@@ -141,26 +87,44 @@ function StaffPayrollProfileSkeleton() {
           className="
             flex
             items-center
-            justify-between
             gap-3
             border-b
             border-border/40
             px-4
-            py-3.5
+            py-3
+            sm:px-5
+            sm:py-3.5
           "
         >
-          <div className="space-y-1.5">
+          <Skeleton
+            className="
+              size-8
+              shrink-0
+              rounded-lg
+            "
+          />
+
+          <div className="min-w-0 space-y-1.5">
             <Skeleton
-              className="h-3.5 w-28"
+              className="
+                h-3.5
+                w-28
+                rounded-md
+              "
             />
 
             <Skeleton
-              className="h-2.5 w-40"
+              className="
+                h-2.5
+                w-40
+                rounded-md
+              "
             />
           </div>
 
           <Skeleton
             className="
+              ml-auto
               h-8
               w-20
               rounded-xl
@@ -178,9 +142,7 @@ function StaffPayrollProfileSkeleton() {
             lg:grid-cols-4
           "
         >
-          {Array.from({
-            length: 4,
-          }).map((_, index) => (
+          {Array.from({ length: 4 }).map((_, index) => (
             <div
               key={index}
               className="
@@ -192,9 +154,7 @@ function StaffPayrollProfileSkeleton() {
                 py-3
               "
             >
-              <Skeleton
-                className="h-2.5 w-20"
-              />
+              <Skeleton className="h-2.5 w-20" />
 
               <Skeleton
                 className="
@@ -207,8 +167,6 @@ function StaffPayrollProfileSkeleton() {
           ))}
         </div>
       </section>
-
-      {/* PAYROLL SKELETON */}
 
       <section
         className="
@@ -233,13 +191,9 @@ function StaffPayrollProfileSkeleton() {
           "
         >
           <div className="space-y-1.5">
-            <Skeleton
-              className="h-3.5 w-24"
-            />
+            <Skeleton className="h-3.5 w-24" />
 
-            <Skeleton
-              className="h-2.5 w-44"
-            />
+            <Skeleton className="h-2.5 w-44" />
           </div>
 
           <Skeleton
@@ -264,9 +218,7 @@ function StaffPayrollProfileSkeleton() {
               sm:grid
             "
           >
-            {Array.from({
-              length: 5,
-            }).map((_, index) => (
+            {Array.from({ length: 5 }).map((_, index) => (
               <Skeleton
                 key={index}
                 className="
@@ -278,9 +230,7 @@ function StaffPayrollProfileSkeleton() {
           </div>
 
           <div className="space-y-1">
-            {Array.from({
-              length: 4,
-            }).map((_, rowIndex) => (
+            {Array.from({ length: 4 }).map((_, rowIndex) => (
               <div
                 key={rowIndex}
                 className="
@@ -294,9 +244,7 @@ function StaffPayrollProfileSkeleton() {
                   sm:items-center
                 "
               >
-                {Array.from({
-                  length: 5,
-                }).map(
+                {Array.from({ length: 5 }).map(
                   (_, columnIndex) => (
                     <Skeleton
                       key={columnIndex}
@@ -331,18 +279,12 @@ export function StaffPayrollProfilePage() {
 
   const navigate = useNavigate();
 
-  /*
-   * Route params are strings.
-   *
-   * We keep the route value separate from the validated
-   * ApiId used by the API.
-   */
   const staffId: ApiId | undefined =
     routeStaffId;
 
   /* ============================================================
-     Contract state
-     ============================================================ */
+     CONTRACT STATE
+  ============================================================ */
 
   const [
     contractDialogOpen,
@@ -364,8 +306,8 @@ export function StaffPayrollProfilePage() {
   );
 
   /* ============================================================
-     Payroll state
-     ============================================================ */
+     PAYROLL STATE
+  ============================================================ */
 
   const [
     selectedPayrollId,
@@ -385,8 +327,8 @@ export function StaffPayrollProfilePage() {
   );
 
   /* ============================================================
-     Staff
-     ============================================================ */
+     STAFF
+  ============================================================ */
 
   const staffQuery = useQuery({
     queryKey: [
@@ -407,8 +349,8 @@ export function StaffPayrollProfilePage() {
   });
 
   /* ============================================================
-     Contracts
-     ============================================================ */
+     CONTRACTS
+  ============================================================ */
 
   const contractsQuery =
     useStaffContracts(
@@ -420,8 +362,8 @@ export function StaffPayrollProfilePage() {
     );
 
   /* ============================================================
-     Payroll
-     ============================================================ */
+     PAYROLL
+  ============================================================ */
 
   const payrollQuery =
     useStaffPayrolls(
@@ -429,15 +371,15 @@ export function StaffPayrollProfilePage() {
     );
 
   /* ============================================================
-     Academic years
-     ============================================================ */
+     ACADEMIC YEARS
+  ============================================================ */
 
   const academicYearsQuery =
     useAcademicYears();
 
   /* ============================================================
-     Mutations
-     ============================================================ */
+     MUTATIONS
+  ============================================================ */
 
   const deleteContractMutation =
     useDeleteContract();
@@ -446,8 +388,8 @@ export function StaffPayrollProfilePage() {
     usePayrollPreview();
 
   /* ============================================================
-     Academic year lookup
-     ============================================================ */
+     ACADEMIC YEAR LOOKUP
+  ============================================================ */
 
   const academicYearsById =
     useMemo(
@@ -467,8 +409,8 @@ export function StaffPayrollProfilePage() {
     );
 
   /* ============================================================
-     Validation
-     ============================================================ */
+     VALIDATION
+  ============================================================ */
 
   if (!staffId) {
     return (
@@ -480,12 +422,10 @@ export function StaffPayrollProfilePage() {
   }
 
   /* ============================================================
-     STAFF LOADING
-     ============================================================ */
+     LOADING
+  ============================================================ */
 
-  if (
-    staffQuery.isLoading
-  ) {
+  if (staffQuery.isLoading) {
     return (
       <StaffPayrollProfileSkeleton />
     );
@@ -493,7 +433,7 @@ export function StaffPayrollProfilePage() {
 
   /* ============================================================
      ERROR
-     ============================================================ */
+  ============================================================ */
 
   if (
     staffQuery.isError ||
@@ -503,9 +443,9 @@ export function StaffPayrollProfilePage() {
       <div
         className="
           mx-auto
-          mt-6
+          mt-2
           max-w-xl
-          rounded-[24px]
+          rounded-[20px]
           border
           border-destructive/15
           bg-card
@@ -552,7 +492,7 @@ export function StaffPayrollProfilePage() {
 
   /* ============================================================
      DATA
-     ============================================================ */
+  ============================================================ */
 
   const staff =
     staffQuery.data;
@@ -572,30 +512,34 @@ export function StaffPayrollProfilePage() {
 
   /* ============================================================
      PAYROLL PREVIEW
-     ============================================================ */
+  ============================================================ */
 
- async function handlePreview() {
-  if (staffId === undefined) {
-    return;
+  async function handlePreview() {
+    if (
+      staffId === undefined
+    ) {
+      return;
+    }
+
+    const now = new Date();
+
+    const result =
+      await previewMutation.mutateAsync(
+        {
+          staff_id: staffId,
+          year: now.getFullYear(),
+          month: now.getMonth() + 1,
+        },
+      );
+
+    setPreview(
+      result.data,
+    );
   }
-
-  const now = new Date();
-
-  const result =
-    await previewMutation.mutateAsync({
-      staff_id: staffId,
-
-      year: now.getFullYear(),
-
-      month: now.getMonth() + 1,
-    });
-
-  setPreview(result.data);
-}
 
   /* ============================================================
      CONTRACT ACTIONS
-     ============================================================ */
+  ============================================================ */
 
   function openCreateContract() {
     setEditingContract(
@@ -620,7 +564,9 @@ export function StaffPayrollProfilePage() {
   }
 
   async function confirmDeleteContract() {
-    if (!deleteContract) {
+    if (
+      !deleteContract
+    ) {
       return;
     }
 
@@ -635,7 +581,7 @@ export function StaffPayrollProfilePage() {
 
   /* ============================================================
      GENERATE PAYROLL
-     ============================================================ */
+  ============================================================ */
 
   function handleGeneratePayroll() {
     setPreview(
@@ -649,7 +595,7 @@ export function StaffPayrollProfilePage() {
 
   /* ============================================================
      PAYROLL SELECT
-     ============================================================ */
+  ============================================================ */
 
   function handleSelectPayroll(
     payroll: Payroll,
@@ -661,85 +607,17 @@ export function StaffPayrollProfilePage() {
 
   /* ============================================================
      RENDER
-     ============================================================ */
+  ============================================================ */
 
   return (
     <div
       className="
-        space-y-4
+        space-y-3
         pb-8
-        pt-2
-        sm:pt-3
-        lg:pt-4
+        pt-0
+        sm:space-y-4
       "
     >
-      {/* PROFILE HEADER */}
-
-      <header
-        className="
-          flex
-          items-center
-          gap-1.5
-        "
-      >
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          className="
-            size-7
-            shrink-0
-            rounded-lg
-            p-0
-            text-muted-foreground
-            hover:bg-muted/60
-            hover:text-foreground
-          "
-          onClick={() =>
-            navigate(
-              "/finance/staff",
-            )
-          }
-        >
-          <ArrowLeft
-            className="
-              size-3.5
-              rtl:rotate-180
-            "
-          />
-        </Button>
-
-        <div
-          className="
-            min-w-0
-            -translate-y-px
-          "
-        >
-          <h1
-            className="
-              text-[14px]
-              font-semibold
-              leading-5
-              text-foreground
-            "
-          >
-            Employee payroll
-          </h1>
-
-          <p
-            className="
-              text-[10px]
-              leading-4
-              text-muted-foreground
-            "
-          >
-            Financial contract and payroll history
-          </p>
-        </div>
-      </header>
-
-      {/* FINANCIAL CONTRACT */}
-
       <ContractsTable
         contracts={
           contracts
@@ -765,9 +643,12 @@ export function StaffPayrollProfilePage() {
         staff={
           staff
         }
+        onBack={() =>
+          navigate(
+            "/finance/staff",
+          )
+        }
       />
-
-      {/* PAYROLL */}
 
       <PayrollTable
         payrolls={
@@ -790,8 +671,6 @@ export function StaffPayrollProfilePage() {
         }
       />
 
-      {/* CONTRACT DIALOG */}
-
       <ContractDialog
         open={
           contractDialogOpen
@@ -812,8 +691,6 @@ export function StaffPayrollProfilePage() {
           );
         }}
       />
-
-      {/* DELETE CONTRACT */}
 
       <ConfirmDialog
         open={
@@ -837,8 +714,6 @@ export function StaffPayrollProfilePage() {
           confirmDeleteContract
         }
       />
-
-      {/* PAYROLL PREVIEW */}
 
       <PayrollPreviewDialog
         open={
@@ -880,8 +755,6 @@ export function StaffPayrollProfilePage() {
           void payrollQuery.refetch();
         }}
       />
-
-      {/* PAYROLL DETAIL */}
 
       <PayrollDetailDialog
         payrollId={

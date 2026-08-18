@@ -40,6 +40,10 @@ type Props = {
   installmentPolicies: Option[];
   isLoading?: boolean;
   onSubmit: (values: ContractFormValues) => void;
+  /** Profile mode: student and academic year are resolved in the background. */
+  profileMode?: boolean;
+  backgroundStudentId?: number | string;
+  backgroundAcademicYearId?: number | string;
 };
 
 export function FinalizeContractDialog({
@@ -50,6 +54,9 @@ export function FinalizeContractDialog({
   installmentPolicies,
   onSubmit,
   isLoading,
+  profileMode = false,
+  backgroundStudentId,
+  backgroundAcademicYearId,
 }: Props) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -59,11 +66,12 @@ export function FinalizeContractDialog({
           <div className="pointer-events-none absolute -left-24 top-20 h-40 w-40 rounded-full bg-info/[0.06] blur-3xl" />
           <DialogHeader className="relative text-start">
             <DialogTitle className="text-[19px] font-semibold tracking-[-0.025em] text-foreground/92">
-              New financial contract
+              Add financial contract
             </DialogTitle>
             <DialogDescription className="mt-1 max-w-xl text-[12px] leading-5 text-muted-foreground/75">
-              Set the student's fee plan, payment policy and optional services.
-              The active enrollment supplies the academic year automatically.
+              {profileMode
+                ? "Choose the fee plan and installment policy. Student and academic year are resolved automatically."
+                : "Set the student's fee plan, payment policy and optional services. The active enrollment supplies the academic year automatically."}
             </DialogDescription>
           </DialogHeader>
         </div>
@@ -73,20 +81,29 @@ export function FinalizeContractDialog({
             students={students}
             lockStudent={students.length === 1}
             defaultValues={
-              students.length === 1
+              profileMode
                 ? {
-                    studentId: Number(students[0].id),
-                    academicYearId: 0,
+                    studentId: Number(backgroundStudentId ?? students[0]?.id ?? 0),
+                    academicYearId: Number(backgroundAcademicYearId ?? 0),
                     feePlanId: 0,
                     installmentPolicyId: 0,
                     selectedExtraServiceIds: [],
                   }
-                : undefined
+                : students.length === 1
+                  ? {
+                      studentId: Number(students[0].id),
+                      academicYearId: 0,
+                      feePlanId: 0,
+                      installmentPolicyId: 0,
+                      selectedExtraServiceIds: [],
+                    }
+                  : undefined
             }
             feePlans={feePlans}
             installmentPolicies={installmentPolicies}
             isLoading={isLoading}
             onSubmit={onSubmit}
+            profileMode={profileMode}
           />
         </div>
       </DialogContent>
@@ -117,6 +134,7 @@ type ContractFormProps = {
   defaultValues?: ContractFormValues;
   onSubmit: (values: ContractFormValues) => void;
   lockStudent?: boolean;
+  profileMode?: boolean;
 };
 
 export function ContractForm({
@@ -127,6 +145,7 @@ export function ContractForm({
   defaultValues,
   isLoading = false,
   lockStudent = false,
+  profileMode = false,
 }: ContractFormProps) {
   const {
     control,
@@ -212,7 +231,7 @@ export function ContractForm({
       className="space-y-5"
     >
       <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-        {!lockStudent ? (
+        {!lockStudent && !profileMode ? (
           <>
             <div className="space-y-2.5">
               <label className="text-[11.5px] font-semibold text-foreground/78">
@@ -358,7 +377,7 @@ export function ContractForm({
         </div>
       </div>
 
-      {currentFeePlan?.extraServices?.length ? (
+      {!profileMode && currentFeePlan?.extraServices?.length ? (
         <div className="space-y-3 rounded-[21px] border border-border/40 bg-muted/[0.14] p-4 shadow-[0_8px_24px_rgba(31,22,73,0.025)]">
           <h3 className="text-[11.5px] font-semibold text-foreground/78">
             Optional Extra Services

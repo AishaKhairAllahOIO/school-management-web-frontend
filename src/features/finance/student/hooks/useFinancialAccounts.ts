@@ -17,7 +17,7 @@ export const financeAccountsKeys = {
   all: ["financial-accounts"] as const,
 
   student: (studentId: string | number) =>
-    ["financial-account", studentId] as const,
+    ["financial-accounts", "student", studentId] as const,
 };
 
 function getErrorMessage(
