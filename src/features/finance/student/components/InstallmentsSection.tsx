@@ -1,23 +1,27 @@
-import { useMemo } from "react";
+import { useState } from "react";
 import {
   CalendarClock,
   CalendarDays,
   CheckCircle2,
   CircleDollarSign,
   Clock3,
-  RefreshCw,
   Wallet,
 } from "lucide-react";
 
-import { Button } from "@/shared/ui/button";
-import { useFinanceInstallments } from "../hooks/useInstallments";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/shared/ui/dialog";
+import { useFinanceInstallment } from "../hooks/useInstallments";
 import type { Installment } from "../types/finance.types";
 import { FinanceSectionShell } from "./FinanceSectionShell";
 import { FinanceTableSkeleton } from "./FinanceTableSkeleton";
 
 type InstallmentsSectionProps = {
-  studentId?: string | number;
-  installments?: Installment[];
+  installments: Installment[];
   title?: string;
   description?: string;
 };
@@ -108,7 +112,13 @@ function ProgressBar({ paid, due }: { paid: number; due: number }) {
   );
 }
 
-function InstallmentsTable({ installments }: { installments: Installment[] }) {
+function InstallmentsTable({
+  installments,
+  onSelect,
+}: {
+  installments: Installment[];
+  onSelect: (item: Installment) => void;
+}) {
   if (!installments.length) {
     return (
       <div className="rounded-[20px] border border-dashed border-border/55 bg-card px-6 py-14 text-center">
@@ -174,13 +184,21 @@ function InstallmentsTable({ installments }: { installments: Installment[] }) {
               return (
                 <tr
                   key={item.id}
+                  onClick={() => onSelect(item)}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      onSelect(item);
+                    }
+                  }}
                   className={[
                     "border-b border-border/30",
                     "transition-colors last:border-b-0",
                     "hover:bg-primary/[0.018]",
                   ].join(" ")}
                 >
-                  {/* INSTALLMENT */}
                   <td className="px-5 py-4">
                     <div className="flex items-center gap-3">
                       <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[11px] bg-primary/[0.07] text-primary">
@@ -199,7 +217,6 @@ function InstallmentsTable({ installments }: { installments: Installment[] }) {
                     </div>
                   </td>
 
-                  {/* AMOUNT DUE */}
                   <td className="px-4 py-4">
                     <div className="flex items-center gap-2">
                       <CircleDollarSign
@@ -213,7 +230,6 @@ function InstallmentsTable({ installments }: { installments: Installment[] }) {
                     </div>
                   </td>
 
-                  {/* PAID */}
                   <td className="px-4 py-4">
                     <div className="flex items-center gap-2">
                       <CheckCircle2
@@ -227,7 +243,6 @@ function InstallmentsTable({ installments }: { installments: Installment[] }) {
                     </div>
                   </td>
 
-                  {/* REMAINING */}
                   <td className="px-4 py-4">
                     <span
                       className={[
@@ -239,12 +254,10 @@ function InstallmentsTable({ installments }: { installments: Installment[] }) {
                     </span>
                   </td>
 
-                  {/* PROGRESS */}
                   <td className="px-4 py-4">
                     <ProgressBar paid={amountPaid} due={amountDue} />
                   </td>
 
-                  {/* DUE DATE */}
                   <td className="px-4 py-4">
                     <div className="flex items-center gap-2">
                       <CalendarDays
@@ -258,7 +271,6 @@ function InstallmentsTable({ installments }: { installments: Installment[] }) {
                     </div>
                   </td>
 
-                  {/* STATUS */}
                   <td className="px-5 py-4">
                     <InstallmentStatus item={item} />
                   </td>
@@ -273,67 +285,23 @@ function InstallmentsTable({ installments }: { installments: Installment[] }) {
 }
 
 export function InstallmentsSection({
-  installments: providedInstallments,
+  installments,
   title = "Installment Schedule",
   description = "Track what is due, what has been paid, and what remains.",
-}: InstallmentsSectionProps = {}) {
-  const {
-    data: queriedInstallments = [],
-    isLoading,
-    isError,
-    refetch,
-  } = useFinanceInstallments();
+}: InstallmentsSectionProps) {
+  const [selectedInstallmentId, setSelectedInstallmentId] = useState<
+    string | number | undefined
+  >(undefined);
 
-  const installments = useMemo(() => {
-    if (!providedInstallments?.length) {
-      return queriedInstallments;
-    }
-
-    // The account response already gives us the exact installment ids for this
-    // student. API #5 is still the source used by this table; we narrow its
-    // global result to those ids so another student's installments can never
-    // leak into the profile.
-    const accountInstallmentIds = new Set(
-      providedInstallments.map((item) => String(item.id)),
+  const installmentDetailQuery = useFinanceInstallment(
+    selectedInstallmentId,
+    selectedInstallmentId !== undefined,
+  );
+  const selectedInstallment =
+    installmentDetailQuery.data ??
+    installments.find(
+      (item) => String(item.id) === String(selectedInstallmentId),
     );
-
-    const matched = queriedInstallments.filter((item) =>
-      accountInstallmentIds.has(String(item.id)),
-    );
-
-    return matched.length || queriedInstallments.length === 0
-      ? matched
-      : providedInstallments;
-  }, [providedInstallments, queriedInstallments]);
-
-  if (isLoading && !providedInstallments?.length) {
-    return <FinanceTableSkeleton />;
-  }
-
-  if (isError && !providedInstallments?.length) {
-    return (
-      <FinanceSectionShell
-        title={title}
-        description={description}
-        icon={CalendarDays}
-      >
-        <div className="rounded-[18px] border border-destructive/15 bg-destructive/[0.035] px-5 py-8 text-center">
-          <p className="text-[12px] font-semibold text-destructive">
-            Installments could not be loaded.
-          </p>
-          <Button
-            type="button"
-            variant="outline"
-            className="mt-3 h-9 rounded-xl px-3 text-[11px]"
-            onClick={() => void refetch()}
-          >
-            <RefreshCw className="mr-1.5 h-3.5 w-3.5" />
-            Retry
-          </Button>
-        </div>
-      </FinanceSectionShell>
-    );
-  }
 
   return (
     <FinanceSectionShell
@@ -341,7 +309,67 @@ export function InstallmentsSection({
       description={description}
       icon={CalendarDays}
     >
-      <InstallmentsTable installments={installments} />
+      <InstallmentsTable
+        installments={installments}
+        onSelect={(item) => setSelectedInstallmentId(item.id)}
+      />
+
+      <Dialog
+        open={selectedInstallmentId !== undefined}
+        onOpenChange={(open) => {
+          if (!open) setSelectedInstallmentId(undefined);
+        }}
+      >
+        <DialogContent className="rounded-[24px] sm:max-w-[520px]">
+          <DialogHeader className="text-start">
+            <DialogTitle>Installment details</DialogTitle>
+            <DialogDescription>
+              Detailed data loaded from the installment endpoint.
+            </DialogDescription>
+          </DialogHeader>
+
+          {installmentDetailQuery.isLoading ? (
+            <FinanceTableSkeleton />
+          ) : selectedInstallment ? (
+            <div className="grid gap-3 sm:grid-cols-2">
+              {[
+                ["Title", selectedInstallment.title],
+                ["Installment", `#${selectedInstallment.installmentNumber}`],
+                ["Amount due", formatAmount(selectedInstallment.amountDue)],
+                ["Amount paid", formatAmount(selectedInstallment.amountPaid)],
+                [
+                  "Remaining",
+                  formatAmount(
+                    Math.max(
+                      0,
+                      Number(selectedInstallment.amountDue) -
+                        Number(selectedInstallment.amountPaid),
+                    ),
+                  ),
+                ],
+                ["Due date", formatDate(selectedInstallment.dueDate)],
+                ["Status", selectedInstallment.status],
+              ].map(([label, value]) => (
+                <div
+                  key={label}
+                  className="rounded-[15px] border border-border/45 bg-muted/[0.18] p-3"
+                >
+                  <p className="text-[10px] uppercase tracking-[0.06em] text-muted-foreground">
+                    {label}
+                  </p>
+                  <p className="mt-1 text-[13px] font-semibold capitalize">
+                    {value}
+                  </p>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-sm text-muted-foreground">
+              Installment details could not be loaded.
+            </p>
+          )}
+        </DialogContent>
+      </Dialog>
     </FinanceSectionShell>
   );
 }

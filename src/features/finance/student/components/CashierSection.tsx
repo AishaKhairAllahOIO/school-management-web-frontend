@@ -36,7 +36,10 @@ import {
   TableRow,
 } from "@/shared/ui/table";
 import { cn } from "@/shared/lib/utils";
-import { useFinancePayments } from "../hooks/usePayments";
+import {
+  useFinancePayment,
+  useFinancePayments,
+} from "../hooks/usePayments";
 import type { PaymentReceipt } from "../types/finance.types";
 import type { UpdatePaymentPayload } from "../types/finance.payloads";
 import {
@@ -640,6 +643,12 @@ export function UpdatePaymentDialog({
   isLoading,
   onSubmit,
 }: UpdatePaymentDialogProps) {
+  const paymentDetailQuery = useFinancePayment(
+    payment?.id,
+    open,
+  );
+  const paymentForForm = paymentDetailQuery.data ?? payment;
+
   const { control, handleSubmit, register, reset, watch } =
     useForm<UpdatePaymentPayload>({
       resolver: zodResolver(updatePaymentSchema) as any,
@@ -651,19 +660,19 @@ export function UpdatePaymentDialog({
     });
 
   useEffect(() => {
-    if (payment && open) {
+    if (paymentForForm && open) {
       reset({
-        paymentMethod: payment.paymentMethod,
-        paperReceiptNo: payment.paperReceiptNo || "",
-        digitalReference: payment.digitalReference || "",
+        paymentMethod: paymentForForm.paymentMethod,
+        paperReceiptNo: paymentForForm.paperReceiptNo || "",
+        digitalReference: paymentForForm.digitalReference || "",
       });
     }
-  }, [payment, open, reset]);
+  }, [paymentForForm, open, reset]);
 
   const selectedMethod = watch("paymentMethod");
 
   function handleFormSubmit(values: UpdatePaymentPayload) {
-    if (!payment) return;
+    if (!paymentForForm) return;
 
     const payload = {
       ...values,
@@ -671,7 +680,7 @@ export function UpdatePaymentDialog({
       digitalReference: values.digitalReference || null,
     };
 
-    onSubmit(payment.id, payload);
+    onSubmit(paymentForForm.id, payload);
   }
 
   return (
@@ -697,7 +706,7 @@ export function UpdatePaymentDialog({
               Receipt Amount:
             </span>
             <span className="text-lg font-bold text-primary">
-              {payment?.paidAmount?.toLocaleString()} $
+              {paymentForForm?.paidAmount?.toLocaleString()} $
             </span>
           </div>
 

@@ -31,11 +31,6 @@ type UpdateContractValues = {
   installmentPolicyId: number;
 };
 
-const updateContractSchema = z.object({
-  feePlanId: z.number().min(1, "Please select the installment amount."),
-  installmentPolicyId: z.number().min(1, "Please select the payment policy."),
-});
-
 type Props = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -46,7 +41,11 @@ type Props = {
   onSubmit: (
     accountId: string | number,
     studentId: string | number,
-    values: UpdateContractValues,
+    values: UpdateContractValues & {
+      studentId: number;
+      academicYearId: number;
+      selectedExtraServiceIds: null;
+    },
   ) => void;
 };
 
@@ -66,7 +65,12 @@ export function UpdateContractDialog({
     reset,
     formState: { errors },
   } = useForm<UpdateContractValues>({
-    resolver: zodResolver(updateContractSchema),
+    resolver: zodResolver(
+      z.object({
+        feePlanId: z.number().min(1, "Please select the installment amount."),
+        installmentPolicyId: z.number().min(1, "Please select the payment policy."),
+      })
+    ),
     defaultValues: {
       feePlanId: 0,
       installmentPolicyId: 0,
@@ -87,7 +91,14 @@ export function UpdateContractDialog({
 
   function submit(values: UpdateContractValues) {
     if (!account) return;
-    onSubmit(account.id, account.studentId, values);
+
+    // ✅ إرسال كل البيانات التي يطلبها الـ Backend
+    onSubmit(account.id, account.studentId, {
+      ...values,
+      studentId: Number(account.studentId),
+      academicYearId: Number(account.academicYearId),
+      selectedExtraServiceIds: null,
+    });
   }
 
   return (

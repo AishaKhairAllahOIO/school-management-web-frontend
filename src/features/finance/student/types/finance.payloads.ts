@@ -11,6 +11,7 @@ export type FinalizeContractPayload = {
 export type UpdateContractPayload = {
   feePlanId: number;
   installmentPolicyId: number;
+  selectedExtraServiceIds: number[] | null;
 };
 
 
