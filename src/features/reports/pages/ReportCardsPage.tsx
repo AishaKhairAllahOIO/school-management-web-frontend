@@ -9,7 +9,11 @@ import {
   CheckCircle2,
   XCircle,
   Loader2,
-  EyeOff
+  EyeOff,
+  Trophy,
+  ChevronLeft,
+  ChevronRight,
+  GraduationCap as CapIcon
 } from "lucide-react";
 
 import { 
@@ -20,8 +24,8 @@ import {
 } from "../hooks/useReportCards";
 import { PromoteStudentsDialog } from "../components/PromoteStudentsDialog";
 import { StudentReportCardModal } from "../components/StudentReportCardModal";
+import { TopStudentsModal } from "../components/TopStudentsModal";
 
-// استيراد هوكات الإعدادات (الفصول، الصفوف، والشعب)
 import { useAcademicTerms } from "../../settings/academic/hooks/useAcademicSettings.ts"; 
 import { useGrades } from "../../academics/grades/hooks/useGrades.ts"; 
 import { useClassrooms } from "../../academics/classrooms/hooks/useClassrooms.ts"; 
@@ -29,44 +33,52 @@ import { useClassrooms } from "../../academics/classrooms/hooks/useClassrooms.ts
 export function ReportCardsPage() {
   const queryClient = useQueryClient();
 
+  const [isTopModalOpen, setIsTopModalOpen] = useState(false);
   const [semesterId, setSemesterId] = useState<string>("");
-  const [gradeId, setGradeId] = useState<string>(""); // فلتر الصف
+  const [gradeId, setGradeId] = useState<string>(""); 
   const [classRoomId, setClassRoomId] = useState<string>("");
+  const [page, setPage] = useState<number>(1);
   const [isPromoteModalOpen, setIsPromoteModalOpen] = useState(false);
   
-  // تمرير كامل كائن الطالب للمودال مباشرة
   const [selectedStudentForModal, setSelectedStudentForModal] = useState<any | null>(null);
 
   const { data: terms, isLoading: isTermsLoading } = useAcademicTerms();
   const { data: grades, isLoading: isGradesLoading } = useGrades();
   const { data: classrooms, isLoading: isClassroomsLoading } = useClassrooms();
 
-  // تعيين الفصل الافتراضي
   useEffect(() => {
     if (terms && terms.length > 0 && !semesterId) {
       setSemesterId(String(terms[0].id));
     }
   }, [terms, semesterId]);
 
-  // تصفير الشعبة تلقائياً عند تغيير الصف المختار
   useEffect(() => {
     setClassRoomId("");
-  }, [gradeId]);
+    setPage(1);
+  }, [gradeId, semesterId]);
 
-  // فلترة الشعب لتتبع الصف المختار فقط (لمنع تكرار الشعب)
   const filteredClassrooms = useMemo(() => {
     if (!classrooms) return [];
     if (!gradeId) return classrooms;
-    return classrooms.filter((room: any) => String(room.gradeId) === String(gradeId));
+    return classrooms.filter((room: any) => String(room.grade_id || room.gradeId) === String(gradeId));
   }, [classrooms, gradeId]);
 
+  const effectiveGradeId = gradeId === "" ? undefined : gradeId;
   const effectiveClassRoomId = classRoomId === "" ? undefined : classRoomId;
 
-  // جلب الجلاءات
-  const { data: reportCards, isLoading: isReportCardsLoading, isFetching } = useReportCards(
+  const { data: reportCardsData, isLoading: isReportCardsLoading, isFetching } = useReportCards(
     semesterId, 
-    effectiveClassRoomId
+    effectiveGradeId,
+    effectiveClassRoomId,
+    page
   );
+
+  const reportCards = Array.isArray(reportCardsData) ? reportCardsData : (reportCardsData?.data || []);
+  const meta = reportCardsData?.meta || reportCardsData || {};
+  const from = meta.from || (reportCards.length > 0 ? 1 : 0);
+  const to = meta.to || reportCards.length;
+  const total = meta.total || reportCards.length;
+  const lastPage = meta.last_page || 1;
 
   const generateMutation = useGenerateReportCards();
   const publishMutation = useTogglePublishReportCards();
@@ -84,10 +96,19 @@ export function ReportCardsPage() {
 
   const handlePublish = (isPublished: boolean) => {
     publishMutation.mutate(
-      { semester_id: semesterId, class_room_id: effectiveClassRoomId, is_published: isPublished },
+      { semester_id: semesterId, grade_id: effectiveGradeId, class_room_id: effectiveClassRoomId, is_published: isPublished },
       {
-        onSuccess: async () => {
-          await queryClient.invalidateQueries({ queryKey: reportCardKeys.all });
+        onSuccess: () => {
+          queryClient.setQueryData(reportCardKeys.list(semesterId, effectiveGradeId, effectiveClassRoomId, page), (oldData: any) => {
+            if (!oldData) return oldData;
+            const updateList = (list: any[]) => list.map((s: any) => ({ ...s, is_published: isPublished }));
+            if (Array.isArray(oldData)) return updateList(oldData);
+            return {
+              ...oldData,
+              data: oldData.data ? updateList(oldData.data) : []
+            };
+          });
+          queryClient.invalidateQueries({ queryKey: reportCardKeys.all });
         }
       }
     );
@@ -95,17 +116,21 @@ export function ReportCardsPage() {
 
   const renderAcademicResult = (result: string) => {
     switch (result) {
-      case 'passed': return <span className="bg-success/10 text-success rounded-full px-2.5 py-0.5 text-[10.5px] font-semibold">Passed</span>;
-      case 'failed': return <span className="bg-destructive/10 text-destructive rounded-full px-2.5 py-0.5 text-[10.5px] font-semibold">Failed</span>;
-      case 'graduated': return <span className="bg-primary/10 text-primary rounded-full px-2.5 py-0.5 text-[10.5px] font-semibold">Graduated</span>;
-      default: return <span className="bg-muted text-muted-foreground rounded-full px-2.5 py-0.5 text-[10.5px] font-medium">N/A</span>;
+      case 'passed': 
+        return <span className="inline-flex items-center px-3 py-1 rounded-full text-[11.5px] font-semibold bg-success/10 text-success border border-success/20 shadow-2xs">Passed</span>;
+      case 'failed': 
+        return <span className="inline-flex items-center px-3 py-1 rounded-full text-[11.5px] font-semibold bg-destructive/10 text-destructive border border-destructive/20 shadow-2xs">Failed</span>;
+      case 'graduated': 
+        return <span className="inline-flex items-center px-3 py-1 rounded-full text-[11.5px] font-semibold bg-primary/10 text-primary border border-primary/20 shadow-2xs">Graduated</span>;
+      default: 
+        return <span className="inline-flex items-center px-3 py-1 rounded-full text-[11.5px] font-semibold bg-muted text-muted-foreground border border-border shadow-2xs">N/A</span>;
     }
   };
 
   const renderFinancialStatus = (status: string) => {
     const isCleared = status === 'cleared';
     return (
-      <span className={`inline-flex items-center gap-1.5 text-[11px] font-medium ${isCleared ? 'text-success' : 'text-warning'}`}>
+      <span className={`inline-flex items-center gap-1.5 text-[12px] font-semibold ${isCleared ? 'text-warning dark:text-warning' : 'text-destructive dark:text-destructive'}`}>
         {isCleared ? <CheckCircle2 size={14} /> : <AlertCircle size={14} />}
         {isCleared ? 'Cleared' : 'Blocked'}
       </span>
@@ -115,66 +140,77 @@ export function ReportCardsPage() {
   const isLoading = isReportCardsLoading || isFetching || isTermsLoading || isClassroomsLoading || isGradesLoading;
 
   return (
-    <div className="space-y-5 animate-in fade-in duration-300">
-      <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between rounded-[22px] border border-border/60 bg-card p-5 shadow-[0_8px_28px_rgba(30,20,70,0.035)]">
-        <div className="flex items-center gap-3.5">
-          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[14px] border border-primary/10 bg-primary/[0.07] text-primary">
-            <FileCheck size={20} strokeWidth={1.8} />
+    <div className="space-y-6 pb-12 animate-in fade-in duration-300">
+      
+      {/* Header Section */}
+      <header className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between rounded-[24px] border border-border/70 bg-card p-6 shadow-sm backdrop-blur-xl">
+        <div className="flex items-center gap-4">
+          <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[16px] border border-primary/20 bg-primary/10 text-primary shadow-xs">
+            <FileCheck size={22} strokeWidth={2} />
           </span>
           <div>
-            <h1 className="text-[17px] font-semibold tracking-[-0.015em] text-foreground">Report Cards & Results</h1>
-            <p className="mt-1 text-[11.5px] text-muted-foreground">Generate, publish, and manage annual student promotions.</p>
+            <h1 className="text-[18px] font-extrabold tracking-tight text-foreground">Report Cards & Results</h1>
+            <p className="mt-0.5 text-[12px] text-muted-foreground font-medium">Generate, publish, and manage annual student promotions seamlessly.</p>
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2.5">
+        {/* Action Buttons */}
+        <div className="flex flex-wrap items-center gap-3">
           <button
             onClick={handleGenerate}
             disabled={generateMutation.isPending || !semesterId}
-            className="inline-flex h-9 items-center justify-center gap-2 rounded-[12px] border border-border/65 bg-background px-4 text-[11.5px] font-semibold text-foreground transition-colors hover:bg-muted/50 disabled:opacity-50"
+            className="inline-flex h-10 items-center justify-center gap-2 rounded-[14px] border border-border/80 bg-background px-4 text-[12px] font-semibold text-foreground transition-all hover:bg-muted/60 disabled:opacity-50 shadow-2xs"
           >
-            {generateMutation.isPending ? <Loader2 size={15} className="animate-spin" /> : <Settings size={15} />}
+            {generateMutation.isPending ? <Loader2 size={16} className="animate-spin text-primary" /> : <Settings size={16} className="text-muted-foreground" />}
             Generate Cards
           </button>
 
-          <div className="flex items-center overflow-hidden rounded-[12px] border border-primary/20 bg-primary/5 p-0.5">
+          <button
+            onClick={() => setIsPromoteModalOpen(true)}
+            className="inline-flex h-10 items-center justify-center gap-2 rounded-[14px] border border-border/80 bg-background px-4 text-[12px] font-semibold text-foreground transition-all hover:bg-muted/60 shadow-2xs"
+          >
+            <GraduationCap size={16} className="text-muted-foreground" />
+            Annual Promotion
+          </button>
+
+          <div className="flex items-center overflow-hidden rounded-[14px] border border-primary/20 bg-primary/5 p-0.5 shadow-2xs">
             <button
               onClick={() => handlePublish(true)}
               disabled={publishMutation.isPending || !semesterId}
-              className="inline-flex h-8 items-center justify-center gap-1.5 rounded-[10px] bg-primary px-4 text-[11px] font-semibold text-primary-foreground shadow-sm transition hover:bg-primary/90 disabled:opacity-50"
+              className="inline-flex h-9 items-center justify-center gap-1.5 rounded-[12px] bg-primary px-4 text-[11.5px] font-semibold text-primary-foreground transition hover:bg-primary/90 disabled:opacity-50 shadow-xs"
             >
-              {publishMutation.isPending ? <Loader2 size={14} className="animate-spin" /> : <Send size={14} />}
+              {publishMutation.isPending ? <Loader2 size={15} className="animate-spin" /> : <Send size={15} />}
               Publish
             </button>
             <button
               onClick={() => handlePublish(false)}
               disabled={publishMutation.isPending || !semesterId}
-              className="inline-flex h-8 items-center justify-center gap-1.5 rounded-[10px] px-3 text-[11px] font-semibold text-primary transition hover:bg-primary/15 disabled:opacity-50"
+              className="inline-flex h-9 items-center justify-center gap-1.5 rounded-[12px] px-3 text-[11.5px] font-semibold text-primary transition hover:bg-primary/15 disabled:opacity-50"
               title="Unpublish (Hide)"
             >
-              <EyeOff size={14} />
+              <EyeOff size={15} />
             </button>
           </div>
 
-          <button
-            onClick={() => setIsPromoteModalOpen(true)}
-            className="inline-flex h-9 items-center justify-center gap-2 rounded-[12px] bg-warning/10 px-4 text-[11.5px] font-semibold text-warning transition hover:bg-warning/20"
+          <button 
+           onClick={() => setIsTopModalOpen(true)}
+           className="inline-flex h-10 items-center justify-center gap-2 rounded-[14px] bg-primary px-5 text-[12px] font-semibold text-primary-foreground shadow-sm hover:bg-primary/90 transition-all"
           >
-            <GraduationCap size={15} />
-            Annual Promotion
+           <Trophy size={16} />
+            Top 10 Students
           </button>
         </div>
       </header>
 
-      {/* Filters */}
-      <section className="grid grid-cols-1 md:grid-cols-3 gap-4 rounded-[16px] border border-border/50 bg-card p-4 shadow-sm">
+      {/* Filters Section */}
+      <section className="grid grid-cols-1 md:grid-cols-3 gap-4 rounded-[20px] border border-border/70 bg-card p-5 shadow-2xs">
         <label className="flex flex-col">
-          <span className="text-[11px] font-medium text-muted-foreground mb-1.5 block">Semester</span>
+          <span className="text-[11.5px] font-bold text-muted-foreground mb-2 block">Semester</span>
           <select 
             value={semesterId} 
             onChange={(e) => setSemesterId(e.target.value)}
             disabled={isTermsLoading}
-            className="block h-9 w-full rounded-[10px] border border-border/65 bg-background/50 px-3 text-[12px] font-medium outline-none transition focus:border-primary/40 focus:ring-4 focus:ring-primary/5 disabled:opacity-50"
+            className="block h-11 w-full rounded-[14px] border border-border/80 bg-background px-4 text-[13px] font-medium text-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/10 disabled:opacity-50 cursor-pointer shadow-2xs"
           >
             {isTermsLoading ? (
               <option value="">Loading...</option>
@@ -189,12 +225,12 @@ export function ReportCardsPage() {
         </label>
         
         <label className="flex flex-col">
-          <span className="text-[11px] font-medium text-muted-foreground mb-1.5 block">Grade (Optional)</span>
+          <span className="text-[11.5px] font-bold text-muted-foreground mb-2 block">Grade (Optional)</span>
           <select 
             value={gradeId} 
             onChange={(e) => setGradeId(e.target.value)}
             disabled={isGradesLoading}
-            className="block h-9 w-full rounded-[10px] border border-border/65 bg-background/50 px-3 text-[12px] font-medium outline-none transition focus:border-primary/40 focus:ring-4 focus:ring-primary/5 disabled:opacity-50"
+            className="block h-11 w-full rounded-[14px] border border-border/80 bg-background px-4 text-[13px] font-medium text-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/10 disabled:opacity-50 cursor-pointer shadow-2xs"
           >
             <option value="">All Grades</option>
             {grades?.map((grade: any) => (
@@ -204,12 +240,12 @@ export function ReportCardsPage() {
         </label>
 
         <label className="flex flex-col">
-          <span className="text-[11px] font-medium text-muted-foreground mb-1.5 block">Classroom (Optional)</span>
+          <span className="text-[11.5px] font-bold text-muted-foreground mb-2 block">Classroom (Optional)</span>
           <select 
             value={classRoomId} 
             onChange={(e) => setClassRoomId(e.target.value)}
-            disabled={isClassroomsLoading || (gradeId === "" && filteredClassrooms.length === 0)}
-            className="block h-9 w-full rounded-[10px] border border-border/65 bg-background/50 px-3 text-[12px] font-medium outline-none transition focus:border-primary/40 focus:ring-4 focus:ring-primary/5 disabled:opacity-50"
+            disabled={isClassroomsLoading || (gradeId !== "" && filteredClassrooms.length === 0)}
+            className="block h-11 w-full rounded-[14px] border border-border/80 bg-background px-4 text-[13px] font-medium text-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/10 disabled:opacity-50 cursor-pointer shadow-2xs"
           >
             <option value="">All Classrooms</option>
             {filteredClassrooms?.map((room: any) => (
@@ -221,31 +257,32 @@ export function ReportCardsPage() {
         </label>
       </section>
 
-      <section className="overflow-hidden rounded-[22px] border border-border/60 bg-card shadow-[0_8px_28px_rgba(30,20,70,0.035)]">
+      {/* Table Section */}
+      <section className="overflow-hidden rounded-[24px] border border-border/70 bg-card shadow-sm">
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[700px] text-start">
+          <table className="w-full min-w-[750px] text-left border-collapse">
             <thead>
-              <tr className="border-b border-border/45 bg-muted/20">
-                <th className="px-5 py-3.5 text-start text-[10.5px] font-semibold text-muted-foreground uppercase tracking-wider">Student Name</th>
-                <th className="px-5 py-3.5 text-start text-[10.5px] font-semibold text-muted-foreground uppercase tracking-wider">Total Marks</th>
-                <th className="px-5 py-3.5 text-start text-[10.5px] font-semibold text-muted-foreground uppercase tracking-wider">GPA</th>
-                <th className="px-5 py-3.5 text-start text-[10.5px] font-semibold text-muted-foreground uppercase tracking-wider">Result</th>
-                <th className="px-5 py-3.5 text-start text-[10.5px] font-semibold text-muted-foreground uppercase tracking-wider">Financial Status</th>
-                <th className="px-5 py-3.5 text-start text-[10.5px] font-semibold text-muted-foreground uppercase tracking-wider">Publish Status</th>
+              <tr className="border-b border-border/60 bg-muted/40">
+                <th className="px-6 py-4 text-[11.5px] font-extrabold text-muted-foreground uppercase tracking-wider">Student Name</th>
+                <th className="px-6 py-4 text-[11.5px] font-extrabold text-muted-foreground uppercase tracking-wider">Total Marks</th>
+                <th className="px-6 py-4 text-[11.5px] font-extrabold text-muted-foreground uppercase tracking-wider">GPA</th>
+                <th className="px-6 py-4 text-[11.5px] font-extrabold text-muted-foreground uppercase tracking-wider">Result</th>
+                <th className="px-6 py-4 text-[11.5px] font-extrabold text-muted-foreground uppercase tracking-wider">Financial Status</th>
+                <th className="px-6 py-4 text-[11.5px] font-extrabold text-muted-foreground uppercase tracking-wider">Publish Status</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-border/40">
+            <tbody className="divide-y divide-border/50">
               {isLoading || generateMutation.isPending ? (
                 <tr>
-                  <td colSpan={6} className="p-12 text-center text-[13px] text-muted-foreground">
-                    <Loader2 className="mx-auto h-6 w-6 animate-spin mb-3 text-primary/60" />
-                    {generateMutation.isPending ? "Generating..." : "Loading data..."}
+                  <td colSpan={6} className="p-16 text-center text-[13px] text-muted-foreground font-medium">
+                    <Loader2 className="mx-auto h-7 w-7 animate-spin mb-3 text-primary" />
+                    {generateMutation.isPending ? "Generating report cards in background..." : "Loading report cards..."}
                   </td>
                 </tr>
               ) : !Array.isArray(reportCards) || reportCards.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="p-12 text-center text-[13px] text-muted-foreground">
-                    <FileCheck className="mx-auto h-8 w-8 mb-3 text-muted-foreground/50" />
+                  <td colSpan={6} className="p-16 text-center text-[13px] text-muted-foreground font-medium">
+                    <FileCheck className="mx-auto h-9 w-9 mb-3 text-muted-foreground/40" />
                     No report cards available for the selected filters.
                   </td>
                 </tr>
@@ -254,15 +291,29 @@ export function ReportCardsPage() {
                   <tr 
                     key={student.student_id} 
                     onClick={() => setSelectedStudentForModal(student)}
-                    className="cursor-pointer transition-colors hover:bg-muted/15"
+                    className="cursor-pointer transition-colors hover:bg-muted/30 group"
                   >
-                    <td className="px-5 py-3.5 text-[12px] font-bold text-primary">{student.student_name}</td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-3">
+                        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary border border-primary/20 shadow-2xs">
+                          <CapIcon size={16} />
+                        </span>
+                        <div>
+                          <div className="text-[13px] font-bold text-foreground group-hover:text-primary transition-colors">
+                            {student.student_name}
+                          </div>
+                          <div className="text-[11px] text-muted-foreground font-medium">
+                            Active enrollment
+                          </div>
+                        </div>
+                      </div>
+                    </td>
                     
-                    <td className="px-5 py-3.5 text-[12px] text-muted-foreground">
+                    <td className="px-6 py-4 text-[13px] font-semibold text-muted-foreground">
                       {student.summary?.total_marks ?? student.total_marks ?? '0.00'}
                     </td>
                     
-                    <td className="px-5 py-3.5 text-[12px] font-bold text-foreground">
+                    <td className="px-6 py-4 text-[13px] font-bold text-foreground">
                       {typeof student.gpa === 'number' 
                         ? `${student.gpa.toFixed(1)}%` 
                         : student.summary?.total_marks && student.summary?.max_total_marks
@@ -270,17 +321,17 @@ export function ReportCardsPage() {
                           : '0.0%'}
                     </td>
                     
-                    <td className="px-5 py-3.5">
+                    <td className="px-6 py-4">
                       {renderAcademicResult(student.summary?.final_result ?? student.academic_result)}
                     </td>
 
-                    <td className="px-5 py-3.5">
+                    <td className="px-6 py-4">
                       {renderFinancialStatus(student.financial_status ?? 'cleared')}
                     </td>
 
-                    <td className="px-5 py-3.5">
-                      <span className={`inline-flex items-center gap-1.5 text-[11px] font-medium ${
-                        student.is_published ? 'text-primary' : 'text-muted-foreground'
+                    <td className="px-6 py-4">
+                      <span className={`inline-flex items-center gap-1.5 text-[12px] font-semibold ${
+                        student.is_published ? 'text-success' : 'text-muted-foreground'
                       }`}>
                         {student.is_published ? <CheckCircle2 size={14} /> : <XCircle size={14} />}
                         {student.is_published ? 'Published' : 'Hidden'}
@@ -292,13 +343,48 @@ export function ReportCardsPage() {
             </tbody>
           </table>
         </div>
+
+        {/* Pagination Bar */}
+        <div className="flex items-center justify-between px-6 py-4 border-t border-border/70 bg-card text-[12.5px] text-muted-foreground">
+          <div className="font-medium">
+            Showing <span className="font-bold text-foreground">{from}-{to}</span> of <span className="font-bold text-foreground">{total}</span>
+          </div>
+          
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setPage(p => Math.max(p - 1, 1))}
+              disabled={page === 1}
+              className="flex h-9 w-9 items-center justify-center rounded-full border border-border/80 bg-background hover:bg-muted/60 disabled:opacity-40 transition-colors shadow-2xs"
+            >
+              <ChevronLeft size={16} />
+            </button>
+
+            {/* تم تعديل لون الصفحة النشطة لتتوافق مع الـ Primary بدلاً من الوردي */}
+            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/90 text-primary-foreground font-bold shadow-xs text-[12px]">
+              {page}
+            </span>
+
+            <button
+              onClick={() => setPage(p => (p < lastPage ? p + 1 : p))}
+              disabled={page >= lastPage}
+              className="flex h-9 w-9 items-center justify-center rounded-full border border-border/80 bg-background hover:bg-muted/60 disabled:opacity-40 transition-colors shadow-2xs"
+            >
+              <ChevronRight size={16} />
+            </button>
+          </div>
+        </div>
       </section>
 
       {isPromoteModalOpen && (
         <PromoteStudentsDialog onClose={() => setIsPromoteModalOpen(false)} />
       )}
 
-      {/* المودال يتلقى بيانات الطالب مباشرة بدون أي API إضافي */}
+      <TopStudentsModal 
+        reportCards={Array.isArray(reportCards) ? reportCards : []} 
+        isOpen={isTopModalOpen} 
+        onClose={() => setIsTopModalOpen(false)} 
+      />
+
       <StudentReportCardModal 
         student={selectedStudentForModal}
         isOpen={!!selectedStudentForModal}
