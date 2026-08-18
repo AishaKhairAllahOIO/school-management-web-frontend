@@ -242,12 +242,14 @@ export const API_ENDPOINTS = {
   },
 
   ATTENDANCE: {
-    STUDENT_RECORDS: {
+   STUDENT_RECORDS: {
       FILTER: "/admin/attendance/filter",
       BULK: "/admin/attendance/bulk",
+      STORE: "/admin/attendance/record", // أضفناها لتكون خاصة بإنشاء سجل فردي إن وجد
       DETAILS: (id: string | number) => `/admin/attendance/getRecord/${id}`,
       UPDATE: (id: string | number) => `/admin/attendance/record/${id}`,
       DELETE: (id: string | number) => `/admin/attendance/record/${id}`,
+      HISTORY: (enrollmentId: ApiId) => `/admin/attendance/${enrollmentId}`,
     },
 
     STUDENT_SETTINGS: {
@@ -259,23 +261,23 @@ export const API_ENDPOINTS = {
       DELETE: (settingId: ApiId) => `/attendance-settings/${settingId}`,
     },
 
-    STAFF_RECORDS: {
+   STAFF_RECORDS: {
       FILTER: "/admin/staff/filter",
       CREATE: "/admin/staff-attendances",
       DETAILS: (id: string | number) => `/admin/staff-attendances/${id}`,
       UPDATE: (id: string | number) => `/admin/staff-attendances/${id}`,
       DELETE: (id: string | number) => `/admin/staff-attendances/${id}`,
-     // HISTORY: (id: string | number) => `/admin/staff-attendances/${id}`,
+      HISTORY: (staffId: string | number) => `/admin/staff-attendances/staff/${staffId}`,
+      STATS: (recordId: string | number) => `/admin/staff-attendances/${recordId}`,
     },
     STAFF_LEAVES: {
+      LIST_ALL: "/admin/staff-leaves/allRecords",
       CREATE: "/admin/staff-leaves",
-      GET_BY_STAFF: (staffId: string | number) =>
-        `/admin/staff-leaves/${staffId}`,
-      DETAILS: (leaveId: string | number) =>
-        `/admin/staff-leaves/${leaveId}/staff`,
-      UPDATE: (id: string | number) => `/admin/staff-leaves/${id}`,
-      DELETE: (id: string | number) => `/admin/staff-leaves/${id}`,
-    },
+      GET_BY_STAFF: (staffId: ApiId) => `/admin/staff-leaves/${staffId}`,
+      DETAILS: (leaveId: ApiId) => `/admin/staff-leaves/${leaveId}/staff`,
+      UPDATE: (id: ApiId) => `/admin/staff-leaves/${id}`,
+      DELETE: (id: ApiId) => `/admin/staff-leaves/${id}`,
+     },
   },
   LEAVE_TYPES: {
     LIST: "/admin/leave/leaves",

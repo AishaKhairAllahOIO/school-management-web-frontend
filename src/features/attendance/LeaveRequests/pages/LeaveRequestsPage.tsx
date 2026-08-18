@@ -2,16 +2,16 @@ import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { axiosClient } from "@/services/axios/axiosClient";
 
-import { useStaffLeaves } from "../hooks/useStaffLeaves";
+import { useAllStaffLeaves } from "../hooks/useStaffLeaves";
 import { LeaveFilters } from "../components/LeaveFilters";
 import { LeaveRequestsTable } from "../components/LeaveRequestsTable";
+import { LeaveStats } from "../components/LeaveStats";
 import { AddLeaveDialog } from "../components/AddLeaveDialog";
-import type { StaffLeave } from "../../staff/types/staffAttendance.types";
+import type { StaffLeaveRecord } from "../types/staffLeave.types";
 
 export const LeaveRequestsPage = () => {
-  const { data: leavesData = [], isLoading: isLeavesLoading } = useStaffLeaves();
+  const { data: leavesData = [], isLoading: isLeavesLoading } = useAllStaffLeaves();
 
-  // 👈 استعلام جلب الموظفين مع معالجة كافة احتمالات هيكلة الرد من الـ API
   const { data: realStaffList = [] } = useQuery({
     queryKey: ['real-staff-list'],
     queryFn: async () => {
@@ -41,32 +41,52 @@ export const LeaveRequestsPage = () => {
 
   const filteredData = useMemo(() => {
     const safeData = Array.isArray(leavesData) ? leavesData : [];
-    return safeData.filter((leave: StaffLeave) => {
-      const typeName = leave.leave_type?.name || "";
-      const matchesSearch = 
-        String(leave.staff_id).toLowerCase().includes(search.toLowerCase()) ||
-        typeName.toLowerCase().includes(search.toLowerCase());
-      const matchesType = leaveType === "all" || String(leave.leave_type?.id) === leaveType;
+    return safeData.filter((leave: StaffLeaveRecord) => {
+      // البحث بالـ ID مؤقتاً أو يمكنك توسيعه ليبحث بالاسم لو أردت
+      const matchesSearch = String(leave.staff_id).toLowerCase().includes(search.toLowerCase());
+      const matchesType = leaveType === "all" || String(leave.leave_type_id || leave.leave_type?.id) === leaveType;
       return matchesSearch && matchesType;
     });
   }, [leavesData, search, leaveType]);
 
+  const stats = useMemo(() => {
+    const safeData = Array.isArray(leavesData) ? leavesData : [];
+    const total = safeData.length;
+    let pending = 0;
+    let approved = total; // كقيمة افتراضية
+    let rejected = 0;
+    
+    // إذا كان لديك حقل status في المستقبل
+    safeData.forEach((item: any) => {
+      if (item.status === "pending") pending++;
+      else if (item.status === "rejected") rejected++;
+    });
+
+    return { total, pending, approved, rejected };
+  }, [leavesData]);
+
   return (
-    <div className="space-y-6 pt-5">
+    <div className="space-y-6 pt-5 animate-in fade-in duration-300">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-foreground">
+          <h1 className="text-2xl font-extrabold tracking-tight text-foreground">
             Leave Requests
           </h1>
-          <p className="mt-1 text-sm text-muted-foreground">
+          <p className="mt-1 text-[13px] text-muted-foreground font-medium">
             Manage and register direct staff leaves.
           </p>
         </div>
-
         <AddLeaveDialog staffList={realStaffList} leaveTypes={realLeaveTypes} />
       </div>
 
-      <div className="rounded-[22px] border border-border/60 bg-card p-4 shadow-[0_10px_30px_rgba(30,20,70,0.045)]">
+      <LeaveStats 
+        total={stats.total} 
+        pending={stats.pending} 
+        approved={stats.approved} 
+        rejected={stats.rejected} 
+      />
+
+      <div className="rounded-[22px] border border-border/60 bg-card p-4 shadow-sm">
         <LeaveFilters
           search={search}
           setSearch={setSearch}
@@ -78,6 +98,8 @@ export const LeaveRequestsPage = () => {
 
       <LeaveRequestsTable
         data={filteredData}
+        staffList={realStaffList}
+        leaveTypes={realLeaveTypes}
         isLoading={isLeavesLoading}
       />
     </div>

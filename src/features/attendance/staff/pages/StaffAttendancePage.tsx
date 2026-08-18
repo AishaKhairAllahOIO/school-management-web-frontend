@@ -1,262 +1,201 @@
-import { CalendarCheck2, CalendarDays, Palmtree, Save, Search } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
-import { axiosClient } from "@/services/axios/axiosClient";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { AddLeaveDialog } from "../../LeaveRequests/components/AddLeaveDialog";
-import { LeaveRequestsTable } from "../../LeaveRequests/components/LeaveRequestsTable";
-import { useStaffLeaves } from "../../LeaveRequests/hooks/useStaffLeaves";
-import type { StaffLeave } from "../types/staffAttendance.types";
+import { CalendarDays, Save, Calendar, FileText } from "lucide-react";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/shared/ui/button";
 import { DatePicker } from "@/shared/ui/date-picker";
-import { Input } from "@/shared/ui/input";
-import { AttendanceStats } from "../components/AttendanceStats";
-import { AttendanceFilters } from "../components/StaffAttendanceFilters";
-import { StaffAttendanceTable } from "../components/StaffAttendanceTable";
-import { useStaffAttendance } from "../hooks/useStaffAttendance";
 
-import { useCreateStaffAttendance } from "../hooks/useCreateStaffAttendance";
-import { useUpdateStaffAttendance } from "../hooks/useUpdateStaffAttendance";
-import type { StaffDailyRosterRecord } from "../types/staffAttendance.types";
+import { 
+  useStaffAttendanceList,
+  useCreateStaffAttendance, 
+  useUpdateStaffAttendance, 
+  useDeleteStaffAttendance
+} from "../hooks/useStaffAttendance";
+
+import { useTeacherSchedule, useCurrentAcademicPeriod } from "@/features/scheduling/class-schedules/hooks/useSchedule";
+
+import { StaffAttendanceTable } from "../components/StaffAttendanceTable";
+import { StaffDetailsDialog } from "../components/StaffDetailsDialog";
 
 function todayForApi() {
   return new Date().toISOString().slice(0, 10);
 }
 
 export function StaffAttendancePage() {
-  const queryClient = useQueryClient();
-  const [draftDate, setDraftDate] = useState(todayForApi());
+  const navigate = useNavigate();
+  const [dateInput, setDateInput] = useState(todayForApi());
   const [selectedDate, setSelectedDate] = useState(todayForApi());
+  const [page, setPage] = useState(1);
+  const [pendingEdits, setPendingEdits] = useState<Record<number, any>>({});
+  const [selectedStaff, setSelectedStaff] = useState<any>(null);
+
+  const { academicYearId, semesterId } = useCurrentAcademicPeriod();
+  const { data: teacherSchedule } = useTeacherSchedule(academicYearId, semesterId);
+
+  const getDayName = (dateStr: string) => {
+    return new Date(dateStr).toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
+  };
+  const currentDay = getDayName(selectedDate);
+
+  const { data: rosterResult, isLoading: isRosterLoading } = useStaffAttendanceList(selectedDate, page);
   
-  const attendanceQuery = useStaffAttendance(selectedDate);
+  const safeRosterData = rosterResult?.data || [];
+  const paginationInfo = {
+    currentPage: rosterResult?.currentPage || 1,
+    lastPage: rosterResult?.lastPage || 1,
+    total: rosterResult?.total || 0,
+    from: rosterResult?.from || 0,
+    to: rosterResult?.to || 0,
+  };
 
-  const leaveQuery = useStaffLeaves();
-  
-  const createAttendanceMutation = useCreateStaffAttendance();
-  const updateAttendanceMutation = useUpdateStaffAttendance();
+  const createMutation = useCreateStaffAttendance();
+  const updateMutation = useUpdateStaffAttendance();
+  const deleteMutation = useDeleteStaffAttendance();
 
-  const { data: staffList = [] } = useQuery({
-    queryKey: ['real-staff-list-for-leave'],
-    queryFn: async () => {
-      const response = await axiosClient.get('/admin/staff/showAllStaff');
-      const data = response.data.data;
+  const handleUpdateLocal = (staffId: number, field: string, value: any) => {
+    setPendingEdits(prev => ({
+      ...prev,
+      [staffId]: {
+        ...prev[staffId],
+        [field]: value
+      }
+    }));
+  };
 
-      return Array.isArray(data) ? data : (data?.data || []);
-    }
-  });
+  const handleApplyDate = () => {
+    setSelectedDate(dateInput);
+    setPage(1);
+  };
 
- const { data: leaveTypes = [] } = useQuery({
-    queryKey: ['leave-types'],
-    queryFn: async () => {
-      const response = await axiosClient.get('/admin/leave/leaves');
-      const data = response.data;
-      
+  const handleBulkSave = async () => {
+    const promises = Object.entries(pendingEdits).map(async ([staffIdStr, edit]) => {
+      const staffId = Number(staffIdStr);
+      const existingRecord = safeRosterData.find((s: any) => s.id === staffId);
+      const recordId = existingRecord?.attendance?.id;
 
-      if (Array.isArray(data)) return data;
-      if (Array.isArray(data?.data)) return data.data;
-      if (Array.isArray(data?.data?.data)) return data.data.data;
-      return [];
-    }
-  });
+      const finalStatus = edit.status ?? (existingRecord?.attendance?.status || "present");
+      const finalAbsenceType = edit.absence_type ?? existingRecord?.attendance?.absence_type;
+      const finalPeriods = edit.missing_periods ?? existingRecord?.attendance?.missing_periods;
 
-  const [records, setRecords] = useState<StaffDailyRosterRecord[]>([]);
-  const [vacations, setVacations] = useState<StaffLeave[]>([]);
-  const [search, setSearch] = useState("");
-  const [role, setRole] = useState("all");
-  const [status, setStatus] = useState("all");
-  const [absenceType, setAbsenceType] = useState("all");
-  const [vacationSearch, setVacationSearch] = useState("");
-  
-  const [dirtyIds, setDirtyIds] = useState<Set<number>>(new Set());
-  const [savedAt, setSavedAt] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (attendanceQuery.data) {
-      setRecords(attendanceQuery.data);
-    }
-  }, [attendanceQuery.data]);
-
-  useEffect(() => {
-    if (leaveQuery.data) {
-      setVacations(leaveQuery.data);
-    }
-  }, [leaveQuery.data]);
-
-  const filteredAttendance = useMemo(() =>
-      records.filter((employee) => {
-        const normalizedSearch = search.trim().toLowerCase();
-        const staffName = `${employee.user?.first_name} ${employee.user?.last_name}`.toLowerCase();
-        const currentStatus = (employee.attendance?.status || "present").toLowerCase();
-        const currentAbsence = (employee.attendance?.absence_type || "none").toLowerCase();
-
-        return (
-          (!normalizedSearch || staffName.includes(normalizedSearch)) &&
-          (status === "all" || currentStatus === status.toLowerCase()) &&
-          (status !== "Absent" || absenceType === "all" || currentAbsence === absenceType.toLowerCase())
-        );
-      }),
-    [records, search, status, absenceType],
-  );
-
-  const filteredVacations = useMemo(() =>
-      vacations.filter((vacation) => {
-        const typeName = vacation.leave_type?.name || "";
-        const searchStr = vacationSearch.trim().toLowerCase();
-        return (
-          String(vacation.staff_id).toLowerCase().includes(searchStr) ||
-          typeName.toLowerCase().includes(searchStr)
-        );
-      }),
-    [vacationSearch, vacations],
-  );
-
-  const present = filteredAttendance.filter((item) => (item.attendance?.status || "present") === "present").length;
-  const absent = filteredAttendance.filter((item) => item.attendance?.status === "absent" || item.attendance?.status === "partial_absence").length;
-  const excused = filteredAttendance.filter((item) => item.attendance?.absence_type === "excused").length;
-  const unexcused = filteredAttendance.filter((item) => item.attendance?.absence_type === "unexcused").length;
-
-  const isInitialLoading = attendanceQuery.isLoading || (leaveQuery.isLoading && leaveQuery.data === undefined);
-
-  // تحديث محلي في المتصفح فقط
-  function updateRecord(staffId: number, patch: Partial<Pick<StaffDailyRosterRecord["attendance"], "status" | "absence_type">>) {
-    setRecords((current) =>
-      current.map((record) => {
-        if (record.id !== staffId) return record;
-        
-        return {
-          ...record,
-          attendance: {
-            ...record.attendance,
-            ...patch,
-          }
-        };
-      })
-    );
-    setDirtyIds((current) => new Set(current).add(staffId));
-    setSavedAt(null);
-  }
-
-  function applyDate() {
-    if (!draftDate) return;
-    setSelectedDate(draftDate);
-    setDirtyIds(new Set());
-    setSavedAt(null);
-  }
-
-
-  async function saveAttendance() {
-    if (dirtyIds.size === 0) return;
-
-    try {
-      for (const staffId of dirtyIds) {
-        const record = records.find((r) => r.id === staffId);
-        if (!record) continue;
-
-        const isPresent = record.attendance.status === "present";
-        const hasId = !!record.attendance.id;
-
-        if (hasId) {
-
-          await updateAttendanceMutation.mutateAsync({
-            id: record.attendance.id!,
-            payload: {
-              status: record.attendance.status,
-              absence_type: isPresent ? null : record.attendance.absence_type,
-            },
-          });
-        } else if (!hasId && !isPresent) {
-
-          await createAttendanceMutation.mutateAsync({
-            staff_id: record.id,
-            attendance_date: selectedDate,
-            status: record.attendance.status,
-            absence_type: record.attendance.absence_type,
-          });
-        }
+      if (finalStatus === "present") {
+        if (recordId) await deleteMutation.mutateAsync(recordId);
+        return; 
       }
 
-      setDirtyIds(new Set());
-      setSavedAt(new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }));
-      queryClient.invalidateQueries({ queryKey: ["staff-attendances"] });
+      const cleanMissingPeriods = finalStatus === "partial_absence" ? finalPeriods : undefined;
+
+      if (recordId) {
+        await updateMutation.mutateAsync({
+          id: recordId,
+          payload: { 
+            status: finalStatus, 
+            absence_type: finalStatus === "absent" ? finalAbsenceType : null, 
+            missing_periods: cleanMissingPeriods 
+          },
+        });
+      } else {
+        await createMutation.mutateAsync({
+          staff_id: staffId,
+          attendance_date: selectedDate,
+          status: finalStatus,
+          absence_type: finalStatus === "absent" ? (finalAbsenceType || "excused") : null,
+          missing_periods: cleanMissingPeriods,
+        });
+      }
+    });
+
+    try {
+      await Promise.all(promises);
+      setPendingEdits({});
     } catch (error) {
-      console.error("Failed to save attendance changes", error);
+      console.error("Failed to save some attendances");
     }
-  }
+  };
+
+  const hasUnsavedChanges = Object.keys(pendingEdits).length > 0;
 
   return (
-    <section className="space-y-4 pt-5">
-      <AttendanceStats present={present} absent={absent} excused={excused} unexcused={unexcused} isLoading={isInitialLoading} />
-
-      <div className="overflow-hidden rounded-[22px] border border-border/60 bg-card shadow-[0_10px_30px_rgba(30,20,70,0.045)]">
-        <div className="flex flex-col gap-4 px-4 py-4 lg:flex-row lg:items-center lg:justify-between">
-          <div className="flex min-w-0 items-center gap-3">
-            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[15px] border border-info/10 bg-info/[0.075] text-info">
-              <CalendarCheck2 className="h-[19px] w-[19px]" strokeWidth={1.8} />
-            </span>
-            <div className="min-w-0">
-              <div className="flex items-center gap-2">
-                <h2 className="text-[14px] font-semibold tracking-[-0.012em] text-foreground">
-                  Daily staff attendance date
-                </h2>
-                <span className="rounded-full bg-info/[0.065] px-2 py-0.5 text-[10px] font-medium text-info">
-                  Full staff table
-                </span>
-              </div>
-              <p className="mt-1 text-[11px] leading-4 text-muted-foreground">
-                Apply one working day to the live staff directory, then save all edited attendance rows together.
-              </p>
-            </div>
-          </div>
-
-          <div className="flex w-full flex-col gap-2 sm:flex-row lg:w-auto lg:items-end">
-            <DatePicker value={draftDate} onChange={setDraftDate} label="Attendance date" className="w-full sm:w-[228px]" />
-
-            <Button type="button" variant="outline" onClick={applyDate} disabled={!draftDate || draftDate === selectedDate} className="h-11 rounded-[13px] border-info/20 bg-transparent px-4 text-info hover:bg-info/[0.055]">
-              <CalendarDays className="h-4 w-4" /> Apply
-            </Button>
-
-            <Button type="button" onClick={saveAttendance} disabled={dirtyIds.size === 0 || updateAttendanceMutation.isPending || createAttendanceMutation.isPending} className="h-11 rounded-[13px] px-5">
-              <Save className="h-4 w-4" /> {(updateAttendanceMutation.isPending || createAttendanceMutation.isPending) ? "Saving..." : "Save"}
-            </Button>
+    <section className="space-y-5 pt-5 animate-in fade-in duration-300">
+      
+      <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between rounded-[22px] border border-border/70 bg-card p-5 shadow-sm">
+        
+        <div className="flex items-center gap-3">
+          <span className="flex h-11 w-11 items-center justify-center rounded-[14px] bg-violet-600/10 text-violet-700 border border-violet-600/25 shrink-0">
+            <CalendarDays className="h-5 w-5" />
+          </span>
+          <div>
+            <h2 className="text-[16px] font-extrabold tracking-tight text-foreground">Staff attendance</h2>
+            <p className="text-[12px] text-muted-foreground font-medium mt-0.5">Select date, apply, then save changes.</p>
           </div>
         </div>
 
-        <div className="border-t border-border/45 bg-muted/[0.10] p-4">
-          <AttendanceFilters
-            data={records as any} search={search} setSearch={setSearch} role={role} setRole={setRole} status={status} setStatus={setStatus} absenceType={absenceType} setAbsenceType={setAbsenceType}
+        {/* 🌟 محاذاة أفقية متطابقة تماماً لكل الأزرار */}
+        <div className="flex flex-wrap items-center gap-3 w-full xl:w-auto">
+          
+          <Button 
+            variant="outline" 
+            onClick={() => navigate('/attendance/staff-leaves')}            
+            className="h-10 px-4 rounded-[12px] border-border/70 text-foreground bg-background hover:bg-muted/50 font-semibold text-[13px]"
+          >
+            <FileText className="w-4 h-4 mr-1.5 text-primary" />
+            Manage Leaves
+          </Button>
+
+          <DatePicker 
+            value={dateInput} 
+            onChange={setDateInput} 
+            className="w-[160px] h-10 rounded-[12px]" 
           />
+
+          <Button 
+            variant="outline" 
+            onClick={handleApplyDate}
+            className="h-10 px-4 rounded-[12px] border-violet-600/30 text-violet-700 bg-violet-600/[0.04] hover:bg-violet-600/[0.1] font-semibold text-[13px]"
+          >
+            <Calendar className="w-4 h-4 mr-1.5" />
+            Apply
+          </Button>
+
+          <Button 
+            onClick={handleBulkSave} 
+            disabled={createMutation.isPending || updateMutation.isPending || !hasUpdatableChanges(hasUnsavedChanges)} 
+            className={`h-10 px-5 rounded-[12px] bg-violet-600 hover:bg-violet-700 text-white font-bold text-[13px] shadow-sm transition-opacity ${!hasUnsavedChanges ? 'opacity-60 cursor-not-allowed' : ''}`}
+          >
+            <Save className="w-4 h-4 mr-1.5" />
+            Save Changes
+          </Button>
         </div>
       </div>
 
-      {savedAt ? <p className="-mt-1 text-end text-[11px] font-medium text-success">Staff attendance changes saved at {savedAt}.</p> : null}
-
-      <div className="grid min-w-0 gap-4 xl:grid-cols-[minmax(0,2fr)_minmax(290px,1fr)]">
-        <div className="min-w-0">
-          <StaffAttendanceTable data={filteredAttendance} isLoading={isInitialLoading} onUpdate={updateRecord} />
+      {hasUnsavedChanges && (
+        <div className="flex items-center justify-between rounded-[18px] bg-warning/15 border border-warning/30 p-4 animate-in slide-in-from-top-2">
+          <p className="text-sm font-semibold text-warning-foreground">You have unsaved changes in the table.</p>
+          <Button variant="outline" size="sm" onClick={() => setPendingEdits({})} className="border-warning/50 hover:bg-warning/20">
+            Discard
+          </Button>
         </div>
+      )}
 
-        <aside className="min-w-0 self-start overflow-hidden rounded-[20px] border border-border/60 bg-card shadow-[0_8px_28px_rgba(30,20,70,0.04)]">
-          <div className="flex items-center justify-between gap-3 border-b border-border/50 px-4 py-3.5">
-            <div className="flex min-w-0 items-center gap-2.5">
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[12px] bg-warning/[0.10] text-warning">
-                <Palmtree className="h-[17px] w-[17px]" strokeWidth={1.75} />
-              </span>
-              <div className="min-w-0">
-                <h2 className="text-[15px] font-semibold tracking-[-0.015em] text-foreground">Vacation</h2>
-                <p className="mt-0.5 truncate text-[11px] text-muted-foreground">Search staff and add vacation directly.</p>
-              </div>
-            </div>
-            <AddLeaveDialog staffList={staffList} leaveTypes={leaveTypes} />
-          </div>
+      <StaffAttendanceTable 
+        data={safeRosterData} 
+        teacherSchedule={teacherSchedule}
+        currentDay={currentDay}
+        isLoading={isRosterLoading} 
+        pendingEdits={pendingEdits}
+        onUpdateLocal={handleUpdateLocal} 
+        onViewDetails={setSelectedStaff}
+        pagination={paginationInfo}
+        onPageChange={setPage}
+      />
 
-          <div className="border-b border-border/45 p-3.5">
-            <div className="relative">
-              <Search className="absolute start-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
-              <Input value={vacationSearch} onChange={(e) => setVacationSearch(e.target.value)} placeholder="Search staff vacation..." className="h-10 rounded-[12px] border-border/60 bg-background/80 ps-8 text-[11px] shadow-none" />
-            </div>
-          </div>
-          <LeaveRequestsTable data={filteredVacations} compact isLoading={isInitialLoading} />
-        </aside>
-      </div>
+      <StaffDetailsDialog 
+        open={!!selectedStaff} 
+        onOpenChange={(open) => !open && setSelectedStaff(null)} 
+        staff={selectedStaff}
+      />
     </section>
   );
+}
+
+function hasUpdatableChanges(val: boolean) {
+  return val;
 }

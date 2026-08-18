@@ -22,8 +22,8 @@ import {
   SelectValue,
 } from "@/shared/ui/select";
 
-import type { CreateStaffLeavePayload } from "../../staff/types/staffAttendance.types";
-import { useCreateStaffLeave } from "../hooks/useCreateStaffLeave";
+import type { CreateStaffLeavePayload } from "../types/staffLeave.types";
+import { useCreateStaffLeave } from "../hooks/useStaffLeaves";
 
 export type LeaveTypeOption = { id: number; name: string };
 export type StaffOption = any;

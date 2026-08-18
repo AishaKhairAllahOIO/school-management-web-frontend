@@ -5,6 +5,7 @@ import { StaffAttendanceHistoryPage } from "@/features/attendance/staff/pages/St
 import { StaffAttendancePage } from "@/features/attendance/staff/pages/StaffAttendancePage";
 import { StudentAttendanceHistoryPage } from "@/features/attendance/students/pages/StudentAttendanceHistoryPage";
 import { StudentAttendancePage } from "@/features/attendance/students/pages/StudentAttendancePage";
+import { LeaveRequestsPage } from "@/features/attendance/LeaveRequests/pages/LeaveRequestsPage";
 
 export const attendanceRoutes = [
   {
@@ -15,7 +16,7 @@ export const attendanceRoutes = [
       { path: "students/:studentId", element: <StudentAttendanceHistoryPage /> },
       { path: "staff", element: <StaffAttendancePage /> },
       { path: "staff/:employeeId", element: <StaffAttendanceHistoryPage /> },
-      { path: "vacations", element: <Navigate to="../staff" replace /> },
+      { path: "staff-leaves", element: <LeaveRequestsPage /> }, 
     ],
   },
 ] satisfies RouteObject[];

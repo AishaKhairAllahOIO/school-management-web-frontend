@@ -8,7 +8,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/shared/ui/dialog";
-import { useDeleteStaffLeave } from "../hooks/useDeleteStaffLeave";
+import { useDeleteStaffLeave } from "../hooks/useStaffLeaves";
 
 interface Props {
   leaveId: string | number;

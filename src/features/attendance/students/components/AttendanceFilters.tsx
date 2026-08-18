@@ -1,7 +1,5 @@
 import { Search } from "lucide-react";
-
 import { Input } from "@/shared/ui/input";
-
 import {
   Select,
   SelectContent,
@@ -13,28 +11,16 @@ import {
 type Props = {
   search: string;
   setSearch: (value: string) => void;
-
   gradeFilter: string;
   setGradeFilter: (value: string) => void;
-
   classroomFilter: string;
   setClassroomFilter: (value: string) => void;
-
   status: string;
   setStatus: (value: string) => void;
-
   absenceType: string;
   setAbsenceType: (value: string) => void;
-
-  grades?: {
-    id: string | number;
-    name: string;
-  }[];
-
-  classrooms?: {
-    id: string | number;
-    name: string;
-  }[];
+  grades?: { id: string | number; name: string }[];
+  classrooms?: { id: string | number; name: string }[];
 };
 
 export function AttendanceFilters({
@@ -51,17 +37,13 @@ export function AttendanceFilters({
   grades = [],
   classrooms = [],
 }: Props) {
-  const triggerClass =
-    "h-11 rounded-[13px] border-border/60 bg-background/80 text-[12px] shadow-none";
-
+  const triggerClass = "h-11 rounded-[13px] border-border/60 bg-background/80 text-[12px] shadow-none";
   const absenceTypeEnabled = status === "absent";
 
   return (
     <div className="grid gap-2.5 md:grid-cols-2 xl:grid-cols-[minmax(240px,1.35fr)_155px_165px_155px_170px]">
-      {/* Search */}
       <div className="relative min-w-0 md:col-span-2 xl:col-span-1">
         <Search className="absolute start-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-
         <Input
           value={search}
           onChange={(event) => setSearch(event.target.value)}
@@ -70,75 +52,58 @@ export function AttendanceFilters({
         />
       </div>
 
-      {/* Grade */}
       <Select
         value={gradeFilter}
         onValueChange={(value) => {
           setGradeFilter(value);
-          setClassroomFilter("all");
+          setClassroomFilter(""); 
         }}
       >
         <SelectTrigger className={triggerClass}>
-          <SelectValue placeholder="Grade" />
+          <SelectValue placeholder="Select Grade" />
         </SelectTrigger>
-
         <SelectContent>
           <SelectItem value="all">All grades</SelectItem>
-
           {grades.map((grade) => (
-            <SelectItem key={grade.id} value={String(grade.id)}>
+            <SelectItem key={String(grade.id)} value={String(grade.id)}>
               {grade.name}
             </SelectItem>
           ))}
         </SelectContent>
       </Select>
 
-      {/* Classroom */}
       <Select
         value={classroomFilter}
         onValueChange={setClassroomFilter}
-        disabled={gradeFilter === "all"}
+        disabled={gradeFilter === "all" || classrooms.length === 0}
       >
         <SelectTrigger
           className={[
             triggerClass,
-            gradeFilter === "all"
-              ? "cursor-not-allowed opacity-55"
-              : "",
+            gradeFilter === "all" || classrooms.length === 0 ? "cursor-not-allowed opacity-55" : "",
           ].join(" ")}
         >
-          <SelectValue placeholder="Classroom" />
+          <SelectValue placeholder={classrooms.length === 0 ? "No Classrooms" : "Select Classroom"} />
         </SelectTrigger>
-
         <SelectContent>
-          <SelectItem value="all">All classrooms</SelectItem>
-
           {classrooms.map((classroom) => (
-            <SelectItem
-              key={classroom.id}
-              value={String(classroom.id)}
-            >
+            <SelectItem key={String(classroom.id)} value={String(classroom.id)}>
               {classroom.name}
             </SelectItem>
           ))}
         </SelectContent>
       </Select>
 
-      {/* Attendance status */}
       <Select
         value={status}
         onValueChange={(value) => {
           setStatus(value);
-
-          if (value !== "absent") {
-            setAbsenceType("all");
-          }
+          if (value !== "absent") setAbsenceType("all");
         }}
       >
         <SelectTrigger className={triggerClass}>
           <SelectValue placeholder="Attendance" />
         </SelectTrigger>
-
         <SelectContent>
           <SelectItem value="all">All attendance</SelectItem>
           <SelectItem value="present">Present</SelectItem>
@@ -146,7 +111,6 @@ export function AttendanceFilters({
         </SelectContent>
       </Select>
 
-      {/* Absence type */}
       <Select
         value={absenceTypeEnabled ? absenceType : "all"}
         onValueChange={setAbsenceType}
@@ -155,14 +119,11 @@ export function AttendanceFilters({
         <SelectTrigger
           className={[
             triggerClass,
-            !absenceTypeEnabled
-              ? "cursor-not-allowed opacity-50"
-              : "",
+            !absenceTypeEnabled ? "cursor-not-allowed opacity-50" : "",
           ].join(" ")}
         >
           <SelectValue placeholder="Absence type" />
         </SelectTrigger>
-
         <SelectContent>
           <SelectItem value="all">All absence types</SelectItem>
           <SelectItem value="excused">Excused</SelectItem>

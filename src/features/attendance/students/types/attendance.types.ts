@@ -2,12 +2,12 @@ export type AttendanceStatus = "present" | "absent";
 
 export type AbsenceType = "excused" | "unexcused" | null;
 
+
 export interface AttendanceRecord {
-  id: number;
-  status: AttendanceStatus;
-  absence_type: AbsenceType;
-  notes?: string | null;
+  id: number | string; // إجباري وليس اختياري
   attendance_date: string;
+  status: AttendanceStatus;
+  absence_type?: AbsenceType | null;
 }
 
 export interface AttendanceSummary {

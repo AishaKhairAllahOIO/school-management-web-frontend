@@ -35,7 +35,7 @@ export function useTogglePublishReportCards() {
 
   return useMutation({
     mutationFn: reportCardsApi.togglePublish,
-    onSuccess: async (data, variables) => {
+    onSuccess: async (data) => {
       await queryClient.invalidateQueries({ queryKey: reportCardKeys.all });
       toast.success(data.message || "Publish status updated successfully.");
     },

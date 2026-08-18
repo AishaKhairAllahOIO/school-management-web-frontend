@@ -16,8 +16,8 @@ import {
   SelectValue,
 } from "@/shared/ui/select";
 import { Edit } from "lucide-react";
-import type { StaffAttendanceStatus, StaffAbsenceType } from "../types/staffAttendance.types";
-import { useUpdateStaffAttendance } from "../hooks/useUpdateStaffAttendance";
+import type { StaffAttendanceStatus , AbsenceType } from "../types/staffAttendance.types";
+import { useUpdateStaffAttendance } from "../hooks/useStaffAttendance";
 import { useState } from "react";
 
 interface AttendanceItem {
@@ -38,7 +38,7 @@ export const EditStaffAttendanceDialog = ({ attendance }: Props) => {
   const { handleSubmit, watch, setValue } = useForm({
     defaultValues: {
       status: (attendance.status || "present") as StaffAttendanceStatus,
-      absence_type: (attendance.absence_type || "") as StaffAbsenceType | "",
+      absence_type: (attendance.absence_type || "") as AbsenceType | "",
     },
   });
 
@@ -95,7 +95,7 @@ export const EditStaffAttendanceDialog = ({ attendance }: Props) => {
               <Label>Absence Type</Label>
               <Select
                 value={watch("absence_type")}
-                onValueChange={(value) => setValue("absence_type", value as StaffAbsenceType)}
+                onValueChange={(value) => setValue("absence_type", value as AbsenceType)}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select type" />
