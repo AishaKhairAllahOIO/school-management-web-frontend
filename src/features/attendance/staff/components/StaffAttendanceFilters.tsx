@@ -1,5 +1,4 @@
 import { Search } from "lucide-react";
-
 import { Input } from "@/shared/ui/input";
 import {
   Select,
@@ -9,10 +8,7 @@ import {
   SelectValue,
 } from "@/shared/ui/select";
 
-import type { StaffAttendanceStatus } from "../types/staffAttendance.types";
-
 type Props = {
-  data: StaffAttendanceStatus[];
   search: string;
   setSearch: (value: string) => void;
   role: string;
@@ -24,7 +20,6 @@ type Props = {
 };
 
 export function AttendanceFilters({
-  // data,
   search,
   setSearch,
   role,
@@ -34,9 +29,7 @@ export function AttendanceFilters({
   absenceType,
   setAbsenceType,
 }: Props) {
-  const controlClass =
-    "h-11 rounded-[13px] border-border/60 bg-background/80 text-[12px] shadow-none";
-  // const roles = [...new Set(data.map((item) => item.role))];
+  const controlClass = "h-11 rounded-[13px] border-border/60 bg-background/80 text-[12px] shadow-none";
   const absenceTypeEnabled = status === "Absent";
 
   return (
@@ -60,9 +53,6 @@ export function AttendanceFilters({
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="all">All staff types</SelectItem>
-          {/* {roles.map((item) => (
-            <SelectItem key={item} value={item}>{item}</SelectItem>
-          ))} */}
         </SelectContent>
       </Select>
 

@@ -1,222 +1,295 @@
-import { Eye, ChevronDown } from "lucide-react"; 
-import { Link } from "react-router-dom"; 
+import { Eye, ChevronLeft, ChevronRight } from "lucide-react"; 
 import { Button } from "@/shared/ui/button"; 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/ui/select"; 
 import { Popover, PopoverContent, PopoverTrigger } from "@/shared/ui/popover";
-import type { StaffAbsenceType, StaffDailyRosterRecord, StaffAttendanceStatus } from "../types/staffAttendance.types"; 
+import type { StaffDailyRosterRecord } from "../types/staffAttendance.types"; 
  
-type Props = { 
-  data: StaffDailyRosterRecord[]; 
-  isLoading?: boolean; 
-  onUpdate: ( 
-    staffId: number, 
-    patch: { status: StaffAttendanceStatus; absence_type?: StaffAbsenceType | null; missing_periods?: number[] }, 
-  ) => void; 
-}; 
- 
-const inlineControlClass = "h-9 w-full rounded-[11px] border-border/55 bg-background/80 text-[12px] shadow-none"; 
-const PERIODS = [1, 2, 3, 4, 5, 6, 7]; 
- 
-const extractStaffRole = (item: any): string => {
-
-  const directRole = item.role || item.user?.role || item.position || item.job_title;
-  if (directRole) {
-    if (Array.isArray(directRole)) return String(directRole[0] || "Staff");
-    if (typeof directRole === 'object') return String(directRole.name || directRole.title || "Staff");
-    return String(directRole);
-  }
-
-  // 2. فحص علاقة الـ roles (شائعة جداً في Laravel Spatie مثل user.roles أو item.roles)
-  const rolesArr = item.roles || item.user?.roles;
-  if (Array.isArray(rolesArr) && rolesArr.length > 0) {
-    const first = rolesArr[0];
-    if (typeof first === 'object') return String(first.name || first.title || "Staff");
-    return String(first);
-  }
-
-  return "Staff";
+type PaginationInfo = {
+  currentPage: number;
+  lastPage: number;
+  total: number;
+  from: number;
+  to: number;
 };
 
-export function StaffAttendanceTable({ data, isLoading = false, onUpdate }: Props) { 
+type Props = { 
+  data: StaffDailyRosterRecord[]; 
+  teacherSchedule?: any; 
+  currentDay?: string;
+  isLoading?: boolean; 
+  pendingEdits: Record<number, any>; 
+  onUpdateLocal: (staffId: number, field: string, value: any) => void; 
+  onViewDetails: (staff: StaffDailyRosterRecord) => void;
+  pagination: PaginationInfo;
+  onPageChange: (page: number) => void;
+}; 
+
+const getStatusBadgeStyles = (status: string) => {
+  switch (status) {
+    case "present":
+      return "text-emerald-700 font-medium bg-emerald-50/60 border border-emerald-200/50 rounded-[10px] shadow-none focus:ring-0 focus:outline-none";
+    case "absent":
+      return "text-rose-700 font-medium bg-rose-50/60 border border-rose-200/50 rounded-[10px] shadow-none focus:ring-0 focus:outline-none";
+    case "partial_absence":
+      return "text-violet-700 font-medium bg-violet-50/60 border border-violet-200/50 rounded-[10px] shadow-none focus:ring-0 focus:outline-none";
+    case "on_leave":
+      return "text-amber-700 font-medium bg-amber-50/60 border border-amber-200/50 rounded-[10px] shadow-none focus:ring-0 focus:outline-none";
+    default:
+      return "text-slate-700 font-medium bg-slate-50/60 border border-slate-200/50 rounded-[10px] shadow-none focus:ring-0 focus:outline-none";
+  }
+};
+
+const getAbsenceBadgeStyles = (type: string) => {
+  switch (type) {
+    case "excused":
+      return "text-sky-700 font-medium bg-sky-50/60 border border-sky-200/50 rounded-[10px] shadow-none focus:ring-0 focus:outline-none";
+    case "unexcused":
+      return "text-amber-700 font-medium bg-amber-50/60 border border-amber-200/50 rounded-[10px] shadow-none focus:ring-0 focus:outline-none";
+    default:
+      return "text-muted-foreground bg-background border border-border/50 rounded-[10px] shadow-none focus:ring-0 focus:outline-none";
+  }
+};
+ 
+export function StaffAttendanceTable({ 
+  data = [], 
+  teacherSchedule, 
+  currentDay,
+  isLoading = false, 
+  pendingEdits, 
+  onUpdateLocal, 
+  onViewDetails,
+  pagination,
+  onPageChange 
+}: Props) { 
+  const safeData = Array.isArray(data) ? data : [];
+
   return ( 
-    <div className="w-full overflow-hidden rounded-[20px] border border-border/60 bg-card shadow-[0_8px_28px_rgba(30,20,70,0.04)]"> 
-      <div className="border-b border-border/50 px-5 py-4"> 
-        <h3 className="text-[15px] font-semibold text-foreground">Staff attendance</h3> 
-        <p className="mt-0.5 text-[12px] text-muted-foreground"> 
-          {isLoading ? "Loading records" : `${data.length} staff members for the selected date`} 
-        </p> 
+    <div className="overflow-hidden rounded-[24px] border border-border/70 bg-card shadow-sm"> 
+      <div className="flex items-center justify-between border-b border-border/60 bg-muted/20 px-6 py-4"> 
+        <div>
+          <h3 className="text-[15px] font-bold tracking-tight text-foreground">Staff attendance</h3> 
+          <p className="mt-0.5 text-[12px] font-medium text-muted-foreground"> 
+            {isLoading ? "Loading records..." : `Showing ${pagination.total > 0 ? pagination.from : 0} to ${pagination.to} of ${pagination.total} staff members`} 
+          </p> 
+        </div>
       </div> 
  
       <div className="w-full overflow-x-auto"> 
-        <table className="w-full min-w-[780px] table-fixed border-collapse"> 
+        <table className="w-full min-w-[760px] table-fixed"> 
           <colgroup> 
-            <col className="w-[24%]" /> 
-            <col className="w-[14%]" /> 
-            <col className="w-[18%]" /> 
-            <col className="w-[18%]" /> 
-            <col className="w-[18%]" /> 
-            <col className="w-[8%]" /> 
+            <col className="w-[30%]" /> 
+            <col className="w-[20%]" /> 
+            <col className="w-[20%]" /> 
+            <col className="w-[20%]" /> 
+            <col className="w-[10%]" /> 
           </colgroup> 
  
-          <thead className="bg-muted/[0.28]"> 
-            <tr className="text-[10px] font-semibold uppercase tracking-[0.075em] text-muted-foreground"> 
-              <th className="h-11 px-4 text-start">Staff Member</th> 
-              <th className="h-11 px-3 text-start">Date</th> 
-              <th className="h-11 px-3 text-start">Status</th> 
-              <th className="h-11 px-3 text-start">Absence Type</th> 
-              <th className="h-11 px-3 text-start">Missing Periods</th> 
-              <th className="h-11 px-2 text-center">Actions</th> 
+          <thead className="bg-muted/40"> 
+            <tr className="text-[11.5px] font-extrabold uppercase tracking-wider text-muted-foreground"> 
+              <th className="h-12 px-6 text-start">Staff Member</th> 
+              <th className="h-12 px-4 text-start">Attendance</th> 
+              <th className="h-12 px-4 text-start">Absence Type</th> 
+              <th className="h-12 px-4 text-start">Periods</th> 
+              <th className="h-12 px-6 text-center">Actions</th> 
             </tr> 
           </thead> 
  
-          <tbody className="divide-y divide-border/40"> 
+          <tbody className="divide-y divide-border/50"> 
             {isLoading 
               ? Array.from({ length: 5 }).map((_, index) => ( 
-                  <tr key={index}> 
-                    <td colSpan={6} className="px-4 py-3.5"> 
-                      <div className="h-10 w-full animate-pulse rounded-[10px] bg-muted/45" /> 
+                  <tr key={index} className="border-t border-border/50"> 
+                    <td colSpan={5} className="px-6 py-4"> 
+                      <div className="h-10 animate-pulse rounded-[12px] bg-muted/50" /> 
                     </td> 
                   </tr> 
                 )) 
-              : data.map((item, index) => {
-                  const isPresent = item.attendance?.id === null || item.attendance?.status === "present";
-                  const currentStatus = isPresent ? "present" : (item.attendance?.status || "present");
-                  const currentPeriods = item.attendance?.missing_periods || [];
-
-                  // استخراج الرول الحقيقي عبر الدالة الذكية
-                  const roleString = extractStaffRole(item);
+              : safeData.map((item, index) => {
+                  const currentStatus = pendingEdits[item.id]?.status ?? (item?.attendance?.status || "present");
+                  const currentAbsenceType = pendingEdits[item.id]?.absence_type ?? item?.attendance?.absence_type ?? "excused";
+                  const currentPeriods = pendingEdits[item.id]?.missing_periods ?? item?.attendance?.missing_periods ?? [];
+              
+                  const roleString = String(item.role || "Staff").replace("_", " ");
                   const isTeacher = roleString.toLowerCase().includes('teach') || roleString.includes('معلم');
 
+                  const highlightEdit = pendingEdits[item.id] ? 'bg-warning/[0.03]' : '';
+                  const teacherScheduleEntries = teacherSchedule?.[item.user_id]?.[currentDay || ''] || [];
+                  
+                  // 🌟 تم إضافة on_leave إلى الحالات الثابتة
+                  const standardStatuses = ["present", "absent", "partial_absence", "on_leave"];
+
                   return (
-                  <tr key={item.id} className="text-[12px] text-foreground transition-colors hover:bg-muted/[0.22]"> 
-                    <td className="px-4 py-3.5"> 
-                      <div className="flex items-center gap-2.5 min-w-0"> 
-                        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[10px] bg-info/[0.09] text-[11px] font-semibold text-info"> 
-                          {index + 1} 
+                  <tr key={item?.id || index} className={`border-t border-border/50 text-[13px] transition-colors hover:bg-muted/30 group ${highlightEdit}`}> 
+                    <td className="px-6 py-3.5"> 
+                      <div className="flex items-center gap-3 min-w-0"> 
+                        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[12px] bg-violet-600/10 text-[13px] font-bold text-violet-700 border border-violet-600/20 uppercase"> 
+                          {item?.user?.first_name?.charAt(0) || index + 1} 
                         </span> 
-                        <div className="min-w-0 truncate"> 
-                          <p className="truncate font-medium text-foreground">
-                            {item.user?.first_name} {item.user?.last_name}
+                        <div className="min-w-0"> 
+                          <p className="truncate font-bold text-slate-800 dark:text-slate-200 group-hover:text-violet-600 transition-colors text-[12.5px]">
+                            {item?.user?.first_name} {item?.user?.last_name}
                           </p> 
-                          <p className="truncate text-[10px] text-muted-foreground capitalize">
+                          <p className="truncate text-[11px] font-medium text-muted-foreground capitalize mt-0.5">
                             {roleString}
                           </p>
                         </div> 
                       </div> 
                     </td> 
  
-                    <td className="px-3 py-3.5 text-muted-foreground truncate">
-                      {item.attendance?.attendance_date || "—"}
-                    </td> 
- 
-                    <td className="px-3 py-3.5"> 
+                    <td className="px-4 py-3.5"> 
                       <Select 
                         value={currentStatus} 
                         onValueChange={(value) => {
-                          if (value === "partial_absence") {
-                            onUpdate(item.id, { 
-                              status: "partial_absence", 
-                              absence_type: item.attendance?.absence_type ?? "excused",
-                              missing_periods: currentPeriods.length > 0 ? currentPeriods : [1] 
-                            });
-                          } else {
-                            onUpdate(item.id, { 
-                              status: value as StaffAttendanceStatus, 
-                              absence_type: value === "present" ? null : (item.attendance?.absence_type ?? "excused"),
-                              missing_periods: []
-                            });
+                          onUpdateLocal(item.id, 'status', value);
+                          // 🌟 تصفير الحصص والأعذار في حال الحضور أو الإجازة
+                          if (value === 'present' || value === 'on_leave') {
+                            onUpdateLocal(item.id, 'absence_type', null);
+                            onUpdateLocal(item.id, 'missing_periods', []);
+                          } else if (value === 'partial_absence' && currentPeriods.length === 0) {
+                            onUpdateLocal(item.id, 'missing_periods', []);
                           }
                         }} 
                       > 
-                        <SelectTrigger className={inlineControlClass}><SelectValue /></SelectTrigger> 
+                        <SelectTrigger className={`h-8 w-[120px] text-[11.5px] px-3 transition-all ${getStatusBadgeStyles(currentStatus)}`}>
+                          <SelectValue />
+                        </SelectTrigger> 
                         <SelectContent> 
-                          <SelectItem value="present">Present</SelectItem> 
-                          <SelectItem value="absent">Absent</SelectItem> 
-                          {isTeacher && <SelectItem value="partial_absence">Partial Absence</SelectItem>}
-                          <SelectItem value="on_leave">On Leave</SelectItem>
+                          <SelectItem value="present" className="font-medium text-emerald-700 focus:text-emerald-800">Present</SelectItem> 
+                          <SelectItem value="absent" className="font-medium text-rose-700 focus:text-rose-800">Absent</SelectItem> 
+                          {isTeacher && <SelectItem value="partial_absence" className="font-medium text-violet-700 focus:text-violet-800">Partial Absence</SelectItem>}
+                          
+                          {/* 🌟 خيار الـ On Leave */}
+                          <SelectItem value="on_leave" className="font-medium text-amber-700 focus:text-amber-800">On Leave</SelectItem>
+                          
+                          {!standardStatuses.includes(currentStatus) && (
+                            <SelectItem value={currentStatus} disabled className="font-medium text-amber-700 capitalize">
+                              {currentStatus.replace('_', ' ')}
+                            </SelectItem>
+                          )}
                         </SelectContent> 
                       </Select> 
                     </td> 
  
-                    <td className="px-3 py-3.5"> 
+                    <td className="px-4 py-3.5"> 
                       {currentStatus === "absent" || currentStatus === "partial_absence" ? ( 
                         <Select 
-                          value={item.attendance?.absence_type ?? "excused"} 
-                          onValueChange={(value) => onUpdate(item.id, { 
-                            status: currentStatus as StaffAttendanceStatus,
-                            absence_type: value as StaffAbsenceType,
-                            missing_periods: currentPeriods
-                          })} 
+                          value={currentAbsenceType} 
+                          onValueChange={(value) => onUpdateLocal(item.id, 'absence_type', value)} 
                         > 
-                          <SelectTrigger className={inlineControlClass}><SelectValue /></SelectTrigger> 
+                          <SelectTrigger className={`h-8 w-[110px] text-[11.5px] px-3 transition-all ${getAbsenceBadgeStyles(currentAbsenceType)}`}>
+                            <SelectValue />
+                          </SelectTrigger> 
                           <SelectContent> 
-                            <SelectItem value="excused">Excused</SelectItem> 
-                            <SelectItem value="unexcused">Unexcused</SelectItem> 
+                            <SelectItem value="excused" className="font-medium text-sky-700 focus:text-sky-800">Excused</SelectItem> 
+                            <SelectItem value="unexcused" className="font-medium text-amber-700 focus:text-amber-800">Unexcused</SelectItem> 
                           </SelectContent> 
                         </Select> 
                       ) : ( 
-                        <span className="text-muted-foreground">—</span> 
+                        <span className="text-muted-foreground font-medium">—</span> 
                       )} 
                     </td> 
 
-                    <td className="px-3 py-3.5">
-                      {currentStatus === "partial_absence" ? (
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <Button variant="outline" className={`${inlineControlClass} justify-between font-normal hover:bg-background/90`}>
-                              <span className="truncate">
-                                {currentPeriods.length > 0 ? `P: ${[...currentPeriods].sort().join(", ")}` : "Select..."}
-                              </span>
-                              <ChevronDown className="h-3 w-3 opacity-50 shrink-0 ms-1" />
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-[170px] p-2.5" align="start">
-                            <div className="grid grid-cols-4 gap-1.5">
-                              {PERIODS.map(p => {
-                                const isSelected = currentPeriods.includes(p);
-                                return (
-                                  <button
-                                    key={p}
-                                    type="button"
-                                    onClick={() => {
-                                      const newPeriods = isSelected ? currentPeriods.filter(x => x !== p) : [...currentPeriods, p];
-                                      if (newPeriods.length === 0) return; 
-
-                                      onUpdate(item.id, { 
-                                        status: "partial_absence", 
-                                        absence_type: item.attendance?.absence_type ?? "excused",
-                                        missing_periods: newPeriods 
-                                      });
-                                    }}
-                                    className={`flex h-7 items-center justify-center rounded-md text-[11px] font-semibold transition-colors ${
-                                      isSelected ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-foreground/10"
-                                    }`}
-                                  >
-                                    {p}
-                                  </button>
-                                );
-                              })}
-                            </div>
-                            <p className="mt-2 text-center text-[10px] text-muted-foreground">Click to toggle</p>
-                          </PopoverContent>
-                        </Popover>
+                    <td className="px-4 py-3.5"> 
+                      {isTeacher ? (
+                        currentStatus === "partial_absence" ? (
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <Button variant="outline" className="h-8 px-2.5 rounded-[10px] border-violet-200 bg-violet-50/50 text-violet-700 text-[11px] font-semibold hover:bg-violet-100/50 transition-colors">
+                                {currentPeriods.length > 0 ? `P: ${currentPeriods.length} selected` : "Select Periods"}
+                              </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-[220px] p-3 rounded-[16px]" align="start">
+                              <div className="mb-2 px-1 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Scheduled Periods</div>
+                              
+                              {teacherScheduleEntries.length > 0 ? (
+                                <div className="flex flex-col gap-1 max-h-[180px] overflow-y-auto">
+                                  {teacherScheduleEntries.map((period: any) => {
+                                    const periodId = period.entry_id;
+                                    const isSelected = currentPeriods.includes(periodId);
+                                    
+                                    return (
+                                      <button
+                                        key={periodId}
+                                        type="button"
+                                        onClick={() => {
+                                          const newPeriods = isSelected 
+                                            ? currentPeriods.filter((id: any) => id !== periodId) 
+                                            : [...currentPeriods, periodId];
+                                          onUpdateLocal(item.id, 'missing_periods', newPeriods);
+                                        }}
+                                        className={`flex items-center justify-between px-2.5 py-1.5 rounded-[8px] text-[11.5px] font-semibold transition-all ${
+                                          isSelected ? "bg-violet-600 text-white shadow-sm" : "bg-muted/50 text-foreground hover:bg-muted"
+                                        }`}
+                                      >
+                                        <span>Period {period.period_index || ''}</span>
+                                        {period.subject_name && <span className="text-[10px] opacity-80">{period.subject_name}</span>}
+                                        <span>{period.start_time}</span>
+                                      </button>
+                                    );
+                                  })}
+                                </div>
+                              ) : (
+                                <p className="text-[11px] text-muted-foreground text-center py-2">No periods found for this teacher today.</p>
+                              )}
+                            </PopoverContent>
+                          </Popover>
+                        ) : (
+                          <span className="text-muted-foreground font-medium">—</span> 
+                        )
                       ) : (
-                        <span className="text-muted-foreground">—</span>
+                        <span className="text-muted-foreground/50 text-[11px] font-medium uppercase tracking-wider">N/A</span>
                       )}
                     </td>
  
-                    <td className="px-2 py-3.5 text-center"> 
-                      <Button asChild variant="outline" size="icon" className="h-8 w-8 rounded-full border-info/15 text-info hover:bg-info/[0.06]"> 
-                        <Link to={`/attendance/staff/${item.id}`} aria-label={`View history`}> 
-                          <Eye className="h-3.5 w-3.5" /> 
-                        </Link> 
-                      </Button> 
+                    <td className="px-6 py-3.5 text-center"> 
+                      <div className="flex items-center justify-center gap-1.5">
+                        <Button 
+                          type="button"
+                          variant="outline" 
+                          size="icon" 
+                          onClick={() => onViewDetails(item)}
+                          className="h-8 w-8 rounded-[10px] border-violet-200 text-violet-600 hover:bg-violet-50 transition-colors"
+                          title="Quick Summary"
+                        > 
+                          <Eye className="h-4 w-4" /> 
+                        </Button> 
+                      </div>
                     </td> 
                   </tr> 
                 )})} 
+            {!isLoading && safeData.length === 0 && (
+              <tr><td colSpan={5} className="px-6 py-16 text-center text-[13px] font-medium text-muted-foreground">No records match the selected filters.</td></tr>
+            )}
           </tbody> 
         </table> 
       </div> 
+
+      {pagination.lastPage >= 1 && (
+        <div className="flex items-center justify-between border-t border-border/60 px-6 py-4">
+          <p className="text-[12px] font-medium text-muted-foreground">
+            Page {pagination.currentPage} of {pagination.lastPage}
+          </p>
+          <div className="flex items-center gap-2">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => onPageChange(pagination.currentPage - 1)} 
+              disabled={pagination.currentPage <= 1 || isLoading} 
+              className="h-8 rounded-[10px] text-[12px]"
+            >
+              <ChevronLeft className="h-4 w-4 mr-1" /> Prev
+            </Button>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => onPageChange(pagination.currentPage + 1)} 
+              disabled={pagination.currentPage >= pagination.lastPage || isLoading} 
+              className="h-8 rounded-[10px] text-[12px]"
+            >
+              Next <ChevronRight className="h-4 w-4 ml-1" />
+            </Button>
+          </div>
+        </div>
+      )}
     </div> 
   ); 
 }

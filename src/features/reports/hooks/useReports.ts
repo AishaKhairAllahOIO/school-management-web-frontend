@@ -19,7 +19,6 @@ import type {
   ReportsWorkspaceData,
 } from "../types/reports.types";
 import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
 
 /* ========================================================================== */
 /*                   1. REPORT CARDS & PROMOTION HOOKS (الجلاءات)             */
@@ -31,7 +30,7 @@ export const reportCardKeys = {
     [...reportCardKeys.all, "list", { semesterId, classRoomId }] as const,
 };
 
-// 1. جلب قائمة الجلاءات
+
 export function useReportCards(semesterId?: string | number, classRoomId?: string | number) {
   return useQuery({
     queryKey: reportCardKeys.list(semesterId, classRoomId),
@@ -45,7 +44,7 @@ export function useReportCards(semesterId?: string | number, classRoomId?: strin
   });
 }
 
-// 2. زر توليد الجلاءات في الخلفية (Background Job)
+
 export function useGenerateReportCards() {
   return useMutation({
     mutationFn: async (payload: { semester_id: string | number; class_room_id?: string | number }) => {
@@ -61,7 +60,7 @@ export function useGenerateReportCards() {
   });
 }
 
-// 3. زر نشر / إلغاء نشر الجلاءات
+
 export function useTogglePublishReportCards() {
   const queryClient = useQueryClient();
 
@@ -80,7 +79,7 @@ export function useTogglePublishReportCards() {
   });
 }
 
-// 4. الزر السحري: ترفيع الطلاب (Promote Students)
+
 export function usePromoteStudents() {
   return useMutation({
     mutationFn: async (payload: { from_academic_year_id: string | number; to_academic_year_id: string | number }) => {
@@ -289,14 +288,14 @@ export function useGenerateReport() {
         downloadBlob(blob, `${fileName}.csv`);
 
     } else {
-        // توليد ملف PDF بشكل يدوي ونظيف بدون الحاجة لـ autotable
-        const doc = new jsPDF();
+
+      const doc = new jsPDF();
         doc.setFontSize(16);
         doc.text(template.title, 14, 20);
         doc.setFontSize(10);
         doc.text(`Academic Year: ${academicYear} | Period: ${dateRange}`, 14, 28);
 
-        // كتابة البيانات بشكل جدول نصي مرتب
+
         let yPos = 40;
         doc.setFontSize(11);
         
@@ -310,7 +309,7 @@ export function useGenerateReport() {
             if (yPos > 280) { doc.addPage(); yPos = 20; }
           });
         } else {
-          Object.entries(rawData).forEach(([key, val], index) => {
+          Object.entries(rawData).forEach(([key, val]) => {
             doc.text(`${key.replace(/_/g, ' ')}: ${typeof val === 'object' ? JSON.stringify(val) : String(val)}`, 14, yPos);
             yPos += 8;
           });
@@ -356,15 +355,15 @@ export function useGenerateReport() {
   });
 }
 
-// 🌟 نسخة آمنة من دالة التنزيل تتحقق من وجود DOM 🌟
+
 function downloadBlob(blob: Blob, filename: string) {
-  if (typeof document === 'undefined') return; // حماية من خطأ الـ body
+  if (typeof document === 'undefined') return; 
   
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
   link.setAttribute("download", filename);
-  document.body.appendChild(link); // الآن هذه آمنة
+  document.body.appendChild(link); 
   link.click();
   document.body.removeChild(link);
   URL.revokeObjectURL(url);

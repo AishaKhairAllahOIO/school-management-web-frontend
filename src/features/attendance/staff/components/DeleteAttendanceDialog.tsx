@@ -7,7 +7,7 @@ import {
 } from "@/shared/ui/dialog";
 import { Button } from "@/shared/ui/button";
 import { Trash2 } from "lucide-react";
-import { useDeleteStaffAttendance } from "../hooks/useDeleteStaffAttendance";
+import { useDeleteStaffAttendance } from "../hooks/useStaffAttendance";
 import { useState } from "react";
 
 interface Props {

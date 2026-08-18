@@ -1,7 +1,5 @@
 import {
   BarChart3,
-  CalendarClock,
-  FilePlus2,
   Search,
   FileCheck,
 } from "lucide-react";
