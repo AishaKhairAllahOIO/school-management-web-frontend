@@ -219,24 +219,7 @@ export function ContractsSection({
   const [activeTab, setActiveTab] = useState<StatusTab>("all");
   const [search, setSearch] = useState("");
 
-  const counts = useMemo(() => {
-    const result: Record<StatusTab, number> = {
-      all: rows.length,
-      draft: 0,
-      unpaid: 0,
-      partially_paid: 0,
-      fully_paid: 0,
-    };
-
-    rows.forEach((row) => {
-      const status = getEffectivePaymentStatus(row.account);
-
-      result[status] += 1;
-    });
-
-    return result;
-  }, [rows]);
-
+ 
   const filteredRows = useMemo(() => {
     const query = search.trim().toLowerCase();
 
@@ -299,7 +282,7 @@ export function ContractsSection({
     <div className="space-y-5 pb-10 pt-4 sm:pt-5 lg:pt-6">
       {/* FILTERS — intentionally mirrors the staff finance page */}
       <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-        <div className="order-2 flex min-w-0 flex-1 gap-2 overflow-x-auto pb-1 lg:order-1">
+        <div className="order-2 flex min-w-0 flex-1 flex-wrap gap-2 lg:order-1">
           {STATUS_TABS.map((item) => {
             const Icon = item.icon;
             const isActive = activeTab === item.value;
@@ -322,16 +305,7 @@ export function ContractsSection({
               >
                 <Icon aria-hidden="true" className="size-3.5" strokeWidth={2} />
                 {item.label}
-                <span
-                  className={[
-                    "rounded-full px-1.5 py-0.5 text-[9px] leading-none",
-                    isActive
-                      ? "bg-white/15 text-white"
-                      : "bg-background/70 text-current",
-                  ].join(" ")}
-                >
-                  {counts[item.value]}
-                </span>
+              
               </button>
             );
           })}

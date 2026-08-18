@@ -1,7 +1,7 @@
 import type { RouteObject } from "react-router-dom";
 import { Navigate } from "react-router-dom";
 
-import { FinanceOperationsPage } from "./student/page/FinanceOperationsPage";
+import { FinanceOperationsPage } from "./pages/FinanceOperationsPage";
 import { StudentFinancialAccountsPage } from "./student/page/StudentFinancialAccountsPage";
 import { StudentFinancialProfilePage } from "./student/page/StudentFinancialProfilePage";
 import { StaffPayrollPage } from "./staff/pages/StaffPayrollPage";
