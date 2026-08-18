@@ -10,10 +10,10 @@ import {
 } from "lucide-react";
 
 import { Button } from "@/shared/ui/button";
-import { useFinanceInstallments } from "../../hooks/useInstallments";
-import type { Installment } from "../../types/finance.types";
-import { FinanceSectionShell } from "../shared/FinanceSectionShell";
-import { FinanceTableSkeleton } from "../shared/FinanceTableSkeleton";
+import { useFinanceInstallments } from "../hooks/useInstallments";
+import type { Installment } from "../types/finance.types";
+import { FinanceSectionShell } from "./FinanceSectionShell";
+import { FinanceTableSkeleton } from "./FinanceTableSkeleton";
 
 type InstallmentsSectionProps = {
   studentId?: string | number;
@@ -37,7 +37,9 @@ function formatDate(value: string | null) {
 }
 
 function getInstallmentState(item: Installment) {
-  const overdue = item.dueDate ? new Date() > new Date(item.dueDate) && item.status !== "paid" : false;
+  const overdue = item.dueDate
+    ? new Date() > new Date(item.dueDate) && item.status !== "paid"
+    : false;
 
   if (item.status === "paid") {
     return {
@@ -271,7 +273,6 @@ function InstallmentsTable({ installments }: { installments: Installment[] }) {
 }
 
 export function InstallmentsSection({
-  studentId,
   installments: providedInstallments,
   title = "Installment Schedule",
   description = "Track what is due, what has been paid, and what remains.",
@@ -280,87 +281,54 @@ export function InstallmentsSection({
     data: queriedInstallments = [],
     isLoading,
     isError,
-    isFetching,
     refetch,
   } = useFinanceInstallments();
 
-  const visibleInstallments = useMemo(() => {
-    /*
-     * If the parent already provides installments
-     * from the student's financial account, use them directly.
-     *
-     * This preserves the existing behavior and avoids
-     * an unnecessary second source of data.
-     */
-    if (providedInstallments) {
-      return providedInstallments;
+  const installments = useMemo(() => {
+    if (!providedInstallments?.length) {
+      return queriedInstallments;
     }
 
-    /*
-     * Otherwise use the general installments query.
-     * When studentId exists, only show this student's installments.
-     */
-    if (studentId === undefined) return queriedInstallments;
-
-    return queriedInstallments.filter((installment) => {
-      const candidate = installment as Installment & { studentId?: string | number | null };
-      return candidate.studentId === undefined || String(candidate.studentId) === String(studentId);
-    });
-  }, [providedInstallments, queriedInstallments, studentId]);
-
-  /*
-   * Only show the loading state when installments were
-   * not already supplied by the parent.
-   */
-  if (!providedInstallments && isLoading) {
-    return (
-      <FinanceSectionShell
-        title={title}
-        description={description}
-        icon={CalendarClock}
-      >
-        <FinanceTableSkeleton />
-      </FinanceSectionShell>
+    // The account response already gives us the exact installment ids for this
+    // student. API #5 is still the source used by this table; we narrow its
+    // global result to those ids so another student's installments can never
+    // leak into the profile.
+    const accountInstallmentIds = new Set(
+      providedInstallments.map((item) => String(item.id)),
     );
+
+    const matched = queriedInstallments.filter((item) =>
+      accountInstallmentIds.has(String(item.id)),
+    );
+
+    return matched.length || queriedInstallments.length === 0
+      ? matched
+      : providedInstallments;
+  }, [providedInstallments, queriedInstallments]);
+
+  if (isLoading && !providedInstallments?.length) {
+    return <FinanceTableSkeleton />;
   }
 
-  /*
-   * Same error behavior as before.
-   */
-  if (!providedInstallments && isError) {
+  if (isError && !providedInstallments?.length) {
     return (
       <FinanceSectionShell
         title={title}
         description={description}
-        icon={CalendarClock}
+        icon={CalendarDays}
       >
-        <div className="flex flex-col items-center justify-center rounded-[18px] border border-destructive/20 bg-destructive/[0.045] py-12 text-center">
-          <span className="flex h-11 w-11 items-center justify-center rounded-[14px] bg-destructive/[0.07] text-destructive">
-            <RefreshCw className="h-5 w-5" strokeWidth={1.8} />
-          </span>
-
-          <p className="mt-3 text-[13px] font-medium text-foreground/85">
-            Unable to load installments
+        <div className="rounded-[18px] border border-destructive/15 bg-destructive/[0.035] px-5 py-8 text-center">
+          <p className="text-[12px] font-semibold text-destructive">
+            Installments could not be loaded.
           </p>
-
-          <p className="mt-1 max-w-sm text-[12px] leading-5 text-muted-foreground/70">
-            Please try again to load the student's installment schedule.
-          </p>
-
           <Button
+            type="button"
             variant="outline"
-            className="mt-4 rounded-xl"
-            onClick={() => refetch()}
-            disabled={isFetching}
+            className="mt-3 h-9 rounded-xl px-3 text-[11px]"
+            onClick={() => void refetch()}
           >
-            <RefreshCw
-              className={[
-                "mr-2 h-4 w-4",
-                isFetching ? "animate-spin" : "",
-              ].join(" ")}
-            />
-
-            {isFetching ? "Retrying..." : "Retry loading installments"}
+            <RefreshCw className="mr-1.5 h-3.5 w-3.5" />
+            Retry
           </Button>
         </div>
       </FinanceSectionShell>
@@ -371,9 +339,9 @@ export function InstallmentsSection({
     <FinanceSectionShell
       title={title}
       description={description}
-      icon={CalendarClock}
+      icon={CalendarDays}
     >
-      <InstallmentsTable installments={visibleInstallments} />
+      <InstallmentsTable installments={installments} />
     </FinanceSectionShell>
   );
 }

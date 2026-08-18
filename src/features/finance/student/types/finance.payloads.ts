@@ -8,13 +8,9 @@ export type FinalizeContractPayload = {
   installmentPolicyId: number;
   selectedExtraServiceIds: number[] | null;
 };
-
 export type UpdateContractPayload = {
-  studentId: number;
-  academicYearId: number;
   feePlanId: number;
   installmentPolicyId: number;
-  selectedExtraServiceIds: number[] | null;
 };
 
 

@@ -1,3 +1,4 @@
+
 import type { ReactNode } from "react";
 
 export function EntityTable({
@@ -8,7 +9,8 @@ export function EntityTable({
   return (
     <div
       className={[
-        "w-full min-w-0 overflow-hidden",
+        "w-full min-w-0",
+        "overflow-x-auto overflow-y-hidden",
         "rounded-[18px]",
         "border border-border/60",
         "bg-card",
@@ -17,7 +19,7 @@ export function EntityTable({
     >
       <table
         className={[
-          "w-full table-fixed border-collapse text-left",
+          "w-full min-w-[640px] border-collapse text-left",
           "text-[13px]",
           "[&_tbody_tr]:transition-colors",
           "[&_tbody_tr]:duration-150",
@@ -69,7 +71,7 @@ export function EntityTd({
   return (
     <td
       className={[
-        "min-w-0 border-b border-border/40",
+        "border-b border-border/40",
         "px-3 py-3 align-middle",
         "text-[13px] leading-5",
         "whitespace-normal break-words",

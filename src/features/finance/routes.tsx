@@ -1,9 +1,9 @@
 import type { RouteObject } from "react-router-dom";
 import { Navigate } from "react-router-dom";
 
-import { FinanceOperationsPage } from "./student/pages/FinanceOperationsPage";
-import { StudentFinancialAccountsPage } from "./student/pages/StudentFinancialAccountsPage";
-import { StudentFinancialProfilePage } from "./student/pages/StudentFinancialProfilePage";
+import { FinanceOperationsPage } from "./pages/FinanceOperationsPage";
+import { StudentFinancialAccountsPage } from "./student/page/StudentFinancialAccountsPage";
+import { StudentFinancialProfilePage } from "./student/page/StudentFinancialProfilePage";
 import { StaffPayrollPage } from "./staff/pages/StaffPayrollPage";
 import { StaffPayrollProfilePage } from "./staff/pages/StaffPayrollProfilePage";
 

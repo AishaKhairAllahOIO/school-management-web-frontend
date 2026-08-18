@@ -1,3 +1,4 @@
+
 import type { ReactNode } from "react";
 
 export function FinancialEntityTable({
@@ -8,16 +9,18 @@ export function FinancialEntityTable({
   return (
     <div
       className={[
-        "w-full min-w-0 overflow-hidden",
+        "w-full min-w-0",
+        "overflow-x-auto overflow-y-hidden",
         "rounded-[18px]",
         "border border-border/60",
         "bg-card",
         "shadow-[0_8px_24px_rgba(30,20,70,0.035)]",
+        "[-webkit-overflow-scrolling:touch]",
       ].join(" ")}
     >
       <table
         className={[
-          "w-full table-fixed border-collapse text-left",
+          "w-full min-w-[640px] border-collapse text-left",
           "text-[13px]",
           "[&_tbody_tr]:transition-colors",
           "[&_tbody_tr]:duration-150",
@@ -69,7 +72,7 @@ export function FinancialEntityTd({
   return (
     <td
       className={[
-        "min-w-0 border-b border-border/40",
+        "border-b border-border/40",
         "px-3 py-3 align-middle",
         "text-[13px] leading-5",
         "whitespace-normal break-words",

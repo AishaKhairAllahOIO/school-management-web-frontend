@@ -1,12 +1,12 @@
 import { ReceiptText } from "lucide-react";
 
 import type { FeePlan } from "../../types/feePlan.types";
-import { FinancialActionMenu } from "../../shared/FinancialActionMenu";
+import { FinancialActionMenu } from "../shared/FinancialActionMenu";
 import {
   FinancialEntityTable,
   FinancialEntityTd,
   FinancialEntityTh,
-} from "../../shared/FinancialEntityTable";
+} from "../shared/FinancialEntityTable";
 
 type Props = {
   feePlans: FeePlan[];
@@ -21,7 +21,9 @@ export function FeePlansTable({ feePlans, onEdit, onDelete }: Props) {
         <span className="mx-auto flex h-10 w-10 items-center justify-center rounded-[13px] bg-primary/[0.08] text-primary">
           <ReceiptText size={18} strokeWidth={1.8} />
         </span>
-        <p className="mt-3 text-[15px] font-medium text-foreground">No fee plans yet</p>
+        <p className="mt-3 text-[15px] font-medium text-foreground">
+          No fee plans yet
+        </p>
         <p className="mt-1 text-[13px] font-normal text-muted-foreground">
           Create the first tuition plan to begin configuring school finances.
         </p>
@@ -45,9 +47,15 @@ export function FeePlansTable({ feePlans, onEdit, onDelete }: Props) {
         {feePlans.map((plan) => (
           <tr key={plan.id}>
             <FinancialEntityTd strong>{plan.name}</FinancialEntityTd>
-            <FinancialEntityTd>{plan.academicYear?.name ?? "—"}</FinancialEntityTd>
-            <FinancialEntityTd>{plan.gradeLevel?.name ?? "—"}</FinancialEntityTd>
-            <FinancialEntityTd strong>{plan.baseAmount.toLocaleString()} $</FinancialEntityTd>
+            <FinancialEntityTd>
+              {plan.academicYear?.name ?? "—"}
+            </FinancialEntityTd>
+            <FinancialEntityTd>
+              {plan.gradeLevel?.name ?? "—"}
+            </FinancialEntityTd>
+            <FinancialEntityTd strong>
+              {plan.baseAmount.toLocaleString()} $
+            </FinancialEntityTd>
             <FinancialEntityTd>
               {plan.extraServices.length > 0 ? (
                 <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/[0.08] px-3 py-1.5 text-[12px] font-medium text-primary">

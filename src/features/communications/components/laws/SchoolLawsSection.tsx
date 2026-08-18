@@ -6,9 +6,7 @@ import {
 import {
   useState,
 } from "react";
-import { toast } from "sonner";
 
-import { PrintPreviewDialog, usePrintIdentity, usePrintPreview } from "@/features/printing";
 import {
   Button,
 } from "@/shared/ui/button";
@@ -33,7 +31,6 @@ import {
 import {
   LawsTable,
 } from "./LawsTable";
-import { buildSchoolLawsPosterDocument } from "./schoolLawsPrintDocument";
 
 export function SchoolLawsSection() {
   const {
@@ -49,8 +46,7 @@ export function SchoolLawsSection() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedLaw, setSelectedLaw] = useState<SchoolLaw | null>(null);
   const [pendingDelete, setPendingDelete] = useState<SchoolLaw | null>(null);
-  const printPreview = usePrintPreview();
-  const printIdentity = usePrintIdentity();
+  
 
   function openCreate() {
     setSelectedLaw(null);
@@ -71,14 +67,6 @@ export function SchoolLawsSection() {
     });
   }
 
-  function handlePrint() {
-    if (!laws.length) {
-      toast.error("Add at least one school law before printing the poster.");
-      return;
-    }
-
-    printPreview.openPreview(buildSchoolLawsPosterDocument(laws, printIdentity));
-  }
 
   const header = (
     <div className="flex flex-col gap-3 rounded-[22px] border border-success/[0.13] bg-card p-3 shadow-[0_10px_30px_rgba(38,24,84,0.045)] sm:flex-row sm:items-center sm:justify-between">
@@ -101,7 +89,7 @@ export function SchoolLawsSection() {
           <Button
             type="button"
             variant="outline"
-            onClick={handlePrint}
+        
             disabled={!laws.length}
             className="h-11 min-w-0 rounded-[14px] border-success/20 bg-success/[0.025] px-4 text-[12px] font-semibold text-success hover:bg-success/[0.08] hover:text-success"
           >
@@ -183,11 +171,6 @@ export function SchoolLawsSection() {
         }}
       />
 
-      <PrintPreviewDialog
-        open={printPreview.isOpen}
-        onOpenChange={printPreview.setOpen}
-        document={printPreview.document}
-      />
     </div>
   );
 }

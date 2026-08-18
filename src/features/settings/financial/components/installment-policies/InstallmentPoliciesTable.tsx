@@ -1,12 +1,12 @@
 import { CalendarRange } from "lucide-react";
 
 import type { InstallmentPolicy } from "../../types/installmentPolicy.types";
-import { FinancialActionMenu } from "../../shared/FinancialActionMenu";
+import { FinancialActionMenu } from "../shared/FinancialActionMenu";
 import {
   FinancialEntityTable,
   FinancialEntityTd,
   FinancialEntityTh,
-} from "../../shared/FinancialEntityTable";
+} from "../shared/FinancialEntityTable";
 
 type Props = {
   policies: InstallmentPolicy[];
@@ -14,16 +14,23 @@ type Props = {
   onDelete: (policy: InstallmentPolicy) => void;
 };
 
-export function InstallmentPoliciesTable({ policies, onEdit, onDelete }: Props) {
+export function InstallmentPoliciesTable({
+  policies,
+  onEdit,
+  onDelete,
+}: Props) {
   if (!policies.length) {
     return (
       <div className="mt-4 rounded-[18px] border border-dashed border-border bg-muted/15 p-8 text-center">
         <span className="mx-auto flex h-10 w-10 items-center justify-center rounded-[13px] bg-primary/[0.08] text-primary">
           <CalendarRange size={18} strokeWidth={1.8} />
         </span>
-        <p className="mt-3 text-[15px] font-medium text-foreground">No installment policies yet</p>
+        <p className="mt-3 text-[15px] font-medium text-foreground">
+          No installment policies yet
+        </p>
         <p className="mt-1 text-[13px] font-normal text-muted-foreground">
-          Create a payment schedule to distribute tuition across multiple due dates.
+          Create a payment schedule to distribute tuition across multiple due
+          dates.
         </p>
       </div>
     );
@@ -49,7 +56,9 @@ export function InstallmentPoliciesTable({ policies, onEdit, onDelete }: Props) 
                 {policy.items.length} Installments
               </span>
             </FinancialEntityTd>
-            <FinancialEntityTd>{new Date(policy.createdAt).toLocaleDateString()}</FinancialEntityTd>
+            <FinancialEntityTd>
+              {new Date(policy.createdAt).toLocaleDateString()}
+            </FinancialEntityTd>
             <FinancialEntityTd align="right">
               <FinancialActionMenu
                 isOpen={false}
