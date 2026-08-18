@@ -1,5 +1,5 @@
 import { FeePlanForm } from "./FeePlanForm";
-import { FinancialBaseDialog } from "../../shared/FinancialBaseDialog";
+import { FinancialBaseDialog } from "../shared/FinancialBaseDialog";
 import type { FeePlanFormValues } from "../../schemas/feePlan.schema";
 
 type Option = { id: number; name: string };
@@ -13,7 +13,15 @@ type Props = {
   onSubmit: (values: FeePlanFormValues) => void;
 };
 
-export function EditFeePlanDialog({ open, onOpenChange, defaultValues, academicYears, gradeLevels, onSubmit, isLoading }: Props) {
+export function EditFeePlanDialog({
+  open,
+  onOpenChange,
+  defaultValues,
+  academicYears,
+  gradeLevels,
+  onSubmit,
+  isLoading,
+}: Props) {
   if (!open) return null;
   return (
     <FinancialBaseDialog

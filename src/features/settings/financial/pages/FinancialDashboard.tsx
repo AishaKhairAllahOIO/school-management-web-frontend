@@ -5,8 +5,8 @@ import { axiosClient } from "@/services/axios/axiosClient";
 import { API_ENDPOINTS } from "@/services/api/endpoints";
 
 import { FeePlansSkeleton } from "../components/fee-plans/FeePlansSkeleton";
-import { FeePlansSection } from "../sections/FeePlansSection";
-import { InstallmentPoliciesSection } from "../sections/InstallmentPoliciesSection";
+import { FeePlansSection } from "../components/sections/FeePlansSection";
+import { InstallmentPoliciesSection } from "../components/sections/InstallmentPoliciesSection";
 import type { FinancialSection } from "./FinancialSettingsPage";
 
 type Props = {
@@ -69,18 +69,18 @@ export const FinancialDashboard = ({ activeSection }: Props) => {
         <span className="flex h-11 w-11 items-center justify-center rounded-[15px] bg-destructive/[0.08] text-destructive">
           <RefreshCw size={19} />
         </span>
-        <h3 className="mt-3 text-[15px] font-semibold text-foreground">Academic data is unavailable</h3>
+        <h3 className="mt-3 text-[15px] font-semibold text-foreground">
+          Academic data is unavailable
+        </h3>
         <p className="mt-1 max-w-md text-[13px] leading-5 text-muted-foreground">
-          Fee plans require academic years and grade levels. Please verify the related API endpoints.
+          Fee plans require academic years and grade levels. Please verify the
+          related API endpoints.
         </p>
       </div>
     );
   }
 
   return (
-    <FeePlansSection
-      academicYears={academicYears}
-      gradeLevels={gradeLevels}
-    />
+    <FeePlansSection academicYears={academicYears} gradeLevels={gradeLevels} />
   );
 };

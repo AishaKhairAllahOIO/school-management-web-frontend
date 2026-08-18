@@ -1,22 +1,16 @@
 import { Banknote, Receipt, TrendingUp } from "lucide-react";
 
-import { useFeePlans } from "../hooks/useFeePlans";
-import { useInstallmentPolicies } from "../hooks/useInstallmentPolicies";
+import { useFeePlans } from "../../hooks/useFeePlans";
+import { useInstallmentPolicies } from "../../hooks/useInstallmentPolicies";
 
 export function FinancialSummaryCards() {
-  const {
-    data: feePlans = [],
-    isLoading: isLoadingFeePlans,
-  } = useFeePlans();
+  const { data: feePlans = [], isLoading: isLoadingFeePlans } = useFeePlans();
 
-  const {
-    data: policies = [],
-    isLoading: isLoadingPolicies,
-  } = useInstallmentPolicies();
+  const { data: policies = [], isLoading: isLoadingPolicies } =
+    useInstallmentPolicies();
 
   const totalExtraServices = feePlans.reduce(
-    (total, plan) =>
-      total + (plan.extraServices?.length || 0),
+    (total, plan) => total + (plan.extraServices?.length || 0),
     0,
   );
 
@@ -24,9 +18,7 @@ export function FinancialSummaryCards() {
     {
       title: "Fee Plans",
       description: "Configured tuition structures",
-      value: isLoadingFeePlans
-        ? "..."
-        : feePlans.length.toString(),
+      value: isLoadingFeePlans ? "..." : feePlans.length.toString(),
       icon: Receipt,
       iconStyle: "bg-primary/[0.09] text-primary",
       accentStyle: "bg-primary",
@@ -34,9 +26,7 @@ export function FinancialSummaryCards() {
     {
       title: "Extra Services",
       description: "Optional services in plans",
-      value: isLoadingFeePlans
-        ? "..."
-        : totalExtraServices.toString(),
+      value: isLoadingFeePlans ? "..." : totalExtraServices.toString(),
       icon: Banknote,
       iconStyle: "bg-info/[0.10] text-info",
       accentStyle: "bg-info",
@@ -44,9 +34,7 @@ export function FinancialSummaryCards() {
     {
       title: "Policies",
       description: "Available payment schedules",
-      value: isLoadingPolicies
-        ? "..."
-        : policies.length.toString(),
+      value: isLoadingPolicies ? "..." : policies.length.toString(),
       icon: TrendingUp,
       iconStyle: "bg-success/[0.10] text-success",
       accentStyle: "bg-success",

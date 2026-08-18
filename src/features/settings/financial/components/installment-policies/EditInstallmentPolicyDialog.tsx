@@ -1,5 +1,5 @@
 import { InstallmentPolicyForm } from "./InstallmentPolicyForm";
-import { FinancialBaseDialog } from "../../shared/FinancialBaseDialog";
+import { FinancialBaseDialog } from "../shared/FinancialBaseDialog";
 import type { InstallmentPolicyFormValues } from "../../schemas/installmentPolicy.schema";
 
 type Props = {
@@ -10,7 +10,13 @@ type Props = {
   onSubmit: (values: InstallmentPolicyFormValues) => void;
 };
 
-export function EditInstallmentPolicyDialog({ open, onOpenChange, defaultValues, onSubmit, isLoading }: Props) {
+export function EditInstallmentPolicyDialog({
+  open,
+  onOpenChange,
+  defaultValues,
+  onSubmit,
+  isLoading,
+}: Props) {
   if (!open) return null;
   return (
     <FinancialBaseDialog

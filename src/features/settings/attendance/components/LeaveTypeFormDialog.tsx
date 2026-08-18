@@ -1,6 +1,6 @@
+
 import { useEffect, useState } from "react";
-import { Button } from "@/shared/ui/button";
-import { Input } from "@/shared/ui/input";
+
 import {
   Select,
   SelectContent,
@@ -8,15 +8,23 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/shared/ui/select";
+
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/shared/ui/dialog";
-import { useCreateLeaveType, useUpdateLeaveType } from "../hooks/useLeaveTypes";
-import type { LeaveType, CreateLeaveTypePayload } from "../types/leaveType.types";
+  BaseDialog,
+  DialogActions,
+  DialogField,
+  dialogInputClass,
+} from "@/features/settings/academic/components/dialogs/BaseDialog";
+
+import {
+  useCreateLeaveType,
+  useUpdateLeaveType,
+} from "../hooks/useLeaveTypes";
+
+import type {
+  LeaveType,
+  CreateLeaveTypePayload,
+} from "../types/leaveType.types";
 
 interface LeaveTypeFormDialogProps {
   open: boolean;
@@ -30,17 +38,37 @@ export const LeaveTypeFormDialog = ({
   leaveTypeToEdit,
 }: LeaveTypeFormDialogProps) => {
   const [name, setName] = useState("");
-  const [paymentType, setPaymentType] = useState<"paid" | "unpaid">("paid");
+  const [paymentType, setPaymentType] =
+    useState<"paid" | "unpaid">("paid");
   const [maxDays, setMaxDays] = useState<number>(10);
 
   const createMutation = useCreateLeaveType();
   const updateMutation = useUpdateLeaveType();
 
+  const isPending =
+    createMutation.isPending || updateMutation.isPending;
+
+  /*
+   * Keep the original form initialization logic.
+   *
+   * New:
+   * - Reset the form to defaults.
+   *
+   * Edit:
+   * - Load the selected leave type.
+   *
+   * The `open` dependency ensures the form is refreshed
+   * every time the dialog is opened.
+   */
   useEffect(() => {
+    if (!open) return;
+
     if (leaveTypeToEdit) {
       setName(leaveTypeToEdit.name);
       setPaymentType(leaveTypeToEdit.payment_type);
-      setMaxDays(leaveTypeToEdit.max_days_per_academic_year);
+      setMaxDays(
+        leaveTypeToEdit.max_days_per_academic_year,
+      );
     } else {
       setName("");
       setPaymentType("paid");
@@ -48,8 +76,7 @@ export const LeaveTypeFormDialog = ({
     }
   }, [leaveTypeToEdit, open]);
 
- const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
     if (!name.trim()) return;
 
     const payload: CreateLeaveTypePayload = {
@@ -60,7 +87,6 @@ export const LeaveTypeFormDialog = ({
 
     try {
       if (leaveTypeToEdit) {
-
         await updateMutation.mutateAsync({
           id: leaveTypeToEdit.id,
           payload,
@@ -68,79 +94,107 @@ export const LeaveTypeFormDialog = ({
       } else {
         await createMutation.mutateAsync(payload);
       }
+
+      /*
+       * IMPORTANT:
+       * The parent still controls the dialog state.
+       */
       onOpenChange(false);
     } catch (error: any) {
       console.error("Failed to save leave type", error);
 
       if (error.response?.data?.errors) {
-        console.log("Validation Errors:", error.response.data.errors);
+        console.log(
+          "Validation Errors:",
+          error.response.data.errors,
+        );
       }
     }
   };
 
-  const isPending = createMutation.isPending || updateMutation.isPending;
+  /*
+   * Do not mount BaseDialog while closed.
+   *
+   * This preserves the original controlled `open` behavior
+   * because BaseDialog itself does not receive an `open` prop.
+   */
+  if (!open) {
+    return null;
+  }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px] rounded-[22px]">
-        <DialogHeader>
-          <DialogTitle>
-            {leaveTypeToEdit ? "Edit Leave Type" : "Add Leave Type"}
-          </DialogTitle>
-        </DialogHeader>
+    <BaseDialog
+      title={
+        leaveTypeToEdit
+          ? "Edit leave type"
+          : "Add leave type"
+      }
+      description="Define the leave type, payment status, and maximum allowed days per academic year."
+      onClose={() => onOpenChange(false)}
+    >
+      <DialogField label="Leave Type Name">
+        <input
+          value={name}
+          onChange={(event) =>
+            setName(event.target.value)
+          }
+          placeholder="e.g. Sick Leave, Annual Leave"
+          className={dialogInputClass}
+        />
+      </DialogField>
 
-        <form onSubmit={handleSubmit} className="space-y-4 pt-2">
-          <div className="space-y-1.5">
-            <label className="text-[12px] font-medium text-foreground">Name</label>
-            <Input
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="e.g., Sick Leave, Annual Leave"
-              required
-              className="h-10 rounded-[12px]"
-            />
-          </div>
+      <DialogField label="Payment Type">
+        <Select
+          value={paymentType}
+          onValueChange={(value: "paid" | "unpaid") =>
+            setPaymentType(value)
+          }
+        >
+          <SelectTrigger className="h-11 rounded-[13px] px-3.5">
+            <SelectValue placeholder="Select payment type" />
+          </SelectTrigger>
 
-          <div className="space-y-1.5">
-            <label className="text-[12px] font-medium text-foreground">Payment Type</label>
-            <Select value={paymentType} onValueChange={(val: "paid" | "unpaid") => setPaymentType(val)}>
-              <SelectTrigger className="h-10 rounded-[12px]">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="paid">Paid (مدفوعة الأجر)</SelectItem>
-                <SelectItem value="unpaid">Unpaid (بدون راتب)</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+          <SelectContent>
+            <SelectItem value="paid">
+              Paid (مدفوعة الأجر)
+            </SelectItem>
 
-          <div className="space-y-1.5">
-            <label className="text-[12px] font-medium text-foreground">Max Days Per Academic Year</label>
-            <Input
-              type="number"
-              value={maxDays}
-              onChange={(e) => setMaxDays(Number(e.target.value))}
-              min={1}
-              required
-              className="h-10 rounded-[12px]"
-            />
-          </div>
+            <SelectItem value="unpaid">
+              Unpaid (بدون راتب)
+            </SelectItem>
+          </SelectContent>
+        </Select>
+      </DialogField>
 
-          <DialogFooter className="pt-4">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-              className="h-10 rounded-[12px]"
-            >
-              Cancel
-            </Button>
-            <Button type="submit" disabled={isPending} className="h-10 rounded-[12px]">
-              {isPending ? "Saving..." : "Save"}
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+      <DialogField label="Max Days Per Academic Year">
+        <input
+          type="number"
+          min={1}
+          value={maxDays}
+          onChange={(event) =>
+            setMaxDays(Number(event.target.value))
+          }
+          placeholder="e.g. 30"
+          className={dialogInputClass}
+        />
+      </DialogField>
+
+      <div className="rounded-[15px] border border-primary/10 bg-primary/[0.035] px-4 py-3">
+        <p className="text-[12px] leading-5 text-muted-foreground">
+          Set the maximum number of days employees can use
+          for this leave type during the academic year.
+        </p>
+      </div>
+
+      <DialogActions
+        onClose={() => onOpenChange(false)}
+        onSave={handleSubmit}
+        disabled={
+          isPending ||
+          !name.trim() ||
+          maxDays < 1
+        }
+      />
+    </BaseDialog>
   );
 };

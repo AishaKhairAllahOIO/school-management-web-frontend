@@ -1,15 +1,10 @@
 import { useState } from "react";
-import {
-  Banknote,
-  CalendarRange,
-  ReceiptText,
-
-} from "lucide-react";
+import { Banknote, CalendarRange, ReceiptText } from "lucide-react";
 
 import { SectionHeader } from "@/features/settings/academic/components/shared/SectionHeader";
 
 import { FinancialDashboard } from "./FinancialDashboard";
-import { FinancialWorkspace } from "../shared/FinancialWorkspace";
+import { FinancialWorkspace } from "../components/shared/FinancialWorkspace";
 
 export type FinancialAudience = "students" | "staff";
 export type FinancialSection = "fee-plans" | "policies";
@@ -35,13 +30,12 @@ const studentWorkspaceItems = [
 }>;
 
 export function FinancialSettingsPage() {
-  const [audience, ] = useState<FinancialAudience>("students");
+  const [audience] = useState<FinancialAudience>("students");
   const [activeSection, setActiveSection] =
     useState<FinancialSection>("fee-plans");
 
   return (
     <div className="mx-auto w-full max-w-[1500px] space-y-4">
-    
       {audience === "students" ? (
         <FinancialWorkspace
           items={studentWorkspaceItems}
@@ -57,7 +51,6 @@ export function FinancialSettingsPage() {
     </div>
   );
 }
-
 
 function StaffFinancialSettings() {
   return (
@@ -75,9 +68,10 @@ function StaffFinancialSettings() {
           Staff finance endpoints are not included in this package
         </h3>
         <p className="mx-auto mt-2 max-w-xl text-[13px] leading-6 text-muted-foreground">
-          The student and staff areas are now clearly separated. Connect the staff
-          salary, allowance and deduction services here once their API files are
-          available; no temporary records or mock data have been added.
+          The student and staff areas are now clearly separated. Connect the
+          staff salary, allowance and deduction services here once their API
+          files are available; no temporary records or mock data have been
+          added.
         </p>
       </div>
     </section>
