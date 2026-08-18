@@ -149,41 +149,40 @@ export function StaffPayrollPage() {
         {/* ===================================================
             ROLE TABS
         ==================================================== */}
-        <div className="order-2 flex min-w-0 flex-1 gap-2 overflow-x-auto pb-1 lg:order-1">
-          {ROLES.map((item) => {
-            const Icon = item.icon;
-            const isActive = role === item.value;
+    <div className="order-2 flex min-w-0 flex-1 flex-wrap gap-2 lg:order-1">
+  {ROLES.map((item) => {
+    const Icon = item.icon;
+    const isActive = role === item.value;
 
-            return (
-              <button
-                key={item.value}
-                type="button"
-                onClick={() => changeRole(item.value)}
-                className={[
-                  "inline-flex shrink-0 items-center gap-2",
-                  "rounded-xl px-3.5 py-2.5",
-                  "text-xs font-semibold",
-                  "transition-all duration-200",
-                  "focus-visible:outline-none",
-                  "focus-visible:ring-2",
-                  "focus-visible:ring-primary/30",
-                  isActive
-                    ? item.activeClass
-                    : item.inactiveClass,
-                ].join(" ")}
-              >
-                <Icon
-                  aria-hidden="true"
-                  className="size-3.5"
-                  strokeWidth={2}
-                />
+    return (
+      <button
+        key={item.value}
+        type="button"
+        onClick={() => changeRole(item.value)}
+        className={[
+          "inline-flex shrink-0 items-center gap-2",
+          "rounded-xl px-3.5 py-2.5",
+          "text-xs font-semibold",
+          "transition-all duration-200",
+          "focus-visible:outline-none",
+          "focus-visible:ring-2",
+          "focus-visible:ring-primary/30",
+          isActive
+            ? item.activeClass
+            : item.inactiveClass,
+        ].join(" ")}
+      >
+        <Icon
+          aria-hidden="true"
+          className="size-3.5"
+          strokeWidth={2}
+        />
 
-                {item.label}
-              </button>
-            );
-          })}
-        </div>
-
+        {item.label}
+      </button>
+    );
+  })}
+</div>
         {/* ===================================================
             SEARCH
         ==================================================== */}

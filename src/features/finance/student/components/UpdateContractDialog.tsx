@@ -21,7 +21,7 @@ import {
   SelectValue,
 } from "@/shared/ui/select";
 
-import type { FinancialAccount } from "../../types/finance.types";
+import type { FinancialAccount } from "../types/finance.types";
 
 type Option = { id: number | string; name: string };
 type FeePlanOption = Option;
@@ -33,8 +33,7 @@ type UpdateContractValues = {
 
 const updateContractSchema = z.object({
   feePlanId: z.number().min(1, "Please select the installment amount."),
-  installmentPolicyId: z.number()
-    .min(1, "Please select the payment policy."),
+  installmentPolicyId: z.number().min(1, "Please select the payment policy."),
 });
 
 type Props = {

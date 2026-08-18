@@ -10,12 +10,13 @@ import { useMemo } from "react";
 
 import { useCommitPayroll } from "../hooks/usePayroll";
 
-import type { ApiId, PayrollPreview } from "../types/payroll.types";
+import type {
+  ApiId,
+  PayrollPreview,
+} from "../types/payroll.types";
 
 import { usePrintIdentity } from "@/features/printing/hooks/usePrintIdentity";
-import { usePrintPreview } from "@/features/printing/hooks/usePrintPreview";
-import { PrintPreviewDialog } from "@/features/printing/components/PrintPreviewDialog";
-import { createOfficialDocument } from "@/features/printing/templates/official-document";
+import { FinancialDocumentTemplate } from "@/features/printing/templates/FinancialDocumentTemplate";
 
 type Props = {
   open: boolean;
@@ -36,14 +37,20 @@ type Props = {
    ARABIC / PERSIAN DIGITS → ENGLISH DIGITS
    ========================================================= */
 
-function toEnglishDigits(value: string | number | null | undefined): string {
+function toEnglishDigits(
+  value: string | number | null | undefined,
+): string {
   if (value === null || value === undefined) {
     return "";
   }
 
   return String(value)
-    .replace(/[٠-٩]/g, (digit) => String("٠١٢٣٤٥٦٧٨٩".indexOf(digit)))
-    .replace(/[۰-۹]/g, (digit) => String("۰۱۲۳۴۵۶۷۸۹".indexOf(digit)));
+    .replace(/[٠-٩]/g, (digit) =>
+      String("٠١٢٣٤٥٦٧٨٩".indexOf(digit)),
+    )
+    .replace(/[۰-۹]/g, (digit) =>
+      String("۰۱۲۳۴۵۶۷۸۹".indexOf(digit)),
+    );
 }
 
 /* =========================================================
@@ -58,7 +65,6 @@ function formatEnglishNumber(
   }
 
   const normalized = toEnglishDigits(value);
-
   const numericValue = Number(normalized);
 
   if (Number.isNaN(numericValue)) {
@@ -82,7 +88,6 @@ function formatEnglishSalary(
   }
 
   const normalized = toEnglishDigits(value);
-
   const numericValue = Number(normalized);
 
   if (Number.isNaN(numericValue)) {
@@ -93,23 +98,6 @@ function formatEnglishSalary(
     minimumFractionDigits: 0,
     maximumFractionDigits: 2,
   }).format(numericValue);
-}
-
-/* =========================================================
-   HTML ESCAPE
-   ========================================================= */
-
-function escapeHtml(value: string | number | null | undefined): string {
-  if (value === null || value === undefined) {
-    return "";
-  }
-
-  return String(value)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
 }
 
 /* =========================================================
@@ -131,524 +119,48 @@ export function PayrollPreviewDialog({
   const commitMutation = useCommitPayroll();
 
   /* =======================================================
-     PRINTING
+     PRINT IDENTITY
      ======================================================= */
 
   const printIdentity = usePrintIdentity();
 
-  const printPreview = usePrintPreview();
+  /* =======================================================
+     PRINT DATA
+     ======================================================= */
 
-  /**
-   * Build the printable payroll document.
-   *
-   * We only create the document when a payroll
-   * preview actually exists.
-   */
-  const printablePayroll = useMemo(() => {
+  const printData = useMemo(() => {
     if (!preview) {
       return null;
     }
 
     const period = `${toEnglishDigits(month)}/${toEnglishDigits(year)}`;
 
-    const paymentDate = new Date().toISOString().slice(0, 10);
-
-    const staffReference = toEnglishDigits(staffId);
- const content = `
-  <div
-    style="
-      width: 100%;
-      box-sizing: border-box;
-      font-family: Arial, Helvetica, sans-serif;
-      color: #222;
-      font-size: 11px;
-    "
-  >
-
-    <!-- =====================================================
-         PAYMENT INFORMATION
-         ===================================================== -->
-
-    <div
-      style="
-        width: 100%;
-        box-sizing: border-box;
-
-        /* Space between header line and payment information */
-        padding-top: 10px;
-
-        margin-bottom: 22px;
-      "
-    >
-
-      <!-- Payment Date -->
-      <div
-        style="
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-
-          width: 100%;
-          box-sizing: border-box;
-
-          margin-bottom: 8px;
-        "
-      >
-
-        <div
-          style="
-            flex: 1 1 auto;
-            min-width: 0;
-
-            color: #555;
-            font-size: 11px;
-            font-weight: 500;
-          "
-        >
-          Payment Date
-        </div>
-
-        <div
-          dir="ltr"
-          style="
-            flex: 0 0 auto;
-
-            margin-left: 24px;
-
-            color: #222;
-            font-size: 11px;
-            font-weight: 600;
-
-            text-align: right;
-            white-space: nowrap;
-          "
-        >
-          ${escapeHtml(paymentDate)}
-        </div>
-
-      </div>
-
-
-      <!-- Payroll Period -->
-      <div
-        style="
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-
-          width: 100%;
-          box-sizing: border-box;
-        "
-      >
-
-        <div
-          style="
-            flex: 1 1 auto;
-            min-width: 0;
-
-            color: #555;
-            font-size: 11px;
-            font-weight: 500;
-          "
-        >
-          Payroll Period
-        </div>
-
-        <div
-          dir="ltr"
-          style="
-            flex: 0 0 auto;
-
-            margin-left: 24px;
-
-            color: #222;
-            font-size: 11px;
-            font-weight: 600;
-
-            text-align: right;
-            white-space: nowrap;
-          "
-        >
-          ${escapeHtml(period)}
-        </div>
-
-      </div>
-
-    </div>
-
-
-    <!-- =====================================================
-         SALARY DETAILS
-         ===================================================== -->
-
-    <div
-      style="
-        width: 100%;
-        box-sizing: border-box;
-
-        margin-bottom: 20px;
-      "
-    >
-
-      <!-- Section Title -->
-      <div
-        style="
-          margin-bottom: 12px;
-
-          color: #222;
-          font-size: 12px;
-          font-weight: 700;
-        "
-      >
-        Salary Details
-      </div>
-
-
-      <!-- Contract Rate -->
-      <div
-        style="
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-
-          width: 100%;
-          box-sizing: border-box;
-
-          min-height: 24px;
-          margin-bottom: 8px;
-        "
-      >
-
-        <div
-          style="
-            flex: 1 1 auto;
-            min-width: 0;
-
-            color: #555;
-            font-weight: 500;
-          "
-        >
-          Contract Rate
-        </div>
-
-        <div
-          dir="ltr"
-          style="
-            flex: 0 0 auto;
-
-            margin-left: 24px;
-
-            color: #222;
-            font-weight: 600;
-
-            text-align: right;
-            white-space: nowrap;
-          "
-        >
-          ${escapeHtml(
-            formatEnglishSalary(
-              preview.contract_rate,
-            ),
-          )}
-        </div>
-
-      </div>
-
-
-      <!-- Expected Units -->
-      <div
-        style="
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-
-          width: 100%;
-          box-sizing: border-box;
-
-          min-height: 24px;
-          margin-bottom: 8px;
-        "
-      >
-
-        <div
-          style="
-            flex: 1 1 auto;
-            min-width: 0;
-
-            color: #555;
-            font-weight: 500;
-          "
-        >
-          Expected Units
-        </div>
-
-        <div
-          dir="ltr"
-          style="
-            flex: 0 0 auto;
-
-            margin-left: 24px;
-
-            color: #222;
-            font-weight: 600;
-
-            text-align: right;
-            white-space: nowrap;
-          "
-        >
-          ${escapeHtml(
-            formatEnglishNumber(
-              preview.expected_units,
-            ),
-          )}
-        </div>
-
-      </div>
-
-
-      <!-- Missed Units -->
-      <div
-        style="
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-
-          width: 100%;
-          box-sizing: border-box;
-
-          min-height: 24px;
-          margin-bottom: 8px;
-        "
-      >
-
-        <div
-          style="
-            flex: 1 1 auto;
-            min-width: 0;
-
-            color: #555;
-            font-weight: 500;
-          "
-        >
-          Missed Units
-        </div>
-
-        <div
-          dir="ltr"
-          style="
-            flex: 0 0 auto;
-
-            margin-left: 24px;
-
-            color: #222;
-            font-weight: 600;
-
-            text-align: right;
-            white-space: nowrap;
-          "
-        >
-          ${escapeHtml(
-            formatEnglishNumber(
-              preview.missed_units,
-            ),
-          )}
-        </div>
-
-      </div>
-
-
-      <!-- Deductions -->
-      <div
-        style="
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-
-          width: 100%;
-          box-sizing: border-box;
-
-          min-height: 24px;
-        "
-      >
-
-        <div
-          style="
-            flex: 1 1 auto;
-            min-width: 0;
-
-            color: #555;
-            font-weight: 500;
-          "
-        >
-          Deductions
-        </div>
-
-        <div
-          dir="ltr"
-          style="
-            flex: 0 0 auto;
-
-            margin-left: 24px;
-
-            color: #222;
-            font-weight: 600;
-
-            text-align: right;
-            white-space: nowrap;
-          "
-        >
-          ${escapeHtml(
-            formatEnglishSalary(
-              preview.deductions,
-            ),
-          )}
-        </div>
-
-      </div>
-
-    </div>
-
-
-    <!-- =====================================================
-         NET SALARY SEPARATOR
-         ===================================================== -->
-
-    <div
-      style="
-        width: 100%;
-        height: 1px;
-
-        margin: 18px 0 16px;
-
-        background: #999;
-      "
-    ></div>
-
-
-    <!-- =====================================================
-         NET SALARY
-         ===================================================== -->
-
-    <div
-      style="
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-
-        width: 100%;
-        box-sizing: border-box;
-
-        margin-bottom: 18px;
-      "
-    >
-
-      <div
-        style="
-          flex: 1 1 auto;
-          min-width: 0;
-        "
-      >
-
-        <div
-          style="
-            color: #222;
-            font-size: 12px;
-            font-weight: 700;
-          "
-        >
-          Net Salary
-        </div>
-
-        <div
-          style="
-            margin-top: 3px;
-
-            color: #777;
-            font-size: 9.5px;
-          "
-        >
-          Final payment amount
-        </div>
-
-      </div>
-
-
-      <div
-        dir="ltr"
-        style="
-          flex: 0 0 auto;
-
-          margin-left: 24px;
-
-          color: #222;
-          font-size: 17px;
-          font-weight: 700;
-
-          text-align: right;
-          white-space: nowrap;
-        "
-      >
-        ${escapeHtml(
-          formatEnglishSalary(
-            preview.net_salary,
-          ),
-        )}
-      </div>
-
-    </div>
-
-
-    <!-- =====================================================
-         NOTE
-         ===================================================== -->
-
-    <div
-      style="
-        width: 100%;
-        box-sizing: border-box;
-
-        margin-top: 20px;
-        padding-top: 10px;
-
-        border-top: 1px solid #ddd;
-
-        color: #777;
-        font-size: 9px;
-        line-height: 1.5;
-
-        text-align: center;
-      "
-    >
-      Payroll calculation completed for the selected period.
-    </div>
-
-  </div>
-`;
-    return createOfficialDocument({
-      title: `Payroll - ${period}`,
-
-      identity: printIdentity,
-
-      documentTitle: "PAYROLL STATEMENT",
-
-      reference: `PAYROLL-${staffReference}-${period}`,
-
-      content,
-
-      signatureLabel: "Authorized payroll officer",
-    });
-  }, [month, year, staffId, preview, printIdentity]);
+    const paymentDate = new Date()
+      .toISOString()
+      .slice(0, 10);
+
+    const documentNumber =
+      `PAYROLL-${toEnglishDigits(staffId)}-${toEnglishDigits(
+        year,
+      )}-${toEnglishDigits(month)}`;
+
+    return {
+      period,
+      paymentDate,
+      documentNumber,
+    };
+  }, [month, year, staffId, preview]);
 
   /* =======================================================
      PRINT
      ======================================================= */
 
   function handlePrint() {
-    if (!printablePayroll) {
+    if (!preview || !printData) {
       return;
     }
 
-    printPreview.openPreview(printablePayroll);
+    window.print();
   }
 
   /* =======================================================
@@ -660,7 +172,9 @@ export function PayrollPreviewDialog({
       staff_id: staffId,
       year,
       month,
-      payment_date: new Date().toISOString().slice(0, 10),
+      payment_date: new Date()
+        .toISOString()
+        .slice(0, 10),
     });
 
     onCommitted();
@@ -668,23 +182,11 @@ export function PayrollPreviewDialog({
   }
 
   /* =======================================================
-     PRINT PREVIEW
-     ======================================================= */
-
-  const printDialog = printablePayroll ? (
-    <PrintPreviewDialog
-      open={printPreview.isOpen}
-      onOpenChange={printPreview.setOpen}
-      document={printPreview.document}
-    />
-  ) : null;
-
-  /* =======================================================
      CLOSED
      ======================================================= */
 
   if (!open) {
-    return <>{printDialog}</>;
+    return null;
   }
 
   /* =======================================================
@@ -693,20 +195,63 @@ export function PayrollPreviewDialog({
 
   return (
     <>
-      <div
-        className="
-          fixed
-          inset-0
-          z-50
-          flex
-          items-center
-          justify-center
-          p-4
-        "
-      >
-        {/* =================================================
-            BACKDROP
-           ================================================= */}
+      {/* =====================================================
+          PRINT STYLES
+         ===================================================== */}
+
+      <style>
+        {`
+          @media print {
+            @page {
+              size: A5 portrait;
+              margin: 0;
+            }
+
+            html,
+            body {
+              margin: 0 !important;
+              padding: 0 !important;
+              background: #ffffff !important;
+            }
+
+            body * {
+              visibility: hidden !important;
+            }
+
+            .payroll-print-document,
+            .payroll-print-document * {
+              visibility: visible !important;
+            }
+
+            .payroll-print-document {
+              position: absolute !important;
+              inset: 0 !important;
+              width: 148mm !important;
+              min-height: 210mm !important;
+              margin: 0 !important;
+              padding: 0 !important;
+              background: #ffffff !important;
+            }
+
+            .payroll-screen-dialog {
+              display: none !important;
+            }
+          }
+
+          @media screen {
+            .payroll-print-document {
+              display: none;
+            }
+          }
+        `}
+      </style>
+
+      {/* =====================================================
+          SCREEN DIALOG
+         ===================================================== */}
+
+      <div className="payroll-screen-dialog fixed inset-0 z-50 flex items-center justify-center p-4">
+        {/* BACKDROP */}
 
         <button
           type="button"
@@ -722,9 +267,7 @@ export function PayrollPreviewDialog({
           "
         />
 
-        {/* =================================================
-            DIALOG
-           ================================================= */}
+        {/* DIALOG */}
 
         <div
           className="
@@ -740,9 +283,7 @@ export function PayrollPreviewDialog({
             shadow-[0_20px_60px_rgba(31,22,73,0.16)]
           "
         >
-          {/* =================================================
-              HEADER
-             ================================================= */}
+          {/* HEADER */}
 
           <div
             className="
@@ -768,7 +309,10 @@ export function PayrollPreviewDialog({
                   text-primary
                 "
               >
-                <CircleDollarSign className="size-[18px]" strokeWidth={1.8} />
+                <CircleDollarSign
+                  className="size-[18px]"
+                  strokeWidth={1.8}
+                />
               </div>
 
               <div>
@@ -792,12 +336,11 @@ export function PayrollPreviewDialog({
                     text-muted-foreground
                   "
                 >
-                  {toEnglishDigits(month)}/{toEnglishDigits(year)}
+                  {toEnglishDigits(month)}/
+                  {toEnglishDigits(year)}
                 </p>
               </div>
             </div>
-
-            {/* Close */}
 
             <button
               type="button"
@@ -814,26 +357,21 @@ export function PayrollPreviewDialog({
                 duration-200
                 hover:bg-muted
                 hover:text-foreground
-                focus-visible:outline-none
-                focus-visible:ring-2
-                focus-visible:ring-primary/20
-                focus-visible:ring-offset-2
                 disabled:pointer-events-none
                 disabled:opacity-50
               "
             >
-              <X className="size-4" strokeWidth={1.8} />
+              <X
+                className="size-4"
+                strokeWidth={1.8}
+              />
             </button>
           </div>
 
-          {/* =================================================
-              CONTENT
-             ================================================= */}
+          {/* CONTENT */}
 
           <div className="px-5 py-5">
-            {/* =================================================
-                BEFORE PREVIEW
-               ================================================= */}
+            {/* BEFORE PREVIEW */}
 
             {!preview && (
               <div className="py-3 text-center">
@@ -849,7 +387,10 @@ export function PayrollPreviewDialog({
                     text-primary
                   "
                 >
-                  <CircleDollarSign className="size-5" strokeWidth={1.7} />
+                  <CircleDollarSign
+                    className="size-5"
+                    strokeWidth={1.7}
+                  />
                 </div>
 
                 <h3
@@ -873,7 +414,8 @@ export function PayrollPreviewDialog({
                     text-muted-foreground
                   "
                 >
-                  Calculate the employee salary before confirming the payment.
+                  Calculate the employee salary before
+                  confirming the payment.
                 </p>
 
                 <button
@@ -896,29 +438,25 @@ export function PayrollPreviewDialog({
                     text-foreground
                     shadow-sm
                     transition-all
-                    duration-200
                     hover:border-primary/30
                     hover:bg-primary/[0.035]
                     hover:text-primary
-                    focus-visible:outline-none
-                    focus-visible:ring-2
-                    focus-visible:ring-primary/20
-                    focus-visible:ring-offset-2
                     disabled:pointer-events-none
                     disabled:opacity-50
                   "
                 >
                   {previewLoading ? (
                     <Loader2
-                      className="
-                        size-3.5
-                        animate-spin
-                      "
+                      className="size-3.5 animate-spin"
                       strokeWidth={2}
                     />
                   ) : (
-                    <CircleDollarSign className="size-3.5" strokeWidth={1.9} />
+                    <CircleDollarSign
+                      className="size-3.5"
+                      strokeWidth={1.9}
+                    />
                   )}
+
                   Generate preview
                 </button>
 
@@ -937,15 +475,11 @@ export function PayrollPreviewDialog({
               </div>
             )}
 
-            {/* =================================================
-                PREVIEW
-               ================================================= */}
+            {/* PREVIEW */}
 
             {preview && (
               <>
-                {/* =================================================
-                    SUMMARY
-                   ================================================= */}
+                {/* SUMMARY */}
 
                 <div
                   className="
@@ -981,7 +515,8 @@ export function PayrollPreviewDialog({
                         text-foreground
                       "
                     >
-                      {toEnglishDigits(month)}/{toEnglishDigits(year)}
+                      {toEnglishDigits(month)}/
+                      {toEnglishDigits(year)}
                     </p>
                   </div>
 
@@ -995,14 +530,16 @@ export function PayrollPreviewDialog({
                       text-success
                     "
                   >
-                    <CheckCircle2 className="size-3.5" strokeWidth={2} />
+                    <CheckCircle2
+                      className="size-3.5"
+                      strokeWidth={2}
+                    />
+
                     Preview ready
                   </div>
                 </div>
 
-                {/* =================================================
-                    DETAILS
-                   ================================================= */}
+                {/* DETAILS */}
 
                 <div
                   className="
@@ -1016,29 +553,35 @@ export function PayrollPreviewDialog({
                 >
                   <PreviewRow
                     label="Contract rate"
-                    value={formatEnglishSalary(preview.contract_rate)}
+                    value={formatEnglishSalary(
+                      preview.contract_rate,
+                    )}
                   />
 
                   <PreviewRow
                     label="Expected units"
-                    value={formatEnglishNumber(preview.expected_units)}
+                    value={formatEnglishNumber(
+                      preview.expected_units,
+                    )}
                   />
 
                   <PreviewRow
                     label="Missed units"
-                    value={formatEnglishNumber(preview.missed_units)}
+                    value={formatEnglishNumber(
+                      preview.missed_units,
+                    )}
                   />
 
                   <PreviewRow
                     label="Deductions"
-                    value={formatEnglishSalary(preview.deductions)}
+                    value={formatEnglishSalary(
+                      preview.deductions,
+                    )}
                     last
                   />
                 </div>
 
-                {/* =================================================
-                    NET SALARY
-                   ================================================= */}
+                {/* NET SALARY */}
 
                 <div
                   className="
@@ -1089,14 +632,14 @@ export function PayrollPreviewDialog({
                         text-primary
                       "
                     >
-                      {formatEnglishSalary(preview.net_salary)}
+                      {formatEnglishSalary(
+                        preview.net_salary,
+                      )}
                     </span>
                   </div>
                 </div>
 
-                {/* =================================================
-                    ERROR
-                   ================================================= */}
+                {/* ERROR */}
 
                 {commitMutation.isError && (
                   <div
@@ -1111,13 +654,12 @@ export function PayrollPreviewDialog({
                       text-destructive
                     "
                   >
-                    Failed to commit payroll. Please try again.
+                    Failed to commit payroll.
+                    Please try again.
                   </div>
                 )}
 
-                {/* =================================================
-                    ACTIONS
-                   ================================================= */}
+                {/* ACTIONS */}
 
                 <div
                   className="
@@ -1130,8 +672,6 @@ export function PayrollPreviewDialog({
                     pt-4
                   "
                 >
-                  {/* LEFT */}
-
                   <button
                     type="button"
                     onClick={onClose}
@@ -1145,14 +685,7 @@ export function PayrollPreviewDialog({
                       underline
                       underline-offset-4
                       decoration-muted-foreground/25
-                      transition-all
-                      duration-200
                       hover:text-foreground
-                      hover:decoration-foreground/40
-                      focus-visible:outline-none
-                      focus-visible:ring-2
-                      focus-visible:ring-primary/20
-                      focus-visible:ring-offset-2
                       disabled:pointer-events-none
                       disabled:opacity-50
                     "
@@ -1160,17 +693,16 @@ export function PayrollPreviewDialog({
                     Cancel
                   </button>
 
-                  {/* RIGHT ACTIONS */}
-
                   <div className="flex items-center gap-4">
-                    {/* =================================================
-                        PRINT
-                       ================================================= */}
+                    {/* PRINT */}
 
                     <button
                       type="button"
                       onClick={handlePrint}
-                      disabled={!printablePayroll || commitMutation.isPending}
+                      disabled={
+                        !preview ||
+                        commitMutation.isPending
+                      }
                       className="
                         inline-flex
                         items-center
@@ -1183,25 +715,20 @@ export function PayrollPreviewDialog({
                         underline
                         underline-offset-4
                         decoration-muted-foreground/25
-                        transition-all
-                        duration-200
                         hover:text-foreground
-                        hover:decoration-foreground/60
-                        focus-visible:outline-none
-                        focus-visible:ring-2
-                        focus-visible:ring-primary/20
-                        focus-visible:ring-offset-2
                         disabled:pointer-events-none
                         disabled:opacity-50
                       "
                     >
-                      <Printer className="size-3.5" strokeWidth={1.9} />
+                      <Printer
+                        className="size-3.5"
+                        strokeWidth={1.9}
+                      />
+
                       Print
                     </button>
 
-                    {/* =================================================
-                        CONFIRM
-                       ================================================= */}
+                    {/* CONFIRM */}
 
                     <button
                       type="button"
@@ -1219,29 +746,23 @@ export function PayrollPreviewDialog({
                         underline
                         underline-offset-4
                         decoration-primary/30
-                        transition-all
-                        duration-200
                         hover:text-primary/70
-                        hover:decoration-primary
-                        focus-visible:outline-none
-                        focus-visible:ring-2
-                        focus-visible:ring-primary/20
-                        focus-visible:ring-offset-2
                         disabled:pointer-events-none
                         disabled:opacity-50
                       "
                     >
                       {commitMutation.isPending ? (
                         <Loader2
-                          className="
-                            size-3.5
-                            animate-spin
-                          "
+                          className="size-3.5 animate-spin"
                           strokeWidth={2}
                         />
                       ) : (
-                        <CheckCircle2 className="size-3.5" strokeWidth={2} />
+                        <CheckCircle2
+                          className="size-3.5"
+                          strokeWidth={2}
+                        />
                       )}
+
                       Confirm payment
                     </button>
                   </div>
@@ -1252,12 +773,222 @@ export function PayrollPreviewDialog({
         </div>
       </div>
 
-      {/* =======================================================
-          PRINT PREVIEW DIALOG
-         ======================================================= */}
+      {/* =====================================================
+          PRINT DOCUMENT
+         ===================================================== */}
 
-      {printDialog}
+      {preview && printData && (
+        <div className="payroll-print-document">
+          <FinancialDocumentTemplate
+            identity={printIdentity}
+            documentNumber={printData.documentNumber}
+            date={printData.paymentDate}
+            title="PAYROLL RECEIPT"
+            showStamp
+            showSignature
+          >
+            {/* =================================================
+                FEATURE CONTENT ONLY
+               ================================================= */}
+
+            <div
+              style={{
+                width: "100%",
+                fontFamily:
+                  "Arial, Helvetica, sans-serif",
+                color: "#111827",
+                fontSize: "10px",
+              }}
+            >
+              {/* PAYMENT INFORMATION */}
+
+              <div
+                style={{
+                  marginBottom: "18px",
+                }}
+              >
+                <FinancialRow
+                  label="Payment Date"
+                  value={printData.paymentDate}
+                />
+
+                <FinancialRow
+                  label="Payroll Period"
+                  value={printData.period}
+                />
+              </div>
+
+              {/* SALARY DETAILS */}
+
+              <div
+                style={{
+                  marginBottom: "18px",
+                }}
+              >
+                <div
+                  style={{
+                    marginBottom: "9px",
+                    fontSize: "11px",
+                    fontWeight: 700,
+                  }}
+                >
+                  Salary Details
+                </div>
+
+                <FinancialRow
+                  label="Contract Rate"
+                  value={formatEnglishSalary(
+                    preview.contract_rate,
+                  )}
+                />
+
+                <FinancialRow
+                  label="Expected Units"
+                  value={formatEnglishNumber(
+                    preview.expected_units,
+                  )}
+                />
+
+                <FinancialRow
+                  label="Missed Units"
+                  value={formatEnglishNumber(
+                    preview.missed_units,
+                  )}
+                />
+
+                <FinancialRow
+                  label="Deductions"
+                  value={formatEnglishSalary(
+                    preview.deductions,
+                  )}
+                />
+              </div>
+
+              {/* TOTAL */}
+
+              <div
+                style={{
+                  marginTop: "18px",
+                  paddingTop: "12px",
+                  borderTop:
+                    "1px solid #9ca3af",
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent:
+                      "space-between",
+                    gap: "20px",
+                  }}
+                >
+                  <div>
+                    <div
+                      style={{
+                        fontSize: "12px",
+                        fontWeight: 700,
+                      }}
+                    >
+                      Net Salary
+                    </div>
+
+                    <div
+                      style={{
+                        marginTop: "3px",
+                        fontSize: "8.5px",
+                        color: "#6b7280",
+                      }}
+                    >
+                      Final payment amount
+                    </div>
+                  </div>
+
+                  <div
+                    dir="ltr"
+                    style={{
+                      fontSize: "18px",
+                      fontWeight: 700,
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {formatEnglishSalary(
+                      preview.net_salary,
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* RECEIPT NOTE */}
+
+              <div
+                style={{
+                  marginTop: "24px",
+                  paddingTop: "9px",
+                  borderTop:
+                    "1px solid #e5e7eb",
+                  textAlign: "center",
+                  fontSize: "8.5px",
+                  lineHeight: 1.5,
+                  color: "#6b7280",
+                }}
+              >
+                This document confirms the payroll
+                payment for the selected period.
+              </div>
+            </div>
+          </FinancialDocumentTemplate>
+        </div>
+      )}
     </>
+  );
+}
+
+/* =========================================================
+   FINANCIAL ROW
+   ========================================================= */
+
+function FinancialRow({
+  label,
+  value,
+}: {
+  label: string;
+  value: string;
+}) {
+  return (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        gap: "20px",
+        minHeight: "24px",
+        padding: "4px 0",
+        borderBottom:
+          "1px solid #f1f5f9",
+      }}
+    >
+      <span
+        style={{
+          color: "#6b7280",
+          fontWeight: 500,
+        }}
+      >
+        {label}
+      </span>
+
+      <span
+        dir="ltr"
+        style={{
+          color: "#111827",
+          fontWeight: 600,
+          textAlign: "right",
+          whiteSpace: "nowrap",
+        }}
+      >
+        {value}
+      </span>
+    </div>
   );
 }
 
@@ -1283,7 +1014,9 @@ function PreviewRow({
         "gap-4",
         "px-4",
         "py-2.5",
-        !last ? "border-b border-border/35" : "",
+        !last
+          ? "border-b border-border/35"
+          : "",
       ].join(" ")}
     >
       <span
