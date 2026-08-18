@@ -1,7 +1,5 @@
 import { useForm } from "react-hook-form";
-
 import { zodResolver } from "@hookform/resolvers/zod";
-
 import {
   Dialog,
   DialogContent,
@@ -9,13 +7,9 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/shared/ui/dialog";
-
 import { Button } from "@/shared/ui/button";
-
 import { Input } from "@/shared/ui/input";
-
 import { Label } from "@/shared/ui/label";
-
 import {
   Select,
   SelectContent,
@@ -23,9 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/shared/ui/select";
-
 import { Plus } from "lucide-react";
-
 import {
   attendanceSchema,
   type AttendanceSchema,
@@ -40,11 +32,7 @@ export const AddStaffAttendanceDialog = () => {
     reset,
     formState: { errors },
   } = useForm<AttendanceSchema>({
-    resolver:
-      zodResolver(
-        attendanceSchema
-      ),
-
+    resolver: zodResolver(attendanceSchema),
     defaultValues: {
       employeeName: "",
       role: "Teacher",
@@ -53,251 +41,132 @@ export const AddStaffAttendanceDialog = () => {
     },
   });
 
-  const status =
-    watch("status");
+  const status = watch("status");
 
-  const onSubmit = (
-    values: AttendanceSchema
-  ) => {
+  const onSubmit = (values: AttendanceSchema) => {
     console.log(values);
-
     reset();
   };
 
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button
-          className="
-            rounded-2xl
-          "
-        >
-          <Plus
-            className="
-              mr-2
-              h-4
-              w-4
-            "
-          />
-
+        <Button className="rounded-[14px] bg-primary hover:bg-primary/90 text-primary-foreground font-semibold shadow-sm">
+          <Plus className="mr-2 h-4 w-4" />
           Add Attendance
         </Button>
       </DialogTrigger>
 
-      <DialogContent
-        className="
-          sm:max-w-xl
-        "
-      >
+      <DialogContent className="sm:max-w-xl rounded-[24px] bg-card text-card-foreground border-border p-6 shadow-xl">
         <DialogHeader>
-          <DialogTitle>
+          <DialogTitle className="text-[18px] font-extrabold text-foreground">
             Add Staff Attendance
           </DialogTitle>
         </DialogHeader>
 
-        <form
-          onSubmit={handleSubmit(
-            onSubmit
-          )}
-          className="
-            space-y-4
-          "
-        >
-          <div>
-            <Label>
-              Employee Name
-            </Label>
-
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 mt-2">
+          <div className="space-y-1.5">
+            <Label className="text-[12.5px] font-semibold text-foreground">Employee Name</Label>
             <Input
-              {...register(
-                "employeeName"
-              )}
+              {...register("employeeName")}
+              className="h-11 rounded-[12px] border-border bg-background text-foreground"
             />
-
-            <p className="text-sm text-red-500">
-              {
-                errors
-                  .employeeName
-                  ?.message
-              }
+            <p className="text-[12px] text-destructive font-medium">
+              {errors.employeeName?.message}
             </p>
           </div>
 
-          <div>
-            <Label>
-              Date
-            </Label>
-
+          <div className="space-y-1.5">
+            <Label className="text-[12.5px] font-semibold text-foreground">Date</Label>
             <Input
               type="date"
-              {...register(
-                "date"
-              )}
+              {...register("date")}
+              className="h-11 rounded-[12px] border-border bg-background text-foreground"
             />
           </div>
 
-          <div>
-            <Label>
-              Role
-            </Label>
-
+          <div className="space-y-1.5">
+            <Label className="text-[12.5px] font-semibold text-foreground">Role</Label>
             <Select
-              value={watch(
-                "role"
-              )}
-              onValueChange={(
-                value
-              ) =>
-                setValue(
-                  "role",
-                  value as any
-                )
-              }
+              value={watch("role")}
+              onValueChange={(value) => setValue("role", value as any)}
             >
-              <SelectTrigger>
+              <SelectTrigger className="h-11 rounded-[12px] border-border bg-background text-foreground">
                 <SelectValue />
               </SelectTrigger>
-
               <SelectContent>
-                <SelectItem value="Teacher">
-                  Teacher
-                </SelectItem>
-
-                <SelectItem value="Secretary">
-                  Secretary
-                </SelectItem>
-
-                <SelectItem value="Supervisor">
-                  Supervisor
-                </SelectItem>
-
-                <SelectItem value="Counselor">
-                  Counselor
-                </SelectItem>
+                <SelectItem value="Teacher">Teacher</SelectItem>
+                <SelectItem value="Secretary">Secretary</SelectItem>
+                <SelectItem value="Supervisor">Supervisor</SelectItem>
+                <SelectItem value="Counselor">Counselor</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
-          <div>
-            <Label>
-              Status
-            </Label>
-
+          <div className="space-y-1.5">
+            <Label className="text-[12.5px] font-semibold text-foreground">Status</Label>
             <Select
-              value={watch(
-                "status"
-              )}
-              onValueChange={(
-                value
-              ) =>
-                setValue(
-                  "status",
-                  value as any
-                )
-              }
+              value={watch("status")}
+              onValueChange={(value) => setValue("status", value as any)}
             >
-              <SelectTrigger>
+              <SelectTrigger className="h-11 rounded-[12px] border-border bg-background text-foreground">
                 <SelectValue />
               </SelectTrigger>
-
               <SelectContent>
-                <SelectItem value="Present">
-                  Present
-                </SelectItem>
-
-                <SelectItem value="Absent">
-                  Absent
-                </SelectItem>
+                <SelectItem value="Present">Present</SelectItem>
+                <SelectItem value="Absent">Absent</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
-          {status !==
-            "Absent" && (
-            <>
-              <div>
-                <Label>
-                  Check In
-                </Label>
-
+          {status !== "Absent" && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label className="text-[12.5px] font-semibold text-foreground">Check In</Label>
                 <Input
                   type="time"
-                  {...register(
-                    "checkIn"
-                  )}
+                  {...register("checkIn")}
+                  className="h-11 rounded-[12px] border-border bg-background text-foreground"
                 />
               </div>
-
-              <div>
-                <Label>
-                  Check Out
-                </Label>
-
+              <div className="space-y-1.5">
+                <Label className="text-[12.5px] font-semibold text-foreground">Check Out</Label>
                 <Input
                   type="time"
-                  {...register(
-                    "checkOut"
-                  )}
+                  {...register("checkOut")}
+                  className="h-11 rounded-[12px] border-border bg-background text-foreground"
                 />
               </div>
-            </>
+            </div>
           )}
 
-          {status ===
-            "Absent" && (
-            <div>
-              <Label>
-                Absence Type
-              </Label>
-
+          {status === "Absent" && (
+            <div className="space-y-1.5">
+              <Label className="text-[12.5px] font-semibold text-foreground">Absence Type</Label>
               <Select
-                value={watch(
-                  "absenceType"
-                )}
-                onValueChange={(
-                  value
-                ) =>
-                  setValue(
-                    "absenceType",
-                    value as any
-                  )
-                }
+                value={watch("absenceType")}
+                onValueChange={(value) => setValue("absenceType", value as any)}
               >
-                <SelectTrigger>
-                  <SelectValue />
+                <SelectTrigger className="h-11 rounded-[12px] border-border bg-background text-foreground">
+                  <SelectValue placeholder="Select type" />
                 </SelectTrigger>
-
                 <SelectContent>
-                  <SelectItem value="Excused">
-                    Excused
-                  </SelectItem>
-
-                  <SelectItem value="Unexcused">
-                    Unexcused
-                  </SelectItem>
+                  <SelectItem value="Excused">Excused</SelectItem>
+                  <SelectItem value="Unexcused">Unexcused</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           )}
 
-          <div>
-            <Label>
-              Notes
-            </Label>
-
+          <div className="space-y-1.5">
+            <Label className="text-[12.5px] font-semibold text-foreground">Notes</Label>
             <Input
-              {...register(
-                "notes"
-              )}
+              {...register("notes")}
+              className="h-11 rounded-[12px] border-border bg-background text-foreground"
             />
           </div>
 
-          <Button
-            type="submit"
-            className="
-              w-full
-            "
-          >
+          <Button type="submit" className="w-full h-11 rounded-[14px] bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-[13.5px] mt-4">
             Save Attendance
           </Button>
         </form>

@@ -101,9 +101,6 @@ export function AddLeaveDialog({ staffList = [], leaveTypes = [] }: Props) {
       setEndDate("");
     } catch (error: any) {
       console.error("Failed to create leave request", error);
-      if (error.response?.data?.errors) {
-        console.log("Validation Errors:", error.response.data.errors);
-      }
     }
   }
 
@@ -113,30 +110,30 @@ export function AddLeaveDialog({ staffList = [], leaveTypes = [] }: Props) {
         <Button
           type="button"
           variant="outline"
-          className="h-9 rounded-[12px] border-warning/25 bg-card px-3 text-[11px] font-medium text-warning hover:bg-warning/[0.06]"
+          className="h-10 rounded-[12px] border-warning/30 bg-card px-4 text-[12px] font-semibold text-warning hover:bg-warning/10 transition-colors shadow-xs"
         >
-          <UserPlus className="me-1.5 h-3.5 w-3.5" />
+          <UserPlus className="me-2 h-4 w-4" />
           Add vacation
         </Button>
       </DialogTrigger>
 
-      <DialogContent className="max-w-[520px] rounded-[22px] border-border/65 p-0">
-        <DialogHeader className="border-b border-border/50 px-5 py-4">
-          <DialogTitle className="text-[16px] font-semibold">
+      <DialogContent className="max-w-[520px] rounded-[24px] border-border/70 bg-card text-card-foreground p-0 shadow-2xl">
+        <DialogHeader className="border-b border-border/60 px-6 py-4 bg-muted/20">
+          <DialogTitle className="text-[17px] font-extrabold text-foreground">
             Add staff vacation
           </DialogTitle>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4 px-5 pb-5 pt-4">
-          <div className="space-y-2">
-            <Label className="text-[12px]">Find employee</Label>
+        <form onSubmit={handleSubmit} className="space-y-4 px-6 pb-6 pt-4">
+          <div className="space-y-1.5">
+            <Label className="text-[12.5px] font-semibold text-foreground">Find employee</Label>
             <div className="relative">
               <Search className="absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
                 value={employeeSearch}
                 onChange={(event) => setEmployeeSearch(event.target.value)}
                 placeholder="Search by employee name or ID..."
-                className="h-10 rounded-[13px] border-border/60 ps-9 text-[12px]"
+                className="h-11 rounded-[13px] border-border bg-background ps-9 text-[12.5px] text-foreground"
               />
             </div>
 
@@ -144,10 +141,10 @@ export function AddLeaveDialog({ staffList = [], leaveTypes = [] }: Props) {
               value={employeeId ? String(employeeId) : ""}
               onValueChange={(val) => setEmployeeId(Number(val))}
             >
-              <SelectTrigger className="h-10 rounded-[13px] border-border/60 text-[12px]">
+              <SelectTrigger className="h-11 rounded-[13px] border-border bg-background text-[12.5px] text-foreground mt-2">
                 <SelectValue placeholder="Select employee" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-popover text-popover-foreground border-border">
                {filteredStaff.map((staff: any) => {
                  const fullName = getStaffName(staff);
                  const roleString = Array.isArray(staff?.role) ? staff.role[0] : staff?.role;
@@ -163,16 +160,16 @@ export function AddLeaveDialog({ staffList = [], leaveTypes = [] }: Props) {
             </Select>
           </div>
 
-          <div className="space-y-2">
-            <Label className="text-[12px]">Vacation type</Label>
+          <div className="space-y-1.5">
+            <Label className="text-[12.5px] font-semibold text-foreground">Vacation type</Label>
             <Select
               value={leaveTypeId ? String(leaveTypeId) : ""}
               onValueChange={(value) => setLeaveTypeId(Number(value))}
             >
-              <SelectTrigger className="h-10 rounded-[13px] border-border/60 text-[12px]">
+              <SelectTrigger className="h-11 rounded-[13px] border-border bg-background text-[12.5px] text-foreground">
                 <SelectValue placeholder="Select type" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-popover text-popover-foreground border-border">
                 {leaveTypes.map((type) => (
                   <SelectItem key={type.id} value={String(type.id)}>
                     {type.name}
@@ -182,44 +179,44 @@ export function AddLeaveDialog({ staffList = [], leaveTypes = [] }: Props) {
             </Select>
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-2">
-              <Label className="text-[12px]">Start date</Label>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <Label className="text-[12.5px] font-semibold text-foreground">Start date</Label>
               <div className="relative">
                 <CalendarDays className="pointer-events-none absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <Input
                   type="date"
                   value={startDate}
                   onChange={(event) => setStartDate(event.target.value)}
-                  className="h-10 rounded-[13px] border-border/60 ps-9 text-[12px]"
+                  className="h-11 rounded-[13px] border-border bg-background ps-9 text-[12.5px] text-foreground"
                 />
               </div>
             </div>
 
-            <div className="space-y-2">
-              <Label className="text-[12px]">End date</Label>
+            <div className="space-y-1.5">
+              <Label className="text-[12.5px] font-semibold text-foreground">End date</Label>
               <Input
                 type="date"
                 value={endDate}
                 min={startDate}
                 onChange={(event) => setEndDate(event.target.value)}
-                className="h-10 rounded-[13px] border-border/60 text-[12px]"
+                className="h-11 rounded-[13px] border-border bg-background text-[12.5px] text-foreground"
               />
             </div>
           </div>
 
-          <div className="flex justify-end gap-2 pt-1">
+          <div className="flex justify-end gap-2.5 pt-3 border-t border-border/60 mt-2">
             <Button
               type="button"
               variant="outline"
               onClick={() => setOpen(false)}
-              className="h-10 rounded-[13px]"
+              className="h-10 rounded-[12px] border-border"
             >
               Cancel
             </Button>
             <Button
               type="submit"
-              className="h-10 rounded-[13px]"
+              className="h-10 rounded-[12px] bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-5"
               disabled={!employeeId || !leaveTypeId || !startDate || !endDate || !activeAcademicYearId || createLeaveMutation.isPending}
             >
               {createLeaveMutation.isPending ? "Saving..." : "Add vacation"}

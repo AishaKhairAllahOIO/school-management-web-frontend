@@ -13,23 +13,23 @@ type Props = {
 };
 
 export function LeaveFilters({ search, setSearch, leaveType, setLeaveType, leaveTypes = [], compact = false }: Props) {
-  const triggerClass = "h-9 rounded-[12px] border-border/60 bg-background/80 text-[11px] shadow-none";
+  const triggerClass = "h-11 rounded-[13px] border-border/60 bg-background text-foreground text-[12px] shadow-none";
 
   return (
     <div className={compact ? "grid gap-2" : "grid gap-2.5 md:grid-cols-[minmax(220px,1fr)_170px]"}>
       <div className="relative min-w-0">
-        <Search className="absolute start-3 top-1/2 z-10 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" strokeWidth={1.8} />
+        <Search className="absolute start-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-muted-foreground" strokeWidth={1.8} />
         <Input 
           value={search} 
           onChange={(event) => setSearch(event.target.value)} 
           placeholder="Search by staff ID or type..." 
-          className={[triggerClass, "ps-8"].join(" ")} 
+          className={[triggerClass, "ps-9 placeholder:text-muted-foreground"].join(" ")} 
         />
       </div>
 
       <Select value={leaveType} onValueChange={setLeaveType}>
         <SelectTrigger className={triggerClass}><SelectValue placeholder="Leave type" /></SelectTrigger>
-        <SelectContent>
+        <SelectContent className="bg-popover text-popover-foreground border-border">
           <SelectItem value="all">All types</SelectItem>
           {leaveTypes.map((type) => (
             <SelectItem key={type.id} value={String(type.id)}>

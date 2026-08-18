@@ -3,7 +3,7 @@ import { Button } from "@/shared/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/ui/select"; 
 import { Popover, PopoverContent, PopoverTrigger } from "@/shared/ui/popover";
 import type { StaffDailyRosterRecord } from "../types/staffAttendance.types"; 
- 
+  
 type PaginationInfo = {
   currentPage: number;
   lastPage: number;
@@ -27,29 +27,29 @@ type Props = {
 const getStatusBadgeStyles = (status: string) => {
   switch (status) {
     case "present":
-      return "text-emerald-700 font-medium bg-emerald-50/60 border border-emerald-200/50 rounded-[10px] shadow-none focus:ring-0 focus:outline-none";
+      return "text-success font-medium bg-success/10 border border-success/25 rounded-[10px] shadow-none focus:ring-0 focus:outline-none";
     case "absent":
-      return "text-rose-700 font-medium bg-rose-50/60 border border-rose-200/50 rounded-[10px] shadow-none focus:ring-0 focus:outline-none";
+      return "text-destructive font-medium bg-destructive/10 border border-destructive/25 rounded-[10px] shadow-none focus:ring-0 focus:outline-none";
     case "partial_absence":
-      return "text-violet-700 font-medium bg-violet-50/60 border border-violet-200/50 rounded-[10px] shadow-none focus:ring-0 focus:outline-none";
+      return "text-primary font-medium bg-primary/10 border border-primary/25 rounded-[10px] shadow-none focus:ring-0 focus:outline-none";
     case "on_leave":
-      return "text-amber-700 font-medium bg-amber-50/60 border border-amber-200/50 rounded-[10px] shadow-none focus:ring-0 focus:outline-none";
+      return "text-warning font-medium bg-warning/10 border border-warning/25 rounded-[10px] shadow-none focus:ring-0 focus:outline-none";
     default:
-      return "text-slate-700 font-medium bg-slate-50/60 border border-slate-200/50 rounded-[10px] shadow-none focus:ring-0 focus:outline-none";
+      return "text-foreground font-medium bg-muted border border-border rounded-[10px] shadow-none focus:ring-0 focus:outline-none";
   }
 };
 
 const getAbsenceBadgeStyles = (type: string) => {
   switch (type) {
     case "excused":
-      return "text-sky-700 font-medium bg-sky-50/60 border border-sky-200/50 rounded-[10px] shadow-none focus:ring-0 focus:outline-none";
+      return "text-info font-medium bg-info/10 border border-info/25 rounded-[10px] shadow-none focus:ring-0 focus:outline-none";
     case "unexcused":
-      return "text-amber-700 font-medium bg-amber-50/60 border border-amber-200/50 rounded-[10px] shadow-none focus:ring-0 focus:outline-none";
+      return "text-warning font-medium bg-warning/10 border border-warning/25 rounded-[10px] shadow-none focus:ring-0 focus:outline-none";
     default:
       return "text-muted-foreground bg-background border border-border/50 rounded-[10px] shadow-none focus:ring-0 focus:outline-none";
   }
 };
- 
+  
 export function StaffAttendanceTable({ 
   data = [], 
   teacherSchedule, 
@@ -111,21 +111,20 @@ export function StaffAttendanceTable({
                   const roleString = String(item.role || "Staff").replace("_", " ");
                   const isTeacher = roleString.toLowerCase().includes('teach') || roleString.includes('معلم');
 
-                  const highlightEdit = pendingEdits[item.id] ? 'bg-warning/[0.03]' : '';
+                  const highlightEdit = pendingEdits[item.id] ? 'bg-warning/[0.05]' : '';
                   const teacherScheduleEntries = teacherSchedule?.[item.user_id]?.[currentDay || ''] || [];
                   
-                  // 🌟 تم إضافة on_leave إلى الحالات الثابتة
                   const standardStatuses = ["present", "absent", "partial_absence", "on_leave"];
 
                   return (
                   <tr key={item?.id || index} className={`border-t border-border/50 text-[13px] transition-colors hover:bg-muted/30 group ${highlightEdit}`}> 
                     <td className="px-6 py-3.5"> 
                       <div className="flex items-center gap-3 min-w-0"> 
-                        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[12px] bg-violet-600/10 text-[13px] font-bold text-violet-700 border border-violet-600/20 uppercase"> 
+                        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[12px] bg-primary/10 text-[13px] font-bold text-primary border border-primary/25 uppercase"> 
                           {item?.user?.first_name?.charAt(0) || index + 1} 
                         </span> 
                         <div className="min-w-0"> 
-                          <p className="truncate font-bold text-slate-800 dark:text-slate-200 group-hover:text-violet-600 transition-colors text-[12.5px]">
+                          <p className="truncate font-bold text-foreground group-hover:text-primary transition-colors text-[12.5px]">
                             {item?.user?.first_name} {item?.user?.last_name}
                           </p> 
                           <p className="truncate text-[11px] font-medium text-muted-foreground capitalize mt-0.5">
@@ -140,7 +139,6 @@ export function StaffAttendanceTable({
                         value={currentStatus} 
                         onValueChange={(value) => {
                           onUpdateLocal(item.id, 'status', value);
-                          // 🌟 تصفير الحصص والأعذار في حال الحضور أو الإجازة
                           if (value === 'present' || value === 'on_leave') {
                             onUpdateLocal(item.id, 'absence_type', null);
                             onUpdateLocal(item.id, 'missing_periods', []);
@@ -152,16 +150,14 @@ export function StaffAttendanceTable({
                         <SelectTrigger className={`h-8 w-[120px] text-[11.5px] px-3 transition-all ${getStatusBadgeStyles(currentStatus)}`}>
                           <SelectValue />
                         </SelectTrigger> 
-                        <SelectContent> 
-                          <SelectItem value="present" className="font-medium text-emerald-700 focus:text-emerald-800">Present</SelectItem> 
-                          <SelectItem value="absent" className="font-medium text-rose-700 focus:text-rose-800">Absent</SelectItem> 
-                          {isTeacher && <SelectItem value="partial_absence" className="font-medium text-violet-700 focus:text-violet-800">Partial Absence</SelectItem>}
-                          
-                          {/* 🌟 خيار الـ On Leave */}
-                          <SelectItem value="on_leave" className="font-medium text-amber-700 focus:text-amber-800">On Leave</SelectItem>
+                        <SelectContent className="bg-popover text-popover-foreground border-border"> 
+                          <SelectItem value="present" className="font-medium text-success focus:text-success">Present</SelectItem> 
+                          <SelectItem value="absent" className="font-medium text-destructive focus:text-destructive">Absent</SelectItem> 
+                          {isTeacher && <SelectItem value="partial_absence" className="font-medium text-primary focus:text-primary">Partial Absence</SelectItem>}
+                          <SelectItem value="on_leave" className="font-medium text-warning focus:text-warning">On Leave</SelectItem>
                           
                           {!standardStatuses.includes(currentStatus) && (
-                            <SelectItem value={currentStatus} disabled className="font-medium text-amber-700 capitalize">
+                            <SelectItem value={currentStatus} disabled className="font-medium text-warning capitalize">
                               {currentStatus.replace('_', ' ')}
                             </SelectItem>
                           )}
@@ -178,9 +174,9 @@ export function StaffAttendanceTable({
                           <SelectTrigger className={`h-8 w-[110px] text-[11.5px] px-3 transition-all ${getAbsenceBadgeStyles(currentAbsenceType)}`}>
                             <SelectValue />
                           </SelectTrigger> 
-                          <SelectContent> 
-                            <SelectItem value="excused" className="font-medium text-sky-700 focus:text-sky-800">Excused</SelectItem> 
-                            <SelectItem value="unexcused" className="font-medium text-amber-700 focus:text-amber-800">Unexcused</SelectItem> 
+                          <SelectContent className="bg-popover text-popover-foreground border-border"> 
+                            <SelectItem value="excused" className="font-medium text-info focus:text-info">Excused</SelectItem> 
+                            <SelectItem value="unexcused" className="font-medium text-warning focus:text-warning">Unexcused</SelectItem> 
                           </SelectContent> 
                         </Select> 
                       ) : ( 
@@ -193,11 +189,11 @@ export function StaffAttendanceTable({
                         currentStatus === "partial_absence" ? (
                           <Popover>
                             <PopoverTrigger asChild>
-                              <Button variant="outline" className="h-8 px-2.5 rounded-[10px] border-violet-200 bg-violet-50/50 text-violet-700 text-[11px] font-semibold hover:bg-violet-100/50 transition-colors">
+                              <Button variant="outline" className="h-8 px-2.5 rounded-[10px] border-primary/30 bg-primary/10 text-primary text-[11px] font-semibold hover:bg-primary/20 transition-colors">
                                 {currentPeriods.length > 0 ? `P: ${currentPeriods.length} selected` : "Select Periods"}
                               </Button>
                             </PopoverTrigger>
-                            <PopoverContent className="w-[220px] p-3 rounded-[16px]" align="start">
+                            <PopoverContent className="w-[220px] p-3 rounded-[16px] bg-popover text-popover-foreground border-border" align="start">
                               <div className="mb-2 px-1 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Scheduled Periods</div>
                               
                               {teacherScheduleEntries.length > 0 ? (
@@ -217,7 +213,7 @@ export function StaffAttendanceTable({
                                           onUpdateLocal(item.id, 'missing_periods', newPeriods);
                                         }}
                                         className={`flex items-center justify-between px-2.5 py-1.5 rounded-[8px] text-[11.5px] font-semibold transition-all ${
-                                          isSelected ? "bg-violet-600 text-white shadow-sm" : "bg-muted/50 text-foreground hover:bg-muted"
+                                          isSelected ? "bg-primary text-primary-foreground shadow-sm" : "bg-muted/50 text-foreground hover:bg-muted"
                                         }`}
                                       >
                                         <span>Period {period.period_index || ''}</span>
@@ -247,7 +243,7 @@ export function StaffAttendanceTable({
                           variant="outline" 
                           size="icon" 
                           onClick={() => onViewDetails(item)}
-                          className="h-8 w-8 rounded-[10px] border-violet-200 text-violet-600 hover:bg-violet-50 transition-colors"
+                          className="h-8 w-8 rounded-[10px] border-border/60 text-primary hover:bg-primary/10 transition-colors"
                           title="Quick Summary"
                         > 
                           <Eye className="h-4 w-4" /> 
@@ -264,7 +260,7 @@ export function StaffAttendanceTable({
       </div> 
 
       {pagination.lastPage >= 1 && (
-        <div className="flex items-center justify-between border-t border-border/60 px-6 py-4">
+        <div className="flex items-center justify-between border-t border-border/60 px-6 py-4 bg-muted/10">
           <p className="text-[12px] font-medium text-muted-foreground">
             Page {pagination.currentPage} of {pagination.lastPage}
           </p>
@@ -274,7 +270,7 @@ export function StaffAttendanceTable({
               size="sm" 
               onClick={() => onPageChange(pagination.currentPage - 1)} 
               disabled={pagination.currentPage <= 1 || isLoading} 
-              className="h-8 rounded-[10px] text-[12px]"
+              className="h-8 rounded-[10px] text-[12px] font-semibold text-foreground border-border/60"
             >
               <ChevronLeft className="h-4 w-4 mr-1" /> Prev
             </Button>
@@ -283,7 +279,7 @@ export function StaffAttendanceTable({
               size="sm" 
               onClick={() => onPageChange(pagination.currentPage + 1)} 
               disabled={pagination.currentPage >= pagination.lastPage || isLoading} 
-              className="h-8 rounded-[10px] text-[12px]"
+              className="h-8 rounded-[10px] text-[12px] font-semibold text-foreground border-border/60"
             >
               Next <ChevronRight className="h-4 w-4 ml-1" />
             </Button>

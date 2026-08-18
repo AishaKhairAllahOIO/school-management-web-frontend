@@ -42,7 +42,6 @@ export const LeaveRequestsPage = () => {
   const filteredData = useMemo(() => {
     const safeData = Array.isArray(leavesData) ? leavesData : [];
     return safeData.filter((leave: StaffLeaveRecord) => {
-      // البحث بالـ ID مؤقتاً أو يمكنك توسيعه ليبحث بالاسم لو أردت
       const matchesSearch = String(leave.staff_id).toLowerCase().includes(search.toLowerCase());
       const matchesType = leaveType === "all" || String(leave.leave_type_id || leave.leave_type?.id) === leaveType;
       return matchesSearch && matchesType;
@@ -53,10 +52,9 @@ export const LeaveRequestsPage = () => {
     const safeData = Array.isArray(leavesData) ? leavesData : [];
     const total = safeData.length;
     let pending = 0;
-    let approved = total; // كقيمة افتراضية
+    let approved = total;
     let rejected = 0;
     
-    // إذا كان لديك حقل status في المستقبل
     safeData.forEach((item: any) => {
       if (item.status === "pending") pending++;
       else if (item.status === "rejected") rejected++;
@@ -67,18 +65,20 @@ export const LeaveRequestsPage = () => {
 
   return (
     <div className="space-y-6 pt-5 animate-in fade-in duration-300">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      {/* رأس الصفحة */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between rounded-[24px] border border-border/70 bg-card p-6 shadow-sm">
         <div>
-          <h1 className="text-2xl font-extrabold tracking-tight text-foreground">
+          <h1 className="text-[18px] font-extrabold tracking-tight text-foreground">
             Leave Requests
           </h1>
-          <p className="mt-1 text-[13px] text-muted-foreground font-medium">
+          <p className="mt-1 text-[12.5px] text-muted-foreground font-medium">
             Manage and register direct staff leaves.
           </p>
         </div>
         <AddLeaveDialog staffList={realStaffList} leaveTypes={realLeaveTypes} />
       </div>
 
+      {/* بطاقات الإحصائيات */}
       <LeaveStats 
         total={stats.total} 
         pending={stats.pending} 
@@ -86,7 +86,8 @@ export const LeaveRequestsPage = () => {
         rejected={stats.rejected} 
       />
 
-      <div className="rounded-[22px] border border-border/60 bg-card p-4 shadow-sm">
+      {/* قسم الفلترة */}
+      <div className="rounded-[24px] border border-border/70 bg-card p-5 shadow-sm">
         <LeaveFilters
           search={search}
           setSearch={setSearch}
@@ -96,6 +97,7 @@ export const LeaveRequestsPage = () => {
         />
       </div>
 
+      {/* جدول الطلبات */}
       <LeaveRequestsTable
         data={filteredData}
         staffList={realStaffList}

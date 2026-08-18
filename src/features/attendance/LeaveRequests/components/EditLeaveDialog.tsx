@@ -13,13 +13,12 @@ import { Label } from "@/shared/ui/label";
 import { useUpdateStaffLeave } from "../hooks/useStaffLeaves";
 
 interface Props {
-  leave: any; // نستخدم any هنا لأن الكائن القادم يحتوي على حقول إضافية من الجدول
+  leave: any;
 }
 
 export function EditLeaveDialog({ leave }: Props) {
   const [open, setOpen] = useState(false);
   
-  // استخراج التواريخ بصيغة Y-m-d لكي تعمل مع input type="date"
   const initialStart = leave?.start_date?.split("T")[0] || "";
   const initialEnd = leave?.end_date?.split("T")[0] || "";
 
@@ -28,7 +27,6 @@ export function EditLeaveDialog({ leave }: Props) {
   
   const updateMutation = useUpdateStaffLeave();
 
-  // تحديث القيم في حال تغيرت الـ Props
   useEffect(() => {
     if (open) {
       setStartDate(leave?.start_date?.split("T")[0] || "");
@@ -61,57 +59,57 @@ export function EditLeaveDialog({ leave }: Props) {
           type="button"
           variant="outline" 
           size="icon" 
-          className="h-8 w-8 rounded-lg border-info/20 text-info hover:bg-info/[0.08] transition-colors"
+          className="h-8 w-8 rounded-[10px] border-info/25 text-info hover:bg-info/10 transition-colors"
           title="Edit Vacation"
         >
           <Edit className="h-3.5 w-3.5" />
         </Button>
       </DialogTrigger>
       
-      <DialogContent className="sm:max-w-[425px] rounded-[24px] border-border/60">
+      <DialogContent className="sm:max-w-[425px] rounded-[24px] bg-card text-card-foreground border-border p-6 shadow-2xl">
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold">Edit Vacation Dates</DialogTitle>
+          <DialogTitle className="text-[18px] font-extrabold text-foreground">Edit Vacation Dates</DialogTitle>
         </DialogHeader>
         
         <form onSubmit={handleUpdate} className="space-y-4 mt-2">
           <div className="grid gap-4">
-            <div className="space-y-2">
-              <Label className="text-[12px]">Start Date</Label>
+            <div className="space-y-1.5">
+              <Label className="text-[12.5px] font-semibold text-foreground">Start Date</Label>
               <Input
                 type="date"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
-                className="h-10 rounded-[13px] border-border/60 text-[12px]"
+                className="h-11 rounded-[12px] border-border bg-background text-[12.5px] text-foreground"
                 required
               />
             </div>
             
-            <div className="space-y-2">
-              <Label className="text-[12px]">End Date</Label>
+            <div className="space-y-1.5">
+              <Label className="text-[12.5px] font-semibold text-foreground">End Date</Label>
               <Input
                 type="date"
                 value={endDate}
                 min={startDate}
                 onChange={(e) => setEndDate(e.target.value)}
-                className="h-10 rounded-[13px] border-border/60 text-[12px]"
+                className="h-11 rounded-[12px] border-border bg-background text-[12.5px] text-foreground"
                 required
               />
             </div>
           </div>
           
-          <div className="flex justify-end gap-2 pt-4 border-t border-border/50 mt-4">
+          <div className="flex justify-end gap-2.5 pt-4 border-t border-border/60 mt-4">
             <Button 
               type="button" 
               variant="outline" 
               onClick={() => setOpen(false)}
-              className="h-10 rounded-[13px]"
+              className="h-10 rounded-[12px] border-border"
             >
               Cancel
             </Button>
             <Button 
               type="submit" 
               disabled={updateMutation.isPending}
-              className="h-10 rounded-[13px] bg-info hover:bg-info/90 text-white"
+              className="h-10 rounded-[12px] bg-info hover:bg-info/90 text-white font-semibold px-5"
             >
               {updateMutation.isPending ? "Saving..." : "Save changes"}
             </Button>

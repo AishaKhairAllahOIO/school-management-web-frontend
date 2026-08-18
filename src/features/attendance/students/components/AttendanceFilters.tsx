@@ -37,7 +37,7 @@ export function AttendanceFilters({
   grades = [],
   classrooms = [],
 }: Props) {
-  const triggerClass = "h-11 rounded-[13px] border-border/60 bg-background/80 text-[12px] shadow-none";
+  const triggerClass = "h-11 rounded-[13px] border-border/60 bg-background/80 text-[12px] text-foreground shadow-none";
   const absenceTypeEnabled = status === "absent";
 
   return (
@@ -48,7 +48,7 @@ export function AttendanceFilters({
           value={search}
           onChange={(event) => setSearch(event.target.value)}
           placeholder="Search student name"
-          className={[triggerClass, "ps-9"].join(" ")}
+          className={[triggerClass, "ps-9 text-foreground placeholder:text-muted-foreground"].join(" ")}
         />
       </div>
 

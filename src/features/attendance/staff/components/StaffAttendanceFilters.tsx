@@ -29,7 +29,7 @@ export function AttendanceFilters({
   absenceType,
   setAbsenceType,
 }: Props) {
-  const controlClass = "h-11 rounded-[13px] border-border/60 bg-background/80 text-[12px] shadow-none";
+  const controlClass = "h-11 rounded-[13px] border-border/60 bg-background text-foreground text-[12px] shadow-none";
   const absenceTypeEnabled = status === "Absent";
 
   return (
@@ -43,7 +43,7 @@ export function AttendanceFilters({
           placeholder="Staff name"
           value={search}
           onChange={(event) => setSearch(event.target.value)}
-          className={[controlClass, "ps-9"].join(" ")}
+          className={[controlClass, "ps-9 placeholder:text-muted-foreground"].join(" ")}
         />
       </div>
 
@@ -51,7 +51,7 @@ export function AttendanceFilters({
         <SelectTrigger className={controlClass}>
           <SelectValue placeholder="Staff type" />
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent className="bg-popover text-popover-foreground border-border">
           <SelectItem value="all">All staff types</SelectItem>
         </SelectContent>
       </Select>
@@ -66,7 +66,7 @@ export function AttendanceFilters({
         <SelectTrigger className={controlClass}>
           <SelectValue placeholder="Attendance" />
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent className="bg-popover text-popover-foreground border-border">
           <SelectItem value="all">All attendance</SelectItem>
           <SelectItem value="Present">Present</SelectItem>
           <SelectItem value="Absent">Absent</SelectItem>
@@ -86,7 +86,7 @@ export function AttendanceFilters({
         >
           <SelectValue placeholder="Absence type" />
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent className="bg-popover text-popover-foreground border-border">
           <SelectItem value="all">All absence types</SelectItem>
           <SelectItem value="Excused">Excused</SelectItem>
           <SelectItem value="Unexcused">Unexcused</SelectItem>

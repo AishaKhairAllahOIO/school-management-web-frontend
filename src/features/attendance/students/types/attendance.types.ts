@@ -4,7 +4,7 @@ export type AbsenceType = "excused" | "unexcused" | null;
 
 
 export interface AttendanceRecord {
-  id: number | string; // إجباري وليس اختياري
+  id: number | string; 
   attendance_date: string;
   status: AttendanceStatus;
   absence_type?: AbsenceType | null;
