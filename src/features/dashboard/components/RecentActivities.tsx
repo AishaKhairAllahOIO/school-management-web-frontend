@@ -24,17 +24,20 @@ export function RecentActivities({
       {/* Header */}
       <div className="mb-4 flex items-center justify-between gap-3">
         <div>
-          <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+          <p className="text-[10px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
             Activity Feed
           </p>
 
-          <h3 className="mt-0.5 text-base font-bold tracking-tight text-foreground">
+          <h3 className="mt-0.5 text-base font-semibold tracking-tight text-foreground">
             Recent Activities
           </h3>
         </div>
 
-        <div className="flex items-center gap-1.5 rounded-lg bg-violet-50 px-2.5 py-1 text-[11px] font-semibold text-violet-600">
-          <Sparkles className="h-3 w-3" strokeWidth={1.8} />
+        <div className="flex items-center gap-1.5 rounded-lg bg-violet-50 px-2.5 py-1 text-[11px] font-medium text-violet-600">
+          <Sparkles
+            className="h-3 w-3"
+            strokeWidth={1.8}
+          />
           Latest 5
         </div>
       </div>
@@ -63,18 +66,20 @@ export function RecentActivities({
 
             {/* Content */}
             <div className="min-w-0 flex-1">
-              <p className="truncate text-xs font-semibold text-foreground">
+              <p className="truncate text-xs font-medium text-foreground">
                 {activity.title}
               </p>
 
-              <p className="mt-0.5 truncate text-[11px] text-muted-foreground">
+              <p className="mt-0.5 truncate text-[11px] font-normal text-muted-foreground">
                 {activity.description}
               </p>
             </div>
 
             {/* Date */}
-            <span className="shrink-0 text-[10px] font-medium text-muted-foreground">
-              {new Date(activity.created_at).toLocaleDateString("en-US")}
+            <span className="shrink-0 text-[10px] font-normal text-muted-foreground">
+              {new Date(activity.created_at).toLocaleDateString(
+                "en-US",
+              )}
             </span>
           </div>
         ))}
@@ -89,7 +94,7 @@ export function RecentActivities({
               />
             </div>
 
-            <p className="text-xs font-medium text-muted-foreground">
+            <p className="text-xs font-normal text-muted-foreground">
               No Recent Activities
             </p>
           </div>

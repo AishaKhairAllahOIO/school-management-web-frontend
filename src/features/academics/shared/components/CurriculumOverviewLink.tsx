@@ -16,21 +16,33 @@ export function CurriculumOverviewLink() {
         border border-warning/15
         bg-white
         text-center
+        shadow-sm
         transition-all duration-200
+
+        dark:border-warning/20
+        dark:bg-card
+        dark:shadow-black/10
       "
     >
       {/* Top warning accent */}
-      <div className="h-[3px] w-full bg-warning" />
+      <div className="h-[3px] w-full bg-warning/80 dark:bg-warning/70" />
 
       {/* Content */}
       <div className="px-5 py-3">
         {/* Title */}
-        <h3 className="text-[15px] font-semibold text-warning">
+        <h3 className="text-[15px] font-semibold text-warning dark:text-amber-300">
           Academic Overview
         </h3>
 
         {/* Description */}
-        <p className="mx-auto mt-0.5 max-w-2xl text-[11.5px] leading-[16px] text-black/65">
+        <p
+          className="
+            mx-auto mt-0.5 max-w-2xl
+            text-[11.5px] leading-[16px]
+            text-black/65
+            dark:text-slate-400
+          "
+        >
           Review the complete academic structure of your school, including
           grades, classrooms, subjects and their academic information.
         </p>
@@ -46,9 +58,16 @@ export function CurriculumOverviewLink() {
               px-2 py-0.5
               text-[9.5px] font-medium
               text-warning
+
+              dark:border-warning/20
+              dark:bg-warning/10
+              dark:text-amber-300
             "
           >
-            <GraduationCap className="h-3 w-3" strokeWidth={2} />
+            <GraduationCap
+              className="h-3 w-3"
+              strokeWidth={2}
+            />
             Grades
           </span>
 
@@ -61,9 +80,16 @@ export function CurriculumOverviewLink() {
               px-2 py-0.5
               text-[9.5px] font-medium
               text-warning
+
+              dark:border-warning/20
+              dark:bg-warning/10
+              dark:text-amber-300
             "
           >
-            <Layers3 className="h-3 w-3" strokeWidth={2} />
+            <Layers3
+              className="h-3 w-3"
+              strokeWidth={2}
+            />
             Classrooms
           </span>
 
@@ -76,9 +102,16 @@ export function CurriculumOverviewLink() {
               px-2 py-0.5
               text-[9.5px] font-medium
               text-warning
+
+              dark:border-warning/20
+              dark:bg-warning/10
+              dark:text-amber-300
             "
           >
-            <BookOpen className="h-3 w-3" strokeWidth={2} />
+            <BookOpen
+              className="h-3 w-3"
+              strokeWidth={2}
+            />
             Subjects
           </span>
 
@@ -91,15 +124,22 @@ export function CurriculumOverviewLink() {
               px-2 py-0.5
               text-[9.5px] font-medium
               text-warning
+
+              dark:border-warning/20
+              dark:bg-warning/10
+              dark:text-amber-300
             "
           >
-            <BookOpen className="h-3 w-3" strokeWidth={2} />
+            <BookOpen
+              className="h-3 w-3"
+              strokeWidth={2}
+            />
             Marks
           </span>
         </div>
       </div>
 
-      {/* Footer — same warning color as Secretaries */}
+      {/* Footer */}
       <div
         className="
           border-t border-warning/[0.08]
@@ -107,6 +147,10 @@ export function CurriculumOverviewLink() {
           px-4 py-2
           transition-colors duration-200
           hover:bg-warning/[0.08]
+
+          dark:border-warning/10
+          dark:bg-warning/[0.025]
+          dark:hover:bg-warning/[0.06]
         "
       >
         <Link
@@ -128,6 +172,10 @@ export function CurriculumOverviewLink() {
             focus-visible:outline-none
             focus-visible:ring-4
             focus-visible:ring-warning/10
+
+            dark:text-amber-300
+            dark:hover:bg-warning/[0.06]
+            dark:focus-visible:ring-warning/15
           "
         >
           <span>Overview</span>
@@ -141,6 +189,8 @@ export function CurriculumOverviewLink() {
               group-hover:translate-x-1
               rtl:rotate-180
               rtl:group-hover:-translate-x-1
+
+              dark:text-amber-300
             "
             strokeWidth={2}
           />
