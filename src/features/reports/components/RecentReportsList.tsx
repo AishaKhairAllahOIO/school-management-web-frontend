@@ -12,7 +12,7 @@ export function RecentReportsList() {
   const { data } = useQuery<ReportsWorkspaceData>({ queryKey: ["reports-workspace-data"] });
   const recentReports = data?.recentReports || [];
 
-  // دالة لإعادة تنزيل أو فتح الملف المخزن
+
   const handleDownloadReport = (report: any) => {
     if (!report.blob) return;
     const url = URL.createObjectURL(report.blob);

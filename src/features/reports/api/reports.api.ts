@@ -9,7 +9,7 @@ import type {
 
 export const reportsApi = {
   getStudentAttendance: async (): Promise<StudentAttendanceReportResponse> => {
-    // استخدمنا ?. للحماية مع مسار احتياطي لمنع أي كراش
+
     const endpoint = API_ENDPOINTS.REPORTS?.ATTENDANCE?.STUDENTS || "/admin/reports/attendance/students";
     const response = await axiosClient.get(endpoint);
     return response.data?.data;
