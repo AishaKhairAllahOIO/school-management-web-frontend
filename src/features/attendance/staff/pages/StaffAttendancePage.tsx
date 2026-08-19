@@ -86,9 +86,22 @@ export function StaffAttendancePage() {
         );
         const recordId = existingRecord?.attendance?.id;
 
+        // 🌟 تجهيز القيم النهائية للطلب
         const finalStatus =
           edit.status ??
           (existingRecord?.attendance?.status || "present");
+
+        const finalAbsenceType =
+          edit.absence_type ??
+          (existingRecord?.attendance?.absence_type || "excused");
+
+        // 🌟 تنظيف وتجهيز الحصص لتكون دائماً مصفوفة أرقام (IDs)
+        const rawPeriods = edit.missing_periods ?? existingRecord?.attendance?.missing_periods ?? [];
+        const finalMissingPeriods = rawPeriods.map((p: any) => 
+          typeof p === 'object' && p !== null ? p.schedule_entry_id : p
+        );
+
+        const isAbsentOrPartial = finalStatus === "absent" || finalStatus === "partial_absence";
 
         if (finalStatus === "present" && recordId) {
           await deleteMutation.mutateAsync(recordId);
@@ -97,8 +110,10 @@ export function StaffAttendancePage() {
             id: recordId,
             payload: {
               status: finalStatus,
-              absence_type:
-                finalStatus === "absent" ? edit.absence_type : null,
+              // إرسال الـ absence_type في حالتي الغياب والغياب الجزئي
+              absence_type: isAbsentOrPartial ? finalAbsenceType : null,
+              // 🌟 إرسال الحصص المفقودة في حالة الـ partial_absence فقط
+              missing_periods: finalStatus === "partial_absence" ? finalMissingPeriods : [],
             },
           });
         } else {
@@ -106,8 +121,8 @@ export function StaffAttendancePage() {
             staff_id: staffId,
             attendance_date: selectedDate,
             status: finalStatus,
-            absence_type:
-              finalStatus === "absent" ? edit.absence_type : null,
+            absence_type: isAbsentOrPartial ? finalAbsenceType : null,
+            missing_periods: finalStatus === "partial_absence" ? finalMissingPeriods : [],
           });
         }
       }
@@ -149,7 +164,7 @@ export function StaffAttendancePage() {
           <DatePicker
             value={dateInput}
             onChange={setDateInput}
-            className="h-10 w-[160px] rounded-[12px]"
+            className="w-full sm:w-[220px]"
           />
 
           <Button

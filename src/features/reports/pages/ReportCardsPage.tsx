@@ -97,7 +97,6 @@ export function ReportCardsPage() {
   };
 
   const handlePublish = (isPublished: boolean) => {
-    // بناء البارامترات حسب الفلاتر المحددة
     const payload: any = { 
       semester_id: semesterId, 
       is_published: isPublished ? 1 : 0 
@@ -107,16 +106,17 @@ export function ReportCardsPage() {
 
     publishMutation.mutate(payload, {
       onSuccess: () => {
-        // 🌟 السحر هنا: تحديث عميق ومضمون للجدول ليظهر التغيير فور نجاح الطلب 🌟
-        queryClient.setQueriesData({ queryKey: reportCardKeys.all }, (oldData: any) => {
+        // 🌟 السحر هنا: استهداف المفتاح الدقيق للجدول المعروض لتحديثه محلياً وفورياً 🌟
+        const exactKey = reportCardKeys.list(semesterId, effectiveGradeId, effectiveClassRoomId, page);
+        
+        queryClient.setQueryData(exactKey, (oldData: any) => {
           if (!oldData) return oldData;
           
           const targetValue = isPublished ? 1 : 0;
           
-          // دالة لتعديل الأسطر بقلب الجدول
           const updateList = (list: any[]) => list.map((s: any) => ({ ...s, is_published: targetValue }));
           
-          // البحث ضمن جميع أشكال استجابات الباك إند (مصفوفة مباشرة أو Pagination)
+          // تحديث البيانات بناءً على هيكلة الرد من الباك إند
           if (Array.isArray(oldData)) {
             return updateList(oldData);
           }
@@ -129,9 +129,6 @@ export function ReportCardsPage() {
           
           return oldData;
         });
-
-        // طلب جلب البيانات بالخلفية لضمان التزامن
-        queryClient.invalidateQueries({ queryKey: reportCardKeys.all });
       }
     });
   };

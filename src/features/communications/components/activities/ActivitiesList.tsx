@@ -2,11 +2,13 @@ import {
   CalendarDays,
   Clock3,
   Edit3,
+  Printer,
   Sparkles,
   Trash2,
   Users,
 } from "lucide-react";
 import {
+  useEffect,
   useState,
 } from "react";
 
@@ -28,6 +30,8 @@ import {
 import {
   DeleteConfirmationDialog,
 } from "../shared/DeleteConfirmationDialog";
+
+import { PosterTemplate } from "../../../printing/templates/PosterTemplate"; 
 
 type Props = {
   onEdit: (activity: Activity) => void;
@@ -70,6 +74,23 @@ export function ActivitiesList({ onEdit }: Props) {
 
   const [pendingDelete, setPendingDelete] = useState<Activity | null>(null);
 
+
+  const [printingItem, setPrintingItem] = useState<Activity | null>(null);
+
+
+  useEffect(() => {
+    const handleAfterPrint = () => setPrintingItem(null);
+    window.addEventListener("afterprint", handleAfterPrint);
+    return () => window.removeEventListener("afterprint", handleAfterPrint);
+  }, []);
+
+  const handlePrint = (activity: Activity) => {
+    setPrintingItem(activity);
+    setTimeout(() => {
+      window.print();
+    }, 150);
+  };
+
   if (isLoading) return <CommunicationLoading />;
 
   if (isError) {
@@ -95,7 +116,7 @@ export function ActivitiesList({ onEdit }: Props) {
 
   return (
     <>
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3 print:hidden">
         {activities.map((activity) => (
           <article
             key={activity.id}
@@ -141,6 +162,9 @@ export function ActivitiesList({ onEdit }: Props) {
             </div>
 
             <footer className="flex h-11 items-center justify-end gap-1.5 border-t border-info/[0.10] bg-info/[0.035] px-4">
+              <Button type="button" variant="ghost" size="sm" onClick={() => handlePrint(activity)} className="h-8 rounded-[10px] px-2.5 text-[11px] font-medium text-primary hover:bg-primary/[0.08] hover:text-primary">
+                <Printer className="h-3.5 w-3.5" /> Poster
+              </Button>
               <Button type="button" variant="ghost" size="sm" onClick={() => onEdit(activity)} className="h-8 rounded-[10px] px-2.5 text-[11px] font-medium text-info hover:bg-info/[0.08] hover:text-info">
                 <Edit3 className="h-3.5 w-3.5" /> Edit
               </Button>
@@ -151,6 +175,42 @@ export function ActivitiesList({ onEdit }: Props) {
           </article>
         ))}
       </div>
+
+      {/* 🌟 قالب طباعة النشاط */}
+      {printingItem && (
+        <div className="hidden print:block">
+          <PosterTemplate>
+            <div className="flex h-full flex-col items-center justify-center px-12 py-16 text-center">
+              <span className="mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-[#f3f4f6] text-[#374151]">
+                <Sparkles className="h-12 w-12" />
+              </span>
+              <p className="mb-4 text-[14px] font-bold uppercase tracking-[0.2em] text-[#6b7280]">
+                {printingItem.type || "School Activity"}
+              </p>
+              <h1 className="mb-8 text-[44px] font-black uppercase leading-tight tracking-wide text-[#111827]">
+                {printingItem.activity_name}
+              </h1>
+              
+              <div className="mb-12 flex items-center justify-center gap-6">
+                 <div className="flex items-center gap-3 rounded-[18px] bg-[#f3f4f6] px-6 py-4 text-[#374151]">
+                   <CalendarDays className="h-7 w-7" />
+                   <span className="text-[20px] font-semibold">{formatActivityDate(printingItem.activity_date)}</span>
+                 </div>
+                 <div className="flex items-center gap-3 rounded-[18px] bg-[#f3f4f6] px-6 py-4 text-[#374151]">
+                   <Clock3 className="h-7 w-7" />
+                   <span className="text-[20px] font-semibold">{formatActivityTime(printingItem.start_time)} – {formatActivityTime(printingItem.end_time)}</span>
+                 </div>
+              </div>
+
+              <div className="mb-10 h-[4px] w-24 bg-[#111827]"></div>
+              
+              <p className="text-[24px] leading-relaxed text-[#374151]">
+                {printingItem.description || "Join us for this exciting school activity! All selected classrooms are welcome."}
+              </p>
+            </div>
+          </PosterTemplate>
+        </div>
+      )}
 
       <DeleteConfirmationDialog
         open={Boolean(pendingDelete)}

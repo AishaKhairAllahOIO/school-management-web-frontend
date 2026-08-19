@@ -1,10 +1,14 @@
 import { Eye, Info, ShieldAlert, CheckCircle2, ChevronLeft, ChevronRight, GraduationCap, Clock } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { axiosClient } from "@/services/axios/axiosClient";
+
 import { Button } from "@/shared/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/shared/ui/dialog";
 import type { AbsenceType, AttendanceStatus, StudentAttendance, PaginatedData } from "../types/attendance.types";
+import { API_ENDPOINTS } from "@/services/api/endpoints";
 
 type Props = {
   data: StudentAttendance[];
@@ -21,7 +25,22 @@ const inlineControlClass = "h-9 rounded-[12px] border-border/60 bg-background/80
 
 export function AttendanceTable({ data, isLoading = false, onUpdate, pagination, currentPage, onPageChange, gradeName, className }: Props) {
   const [selectedStudent, setSelectedStudent] = useState<StudentAttendance | null>(null);
+  
   const totalPages = pagination?.per_page ? Math.ceil((pagination.total || 0) / pagination.per_page) : 1;
+
+  // 🌟 السحر هنا: جلب بيانات الطالب الكاملة (ومن ضمنها الشعبة والصف) عند فتح الـ Modal فقط
+  const { data: studentProfile, isLoading: isLoadingProfile } = useQuery({
+    queryKey: ['student-full-profile', selectedStudent?.enrollment_id],
+    queryFn: async () => {
+      const response = await axiosClient.get(API_ENDPOINTS.STUDENTS.FULL_PROFILE(selectedStudent!.enrollment_id));
+      return response.data?.data;
+    },
+    enabled: !!selectedStudent?.enrollment_id, // لا يشتغل الطلب إلا إذا فتحنا الـ Modal
+  });
+
+  // تحديد الأسماء الحقيقية لعرضها
+  const displayGrade = studentProfile?.enrollment?.grade?.name || gradeName;
+  const displayClass = studentProfile?.enrollment?.classroom?.name || className;
 
   return (
     <>
@@ -160,9 +179,15 @@ export function AttendanceTable({ data, isLoading = false, onUpdate, pagination,
                 </div>
                 <div className="flex items-center gap-2 mt-2 bg-background/60 rounded-[12px] p-2.5 border border-border/40">
                   <GraduationCap className="h-4 w-4 text-primary" />
-                  <span className="text-[12px] font-semibold text-foreground">{gradeName}</span>
+                  <span className="text-[12px] font-semibold text-foreground">
+                    {/* 🌟 نظهر Loading مؤقت أثناء جلب المرحلة، أو نعرض النتيجة */}
+                    {isLoadingProfile ? <span className="animate-pulse bg-muted text-transparent rounded">Loading</span> : displayGrade}
+                  </span>
                   <span className="text-muted-foreground mx-1 text-[10px]">/</span>
-                  <span className="text-[12px] font-semibold text-muted-foreground">{className}</span>
+                  <span className="text-[12px] font-semibold text-muted-foreground">
+                    {/* 🌟 نظهر Loading مؤقت أثناء جلب الشعبة، أو نعرض النتيجة */}
+                    {isLoadingProfile ? <span className="animate-pulse bg-muted text-transparent rounded">Loading</span> : displayClass}
+                  </span>
                 </div>
               </div>
               <div className="grid grid-cols-3 gap-3">
