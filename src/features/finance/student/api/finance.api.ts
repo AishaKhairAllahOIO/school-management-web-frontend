@@ -159,20 +159,15 @@ export const financeApi = {
     );
   },
 
-  async getInstallmentsByAccount(
-    accountId: string | number,
+async getStudentInstallments(
+    studentId: string | number,
   ): Promise<Installment[]> {
     const response =
-      await axiosClient.get<
-        ApiResponse<Installment[]>
-      >(
-        API_ENDPOINTS.FINANCE_OPERATIONS
-          .ACCOUNT_INSTALLMENTS(accountId),
+      await axiosClient.get<ApiResponse<Installment[]>>(
+        API_ENDPOINTS.FINANCE_OPERATIONS.STUDENT_INSTALLMENTS(studentId),
       );
 
-    return unwrapResponseData(
-      response.data,
-    );
+    return unwrapResponseData(response.data);
   },
 
   /* ------------------------------------------------------------------------ */

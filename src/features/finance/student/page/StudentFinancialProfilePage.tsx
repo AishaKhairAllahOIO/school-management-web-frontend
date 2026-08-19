@@ -23,8 +23,7 @@ import {
   useStudentFinancialAccount,
 } from "../hooks/useFinancialAccounts";
 import { useFinancePayments } from "../hooks/usePayments";
-import { useAccountInstallments } from "../hooks/useInstallments";
-
+import { useStudentInstallments } from "../hooks/useInstallments";
 import { InstallmentsSection } from "../components/InstallmentsSection";
 import { FinanceTableSkeleton } from "../components/FinanceTableSkeleton";
 import {
@@ -150,8 +149,8 @@ export function StudentFinancialProfilePage() {
     refetch: refetchInstallments,
     isLoading: isLoadingInstallments,
     isFetching: isFetchingInstallments,
-  } = useAccountInstallments(
-    account?.id,
+  } = useStudentInstallments(
+    studentId,
     Boolean(account?.id && !isNotFound(accountQuery.error) && account?.paymentStatus !== 'draft'),
   );
 
