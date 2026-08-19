@@ -10,7 +10,7 @@ import {
   Printer,
   WalletCards,
 } from "lucide-react";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
 
 import { Button } from "@/shared/ui/button";
@@ -23,6 +23,7 @@ import {
   useStudentFinancialAccount,
 } from "../hooks/useFinancialAccounts";
 import { useFinancePayments } from "../hooks/usePayments";
+import { useAccountInstallments } from "../hooks/useInstallments";
 
 import { InstallmentsSection } from "../components/InstallmentsSection";
 import { FinanceTableSkeleton } from "../components/FinanceTableSkeleton";
@@ -133,25 +134,56 @@ export function StudentFinancialProfilePage() {
     retry: false,
   });
 
+  // 🔍 جلب الحساب المالي للطالب
   const accountQuery = useStudentFinancialAccount(
     studentId,
     Boolean(studentId),
+  );
+
+  const account = isNotFound(accountQuery.error)
+    ? undefined
+    : accountQuery.data;
+
+  // ✅ جلب الأقساط الخاصة بالحساب (من الـ API المخصص)
+  const {
+    data: accountInstallments = [],
+    refetch: refetchInstallments,
+    isLoading: isLoadingInstallments,
+    isFetching: isFetchingInstallments,
+  } = useAccountInstallments(
+    account?.id,
+    Boolean(account?.id && !isNotFound(accountQuery.error) && account?.paymentStatus !== 'draft'),
   );
 
   const { processPayment, data: allPayments = [] } = useFinancePayments();
 
   // ✅ التحقق من وجود مدفوعات لهذا الطالب
   const hasPayments = useMemo(() => {
-    if (!accountQuery.data) return false;
+    if (!account) return false;
     return allPayments.some(
       (payment) =>
         String(payment.studentId) === String(studentId) ||
-        String(payment.accountId) === String(accountQuery.data?.id),
+        String(payment.accountId) === String(account.id),
     );
-  }, [allPayments, accountQuery.data, studentId]);
+  }, [allPayments, account, studentId]);
 
-  // ✅ هل الحساب في حالة draft (تم إنشاؤه ولكن لم يتم التعاقد عليه بعد)
-  const isDraft = accountQuery.data?.paymentStatus === "draft";
+  // ✅ هل الحساب في حالة draft؟
+  const isDraft = account?.paymentStatus === "draft";
+
+  // ✅ عند تغيير الحساب (بعد create/update) أو عند تغيير حالة الدفع
+  // نعيد جلب الأقساط لتحديث الجدول
+  useEffect(() => {
+    if (account?.id && !isDraft) {
+      void refetchInstallments();
+    }
+  }, [account?.id, isDraft, refetchInstallments]);
+
+  // ✅ بعد كل عملية دفع ناجحة، نحدث الأقساط
+  useEffect(() => {
+    if (account?.id && !isDraft && hasPayments) {
+      void refetchInstallments();
+    }
+  }, [hasPayments, account?.id, isDraft, refetchInstallments]);
 
   if (!studentId) {
     return (
@@ -174,10 +206,6 @@ export function StudentFinancialProfilePage() {
   }
 
   const student = studentQuery.data?.student;
-
-  const account = isNotFound(accountQuery.error)
-    ? undefined
-    : accountQuery.data;
 
   if (
     studentQuery.isError ||
@@ -455,7 +483,6 @@ export function StudentFinancialProfilePage() {
                     </div>
                   </div>
 
-                  {/* ✅ إذا كان draft → زر Create Contract */}
                   {isDraft ? (
                     <Button
                       type="button"
@@ -466,7 +493,6 @@ export function StudentFinancialProfilePage() {
                       Create Contract
                     </Button>
                   ) : (
-                    /* ✅ إذا كان unpaid أو partially_paid → زر Update Contract */
                     <Button
                       type="button"
                       variant="outline"
@@ -509,8 +535,10 @@ export function StudentFinancialProfilePage() {
             </div>
           </section>
 
+          {/* ✅ عرض الأقساط الخاصة بالطالب مع تحديث تلقائي */}
           <InstallmentsSection
-            installments={account.installments}
+            installments={accountInstallments}
+            isLoading={isLoadingInstallments || isFetchingInstallments}
             title="Installment Schedule"
             description="View each scheduled payment, due date, and payment status."
           />
@@ -551,17 +579,18 @@ export function StudentFinancialProfilePage() {
             processPayment.mutate(values, {
               onSuccess: () => {
                 setPaymentDialogOpen(false);
+                // ✅ تحديث الحساب والأقساط بعد الدفع
                 void accountQuery.refetch();
+                // ✅ إعادة جلب الأقساط لتحديث الحالات والمبالغ
+                setTimeout(() => {
+                  void refetchInstallments();
+                }, 500);
               },
             });
           }}
         />
       ) : null}
 
-      {/* ✅ FinalizeContractDialog - يظهر في حالتين:
-          1. لا يوجد حساب (account === undefined)
-          2. يوجد حساب ولكن في حالة draft (isDraft === true)
-      */}
       {(!account || isDraft) ? (
         <FinalizeContractDialog
           open={createContractOpen}
@@ -595,7 +624,12 @@ export function StudentFinancialProfilePage() {
               {
                 onSuccess: () => {
                   setCreateContractOpen(false);
+                  // ✅ بعد إنشاء العقد: تحديث الحساب وجلب الأقساط
                   void accountQuery.refetch();
+                  // ✅ ننتظر قليلاً حتى ينتهي الـ refetch ثم نجلب الأقساط
+                  setTimeout(() => {
+                    void refetchInstallments();
+                  }, 500);
                 },
               },
             );
@@ -603,37 +637,39 @@ export function StudentFinancialProfilePage() {
         />
       ) : null}
 
- {/* ✅ UpdateContractDialog - يظهر فقط إذا يوجد حساب وليس draft */}
-{account && !isDraft ? (
-  <UpdateContractDialog
-    open={updateContractOpen}
-    onOpenChange={setUpdateContractOpen}
-    account={account}
-    feePlans={feePlans}
-    installmentPolicies={installmentPolicies}
-    isLoading={updateContract.isPending}
-    onSubmit={(
-      accountId,
-      updateStudentId,
-      values,
-    ) => {
-      // ✅ values الآن يحتوي على studentId, academicYearId, feePlanId, installmentPolicyId, selectedExtraServiceIds
-      updateContract.mutate(
-        {
-          accountId,
-          studentId: updateStudentId,
-          payload: values, // ✅ نرسل الـ payload كاملاً
-        },
-        {
-          onSuccess: () => {
-            setUpdateContractOpen(false);
-            void accountQuery.refetch();
-          },
-        },
-      );
-    }}
-  />
-) : null}
+      {account && !isDraft ? (
+        <UpdateContractDialog
+          open={updateContractOpen}
+          onOpenChange={setUpdateContractOpen}
+          account={account}
+          feePlans={feePlans}
+          installmentPolicies={installmentPolicies}
+          isLoading={updateContract.isPending}
+          onSubmit={(
+            accountId,
+            updateStudentId,
+            values,
+          ) => {
+            updateContract.mutate(
+              {
+                accountId,
+                studentId: updateStudentId,
+                payload: values,
+              },
+              {
+                onSuccess: () => {
+                  setUpdateContractOpen(false);
+                  // ✅ بعد تحديث العقد: تحديث الحساب وجلب الأقساط الجديدة
+                  void accountQuery.refetch();
+                  setTimeout(() => {
+                    void refetchInstallments();
+                  }, 500);
+                },
+              },
+            );
+          }}
+        />
+      ) : null}
     </div>
   );
 }
