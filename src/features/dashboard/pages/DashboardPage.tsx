@@ -1,4 +1,3 @@
-// features/dashboard/pages/DashboardPage.tsx
 import { useCurrentUser } from "@/app/layout/hooks/useCurrentUser";
 import { AdviserDashboard } from "@/features/dashboard/supervisor/SupervisorDashboard";
 import { resolveDashboardRole } from "@/features/dashboard/lib/dashboard-role";

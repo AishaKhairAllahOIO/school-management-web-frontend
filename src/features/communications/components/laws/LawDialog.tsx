@@ -31,7 +31,6 @@ import type {
   LawPayload,
   SchoolLaw,
 } from "../../types/school-laws.types";
-import { DialogFormSkeleton } from "../shared/DialogFormSkeleton";
 
 const lawSchema = z.object({
   title: z.string().trim().min(1, "Law title is required."),
@@ -110,8 +109,27 @@ export function LawDialog({
         </div>
 
         <div className="max-h-[calc(92dvh-96px)] overflow-y-auto px-5 py-5 sm:px-6">
-          {isLoadingDetails ? (
-            <DialogFormSkeleton rows={2} />
+       {isLoadingDetails ? (
+  <div className="space-y-4">
+    {/* Law title */}
+    <div className="space-y-1.5">
+      <div className="h-3 w-16 animate-pulse rounded bg-muted" />
+      <div className="h-11 w-full animate-pulse rounded-[13px] border border-input bg-muted/50" />
+    </div>
+
+    {/* Official description */}
+    <div className="space-y-1.5">
+      <div className="h-3 w-28 animate-pulse rounded bg-muted" />
+      <div className="min-h-[150px] w-full animate-pulse rounded-[14px] border border-input bg-muted/50" />
+    </div>
+
+    {/* Footer actions */}
+    <div className="sticky bottom-0 z-10 -mx-5 flex flex-col-reverse gap-2 border-t border-border/50 bg-card/95 px-5 pb-1 pt-4 backdrop-blur sm:-mx-6 sm:flex-row sm:justify-end sm:px-6">
+      <div className="h-10 w-full animate-pulse rounded-[12px] bg-muted sm:w-[76px]" />
+      <div className="h-10 w-full animate-pulse rounded-[12px] bg-muted sm:w-[112px]" />
+    </div>
+  </div>
+
           ) : detailsQuery.isError ? (
             <div className="rounded-[16px] border border-destructive/20 bg-destructive/[0.035] p-5">
               <p className="text-[13px] font-medium">Law details could not be loaded.</p>
