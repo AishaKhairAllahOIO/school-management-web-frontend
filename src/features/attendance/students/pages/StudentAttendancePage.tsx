@@ -24,7 +24,8 @@ export function StudentAttendancePage() {
   const { data: academicData } = useAcademicSettings();
   const activeSemester = academicData?.settings?.currentSemesterId || null; 
   
-  const [classroomFilter, setClassroomFilter] = useState(""); 
+  // 🌟 القيمة الافتراضية للفلاتر هي "all"
+  const [classroomFilter, setClassroomFilter] = useState("all"); 
   const [search, setSearch] = useState("");
   const [gradeFilter, setGradeFilter] = useState("all");
   const [status, setStatus] = useState("all");
@@ -33,7 +34,7 @@ export function StudentAttendancePage() {
 
   useEffect(() => {
     setPage(1);
-  }, [search, status, absenceType, classroomFilter, selectedDate]);
+  }, [search, status, absenceType, classroomFilter, selectedDate, gradeFilter]);
 
   const { data: gradesData = [] } = useQuery({
     queryKey: ['real-grades'],
@@ -56,20 +57,25 @@ export function StudentAttendancePage() {
     return classroomsData.filter((c: any) => String(c.gradeId || c.grade_id) === gradeFilter);
   }, [classroomsData, gradeFilter]);
 
+  // 🌟 منطق ذكي: إذا اختار مرحلة محددة، نختار أول شعبة لنسهل عليه أخذ التفقد
   useEffect(() => {
-    if (filteredClassrooms.length > 0 && !classroomFilter && classroomFilter !== "all") {
+    if (gradeFilter === "all") {
+      setClassroomFilter("all");
+    } else if (filteredClassrooms.length > 0 && classroomFilter === "all") {
       setClassroomFilter(String(filteredClassrooms[0].id));
     }
-  }, [filteredClassrooms, classroomFilter]);
+  }, [gradeFilter, filteredClassrooms]);
 
   const activeClassroom = classroomsData.find((c: any) => String(c.id) === classroomFilter);
-  const activeClassName = activeClassroom?.name || "N/A";
+  const activeClassName = classroomFilter === "all" ? "All classrooms" : (activeClassroom?.name || "N/A");
   
-  const activeGrade = gradesData.find((g: any) => String(g.id) === String(activeClassroom?.gradeId || activeClassroom?.grade_id));
-  const activeGradeName = activeGrade?.name || "N/A";
+  const activeGrade = gradesData.find((g: any) => String(g.id) === gradeFilter);
+  const activeGradeName = gradeFilter === "all" ? "All grades" : (activeGrade?.name || "N/A");
 
+  // 🌟 إرسال `gradeId` مع الدالة لكي تفلتر بناءً عليها إذا لم يتم اختيار شعبة محددة
   const attendanceQuery = useStudentAttendance({
     date: selectedDate,
+    gradeId: gradeFilter,
     classroomId: classroomFilter,
     page,
     search,
@@ -196,8 +202,10 @@ export function StudentAttendancePage() {
             <Button type="button" variant="outline" onClick={applyDate} disabled={!draftDate || draftDate === selectedDate} className="h-11 rounded-[14px] border-primary/30 bg-transparent px-5 text-[13px] font-semibold text-primary hover:bg-primary/10 transition-colors shadow-2xs">
               <CalendarDays className="h-4 w-4 mr-2" /> Apply
             </Button>
-            <Button type="button" onClick={saveAttendance} disabled={dirtyIds.size === 0 || isSaving} className="h-11 rounded-[14px] px-6 text-[13px] font-semibold bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm transition-all disabled:opacity-50">
-              <Save className="h-4 w-4 mr-2" /> {isSaving ? "Saving..." : "Save Changes"}
+            {/* 🌟 تعطيل زر الحفظ إذا كان يعرض كل الشعب، لأن الباك إند يحتاج class_room_id للحفظ الجماعي */}
+            <Button type="button" onClick={saveAttendance} disabled={dirtyIds.size === 0 || isSaving || classroomFilter === "all"} className="h-11 rounded-[14px] px-6 text-[13px] font-semibold bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm transition-all disabled:opacity-50">
+              <Save className="h-4 w-4 mr-2" /> 
+              {isSaving ? "Saving..." : classroomFilter === "all" && dirtyIds.size > 0 ? "Select class to save" : "Save Changes"}
             </Button>
           </div>
         </div>
