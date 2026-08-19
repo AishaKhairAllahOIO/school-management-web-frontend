@@ -13,7 +13,7 @@ import type {
   ProfileIdentity,
 } from "@/features/profile/types/profile.types";
 
-import { useAuthenticatedImage } from "@/shared/hooks/useAuthenticatedImage";
+import { UserAvatar } from "@/features/users/shared/components/UserAvatar"; // ← استخدم UserAvatar بدلاً من useAuthenticatedImage
 import {
   formatDate,
   formatFullName,
@@ -40,8 +40,8 @@ export function ProfileHeaderCard({
       user.lastName,
     );
 
-  const photoUrl =
-    useAuthenticatedImage(user?.photoUrl);
+  // photoUrl أصبح مباشر من user.photoUrl
+  const photoUrl = user?.photoUrl;
 
   const isEnabled =
     String(
@@ -93,9 +93,11 @@ export function ProfileHeaderCard({
                 "to-transparent",
               ].join(" ")}
             >
-              <img
+              {/* استخدم UserAvatar بدلاً من img */}
+              <UserAvatar
                 src={photoUrl}
                 alt={fullName}
+                size="xl"
                 className={[
                   "h-[74px] w-[74px]",
                   "rounded-[18px]",
