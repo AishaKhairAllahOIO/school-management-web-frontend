@@ -9,7 +9,7 @@ import {
   RotateCcw,
   Trash2,
 } from "lucide-react";
-import { AuthenticatedUserImage } from "../../../shared/components/AuthenticatedUserImage";
+import { UserAvatar } from "../../../shared/components/UserAvatar";
 import type { StaffProfile, StaffSectionColor } from "../../types/staff.types";
 
 type StaffCardProps = {
@@ -96,7 +96,7 @@ export function StaffCard({
           >
             <div className="flex items-center gap-3">
               {staff.photoUrl ? (
-                <AuthenticatedUserImage
+                <UserAvatar
                   src={staff.photoUrl}
                   alt={fullName}
                   className={[

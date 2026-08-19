@@ -179,7 +179,7 @@ export const API_ENDPOINTS = {
     INSTALLMENT: (installmentId: ApiId) =>
       `/admin/finance/contracts/installments/${installmentId}`,
 
-    ACCOUNT_INSTALLMENTS: (studentId: string | number) => `/admin/finance/contracts/student/${studentId}/installments`,
+    STUDENT_INSTALLMENTS: (studentId: string | number) => `/admin/finance/contracts/student/${studentId}/installments`,
 
     PAYMENTS: "/admin/finance/contracts/payments",
 

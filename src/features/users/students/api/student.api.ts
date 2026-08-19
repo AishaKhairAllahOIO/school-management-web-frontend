@@ -71,12 +71,18 @@ function normalizeToggleAccountResponse(
 }
 
 
-function normalizePersonProfile<T extends {
-  birthDate?: string | null;
-}>(person: T): T {
+function normalizePersonProfile<
+  T extends {
+    birthDate?: string | null;
+    photoUrl?: string | null;
+  },
+>(person: T): T {
   return {
     ...person,
-    birthDate: normalizeApiDateOnly(person.birthDate),
+    birthDate: normalizeApiDateOnly(
+      person.birthDate,
+    ),
+    photoUrl: person.photoUrl ?? null,
   };
 }
 
@@ -113,9 +119,12 @@ function normalizeStudentListResponse(
   return {
     ...response,
     data: response.data.map((student) => ({
-      ...student,
-      deletedAt: normalizeApiDateTime(student.deletedAt),
-    })),
+  ...student,
+  photoUrl: student.photoUrl ?? null,
+  deletedAt: normalizeApiDateTime(
+    student.deletedAt,
+  ),
+})),
   };
 }
 

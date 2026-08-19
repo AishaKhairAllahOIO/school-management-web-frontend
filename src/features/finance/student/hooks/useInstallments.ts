@@ -13,30 +13,30 @@ export const financeInstallmentsKeys = {
       installmentId,
     ] as const,
 
-     byAccount: (accountId: string | number) =>
-    ["finance-installments", "account", accountId] as const,
+     byStudent: (studentId: string | number) =>
+    ["finance-installments", "student", studentId] as const,
 };
 
-export function useAccountInstallments(
-  accountId: string | number | undefined,
+export function useStudentInstallments(
+  studentId: string | number | undefined,
   enabled = true,
 ) {
-  const hasAccountId =
-    accountId !== undefined &&
-    accountId !== null;
+  const hasStudentId =
+    studentId !== undefined &&
+    studentId !== null;
 
   return useQuery({
-    queryKey: hasAccountId
-      ? financeInstallmentsKeys.byAccount(accountId)
-      : ["finance-installments", "account", "missing"],
+    queryKey: hasStudentId
+      ? financeInstallmentsKeys.byStudent(studentId)
+      : ["finance-installments", "student", "missing"],
 
     queryFn: () =>
-      financeApi.getInstallmentsByAccount(
-        accountId!,
+      financeApi.getStudentInstallments(
+        studentId!,
       ),
 
     enabled:
-      enabled && hasAccountId,
+      enabled && hasStudentId,
 
     retry: false,
   });

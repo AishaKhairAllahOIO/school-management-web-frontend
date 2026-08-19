@@ -14,7 +14,7 @@ import { useOnboardingStore } from "@/features/onboarding/store/onboardingStore"
 import { useCurrentUser } from "@/app/layout/hooks/useCurrentUser";
 import { useLocale } from "@/app/providers/locale";
 import { useLogout } from "@/features/auth/hooks/use-logout";
-import { useAuthenticatedImage } from "@/shared/hooks/useAuthenticatedImage";
+import { UserAvatar } from "@/features/users/shared/components/UserAvatar"; // ← أضف هذا
 import { useDismissibleLayer } from "@/shared/hooks/use-dismissible-layer";
 
 import type { TopbarMenuProps } from "../topbar.types";
@@ -36,7 +36,6 @@ export function ProfileMenu({
 
   const { user } = useCurrentUser();
 
-
   const logoutMutation = useLogout();
 
   useDismissibleLayer({
@@ -45,14 +44,14 @@ export function ProfileMenu({
     onDismiss: onClose,
   });
 
-   const resetOnboarding = useOnboardingStore((state) => state.resetOnboarding);
+  const resetOnboarding = useOnboardingStore((state) => state.resetOnboarding);
 
   const displayName = user
     ? `${user.firstName} ${user.lastName}`.trim()
     : t.layout.topbar.loadingUser;
 
-  const photoUrl =
-    useAuthenticatedImage(user?.photoUrl);
+  // استخدم photoUrl مباشرة
+  const photoUrl = user?.photoUrl;
 
   const primaryRole =
     user?.role?.[0] ?? "";
@@ -110,8 +109,8 @@ export function ProfileMenu({
     <div
       ref={containerRef}
       className="relative block shrink-0"
-        id="topbar-profile" 
-        data-onboarding="profile"
+      id="topbar-profile" 
+      data-onboarding="profile"
     >
       <button
         ref={triggerRef}
@@ -147,9 +146,11 @@ export function ProfileMenu({
           "lg:px-[7px]",
         ].join(" ")}
       >
-        <img
+        {/* استخدم UserAvatar بدلاً من img */}
+        <UserAvatar
           src={photoUrl}
           alt={displayName}
+          size="lg"
           className={[
             "h-[34px] w-[34px] sm:h-[38px] sm:w-[38px] lg:h-[46px] lg:w-[46px]",
             "shrink-0 rounded-full",
@@ -243,7 +244,6 @@ export function ProfileMenu({
               }
             />
 
-
             {isSuperAdmin && (
               <>
                 <ProfileMenuItem
@@ -298,15 +298,15 @@ export function ProfileMenu({
             <p className="px-3 pb-1.5 text-[9px] font-semibold uppercase tracking-[0.13em] text-topbar-muted/70">
               Help
             </p>
-         <ProfileMenuItem
-  title="Take the tour"
-  description="Review the main features again."
-  icon={HelpCircle}
-  onClick={() => {
-    onClose();
- resetOnboarding(); 
-  }}
-/>
+            <ProfileMenuItem
+              title="Take the tour"
+              description="Review the main features again."
+              icon={HelpCircle}
+              onClick={() => {
+                onClose();
+                resetOnboarding(); 
+              }}
+            />
           </div>
 
           <div

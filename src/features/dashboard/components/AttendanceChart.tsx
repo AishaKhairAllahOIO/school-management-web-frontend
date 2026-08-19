@@ -23,16 +23,16 @@ export function AttendanceChart({ data }: AttendanceChartProps) {
     <div className="group rounded-2xl border border-border/60 bg-card p-4 shadow-[0_6px_24px_rgba(148,163,184,0.06)] transition-all duration-300 hover:shadow-[0_12px_32px_rgba(148,163,184,0.10)]">
       <div className="mb-1.5 flex items-center justify-between">
         <div>
-          <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+          <p className="text-[10px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
             Daily overview
           </p>
 
-          <h3 className="mt-0.5 text-lg font-bold tracking-tight text-foreground">
+          <h3 className="mt-0.5 text-lg font-semibold tracking-tight text-foreground">
             Attendance
           </h3>
         </div>
 
-        <div className="rounded-lg bg-emerald-50 px-2.5 py-1 text-[11px] font-semibold text-emerald-600">
+        <div className="rounded-lg bg-emerald-50 px-2.5 py-1 text-[11px] font-medium text-emerald-600">
           Today
         </div>
       </div>
@@ -88,11 +88,11 @@ export function AttendanceChart({ data }: AttendanceChartProps) {
           </ResponsiveContainer>
 
           <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
-            <span className="text-3xl font-bold tracking-tight text-foreground">
+            <span className="text-3xl font-semibold tracking-tight text-foreground">
               {total.toLocaleString()}
             </span>
 
-            <span className="text-xs font-medium text-muted-foreground">
+            <span className="text-xs font-normal text-muted-foreground">
               Students
             </span>
           </div>
@@ -109,11 +109,11 @@ export function AttendanceChart({ data }: AttendanceChartProps) {
                 style={{ backgroundColor: COLORS[index] }}
               />
 
-              <span className="min-w-0 flex-1 text-xs font-medium text-muted-foreground">
+              <span className="min-w-0 flex-1 text-xs font-normal text-muted-foreground">
                 {item.name}
               </span>
 
-              <span className="text-sm font-bold text-foreground">
+              <span className="text-sm font-semibold text-foreground">
                 {item.value.toLocaleString()}
               </span>
             </div>
@@ -121,11 +121,11 @@ export function AttendanceChart({ data }: AttendanceChartProps) {
 
           <div className="mt-2 border-t border-border/50 pt-3">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-medium text-muted-foreground">
+              <span className="text-xs font-normal text-muted-foreground">
                 Total
               </span>
 
-              <span className="text-sm font-bold text-foreground">
+              <span className="text-sm font-semibold text-foreground">
                 {total.toLocaleString()}
               </span>
             </div>

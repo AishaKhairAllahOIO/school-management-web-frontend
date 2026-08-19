@@ -23,15 +23,14 @@ import {
   useStudentFinancialAccount,
 } from "../hooks/useFinancialAccounts";
 import { useFinancePayments } from "../hooks/usePayments";
-import { useAccountInstallments } from "../hooks/useInstallments";
-
+import { useStudentInstallments } from "../hooks/useInstallments";
 import { InstallmentsSection } from "../components/InstallmentsSection";
 import { FinanceTableSkeleton } from "../components/FinanceTableSkeleton";
 import {
   CashierSection,
   FullFinancialStatementDialog,
   ProcessPaymentDialog,
-} from "../components/CashierSection";
+} from "../components/PaymentProcess";
 import { FinalizeContractDialog } from "../components/FinalizeContractDialog";
 import { UpdateContractDialog } from "../components/UpdateContractDialog";
 
@@ -150,8 +149,8 @@ export function StudentFinancialProfilePage() {
     refetch: refetchInstallments,
     isLoading: isLoadingInstallments,
     isFetching: isFetchingInstallments,
-  } = useAccountInstallments(
-    account?.id,
+  } = useStudentInstallments(
+    studentId,
     Boolean(account?.id && !isNotFound(accountQuery.error) && account?.paymentStatus !== 'draft'),
   );
 

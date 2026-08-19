@@ -38,16 +38,16 @@ export function FinanceChart({ data }: FinanceChartProps) {
     <div className="group rounded-2xl border border-border/60 bg-card p-4 shadow-[0_6px_24px_rgba(148,163,184,0.06)] transition-all duration-300 hover:shadow-[0_12px_32px_rgba(148,163,184,0.10)]">
       <div className="mb-2 flex items-center justify-between">
         <div>
-          <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+          <p className="text-[10px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
             Financial overview
           </p>
 
-          <h3 className="mt-0.5 text-lg font-bold tracking-tight text-foreground">
+          <h3 className="mt-0.5 text-lg font-semibold tracking-tight text-foreground">
             Finance Summary
           </h3>
         </div>
 
-        <div className="rounded-lg bg-sky-50 px-2.5 py-1 text-[11px] font-semibold text-sky-600">
+        <div className="rounded-lg bg-sky-50 px-2.5 py-1 text-[11px] font-medium text-sky-600">
           Overview
         </div>
       </div>

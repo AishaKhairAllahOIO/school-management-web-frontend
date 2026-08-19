@@ -1,6 +1,6 @@
 import { ArrowLeft, GraduationCap } from "lucide-react";
 
-import { AuthenticatedUserImage } from "../../../shared/components/AuthenticatedUserImage";
+import { UserAvatar } from "../../../shared/components/UserAvatar";
 import type { ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -47,11 +47,16 @@ export function StudentPageHeader({
           </button>
         ) : null}
 
-        <div className={["flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between", showBackButton ? "mt-3" : ""].join(" ")}>
+        <div
+          className={[
+            "flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between",
+            showBackButton ? "mt-3" : "",
+          ].join(" ")}
+        >
           <div className="flex min-w-0 items-center gap-3.5">
             {photoUrl ? (
               <div className="h-12 w-12 shrink-0 overflow-hidden rounded-[14px] border border-primary/20 bg-card shadow-[var(--shadow-card)]">
-                <AuthenticatedUserImage
+                <UserAvatar
                   src={photoUrl}
                   alt={photoAlt ?? title}
                   className="h-full w-full object-cover"
@@ -59,7 +64,9 @@ export function StudentPageHeader({
               </div>
             ) : (
               <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[14px] bg-primary text-primary-foreground shadow-[var(--shadow-card)]">
-                {icon ?? <GraduationCap className="h-5 w-5" strokeWidth={1.8} />}
+                {icon ?? (
+                  <GraduationCap className="h-5 w-5" strokeWidth={1.8} />
+                )}
               </span>
             )}
 
@@ -72,12 +79,18 @@ export function StudentPageHeader({
                 {title}
               </h1>
               {description ? (
-                <p className="mt-1 max-w-2xl text-sm leading-5 text-muted-foreground">{description}</p>
+                <p className="mt-1 max-w-2xl text-sm leading-5 text-muted-foreground">
+                  {description}
+                </p>
               ) : null}
             </div>
           </div>
 
-          {actions ? <div className="flex shrink-0 flex-wrap items-center gap-2 self-start lg:self-center">{actions}</div> : null}
+          {actions ? (
+            <div className="flex shrink-0 flex-wrap items-center gap-2 self-start lg:self-center">
+              {actions}
+            </div>
+          ) : null}
         </div>
       </div>
     </section>

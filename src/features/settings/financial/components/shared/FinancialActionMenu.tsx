@@ -1,22 +1,51 @@
 import {
   Edit3,
+  Eye,
   Trash2,
 } from "lucide-react";
 
 type Props = {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
+  onView?: () => void;
   onEdit: () => void;
   onDelete?: () => void;
 };
 
 export function FinancialActionMenu({
   onOpenChange,
+  onView,
   onEdit,
   onDelete,
 }: Props) {
   return (
     <div className="inline-flex items-center justify-end gap-2">
+      {onView && (
+        <button
+          type="button"
+          aria-label="View details"
+          title="View details"
+          onClick={() => {
+            onOpenChange(false);
+            onView();
+          }}
+          className={[
+            "inline-flex h-10 w-10 shrink-0 items-center justify-center",
+            "rounded-full border border-primary/15",
+            "bg-primary/[0.045] text-primary",
+            "transition-all duration-200",
+            "hover:-translate-y-0.5",
+            "hover:border-primary/25",
+            "hover:bg-primary/[0.09]",
+            "active:translate-y-0 active:scale-95",
+            "focus-visible:outline-none focus-visible:ring-4",
+            "focus-visible:ring-primary/10",
+          ].join(" ")}
+        >
+          <Eye size={16} strokeWidth={1.8} />
+        </button>
+      )}
+
       <button
         type="button"
         aria-label="Edit"
@@ -29,10 +58,10 @@ export function FinancialActionMenu({
           "inline-flex h-10 w-10 shrink-0 items-center justify-center",
           "rounded-full border border-primary/15",
           "bg-primary/[0.045] text-primary",
-          "shadow-[0_3px_12px_rgba(98,68,220,0.06)]",
           "transition-all duration-200",
-          "hover:-translate-y-0.5 hover:border-primary/25",
-          "hover:bg-primary/[0.09] hover:shadow-[0_6px_18px_rgba(98,68,220,0.12)]",
+          "hover:-translate-y-0.5",
+          "hover:border-primary/25",
+          "hover:bg-primary/[0.09]",
           "active:translate-y-0 active:scale-95",
           "focus-visible:outline-none focus-visible:ring-4",
           "focus-visible:ring-primary/10",
@@ -41,7 +70,7 @@ export function FinancialActionMenu({
         <Edit3 size={16} strokeWidth={1.8} />
       </button>
 
-      {onDelete ? (
+      {onDelete && (
         <button
           type="button"
           aria-label="Delete"
@@ -54,10 +83,10 @@ export function FinancialActionMenu({
             "inline-flex h-10 w-10 shrink-0 items-center justify-center",
             "rounded-full border border-destructive/20",
             "bg-destructive/[0.035] text-destructive",
-            "shadow-[0_3px_12px_rgba(220,38,38,0.04)]",
             "transition-all duration-200",
-            "hover:-translate-y-0.5 hover:border-destructive/30",
-            "hover:bg-destructive/[0.075] hover:shadow-[0_6px_18px_rgba(220,38,38,0.09)]",
+            "hover:-translate-y-0.5",
+            "hover:border-destructive/30",
+            "hover:bg-destructive/[0.075]",
             "active:translate-y-0 active:scale-95",
             "focus-visible:outline-none focus-visible:ring-4",
             "focus-visible:ring-destructive/10",
@@ -65,7 +94,7 @@ export function FinancialActionMenu({
         >
           <Trash2 size={16} strokeWidth={1.8} />
         </button>
-      ) : null}
+      )}
     </div>
   );
 }

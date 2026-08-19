@@ -15,132 +15,270 @@ import type {
   UpdatePaymentPayload,
 } from "../types/finance.payloads";
 
+/* -------------------------------------------------------------------------- */
+/* Response types                                                             */
+/* -------------------------------------------------------------------------- */
+
 export type ProcessPaymentResponse = {
   receipt: PaymentReceipt;
   account: FinancialAccount;
 };
 
-function unwrapResponseData<T>(response: ApiResponse<T>): T {
+/* -------------------------------------------------------------------------- */
+/* Helpers                                                                    */
+/* -------------------------------------------------------------------------- */
+
+function unwrapResponseData<T>(
+  response: ApiResponse<T>,
+): T {
   if (response.data === undefined) {
     throw new Error(
-      response.message ?? "The server returned an empty response.",
+      response.message ??
+        "The server returned an empty response.",
     );
   }
 
   return response.data;
 }
 
-export const financeApi = {
-  async getAccounts(): Promise<FinancialAccount[]> {
-    const response = await axiosClient.get<ApiResponse<FinancialAccount[]>>(
-      API_ENDPOINTS.FINANCE_OPERATIONS.ACCOUNTS,
-    );
+/* -------------------------------------------------------------------------- */
+/* Finance API                                                                */
+/* -------------------------------------------------------------------------- */
 
-    return unwrapResponseData(response.data);
+export const financeApi = {
+  /* ------------------------------------------------------------------------ */
+  /* Accounts                                                                 */
+  /* ------------------------------------------------------------------------ */
+
+  async getAccounts(): Promise<
+    FinancialAccount[]
+  > {
+    const response =
+      await axiosClient.get<
+        ApiResponse<FinancialAccount[]>
+      >(
+        API_ENDPOINTS.FINANCE_OPERATIONS.ACCOUNTS,
+      );
+
+    return unwrapResponseData(
+      response.data,
+    );
   },
 
   async getAccountByStudent(
     studentId: string | number,
   ): Promise<FinancialAccount> {
-    const response = await axiosClient.get<ApiResponse<FinancialAccount>>(
-      API_ENDPOINTS.FINANCE_OPERATIONS.ACCOUNT(studentId),
-    );
+    const response =
+      await axiosClient.get<
+        ApiResponse<FinancialAccount>
+      >(
+        API_ENDPOINTS.FINANCE_OPERATIONS.ACCOUNT(
+          studentId,
+        ),
+      );
 
-    return unwrapResponseData(response.data);
+    return unwrapResponseData(
+      response.data,
+    );
   },
+
+  /* ------------------------------------------------------------------------ */
+  /* Contracts                                                                */
+  /* ------------------------------------------------------------------------ */
 
   async finalizeContract(
     payload: FinalizeContractPayload,
   ): Promise<FinancialAccount> {
-    const response = await axiosClient.post<ApiResponse<FinancialAccount>>(
-      API_ENDPOINTS.FINANCE_OPERATIONS.FINALIZE_CONTRACT,
-      payload,
-    );
+    const response =
+      await axiosClient.post<
+        ApiResponse<FinancialAccount>
+      >(
+        API_ENDPOINTS.FINANCE_OPERATIONS
+          .FINALIZE_CONTRACT,
+        payload,
+      );
 
-    return unwrapResponseData(response.data);
+    return unwrapResponseData(
+      response.data,
+    );
   },
 
   async updateContract(
     accountId: string | number,
     payload: UpdateContractPayload,
   ): Promise<FinancialAccount> {
-    const response = await axiosClient.post<ApiResponse<FinancialAccount>>(
-      API_ENDPOINTS.FINANCE_OPERATIONS.UPDATE_CONTRACT(accountId),
-      payload,
-    );
+    const response =
+      await axiosClient.post<
+        ApiResponse<FinancialAccount>
+      >(
+        API_ENDPOINTS.FINANCE_OPERATIONS.UPDATE_CONTRACT(
+          accountId,
+        ),
+        payload,
+      );
 
-    return unwrapResponseData(response.data);
+    return unwrapResponseData(
+      response.data,
+    );
   },
 
-  async getInstallments(): Promise<Installment[]> {
-    const response = await axiosClient.get<ApiResponse<Installment[]>>(
-      API_ENDPOINTS.FINANCE_OPERATIONS.INSTALLMENTS,
-    );
+  /* ------------------------------------------------------------------------ */
+  /* Installments                                                             */
+  /* ------------------------------------------------------------------------ */
 
-    return unwrapResponseData(response.data);
+  async getInstallments(): Promise<
+    Installment[]
+  > {
+    const response =
+      await axiosClient.get<
+        ApiResponse<Installment[]>
+      >(
+        API_ENDPOINTS.FINANCE_OPERATIONS
+          .INSTALLMENTS,
+      );
+
+    return unwrapResponseData(
+      response.data,
+    );
   },
 
-  async getInstallment(installmentId: string | number): Promise<Installment> {
-    const response = await axiosClient.get<ApiResponse<Installment>>(
-      API_ENDPOINTS.FINANCE_OPERATIONS.INSTALLMENT(installmentId),
-    );
+  async getInstallment(
+    installmentId: string | number,
+  ): Promise<Installment> {
+    const response =
+      await axiosClient.get<
+        ApiResponse<Installment>
+      >(
+        API_ENDPOINTS.FINANCE_OPERATIONS.INSTALLMENT(
+          installmentId,
+        ),
+      );
 
-    return unwrapResponseData(response.data);
+    return unwrapResponseData(
+      response.data,
+    );
   },
 
-  async getInstallmentsByAccount(
-    accountId: string | number,
+async getStudentInstallments(
+    studentId: string | number,
   ): Promise<Installment[]> {
-    const response = await axiosClient.get<ApiResponse<Installment[]>>(
-      API_ENDPOINTS.FINANCE_OPERATIONS.ACCOUNT_INSTALLMENTS(accountId),
-    );
+    const response =
+      await axiosClient.get<ApiResponse<Installment[]>>(
+        API_ENDPOINTS.FINANCE_OPERATIONS.STUDENT_INSTALLMENTS(studentId),
+      );
 
     return unwrapResponseData(response.data);
   },
 
-  async getPayments(): Promise<PaymentReceipt[]> {
-    const response = await axiosClient.get<ApiResponse<PaymentReceipt[]>>(
-      API_ENDPOINTS.FINANCE_OPERATIONS.PAYMENTS,
-    );
+  /* ------------------------------------------------------------------------ */
+  /* Payments - List                                                          */
+  /* ------------------------------------------------------------------------ */
 
-    return unwrapResponseData(response.data);
+  async getPayments(): Promise<
+    PaymentReceipt[]
+  > {
+    const response =
+      await axiosClient.get<
+        ApiResponse<PaymentReceipt[]>
+      >(
+        API_ENDPOINTS.FINANCE_OPERATIONS.PAYMENTS,
+      );
+
+    return unwrapResponseData(
+      response.data,
+    );
   },
 
-  async getPayment(paymentId: string | number): Promise<PaymentReceipt> {
-    const response = await axiosClient.get<ApiResponse<PaymentReceipt>>(
-      API_ENDPOINTS.FINANCE_OPERATIONS.PAYMENT(paymentId),
-    );
+  /* ------------------------------------------------------------------------ */
+  /* Payments - Detail                                                        */
+  /* ------------------------------------------------------------------------ */
 
-    return unwrapResponseData(response.data);
+  async getPayment(
+    paymentId: string | number,
+  ): Promise<PaymentReceipt> {
+    const response =
+      await axiosClient.get<
+        ApiResponse<PaymentReceipt>
+      >(
+        API_ENDPOINTS.FINANCE_OPERATIONS.PAYMENT(
+          paymentId,
+        ),
+      );
+
+    return unwrapResponseData(
+      response.data,
+    );
   },
+
+  /* ------------------------------------------------------------------------ */
+  /* Payments - Create                                                        */
+  /* ------------------------------------------------------------------------ */
 
   async processPayment(
     payload: ProcessPaymentPayload,
   ): Promise<ProcessPaymentResponse> {
-    const response = await axiosClient.post<
-      ApiResponse<ProcessPaymentResponse>
-    >(API_ENDPOINTS.FINANCE_OPERATIONS.PAYMENTS, payload);
+    const response =
+      await axiosClient.post<
+        ApiResponse<ProcessPaymentResponse>
+      >(
+        API_ENDPOINTS.FINANCE_OPERATIONS.PAYMENTS,
+        payload,
+      );
 
-    return unwrapResponseData(response.data);
+    return unwrapResponseData(
+      response.data,
+    );
   },
+
+  /* ------------------------------------------------------------------------ */
+  /* Payments - Update                                                        */
+  /* ------------------------------------------------------------------------ */
 
   async updatePayment(
     paymentId: string | number,
     payload: UpdatePaymentPayload,
   ): Promise<PaymentReceipt> {
-    const response = await axiosClient.post<ApiResponse<PaymentReceipt>>(
-      API_ENDPOINTS.FINANCE_OPERATIONS.PAYMENT(paymentId),
-      payload,
-    );
+    const response =
+      await axiosClient.post<
+        ApiResponse<PaymentReceipt>
+      >(
+        API_ENDPOINTS.FINANCE_OPERATIONS.PAYMENT(
+          paymentId,
+        ),
+        payload,
+      );
 
-    return unwrapResponseData(response.data);
+    return unwrapResponseData(
+      response.data,
+    );
   },
 
-  async deletePayment(paymentId: string | number): Promise<null> {
-    const response = await axiosClient.delete<ApiResponse<null>>(
-      API_ENDPOINTS.FINANCE_OPERATIONS.PAYMENT(paymentId),
+  /* ------------------------------------------------------------------------ */
+  /* Payments - Delete                                                        */
+  /* ------------------------------------------------------------------------ */
+
+  async deletePayment(
+    paymentId: string | number,
+  ): Promise<null> {
+    /*
+     * DELETE endpoints commonly return:
+     *
+     * 204 No Content
+     *
+     * or an empty response body.
+     *
+     * Therefore we intentionally DO NOT call
+     * unwrapResponseData() here.
+     *
+     * Axios reaching this point without throwing
+     * means the DELETE request succeeded.
+     */
+    await axiosClient.delete(
+      API_ENDPOINTS.FINANCE_OPERATIONS.PAYMENT(
+        paymentId,
+      ),
     );
 
-    return unwrapResponseData(response.data);
+    return null;
   },
 };

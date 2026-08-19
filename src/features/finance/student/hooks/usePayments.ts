@@ -21,6 +21,10 @@ import type {
   UpdatePaymentPayload,
 } from "../types/finance.payloads";
 
+/* -------------------------------------------------------------------------- */
+/* Query keys                                                                 */
+/* -------------------------------------------------------------------------- */
+
 export const financePaymentsKeys = {
   all: ["finance-payments"] as const,
 
@@ -29,6 +33,10 @@ export const financePaymentsKeys = {
   ) =>
     ["finance-payment", paymentId] as const,
 };
+
+/* -------------------------------------------------------------------------- */
+/* Error helper                                                               */
+/* -------------------------------------------------------------------------- */
 
 function getErrorMessage(
   error: unknown,
@@ -74,8 +82,7 @@ function getErrorMessage(
       }
 
       if (
-        typeof firstError ===
-        "string"
+        typeof firstError === "string"
       ) {
         return firstError;
       }
@@ -92,61 +99,91 @@ function getErrorMessage(
   return fallback;
 }
 
+/* -------------------------------------------------------------------------- */
+/* Finance cache invalidation                                                 */
+/* -------------------------------------------------------------------------- */
+
+async function invalidateFinanceQueries(
+  queryClient: ReturnType<typeof useQueryClient>,
+  studentId?: string | number,
+) {
+  const invalidations: Promise<unknown>[] = [
+    queryClient.invalidateQueries({
+      queryKey:
+        financePaymentsKeys.all,
+      refetchType: "active",
+    }),
+
+    queryClient.invalidateQueries({
+      queryKey:
+        financeInstallmentsKeys.all,
+      refetchType: "active",
+    }),
+
+    queryClient.invalidateQueries({
+      queryKey:
+        financeAccountsKeys.all,
+      refetchType: "active",
+    }),
+  ];
+
+  if (studentId !== undefined) {
+    invalidations.push(
+      queryClient.invalidateQueries({
+        queryKey:
+          financeAccountsKeys.student(
+            studentId,
+        ),
+        refetchType: "active",
+      }),
+    );
+  }
+
+  /*
+   * Do not allow a cache-refresh problem to turn
+   * a successful backend mutation into a failed mutation.
+   *
+   * The actual POST/PATCH/DELETE request has already
+   * succeeded at this point.
+   */
+  await Promise.allSettled(
+    invalidations,
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+/* Main payments hook                                                         */
+/* -------------------------------------------------------------------------- */
+
 export function useFinancePayments() {
   const queryClient =
     useQueryClient();
 
+  /* ------------------------------------------------------------------------ */
+  /* Payments list                                                            */
+  /* ------------------------------------------------------------------------ */
+
   const paymentsQuery = useQuery({
     queryKey:
       financePaymentsKeys.all,
+
     queryFn:
       financeApi.getPayments,
+
+    /*
+     * Keep the previous data visible while
+     * React Query refreshes the table.
+     */
+    placeholderData: (previousData) =>
+      previousData,
+
+    staleTime: 0,
   });
 
-  const invalidateFinance =
-    async (
-      studentId?:
-        | string
-        | number,
-    ) => {
-      const queries = [
-        queryClient.invalidateQueries({
-          queryKey:
-            financePaymentsKeys.all,
-        }),
+  /* ------------------------------------------------------------------------ */
+  /* Create payment                                                           */
+  /* ------------------------------------------------------------------------ */
 
-        queryClient.invalidateQueries({
-          queryKey:
-            financeInstallmentsKeys.all,
-        }),
-
-        queryClient.invalidateQueries({
-          queryKey:
-            financeAccountsKeys.all,
-        }),
-      ];
-
-      if (
-        studentId !== undefined
-      ) {
-        queries.push(
-          queryClient.invalidateQueries(
-            {
-              queryKey:
-                financeAccountsKeys.student(
-                  studentId,
-                ),
-            },
-          ),
-        );
-      }
-
-      await Promise.all(queries);
-    };
-
-  /**
-   * 9. Create payment
-   */
   const processPayment =
     useMutation({
       mutationFn: (
@@ -160,10 +197,18 @@ export function useFinancePayments() {
         _result,
         payload,
       ) => {
-        await invalidateFinance(
+        /*
+         * First update/invalidate the relevant
+         * finance queries.
+         */
+        await invalidateFinanceQueries(
+          queryClient,
           payload.studentId,
         );
 
+        /*
+         * Success toast.
+         */
         toast.success(
           "Payment recorded successfully.",
         );
@@ -179,9 +224,10 @@ export function useFinancePayments() {
       },
     });
 
-  /**
-   * 10. Update payment
-   */
+  /* ------------------------------------------------------------------------ */
+  /* Update payment                                                           */
+  /* ------------------------------------------------------------------------ */
+
   const updatePayment =
     useMutation({
       mutationFn: ({
@@ -201,18 +247,22 @@ export function useFinancePayments() {
         _result,
         variables,
       ) => {
-        await invalidateFinance(
+        await invalidateFinanceQueries(
+          queryClient,
           variables.studentId,
         );
 
-        await queryClient.invalidateQueries(
-          {
+        /*
+         * Refresh the individual payment query.
+         */
+        await Promise.allSettled([
+          queryClient.invalidateQueries({
             queryKey:
               financePaymentsKeys.detail(
                 variables.id,
               ),
-          },
-        );
+          }),
+        ]);
 
         toast.success(
           "Payment details updated.",
@@ -229,9 +279,10 @@ export function useFinancePayments() {
       },
     });
 
-  /**
-   * 11. Delete payment
-   */
+  /* ------------------------------------------------------------------------ */
+  /* Delete payment                                                           */
+  /* ------------------------------------------------------------------------ */
+
   const deletePayment =
     useMutation({
       mutationFn: ({
@@ -244,23 +295,53 @@ export function useFinancePayments() {
           id,
         ),
 
+      /*
+       * IMPORTANT:
+       *
+       * We do NOT depend on cache invalidation
+       * for the DELETE request itself to be considered
+       * successful.
+       *
+       * The API deletion has already succeeded when
+       * this callback is executed.
+       */
       onSuccess: async (
         _result,
         variables,
       ) => {
-        await invalidateFinance(
+        const paymentId =
+          variables.id;
+
+        /*
+         * Immediately remove the deleted payment
+         * from the individual cache.
+         */
+        queryClient.removeQueries({
+          queryKey:
+            financePaymentsKeys.detail(
+              paymentId,
+            ),
+        });
+
+        /*
+         * Mark all relevant finance data as stale
+         * and refresh active queries.
+         *
+         * Promise.allSettled guarantees that a problem
+         * in one refresh cannot make the successful
+         * DELETE mutation appear to have failed.
+         */
+        await invalidateFinanceQueries(
+          queryClient,
           variables.studentId,
         );
 
-        await queryClient.invalidateQueries(
-          {
-            queryKey:
-              financePaymentsKeys.detail(
-                variables.id,
-              ),
-          },
-        );
-
+        /*
+         * IMPORTANT:
+         *
+         * The success notification is emitted only
+         * after the delete succeeded.
+         */
         toast.success(
           "Payment deleted successfully.",
         );
@@ -276,13 +357,24 @@ export function useFinancePayments() {
       },
     });
 
+  /* ------------------------------------------------------------------------ */
+  /* Return                                                                   */
+  /* ------------------------------------------------------------------------ */
+
   return {
     ...paymentsQuery,
+
     processPayment,
+
     updatePayment,
+
     deletePayment,
   };
 }
+
+/* -------------------------------------------------------------------------- */
+/* Single payment                                                             */
+/* -------------------------------------------------------------------------- */
 
 export function useFinancePayment(
   paymentId:

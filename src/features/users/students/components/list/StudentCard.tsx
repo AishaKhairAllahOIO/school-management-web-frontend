@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 
-import { AuthenticatedUserImage } from "../../../shared/components/AuthenticatedUserImage";
+import { UserAvatar } from "../../../shared/components/UserAvatar";
 import type { StudentListItem } from "../../types/student.types";
 import { StudentStatusBadge } from "../shared/StudentStatusBadge";
 
@@ -96,7 +96,7 @@ export function StudentCard({
           >
             <div className="flex items-center gap-3">
               {student.photoUrl ? (
-                <AuthenticatedUserImage
+                <UserAvatar
                   src={student.photoUrl}
                   alt={fullName}
                   className="h-12 w-12 shrink-0 rounded-[15px] border border-primary/20 object-cover shadow-[var(--shadow-soft)]"

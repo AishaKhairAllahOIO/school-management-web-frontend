@@ -15,7 +15,7 @@ type ProfileTaskStorage = {
 };
 
 const REMEMBER_KEYS = [
-  "aisha:remember-me",
+
   "rememberMe",
   "remember_me",
 ];

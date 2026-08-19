@@ -1,9 +1,6 @@
-import { AuthenticatedUserImage } from "../../../shared/components/AuthenticatedUserImage";
+import { UserAvatar } from "../../../shared/components/UserAvatar";
 
-import {
-  Camera,
-  UserRound,
-} from "lucide-react";
+import { Camera, UserRound } from "lucide-react";
 
 type StaffProfilePhotoProps = {
   photoUrl?: string | null;
@@ -19,22 +16,19 @@ type StaffProfilePhotoProps = {
 
 const sizeClassNames = {
   sm: {
-    container:
-      "h-16 w-16 rounded-[18px]",
+    container: "h-16 w-16 rounded-[18px]",
     icon: "h-6 w-6",
     initials: "text-base",
   },
 
   md: {
-    container:
-      "h-24 w-24 rounded-[24px]",
+    container: "h-24 w-24 rounded-[24px]",
     icon: "h-8 w-8",
     initials: "text-xl",
   },
 
   lg: {
-    container:
-      "h-32 w-32 rounded-[28px]",
+    container: "h-32 w-32 rounded-[28px]",
     icon: "h-10 w-10",
     initials: "text-2xl",
   },
@@ -47,19 +41,15 @@ export function StaffProfilePhoto({
   size = "lg",
   className = "",
 }: StaffProfilePhotoProps) {
-  const dimensions =
-    sizeClassNames[size];
+  const dimensions = sizeClassNames[size];
 
-  const initials =
-    getInitials(fullName);
+  const initials = getInitials(fullName);
 
   return (
     <div
-      className={[
-        "relative shrink-0",
-        dimensions.container,
-        className,
-      ].join(" ")}
+      className={["relative shrink-0", dimensions.container, className].join(
+        " ",
+      )}
     >
       <div
         className={[
@@ -71,7 +61,7 @@ export function StaffProfilePhoto({
         ].join(" ")}
       >
         {photoUrl ? (
-          <AuthenticatedUserImage
+          <UserAvatar
             src={photoUrl}
             alt={alt ?? fullName ?? "Staff profile"}
             className="h-full w-full object-cover"
@@ -98,11 +88,7 @@ export function StaffProfilePhoto({
               "text-primary",
             ].join(" ")}
           >
-            <UserRound
-              className={
-                dimensions.icon
-              }
-            />
+            <UserRound className={dimensions.icon} />
           </div>
         )}
       </div>
@@ -126,9 +112,7 @@ export function StaffProfilePhoto({
   );
 }
 
-function getInitials(
-  fullName?: string | null,
-): string {
+function getInitials(fullName?: string | null): string {
   if (!fullName) {
     return "";
   }
@@ -138,9 +122,7 @@ function getInitials(
     .split(/\s+/)
     .filter(Boolean)
     .slice(0, 2)
-    .map((part) =>
-      part.charAt(0),
-    )
+    .map((part) => part.charAt(0))
     .join("")
     .toUpperCase();
 }
