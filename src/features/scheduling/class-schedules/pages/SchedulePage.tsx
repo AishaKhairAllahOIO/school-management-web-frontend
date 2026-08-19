@@ -191,12 +191,8 @@ export function ClassSchedulesPage() {
   /**
    * Add lesson from an empty cell.
    *
-   * IMPORTANT:
-   * We intentionally do NOT receive periodIndex here.
    * The backend decides which period to use.
-   *
-   * The selected day is still important because the backend
-   * requires it.
+   * Therefore periodIndex is intentionally not sent.
    */
   function openAddDialog({
     classItem,
@@ -218,9 +214,6 @@ export function ClassSchedulesPage() {
 
   /**
    * Add lesson from the table-level "Add Lesson" button.
-   *
-   * Since there is no selected cell, the dialog will ask
-   * the user to select the day.
    */
   function openTableAddDialog(
     classItem: ScheduleClass,
@@ -321,8 +314,6 @@ export function ClassSchedulesPage() {
    * ADD
    *
    * Backend decides the period.
-   *
-   * Therefore periodIndex is deliberately NOT sent.
    */
   function handleAddEntry(payload: {
     gradeSubjectId: number;
@@ -369,9 +360,6 @@ export function ClassSchedulesPage() {
    * EDIT
    *
    * Only teacher and subject can be changed.
-   *
-   * IMPORTANT:
-   * day and periodIndex are intentionally NOT sent.
    */
   function handleEditEntry(payload: {
     entryId: number | string;
@@ -435,9 +423,9 @@ export function ClassSchedulesPage() {
     semesterId === null
   ) {
     return (
-      <section className="rounded-[26px] border border-amber-200/60 bg-amber-50/60 p-8 text-center">
+      <section className="rounded-[26px] border border-amber-200/60 bg-amber-50/60 p-8 text-center dark:border-amber-400/20 dark:bg-amber-400/[0.07]">
         <AlertCircle
-          className="mx-auto text-amber-600"
+          className="mx-auto text-amber-600 dark:text-amber-400"
           size={24}
         />
 
@@ -567,60 +555,71 @@ export function ClassSchedulesPage() {
               const colorIndex =
                 index % 5;
 
+              /*
+               * Class card palette.
+               *
+               * IMPORTANT:
+               * The previous `bg-violet-50/45`,
+               * `bg-sky-50/45`, etc. caused the
+               * header to look grey in dark mode.
+               *
+               * We now use very soft color overlays
+               * based on the 500 shade.
+               */
               const cardColors =
                 colorIndex === 0
                   ? {
                       border:
-                        "border-violet-200/60",
+                        "border-violet-300/35 dark:border-violet-400/20",
                       bg:
-                        "bg-violet-50/45",
+                        "bg-violet-500/[0.09] dark:bg-violet-400/[0.11]",
                       icon:
-                        "bg-violet-100 text-violet-600",
+                        "bg-violet-500/[0.14] text-violet-600 dark:bg-violet-400/[0.15] dark:text-violet-300",
                       button:
-                        "border-violet-200/70 bg-violet-100/80 text-violet-700 hover:bg-violet-100",
+                        "border-violet-300/45 bg-violet-500/[0.10] text-violet-700 hover:bg-violet-500/[0.16] dark:border-violet-400/25 dark:bg-violet-400/[0.12] dark:text-violet-200 dark:hover:bg-violet-400/[0.18]",
                     }
                   : colorIndex === 1
                     ? {
                         border:
-                          "border-sky-200/60",
+                          "border-sky-300/35 dark:border-sky-400/20",
                         bg:
-                          "bg-sky-50/45",
+                          "bg-sky-500/[0.09] dark:bg-sky-400/[0.11]",
                         icon:
-                          "bg-sky-100 text-sky-600",
+                          "bg-sky-500/[0.14] text-sky-600 dark:bg-sky-400/[0.15] dark:text-sky-300",
                         button:
-                          "border-sky-200/70 bg-sky-100/80 text-sky-700 hover:bg-sky-100",
+                          "border-sky-300/45 bg-sky-500/[0.10] text-sky-700 hover:bg-sky-500/[0.16] dark:border-sky-400/25 dark:bg-sky-400/[0.12] dark:text-sky-200 dark:hover:bg-sky-400/[0.18]",
                       }
                     : colorIndex === 2
                       ? {
                           border:
-                            "border-emerald-200/60",
+                            "border-emerald-300/35 dark:border-emerald-400/20",
                           bg:
-                            "bg-emerald-50/45",
+                            "bg-emerald-500/[0.09] dark:bg-emerald-400/[0.11]",
                           icon:
-                            "bg-emerald-100 text-emerald-600",
+                            "bg-emerald-500/[0.14] text-emerald-600 dark:bg-emerald-400/[0.15] dark:text-emerald-300",
                           button:
-                            "border-emerald-200/70 bg-emerald-100/80 text-emerald-700 hover:bg-emerald-100",
+                            "border-emerald-300/45 bg-emerald-500/[0.10] text-emerald-700 hover:bg-emerald-500/[0.16] dark:border-emerald-400/25 dark:bg-emerald-400/[0.12] dark:text-emerald-200 dark:hover:bg-emerald-400/[0.18]",
                         }
                       : colorIndex === 3
                         ? {
                             border:
-                              "border-amber-200/60",
+                              "border-amber-300/35 dark:border-amber-400/20",
                             bg:
-                              "bg-amber-50/45",
+                              "bg-amber-500/[0.09] dark:bg-amber-400/[0.11]",
                             icon:
-                              "bg-amber-100 text-amber-600",
+                              "bg-amber-500/[0.14] text-amber-600 dark:bg-amber-400/[0.15] dark:text-amber-300",
                             button:
-                              "border-amber-200/70 bg-amber-100/80 text-amber-700 hover:bg-amber-100",
+                              "border-amber-300/45 bg-amber-500/[0.10] text-amber-700 hover:bg-amber-500/[0.16] dark:border-amber-400/25 dark:bg-amber-400/[0.12] dark:text-amber-200 dark:hover:bg-amber-400/[0.18]",
                           }
                         : {
                             border:
-                              "border-rose-200/60",
+                              "border-rose-300/35 dark:border-rose-400/20",
                             bg:
-                              "bg-rose-50/45",
+                              "bg-rose-500/[0.09] dark:bg-rose-400/[0.11]",
                             icon:
-                              "bg-rose-100 text-rose-600",
+                              "bg-rose-500/[0.14] text-rose-600 dark:bg-rose-400/[0.15] dark:text-rose-300",
                             button:
-                              "border-rose-200/70 bg-rose-100/80 text-rose-700 hover:bg-rose-100",
+                              "border-rose-300/45 bg-rose-500/[0.10] text-rose-700 hover:bg-rose-500/[0.16] dark:border-rose-400/25 dark:bg-rose-400/[0.12] dark:text-rose-200 dark:hover:bg-rose-400/[0.18]",
                           };
 
               return (
@@ -634,9 +633,15 @@ export function ClassSchedulesPage() {
                     cardColors.border,
                   ].join(" ")}
                 >
+                  {/* ---------------------------------------------------- */}
+                  {/* Class Header                                          */}
+                  {/* ---------------------------------------------------- */}
+
                   <div
                     className={[
-                      "flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5",
+                      "relative flex flex-col gap-3 px-4 py-4",
+                      "sm:flex-row sm:items-center sm:justify-between sm:px-5",
+                      "transition-colors duration-300",
                       cardColors.bg,
                     ].join(" ")}
                   >
@@ -644,6 +649,7 @@ export function ClassSchedulesPage() {
                       <span
                         className={[
                           "flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px]",
+                          "ring-1 ring-black/[0.02] dark:ring-white/[0.05]",
                           cardColors.icon,
                         ].join(" ")}
                       >
@@ -683,6 +689,7 @@ export function ClassSchedulesPage() {
                         "text-[12px] font-medium shadow-sm",
                         "transition-all duration-200",
                         "hover:-translate-y-[1px]",
+                        "active:translate-y-0",
                         "disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0",
                         cardColors.button,
                       ].join(" ")}
@@ -691,6 +698,10 @@ export function ClassSchedulesPage() {
                       Add Lesson
                     </button>
                   </div>
+
+                  {/* ---------------------------------------------------- */}
+                  {/* Schedule Grid                                         */}
+                  {/* ---------------------------------------------------- */}
 
                   <div className="border-t border-border/40 p-3 sm:p-4">
                     <ScheduleGrid
@@ -806,9 +817,7 @@ function PageHeader({
   return (
     <section className="rounded-[24px] border border-border/45 bg-card px-4 py-3.5 shadow-[0_8px_30px_rgba(30,20,70,0.035)] sm:px-4.5 sm:py-4">
       <div className="flex flex-col gap-3.5 lg:flex-row lg:items-center lg:justify-between">
-        {/* ---------------------------------------------------------------- */}
-        {/* Page identity                                                     */}
-        {/* ---------------------------------------------------------------- */}
+        {/* Page identity */}
 
         <div className="flex items-center gap-3">
           <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[13px] bg-primary/[0.09] text-primary">
@@ -826,40 +835,38 @@ function PageHeader({
           </div>
         </div>
 
-        {/* ---------------------------------------------------------------- */}
-        {/* Actions + statistics                                             */}
-        {/* ---------------------------------------------------------------- */}
+        {/* Actions + statistics */}
 
         <div className="flex w-full flex-col gap-3 lg:w-auto lg:flex-row lg:items-center lg:gap-0">
-          {/* -------------------------------------------------------------- */}
-          {/* Statistics                                                     */}
-          {/* -------------------------------------------------------------- */}
-
           {hasSchedule && (
             <div className="grid w-full grid-cols-2 gap-1.5 sm:grid-cols-4 lg:flex lg:w-auto lg:flex-wrap lg:items-center">
               <MetricCard
                 label="Lessons"
                 value={totalEntries ?? 0}
-                className="border-violet-200/50 bg-violet-50/55 text-violet-700"
+                className="border-violet-200/50 bg-violet-50/55 text-violet-700 dark:border-violet-400/20 dark:bg-violet-400/[0.08] dark:text-violet-300"
               />
 
               <MetricCard
                 label="Teacher Conflicts"
-                value={teacherConflicts ?? 0}
+                value={
+                  teacherConflicts ?? 0
+                }
                 className={
                   teacherConflicts
-                    ? "border-rose-200/50 bg-rose-50/55 text-rose-700"
-                    : "border-sky-200/50 bg-sky-50/55 text-sky-700"
+                    ? "border-rose-200/50 bg-rose-50/55 text-rose-700 dark:border-rose-400/20 dark:bg-rose-400/[0.08] dark:text-rose-300"
+                    : "border-sky-200/50 bg-sky-50/55 text-sky-700 dark:border-sky-400/20 dark:bg-sky-400/[0.08] dark:text-sky-300"
                 }
               />
 
               <MetricCard
                 label="Class Conflicts"
-                value={classConflicts ?? 0}
+                value={
+                  classConflicts ?? 0
+                }
                 className={
                   classConflicts
-                    ? "border-amber-200/50 bg-amber-50/55 text-amber-700"
-                    : "border-emerald-200/50 bg-emerald-50/55 text-emerald-700"
+                    ? "border-amber-200/50 bg-amber-50/55 text-amber-700 dark:border-amber-400/20 dark:bg-amber-400/[0.08] dark:text-amber-300"
+                    : "border-emerald-200/50 bg-emerald-50/55 text-emerald-700 dark:border-emerald-400/20 dark:bg-emerald-400/[0.08] dark:text-emerald-300"
                 }
               />
 
@@ -872,16 +879,12 @@ function PageHeader({
                 }
                 className={
                   isPerfect
-                    ? "border-emerald-200/50 bg-emerald-50/55 text-emerald-700"
-                    : "border-amber-200/50 bg-amber-50/55 text-amber-700"
+                    ? "border-emerald-200/50 bg-emerald-50/55 text-emerald-700 dark:border-emerald-400/20 dark:bg-emerald-400/[0.08] dark:text-emerald-300"
+                    : "border-amber-200/50 bg-amber-50/55 text-amber-700 dark:border-amber-400/20 dark:bg-amber-400/[0.08] dark:text-amber-300"
                 }
               />
             </div>
           )}
-
-          {/* -------------------------------------------------------------- */}
-          {/* Regenerate / Generate                                           */}
-          {/* -------------------------------------------------------------- */}
 
           <div className="w-full lg:ml-5 lg:w-auto">
             <button

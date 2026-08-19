@@ -62,53 +62,54 @@
   --sidebar-divider: 255 255 255;
 
   /* Pastel Green */
---success: 95 186 143;
+  --success: 95 186 143;
 
-/* Pastel Amber */
---warning: 223 181 88;
+  /* Pastel Amber */
+  --warning: 223 181 88;
 
-/* Pastel Blue */
---info: 108 153 224;
+  /* Pastel Blue */
+  --info: 108 153 224;
 
-/* Pastel Red */
---destructive: 223 118 128;
+  /* Pastel Red */
+  --destructive: 223 118 128;
 
+  /* Soft Light Gradients */
   --gradient-primary:
     linear-gradient(
       135deg,
-      #5b4fc7 0%,
-      #6d5fdb 45%,
-      #8b5cf6 100%
+      #6158c9 0%,
+      #7066d6 45%,
+      #9270f4 100%
     );
 
   --gradient-sidebar:
     linear-gradient(
       180deg,
-      #17143f 0%,
-      #120f35 48%,
-      #0c0a27 100%
+      #191642 0%,
+      #151238 48%,
+      #100e2d 100%
     );
 
   --gradient-card:
     linear-gradient(
       135deg,
-      rgba(255, 255, 255, 0.95),
-      rgba(248, 247, 255, 0.88)
+      rgba(255, 255, 255, 0.92),
+      rgba(250, 249, 255, 0.88)
     );
 
   --gradient-soft-purple:
     linear-gradient(
       135deg,
-      rgba(103, 58, 244, 0.14),
-      rgba(139, 92, 246, 0.06)
+      rgba(103, 58, 244, 0.09),
+      rgba(139, 92, 246, 0.035)
     );
 
   --gradient-hero-overlay:
     linear-gradient(
       90deg,
-      rgba(38, 24, 117, 0.92),
-      rgba(70, 50, 170, 0.72),
-      rgba(17, 14, 54, 0.18)
+      rgba(38, 24, 117, 0.84),
+      rgba(70, 50, 170, 0.58),
+      rgba(17, 14, 54, 0.12)
     );
 
   --shadow-soft:
@@ -184,50 +185,53 @@
   --sidebar-active-foreground: 255 255 255;
   --sidebar-divider: 255 255 255;
 
---success: 129 205 165;
+  --success: 129 205 165;
+  --warning: 232 196 112;
+  --info: 138 175 232;
+  --destructive: 231 144 152;
 
---warning: 232 196 112;
-
---info: 138 175 232;
-
---destructive: 231 144 152;
+  /*
+   * Dark Mode:
+   * gradients are intentionally very subtle.
+   * Purple is reserved for important UI elements.
+   */
 
   --gradient-primary:
     linear-gradient(
       135deg,
-      #6d5fdb 0%,
-      #8b5cf6 50%,
-      #a78bfa 100%
+      #665dcc 0%,
+      #746bd4 50%,
+      #8178df 100%
     );
 
   --gradient-sidebar:
     linear-gradient(
       180deg,
-      #0f0d32 0%,
-      #0c0a29 52%,
-      #07061c 100%
+      #0f0d2f 0%,
+      #0d0b29 52%,
+      #09081f 100%
     );
 
   --gradient-card:
     linear-gradient(
       135deg,
-      rgba(24, 21, 58, 0.96),
-      rgba(15, 13, 41, 0.9)
+      rgba(24, 21, 58, 0.97),
+      rgba(17, 15, 44, 0.95)
     );
 
   --gradient-soft-purple:
     linear-gradient(
       135deg,
-      rgba(139, 92, 246, 0.22),
-      rgba(91, 79, 199, 0.08)
+      rgba(139, 92, 246, 0.06),
+      rgba(91, 79, 199, 0.015)
     );
 
   --gradient-hero-overlay:
     linear-gradient(
       90deg,
-      rgba(16, 12, 59, 0.94),
-      rgba(65, 44, 155, 0.72),
-      rgba(8, 7, 28, 0.24)
+      rgba(16, 12, 59, 0.90),
+      rgba(65, 44, 155, 0.48),
+      rgba(8, 7, 28, 0.10)
     );
 
   --shadow-soft:
@@ -299,12 +303,16 @@
   --color-sidebar: rgb(var(--sidebar));
   --color-sidebar-foreground:
     rgb(var(--sidebar-foreground));
+
   --color-sidebar-muted:
     rgb(var(--sidebar-muted));
+
   --color-sidebar-active:
     rgb(var(--sidebar-active));
+
   --color-sidebar-active-foreground:
     rgb(var(--sidebar-active-foreground));
+
   --color-sidebar-divider:
     rgb(var(--sidebar-divider));
 
@@ -384,7 +392,7 @@
     border-color: rgb(var(--border));
   }
 
- html,
+  html,
   body,
   #root {
     font-family: var(--font-family);
@@ -393,79 +401,87 @@
     -moz-osx-font-smoothing: grayscale;
   }
 
-button,
-input,
-textarea,
-select {
-  font: inherit;
-  font-family: inherit;
-}
- html {
-  scroll-behavior: smooth;
+  button,
+  input,
+  textarea,
+  select {
+    font: inherit;
+    font-family: inherit;
+  }
 
-  scrollbar-width: thin;
+  html {
+    scroll-behavior: smooth;
 
-  scrollbar-color:
-    rgba(120, 124, 145, 0.25)
-    transparent;
-}
+    scrollbar-width: thin;
 
+    scrollbar-color:
+      rgba(120, 124, 145, 0.25)
+      transparent;
+  }
 
-/* Chrome / Edge / Safari */
+  /* Chrome / Edge / Safari */
 
-*::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
-}
+  *::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+  }
 
+  *::-webkit-scrollbar-track {
+    background:
+      transparent;
+  }
 
-*::-webkit-scrollbar-track {
-  background:
-    transparent;
-}
+  *::-webkit-scrollbar-thumb {
+    border-radius: 999px;
 
+    background:
+      rgba(120, 124, 145, 0.22);
 
-*::-webkit-scrollbar-thumb {
-  border-radius: 999px;
+    transition:
+      background-color 200ms ease;
+  }
 
-  background:
-    rgba(120, 124, 145, 0.22);
+  *::-webkit-scrollbar-thumb:hover {
+    background:
+      rgba(120, 124, 145, 0.42);
+  }
 
-  transition:
-    background-color 200ms ease;
-}
+  *::-webkit-scrollbar-button {
+    display: none;
+  }
 
-
-*::-webkit-scrollbar-thumb:hover {
-  background:
-    rgba(120, 124, 145, 0.42);
-}
-
-
-*::-webkit-scrollbar-button {
-  display: none;
-}
-
-
-*::-webkit-scrollbar-corner {
-  background:
-    transparent;
-}
+  *::-webkit-scrollbar-corner {
+    background:
+      transparent;
+  }
 }
 
 @layer utilities {
+  /*
+   * Light Mode background:
+   * soft and slightly lively.
+   */
   .app-shell-bg {
     background:
       radial-gradient(
         circle at 20% 0%,
-        rgba(139, 92, 246, 0.14),
+        rgba(139, 92, 246, 0.075),
         transparent 28rem
       ),
       radial-gradient(
         circle at 80% 10%,
-        rgba(91, 79, 199, 0.12),
+        rgba(91, 79, 199, 0.06),
         transparent 28rem
       ),
+      rgb(var(--background));
+  }
+
+  /*
+   * Dark Mode:
+   * completely clean background without purple glow.
+   */
+  .dark .app-shell-bg {
+    background:
       rgb(var(--background));
   }
 
@@ -538,7 +554,8 @@ select {
   .sidebar-shell {
     box-shadow:
       14px 0 46px rgb(28 22 78 / 0.16),
-      inset -1px 0 0 rgb(var(--sidebar-foreground) / 0.08);
+      inset -1px 0 0
+        rgb(var(--sidebar-foreground) / 0.08);
   }
 
   .sidebar-divider {
@@ -556,8 +573,10 @@ select {
 
   .sidebar-active-glow {
     box-shadow:
-      0 10px 24px rgb(var(--sidebar-active) / 0.18),
-      inset 0 1px 0 rgb(var(--sidebar-active-foreground) / 0.10);
+      0 10px 24px
+        rgb(var(--sidebar-active) / 0.18),
+      inset 0 1px 0
+        rgb(var(--sidebar-active-foreground) / 0.10);
   }
 
   .sidebar-shell a[aria-current="page"] {
@@ -618,16 +637,15 @@ select {
     background:
       linear-gradient(
         90deg,
-        rgb(var(--sidebar) / 0.9) 0%,
-        rgb(var(--sidebar) / 0.74) 38%,
-        rgb(var(--sidebar) / 0.34) 70%,
-        rgb(var(--sidebar) / 0.08) 100%
+        rgb(var(--sidebar) / 0.84) 0%,
+        rgb(var(--sidebar) / 0.58) 38%,
+        rgb(var(--sidebar) / 0.12) 100%
       ),
       linear-gradient(
         180deg,
-        rgb(var(--sidebar) / 0.08) 0%,
+        rgb(var(--sidebar) / 0.06) 0%,
         transparent 46%,
-        rgb(var(--sidebar) / 0.34) 100%
+        rgb(var(--sidebar) / 0.22) 100%
       );
   }
 
@@ -785,6 +803,7 @@ select {
     box-shadow:
       var(--shadow-topbar-menu);
   }
+
   .sidebar-brand-title {
     display: block;
     max-width: 100%;
@@ -796,7 +815,8 @@ select {
     line-height: 1.08;
     letter-spacing: -0.03em;
     white-space: nowrap;
-    color: rgb(var(--sidebar-foreground));
+    color:
+      rgb(var(--sidebar-foreground));
   }
 
   .sidebar-brand-subtitle {
@@ -810,7 +830,8 @@ select {
     line-height: 1.2;
     letter-spacing: 0.012em;
     white-space: nowrap;
-    color: rgb(var(--sidebar-muted) / 0.74);
+    color:
+      rgb(var(--sidebar-muted) / 0.74);
   }
 }
 
@@ -852,94 +873,127 @@ select {
   }
 
   .staff-form-field::placeholder {
-    color: rgb(var(--muted-foreground) / 0.65);
+    color:
+      rgb(var(--muted-foreground) / 0.65);
   }
 
   .staff-form-field:hover:not(:disabled) {
-    border-color: rgb(var(--primary) / 0.24);
+    border-color:
+      rgb(var(--primary) / 0.24);
   }
 
   .staff-form-field:focus {
-    border-color: rgb(var(--primary));
-    background: rgb(var(--card));
+    border-color:
+      rgb(var(--primary));
+
+    background:
+      rgb(var(--card));
+
     box-shadow:
       0 0 0 4px
         rgb(var(--primary) / 0.09);
   }
 
   .staff-form-field:disabled {
-    cursor: not-allowed;
-    opacity: 0.6;
+    cursor:
+      not-allowed;
+
+    opacity:
+      0.6;
   }
 
   .staff-form-surface {
-    border: 1px solid rgb(var(--border) / 0.72);
-    background: rgb(var(--card));
-    box-shadow: var(--shadow-card);
+    border:
+      1px solid rgb(var(--border) / 0.72);
+
+    background:
+      rgb(var(--card));
+
+    box-shadow:
+      var(--shadow-card);
   }
 
-
   .academics-primary-surface {
-  background: rgb(var(--primary) / 0.08);
-}
+    background:
+      rgb(var(--primary) / 0.08);
+  }
 
-.academics-primary-footer {
-  background: rgb(var(--primary) / 0.045);
-}
+  .academics-primary-footer {
+    background:
+      rgb(var(--primary) / 0.045);
+  }
 
-.academics-primary-border {
-  border-color: rgb(var(--primary) / 0.20);
-}
+  .academics-primary-border {
+    border-color:
+      rgb(var(--primary) / 0.20);
+  }
 
-.academics-primary-button {
-  border-color: rgb(var(--primary) / 0.25);
-  color: rgb(var(--primary));
-}
+  .academics-primary-button {
+    border-color:
+      rgb(var(--primary) / 0.25);
 
-.academics-primary-button:hover {
-  background: rgb(var(--primary) / 0.08);
-}
+    color:
+      rgb(var(--primary));
+  }
 
-.academics-info-surface {
-  background: rgb(var(--info) / 0.09);
-}
+  .academics-primary-button:hover {
+    background:
+      rgb(var(--primary) / 0.08);
+  }
 
-.academics-info-footer {
-  background: rgb(var(--info) / 0.055);
-}
+  .academics-info-surface {
+    background:
+      rgb(var(--info) / 0.09);
+  }
 
-.academics-info-border {
-  border-color: rgb(var(--info) / 0.22);
-}
+  .academics-info-footer {
+    background:
+      rgb(var(--info) / 0.055);
+  }
 
-.academics-info-button {
-  border-color: rgb(var(--info) / 0.28);
-  color: rgb(var(--info));
-}
+  .academics-info-border {
+    border-color:
+      rgb(var(--info) / 0.22);
+  }
 
-.academics-info-button:hover {
-  background: rgb(var(--info) / 0.08);
-}
+  .academics-info-button {
+    border-color:
+      rgb(var(--info) / 0.28);
 
-.academics-success-surface {
-  background: rgb(var(--success) / 0.10);
-}
+    color:
+      rgb(var(--info));
+  }
 
-.academics-success-footer {
-  background: rgb(var(--success) / 0.06);
-}
+  .academics-info-button:hover {
+    background:
+      rgb(var(--info) / 0.08);
+  }
 
-.academics-success-border {
-  border-color: rgb(var(--success) / 0.22);
-}
+  .academics-success-surface {
+    background:
+      rgb(var(--success) / 0.10);
+  }
 
-.academics-success-button {
-  border-color: rgb(var(--success) / 0.28);
-  color: rgb(var(--success));
-}
+  .academics-success-footer {
+    background:
+      rgb(var(--success) / 0.06);
+  }
 
-.academics-success-button:hover {
-  background: rgb(var(--success) / 0.08);
-}
-}
+  .academics-success-border {
+    border-color:
+      rgb(var(--success) / 0.22);
+  }
 
+  .academics-success-button {
+    border-color:
+      rgb(var(--success) / 0.28);
+
+    color:
+      rgb(var(--success));
+  }
+
+  .academics-success-button:hover {
+    background:
+      rgb(var(--success) / 0.08);
+  }
+}

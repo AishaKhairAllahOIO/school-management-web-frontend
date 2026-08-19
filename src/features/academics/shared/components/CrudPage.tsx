@@ -504,8 +504,10 @@ export function CrudPage<
       <section className="overflow-hidden rounded-[22px] border border-border/70 bg-card shadow-[0_12px_34px_rgba(31,24,74,0.055)]">
         <header className="relative overflow-hidden px-6 py-5 sm:px-7">
           <div className="absolute inset-x-0 top-0 h-[2px] bg-[var(--academic-accent)]" />
-          <div className="absolute -right-16 -top-20 h-56 w-56 rounded-full bg-[var(--academic-soft)] blur-3xl" />
-
+<div
+  aria-hidden="true"
+  className="pointer-events-none absolute -right-10 -top-12 h-32 w-32 rounded-full bg-[var(--academic-soft)] opacity-25 blur-2xl dark:opacity-10"
+/>
           <div className="relative flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
             <div className="flex min-w-0 items-start gap-4">
               <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px] border border-[var(--academic-border)] bg-[var(--academic-soft)] text-[var(--academic-accent)]">
@@ -1043,8 +1045,10 @@ function DetailsDrawer<
             "bg-card px-5 py-4 sm:px-6",
           ].join(" ")}
         >
-          <div className="absolute -right-16 -top-20 h-48 w-48 rounded-full bg-[var(--academic-soft)] blur-3xl" />
-
+<div
+  aria-hidden="true"
+  className="pointer-events-none absolute -right-10 -top-10 h-28 w-28 rounded-full bg-[var(--academic-soft)] opacity-20 blur-2xl dark:opacity-8"
+/>
           <div className="relative flex items-start justify-between gap-4">
             <div className="flex min-w-0 items-start gap-4">
               <span
@@ -1250,8 +1254,10 @@ function EditorDialog({
             "px-5 py-4",
           ].join(" ")}
         >
-          <div className="absolute -right-12 -top-16 h-40 w-40 rounded-full bg-[var(--academic-soft)] blur-3xl" />
-
+<div
+  aria-hidden="true"
+  className="pointer-events-none absolute -right-8 -top-10 h-24 w-24 rounded-full bg-[var(--academic-soft)] opacity-20 blur-2xl dark:opacity-8"
+/>
           <div className="relative flex items-start justify-between gap-4">
             <div className="flex items-start gap-4">
               <span

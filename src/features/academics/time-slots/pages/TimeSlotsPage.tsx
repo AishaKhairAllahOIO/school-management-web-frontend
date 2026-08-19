@@ -68,8 +68,6 @@ export function TimeSlotsPage() {
           <header className="relative overflow-hidden px-6 py-5 sm:px-7">
             <div className="absolute inset-x-0 top-0 h-[2px] bg-[var(--academic-accent)]" />
 
-            <div className="absolute -right-16 -top-20 h-56 w-56 rounded-full bg-[var(--academic-soft)] opacity-60 blur-3xl dark:opacity-30" />
-
             <div className="relative flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
               <div className="flex min-w-0 items-start gap-4">
                 <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px] border border-[var(--academic-border)] bg-[var(--academic-soft)] text-[var(--academic-accent)]">
@@ -206,8 +204,6 @@ export function TimeSlotsPage() {
           <header className="relative overflow-hidden px-6 py-8 sm:px-7">
             <div className="absolute inset-x-0 top-0 h-[2px] bg-[var(--academic-accent)]" />
 
-            <div className="absolute -right-16 -top-20 h-56 w-56 rounded-full bg-[var(--academic-soft)] opacity-60 blur-3xl dark:opacity-30" />
-
             <div className="relative flex flex-col items-center justify-center py-8 text-center">
               <span className="flex h-10 w-10 items-center justify-center rounded-[14px] border border-[var(--academic-border)] bg-[var(--academic-soft)] text-[var(--academic-accent)]">
                 <CalendarDays size={25} strokeWidth={1.75} />
@@ -240,8 +236,6 @@ export function TimeSlotsPage() {
         <section className="overflow-hidden rounded-[22px] border border-border/70 bg-card shadow-[0_12px_34px_rgba(31,24,74,0.055)] dark:shadow-black/10">
           <header className="relative overflow-hidden px-6 py-8 sm:px-7">
             <div className="absolute inset-x-0 top-0 h-[2px] bg-[var(--academic-accent)]" />
-
-            <div className="absolute -right-16 -top-20 h-56 w-56 rounded-full bg-[var(--academic-soft)] opacity-60 blur-3xl dark:opacity-30" />
 
             <div className="relative flex flex-col items-center justify-center py-8 text-center">
               <span className="flex h-10 w-10 items-center justify-center rounded-[14px] border border-[var(--academic-border)] bg-[var(--academic-soft)] text-[var(--academic-accent)]">
@@ -282,8 +276,6 @@ export function TimeSlotsPage() {
       <section className="overflow-hidden rounded-[22px] border border-border/70 bg-card shadow-[0_12px_34px_rgba(31,24,74,0.055)] dark:shadow-black/10">
         <header className="relative overflow-hidden px-6 py-5 sm:px-7">
           <div className="absolute inset-x-0 top-0 h-[2px] bg-[var(--academic-accent)]" />
-
-          <div className="absolute -right-16 -top-20 h-56 w-56 rounded-full bg-[var(--academic-soft)] opacity-60 blur-3xl dark:opacity-30" />
 
           <div className="relative flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
             <div className="flex min-w-0 items-start gap-4">
@@ -355,8 +347,6 @@ function TeacherScheduleCard({
       {/* Teacher header */}
       <header className="relative overflow-hidden border-b border-border/65 px-5 py-4 sm:px-6">
         <div className="absolute inset-x-0 top-0 h-px bg-[var(--academic-accent)] opacity-0 transition-opacity duration-200 group-hover:opacity-40" />
-
-        <div className="absolute -right-12 -top-16 h-40 w-40 rounded-full bg-[var(--academic-soft)] opacity-50 blur-3xl dark:opacity-25" />
 
         <div className="relative flex items-center gap-3">
           <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px] border border-[var(--academic-border)] bg-[var(--academic-soft)] text-[var(--academic-accent)]">

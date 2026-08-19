@@ -96,8 +96,16 @@ export function ScheduleGrid({
 
   if (!workingDays.length) {
     return (
-      <div className="rounded-[22px] border border-dashed border-border/60 bg-card p-6 text-center sm:p-10">
-        <p className="text-sm font-medium">
+      <div
+        className="
+          rounded-[22px]
+          border border-dashed border-border/60
+          bg-card
+          p-6 text-center
+          sm:p-10
+        "
+      >
+        <p className="text-sm font-medium text-foreground">
           No working days configured.
         </p>
 
@@ -110,10 +118,6 @@ export function ScheduleGrid({
 
   const gridTemplateColumns = `110px repeat(${workingDays.length}, minmax(150px, 1fr))`;
 
-  /*
-   * Keep the theme support for the parent card,
-   * but the dropdown icon itself is intentionally neutral.
-   */
   const toggleTheme = theme ?? {
     border: "border-border/55",
     bg: "bg-card",
@@ -134,17 +138,19 @@ export function ScheduleGrid({
           "bg-card",
           "transition-all duration-200",
           toggleTheme.border,
+          "hover:bg-muted/30",
+          "dark:hover:bg-muted/20",
         ].join(" ")}
       >
         <div className="flex items-center gap-2.5">
-          {/* Dropdown icon */}
           <span
             className="
               flex h-8 w-8
               items-center justify-center
               rounded-[10px]
-              bg-card
+              bg-muted/40
               text-muted-foreground
+              dark:bg-muted/50
             "
           >
             {isOpen ? (
@@ -161,7 +167,7 @@ export function ScheduleGrid({
           </span>
 
           <div>
-            <p className="text-[11px] font-semibold text-foreground">
+            <p className="text-[11px] font-medium text-foreground">
               Weekly timetable
             </p>
 
@@ -175,10 +181,11 @@ export function ScheduleGrid({
         <span
           className={[
             "rounded-full border px-2.5 py-1",
-            "bg-card",
+            "bg-muted/30",
             "text-[9px] font-medium",
             toggleTheme.border,
             "text-muted-foreground",
+            "dark:bg-muted/40",
           ].join(" ")}
         >
           {isOpen
@@ -201,14 +208,21 @@ export function ScheduleGrid({
           "
         >
           <div
-            className="min-w-max bg-card"
+            className="
+              min-w-max
+              bg-card
+            "
             style={{
               minWidth: `${110 + workingDays.length * 150}px`,
             }}
           >
             {/* Header */}
             <div
-              className="grid bg-card"
+              className="
+                grid
+                bg-muted/[0.025]
+                dark:bg-muted/[0.08]
+              "
               style={{
                 gridTemplateColumns,
               }}
@@ -287,14 +301,15 @@ export function ScheduleGrid({
                         flex-col
                         justify-center
                         border-r border-border/45
-                        bg-card
+                        bg-muted/[0.025]
                         px-2 py-2
                         sm:min-h-[112px]
                         sm:px-3
                         sm:py-3
+                        dark:bg-muted/[0.06]
                       "
                     >
-                      <span className="text-[11px] font-medium sm:text-[12px]">
+                      <span className="text-[11px] font-medium text-foreground sm:text-[12px]">
                         Period {periodIndex}
                       </span>
                     </div>
@@ -393,7 +408,7 @@ function ScheduleCell({
             rounded-[12px]
             border border-dashed
             border-border/45
-            bg-card
+            bg-muted/[0.025]
             px-2
             text-center
             text-[10px]
@@ -405,6 +420,8 @@ function ScheduleCell({
             hover:text-primary
             sm:min-h-[96px]
             sm:rounded-[15px]
+            dark:bg-muted/[0.06]
+            dark:hover:bg-primary/[0.08]
           "
         >
           <span
@@ -413,9 +430,10 @@ function ScheduleCell({
               items-center justify-center
               rounded-full
               border border-border/40
-              bg-card
+              bg-muted/30
               transition-all
               group-hover:bg-primary/10
+              dark:bg-muted/40
             "
           >
             <Plus
