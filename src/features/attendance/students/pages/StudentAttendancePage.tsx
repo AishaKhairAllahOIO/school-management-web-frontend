@@ -68,7 +68,6 @@ export function StudentAttendancePage() {
   const activeGrade = gradesData.find((g: any) => String(g.id) === String(activeClassroom?.gradeId || activeClassroom?.grade_id));
   const activeGradeName = activeGrade?.name || "N/A";
 
-  // 🌟 استدعاء الهوك بعد فصح التعليق عنه وتمرير البارامترات المطلوبة
   const attendanceQuery = useStudentAttendance({
     date: selectedDate,
     classroomId: classroomFilter,
@@ -194,10 +193,10 @@ export function StudentAttendancePage() {
 
           <div className="flex w-full flex-col gap-3 sm:flex-row lg:w-auto lg:items-end">
             <DatePicker value={draftDate} onChange={setDraftDate} label="Attendance date" className="w-full sm:w-[228px]" />
-            <Button type="button" variant="outline" onClick={applyDate} disabled={!draftDate || draftDate === selectedDate} className="h-11 rounded-[14px] border-violet-200 bg-transparent px-5 text-[13px] font-semibold text-violet-700 hover:bg-violet-50 transition-colors shadow-2xs">
+            <Button type="button" variant="outline" onClick={applyDate} disabled={!draftDate || draftDate === selectedDate} className="h-11 rounded-[14px] border-primary/30 bg-transparent px-5 text-[13px] font-semibold text-primary hover:bg-primary/10 transition-colors shadow-2xs">
               <CalendarDays className="h-4 w-4 mr-2" /> Apply
             </Button>
-            <Button type="button" onClick={saveAttendance} disabled={dirtyIds.size === 0 || isSaving} className="h-11 rounded-[14px] px-6 text-[13px] font-semibold bg-violet-600 hover:bg-violet-700 text-white shadow-sm transition-all disabled:opacity-50">
+            <Button type="button" onClick={saveAttendance} disabled={dirtyIds.size === 0 || isSaving} className="h-11 rounded-[14px] px-6 text-[13px] font-semibold bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm transition-all disabled:opacity-50">
               <Save className="h-4 w-4 mr-2" /> {isSaving ? "Saving..." : "Save Changes"}
             </Button>
           </div>
@@ -213,7 +212,7 @@ export function StudentAttendancePage() {
       </div>
 
       {savedAt && (
-        <p className="-mt-1 text-end text-[11.5px] font-bold text-emerald-600">✓ Changes saved at {savedAt}.</p>
+        <p className="-mt-1 text-end text-[11.5px] font-bold text-success">✓ Changes saved at {savedAt}.</p>
       )}
 
       <AttendanceTable 

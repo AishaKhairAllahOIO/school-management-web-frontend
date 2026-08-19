@@ -31,7 +31,7 @@ import { useDeleteAttendance } from "../hooks/useDeleteAttendance";
 import type { AttendanceStatus, AbsenceType, AttendanceRecord } from "../types/attendance.types";
 
 const controlClass =
-  "h-9 rounded-[12px] border-border/60 bg-background/80 text-[12px] shadow-none outline-none focus:ring-1 focus:ring-violet-500/30 transition-all";
+  "h-9 rounded-[12px] border-border/60 bg-background/80 text-[12px] text-foreground shadow-none outline-none focus:ring-1 focus:ring-primary/30 transition-all";
 
 const emptyDraft = {
   date: "",
@@ -40,10 +40,9 @@ const emptyDraft = {
 };
 
 export function StudentAttendanceHistoryPage() {
-  const { studentId = "" } = useParams(); // هذا هو الـ enrollment_id للطالب
+  const { studentId = "" } = useParams();
   const [page, setPage] = useState(1);
 
-  // 🌟 استدعاء الهوك بـ enrollmentId والـ page الحالية
   const { data, isLoading } = useStudentAttendanceHistory(studentId, page);
 
   const studentInfo = data?.student_info;
@@ -114,7 +113,7 @@ export function StudentAttendanceHistoryPage() {
     <section className="space-y-5 pt-5 animate-in fade-in duration-300">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-4">
-          <Button asChild variant="outline" size="icon" className="h-11 w-11 rounded-[14px] border-violet-200 text-violet-700 hover:bg-violet-50 transition-colors">
+          <Button asChild variant="outline" size="icon" className="h-11 w-11 rounded-[14px] border-border/60 text-primary hover:bg-primary/10 transition-colors">
             <Link to="/attendance/students" aria-label="Back to student attendance">
               <ArrowLeft className="h-5 w-5 rtl:rotate-180" />
             </Link>
@@ -130,10 +129,10 @@ export function StudentAttendanceHistoryPage() {
         </div>
       </div>
 
-      {/* العدادات المستخرجة من الباك إند */}
+      {/* العدادات المتوافقة مع الثيم والدارك */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
         <div className="flex items-center gap-3.5 rounded-[18px] border border-success/25 bg-card px-4 py-3 shadow-xs">
-          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[12px] bg-success/[0.10] text-success">
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[12px] bg-success/[0.12] text-success">
             <CheckCircle2 className="h-5 w-5" strokeWidth={2.2} />
           </span>
           <div className="min-w-0">
@@ -143,7 +142,7 @@ export function StudentAttendanceHistoryPage() {
         </div>
 
         <div className="flex items-center gap-3.5 rounded-[18px] border border-destructive/25 bg-card px-4 py-3 shadow-xs">
-          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[12px] bg-destructive/[0.10] text-destructive">
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[12px] bg-destructive/[0.12] text-destructive">
             <ShieldAlert className="h-5 w-5" strokeWidth={2.2} />
           </span>
           <div className="min-w-0">
@@ -152,13 +151,13 @@ export function StudentAttendanceHistoryPage() {
           </div>
         </div>
 
-        <div className="flex items-center gap-3.5 rounded-[18px] border border-violet-200 bg-card px-4 py-3 shadow-xs">
-          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[12px] bg-violet-600/[0.10] text-violet-700">
+        <div className="flex items-center gap-3.5 rounded-[18px] border border-primary/25 bg-card px-4 py-3 shadow-xs">
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[12px] bg-primary/[0.12] text-primary">
             <Info className="h-5 w-5" strokeWidth={2.2} />
           </span>
           <div className="min-w-0">
             <span className="block text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Remaining Days</span>
-            <strong className="text-[20px] font-bold text-violet-700 leading-none">{summary?.remaining_absence_days || 0}</strong>
+            <strong className="text-[20px] font-bold text-primary leading-none">{summary?.remaining_absence_days || 0}</strong>
           </div>
         </div>
       </div>
@@ -166,7 +165,7 @@ export function StudentAttendanceHistoryPage() {
       {/* إضافة غياب جديد */}
       <div className="rounded-[22px] border border-border/70 bg-card p-5 shadow-sm">
         <div className="mb-4 flex items-center gap-3">
-          <span className="flex h-10 w-10 items-center justify-center rounded-[14px] bg-violet-600/10 text-violet-700 border border-violet-600/20">
+          <span className="flex h-10 w-10 items-center justify-center rounded-[14px] bg-primary/10 text-primary border border-primary/25">
             <Plus className="h-5 w-5" />
           </span>
           <div>
@@ -180,8 +179,8 @@ export function StudentAttendanceHistoryPage() {
           <Select value={draft.status} onValueChange={(status) => setDraft((current) => ({ ...current, status: status as AttendanceStatus }))}>
             <SelectTrigger className={controlClass}><SelectValue /></SelectTrigger>
             <SelectContent>
-              <SelectItem value="present" className="text-emerald-600">Present</SelectItem>
-              <SelectItem value="absent" className="text-rose-600">Absent</SelectItem>
+              <SelectItem value="present" className="text-success">Present</SelectItem>
+              <SelectItem value="absent" className="text-destructive">Absent</SelectItem>
             </SelectContent>
           </Select>
 
@@ -189,13 +188,13 @@ export function StudentAttendanceHistoryPage() {
             <Select value={draft.absenceType ?? "excused"} onValueChange={(absenceType) => setDraft((current) => ({ ...current, absenceType: absenceType as AbsenceType }))}>
               <SelectTrigger className={controlClass}><SelectValue /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="excused" className="text-sky-600">Excused absence</SelectItem>
-                <SelectItem value="unexcused" className="text-amber-600">Unexcused absence</SelectItem>
+                <SelectItem value="excused" className="text-info">Excused absence</SelectItem>
+                <SelectItem value="unexcused" className="text-warning">Unexcused absence</SelectItem>
               </SelectContent>
             </Select>
           ) : <div />}
 
-          <Button type="button" onClick={addRecord} disabled={!draft.date || createMutation.isPending} className="h-9 rounded-[12px] bg-violet-600 hover:bg-violet-700 text-white font-semibold transition-all">
+          <Button type="button" onClick={addRecord} disabled={!draft.date || createMutation.isPending} className="h-9 rounded-[12px] bg-primary hover:bg-primary/90 text-primary-foreground font-semibold transition-all">
             <Save className="h-4 w-4 mr-1.5" />
             {createMutation.isPending ? "Saving..." : "Save Record"}
           </Button>
@@ -238,7 +237,7 @@ export function StudentAttendanceHistoryPage() {
                 const isEditing = editingId === record.id && editingRecord;
                 return (
                   <tr key={record.id} className="border-t border-border/50 text-[13px] hover:bg-muted/30 transition-colors">
-                    <td className="px-6 py-4 font-bold text-slate-700">
+                    <td className="px-6 py-4 font-bold text-foreground">
                       {isEditing ? (
                         <DatePicker value={editingRecord.attendance_date} onChange={(date) => setEditingRecord({ ...editingRecord, attendance_date: date })} />
                       ) : (
@@ -250,12 +249,12 @@ export function StudentAttendanceHistoryPage() {
                         <Select value={editingRecord.status} onValueChange={(status) => setEditingRecord({ ...editingRecord, status: status as AttendanceStatus })}>
                           <SelectTrigger className={controlClass}><SelectValue /></SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="present" className="text-emerald-600">Present</SelectItem>
-                            <SelectItem value="absent" className="text-rose-600">Absent</SelectItem>
+                            <SelectItem value="present" className="text-success">Present</SelectItem>
+                            <SelectItem value="absent" className="text-destructive">Absent</SelectItem>
                           </SelectContent>
                         </Select>
                       ) : (
-                        <span className={record.status === "present" ? "font-bold text-emerald-600" : "font-bold text-rose-600"}>
+                        <span className={record.status === "present" ? "font-bold text-success" : "font-bold text-destructive"}>
                           {record.status}
                         </span>
                       )}
@@ -266,13 +265,13 @@ export function StudentAttendanceHistoryPage() {
                           <Select value={editingRecord.absence_type ?? "excused"} onValueChange={(absence_type) => setEditingRecord({ ...editingRecord, absence_type: absence_type as AbsenceType })}>
                             <SelectTrigger className={controlClass}><SelectValue /></SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="excused" className="text-sky-600">Excused absence</SelectItem>
-                              <SelectItem value="unexcused" className="text-amber-600">Unexcused absence</SelectItem>
+                              <SelectItem value="excused" className="text-info">Excused absence</SelectItem>
+                              <SelectItem value="unexcused" className="text-warning">Unexcused absence</SelectItem>
                             </SelectContent>
                           </Select>
                         ) : <span className="text-muted-foreground font-medium">—</span>
                       ) : (
-                        <span className={`font-medium ${record.absence_type === 'excused' ? 'text-sky-600' : record.absence_type === 'unexcused' ? 'text-amber-600' : 'text-muted-foreground'}`}>
+                        <span className={`font-medium ${record.absence_type === 'excused' ? 'text-info' : record.absence_type === 'unexcused' ? 'text-warning' : 'text-muted-foreground'}`}>
                           {record.status === "absent" ? record.absence_type : "—"}
                         </span>
                       )}
@@ -281,7 +280,7 @@ export function StudentAttendanceHistoryPage() {
                       <div className="flex items-center justify-center gap-2">
                         {isEditing ? (
                           <>
-                            <Button type="button" size="sm" onClick={saveEdit} disabled={updateMutation.isPending} className="h-8 rounded-[10px] px-4 bg-violet-600 text-white hover:bg-violet-700 font-semibold shadow-xs">
+                            <Button type="button" size="sm" onClick={saveEdit} disabled={updateMutation.isPending} className="h-8 rounded-[10px] px-4 bg-primary text-primary-foreground hover:bg-primary/90 font-semibold shadow-xs">
                               <Save className="h-3.5 w-3.5 mr-1" /> Save
                             </Button>
                             <Button type="button" variant="ghost" size="sm" onClick={() => setEditingId(null)} className="h-8 rounded-[10px] px-3 font-medium text-muted-foreground hover:text-foreground">
@@ -290,10 +289,10 @@ export function StudentAttendanceHistoryPage() {
                           </>
                         ) : (
                           <>
-                            <Button type="button" variant="outline" size="icon" onClick={() => beginEdit(record)} className="h-8 w-8 rounded-[10px] border-violet-200 text-violet-600 hover:bg-violet-50 transition-colors">
+                            <Button type="button" variant="outline" size="icon" onClick={() => beginEdit(record)} className="h-8 w-8 rounded-[10px] border-border/60 text-primary hover:bg-primary/10 transition-colors">
                               <Pencil className="h-3.5 w-3.5" />
                             </Button>
-                            <Button type="button" variant="outline" size="icon" onClick={() => setDeleteTarget(record)} className="h-8 w-8 rounded-[10px] border-destructive/20 text-destructive hover:bg-destructive/[0.07] transition-colors">
+                            <Button type="button" variant="outline" size="icon" onClick={() => setDeleteTarget(record)} className="h-8 w-8 rounded-[10px] border-destructive/20 text-destructive hover:bg-destructive/10 transition-colors">
                               <Trash2 className="h-3.5 w-3.5" />
                             </Button>
                           </>
@@ -317,10 +316,10 @@ export function StudentAttendanceHistoryPage() {
               Page {page} of {totalPages}
             </p>
             <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm" onClick={() => setPage(page - 1)} disabled={page <= 1 || isLoading} className="h-8 rounded-[10px] text-[12px] font-semibold text-slate-700">
+              <Button variant="outline" size="sm" onClick={() => setPage(page - 1)} disabled={page <= 1 || isLoading} className="h-8 rounded-[10px] text-[12px] font-semibold text-foreground border-border/60">
                 <ChevronLeft className="h-4 w-4 mr-1" /> Prev
               </Button>
-              <Button variant="outline" size="sm" onClick={() => setPage(page + 1)} disabled={page >= totalPages || isLoading} className="h-8 rounded-[10px] text-[12px] font-semibold text-slate-700">
+              <Button variant="outline" size="sm" onClick={() => setPage(page + 1)} disabled={page >= totalPages || isLoading} className="h-8 rounded-[10px] text-[12px] font-semibold text-foreground border-border/60">
                 Next <ChevronRight className="h-4 w-4 ml-1" />
               </Button>
             </div>

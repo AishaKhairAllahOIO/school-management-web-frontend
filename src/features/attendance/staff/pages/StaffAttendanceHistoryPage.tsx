@@ -12,9 +12,7 @@ export function StaffAttendanceHistoryPage() {
   const { employeeId } = useParams();
   const navigate = useNavigate();
   
-
   const { data: historyRecords = [], isLoading } = useStaffAttendanceHistory(employeeId!);
-
 
   const totalRecords = historyRecords.length;
   const totalAbsences = historyRecords.filter((r: any) => r.status === 'absent').length;
@@ -30,9 +28,9 @@ export function StaffAttendanceHistoryPage() {
           variant="outline" 
           size="icon" 
           onClick={() => navigate('/attendance/staff')}
-          className="h-9 w-9 rounded-[12px] border-border/70 hover:bg-muted/40"
+          className="h-9 w-9 rounded-[12px] border-border/70 hover:bg-muted/40 text-muted-foreground hover:text-foreground"
         >
-          <ArrowLeft className="h-4.5 w-4.5 text-muted-foreground" />
+          <ArrowLeft className="h-4.5 w-4.5" />
         </Button>
         <div>
           <h1 className="text-[18px] font-extrabold tracking-tight text-foreground">Staff History</h1>
@@ -74,16 +72,16 @@ export function StaffAttendanceHistoryPage() {
               ) : (
                 historyRecords.map((record: any) => (
                   <tr key={record.id} className="transition-colors hover:bg-muted/30 group">
-                    <td className="px-6 py-4 font-bold text-slate-800 dark:text-slate-200 text-[12.5px]">
+                    <td className="px-6 py-4 font-bold text-foreground text-[12.5px]">
                       {formatDate(record.attendance_date)}
                     </td>
                     
                     <td className="px-4 py-4">
                       <span className={`inline-flex items-center px-2.5 py-1 rounded-[10px] text-[11.5px] font-bold capitalize border ${
-                        record.status === 'present' ? 'text-emerald-700 bg-emerald-50/60 border-emerald-200/50' : 
-                        record.status === 'absent' ? 'text-rose-700 bg-rose-50/60 border-rose-200/50' : 
-                        record.status === 'on_leave' ? 'text-amber-700 bg-amber-50/60 border-amber-200/50' : 
-                        'text-violet-700 bg-violet-50/60 border-violet-200/50'
+                        record.status === 'present' ? 'text-success bg-success/10 border-success/25' : 
+                        record.status === 'absent' ? 'text-destructive bg-destructive/10 border-destructive/25' : 
+                        record.status === 'on_leave' ? 'text-warning bg-warning/10 border-warning/25' : 
+                        'text-primary bg-primary/10 border-primary/25'
                       }`}>
                         {record.status.replace('_', ' ')}
                       </span>
@@ -91,7 +89,9 @@ export function StaffAttendanceHistoryPage() {
 
                     <td className="px-4 py-4">
                       {record.absence_type ? (
-                        <span className={`text-[12px] font-semibold capitalize ${record.absence_type === 'unexcused' ? 'text-amber-700 bg-amber-50/50 px-2 py-0.5 rounded-[6px]' : 'text-sky-700 bg-sky-50/50 px-2 py-0.5 rounded-[6px]'}`}>
+                        <span className={`text-[12px] font-semibold capitalize px-2 py-0.5 rounded-[6px] ${
+                          record.absence_type === 'unexcused' ? 'text-warning bg-warning/10' : 'text-info bg-info/10'
+                        }`}>
                           {record.absence_type}
                         </span>
                       ) : (
@@ -100,20 +100,19 @@ export function StaffAttendanceHistoryPage() {
                     </td>
 
                     <td className="px-6 py-4">
-                      {/* عرض الإجازة المتداخلة من الباك إند */}
                       {record.status === 'on_leave' && record.leave ? (
-                        <div className="flex flex-col gap-1 bg-amber-50/60 border border-amber-200/50 rounded-[12px] p-2.5 w-max">
-                          <span className="text-[11.5px] font-bold text-amber-800">
+                        <div className="flex flex-col gap-1 bg-warning/10 border border-warning/25 rounded-[12px] p-2.5 w-max">
+                          <span className="text-[11.5px] font-bold text-warning">
                             Leave ID: #{record.leave.id} <span className="opacity-70">({record.leave.days_count} Days)</span>
                           </span>
-                          <span className="text-[11px] font-medium text-amber-700/90">
+                          <span className="text-[11px] font-medium text-warning/90">
                             From {formatDate(record.leave.start_date)} to {formatDate(record.leave.end_date)}
                           </span>
                         </div>
                       ) : record.status === 'partial_absence' && record.period_attendances?.length > 0 ? (
                         <div className="flex flex-wrap gap-1.5">
                           {record.period_attendances.map((p: any, idx: number) => (
-                            <span key={idx} className="bg-violet-50/60 text-violet-700 border border-violet-200/50 text-[11px] font-bold px-2 py-1 rounded-[8px]">
+                            <span key={idx} className="bg-primary/10 text-primary border border-primary/25 text-[11px] font-bold px-2 py-1 rounded-[8px]">
                               Period {p.period_index || p.id}
                             </span>
                           ))}
@@ -136,10 +135,10 @@ export function StaffAttendanceHistoryPage() {
 // كارد الإحصائيات 
 function StatCard({ title, value, icon: Icon, color }: any) {
   const colors: Record<string, string> = {
-    violet: "bg-violet-600/10 text-violet-700 border-violet-600/20",
-    rose: "bg-rose-600/10 text-rose-700 border-rose-600/20",
-    amber: "bg-amber-600/10 text-amber-700 border-amber-600/20",
-    sky: "bg-sky-600/10 text-sky-700 border-sky-600/20",
+    violet: "bg-primary/10 text-primary border-primary/25",
+    rose: "bg-destructive/10 text-destructive border-destructive/25",
+    amber: "bg-warning/10 text-warning border-warning/25",
+    sky: "bg-info/10 text-info border-info/25",
   };
   const theme = colors[color];
 

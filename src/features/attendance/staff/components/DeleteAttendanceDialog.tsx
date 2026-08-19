@@ -10,11 +10,11 @@ import { Trash2 } from "lucide-react";
 import { useDeleteStaffAttendance } from "../hooks/useStaffAttendance";
 import { useState } from "react";
 
-interface Props {
+interface DeleteProps {
   id: string | number;
 }
 
-export const DeleteAttendanceDialog = ({ id }: Props) => {
+export const DeleteAttendanceDialog = ({ id }: DeleteProps) => {
   const [open, setOpen] = useState(false);
   const deleteMutation = useDeleteStaffAttendance();
 
@@ -33,24 +33,24 @@ export const DeleteAttendanceDialog = ({ id }: Props) => {
         <Button
           size="icon"
           variant="outline"
-          className="border-primary/30 text-primary hover:bg-primary/10 hover:text-primary"
+          className="h-8 w-8 rounded-[10px] border-destructive/25 text-destructive hover:bg-destructive/10"
         >
-          <Trash2 size={16} />
+          <Trash2 size={15} />
         </Button>
       </DialogTrigger>
 
-      <DialogContent>
+      <DialogContent className="sm:max-w-md rounded-[24px] bg-card text-card-foreground border-border p-6 shadow-xl">
         <DialogHeader>
-          <DialogTitle>Delete Attendance</DialogTitle>
+          <DialogTitle className="text-[18px] font-extrabold text-foreground">Delete Attendance</DialogTitle>
         </DialogHeader>
 
-        <p>Are you sure you want to delete this record?</p>
+        <p className="text-[13px] text-muted-foreground my-2">Are you sure you want to delete this record?</p>
 
-        <div className="flex justify-end gap-2">
-          <Button variant="outline" onClick={() => setOpen(false)}>
+        <div className="flex justify-end gap-2.5 mt-4">
+          <Button variant="outline" onClick={() => setOpen(false)} className="h-10 rounded-[12px] border-border/70">
             Cancel
           </Button>
-          <Button variant="destructive" onClick={handleDelete} disabled={deleteMutation.isPending}>
+          <Button variant="destructive" onClick={handleDelete} disabled={deleteMutation.isPending} className="h-10 rounded-[12px] bg-destructive text-destructive-foreground font-semibold">
             {deleteMutation.isPending ? "Deleting..." : "Delete"}
           </Button>
         </div>

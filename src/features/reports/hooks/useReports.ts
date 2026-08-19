@@ -14,7 +14,6 @@ import { API_ENDPOINTS } from "@/services/api/endpoints";
 import { axiosClient } from "@/services/axios/axiosClient";
 import { getAxiosErrorMessage } from "@/services/axios/axiosError";
 import type {
-  ReportFormat,
   ReportTemplate,
   ReportsWorkspaceData,
 } from "../types/reports.types";
@@ -257,24 +256,26 @@ export function useGenerateReport() {
       format,
       academicYear,
       dateRange,
-    }: {
-      template: ReportTemplate;
-      format: ReportFormat;
-      academicYear: string;
-      dateRange: string;
-    }) => {
+      startDate,
+      endDate
+    }: any) => {
       
-      if (!template.endpoint) {
-        throw new Error("Report endpoint is undefined");
+      if (!template.endpoint) throw new Error("Report endpoint is undefined");
+
+
+      const params: any = { academic_year_id: academicYear, date_range: dateRange };
+      if (dateRange === "custom" && startDate && endDate) {
+        params.start_date = startDate;
+        params.end_date = endDate;
       }
 
-      const response = await axiosClient.get(template.endpoint, {
-        params: { academic_year: academicYear, date_range: dateRange },
-      });
+      const response = await axiosClient.get(template.endpoint, { params });
 
       const rawData = response.data?.data || response.data;
       let blob: Blob;
-      const fileName = `${template.title.replace(/\s+/g, "_")}_${dateRange}`;
+      
+      const rangeSuffix = dateRange === 'custom' ? `${startDate}_to_${endDate}` : dateRange;
+      const fileName = `${template.title.replace(/\s+/g, "_")}_${rangeSuffix}`;
 
       if (format === "JSON") {
         const jsonString = JSON.stringify(rawData, null, 2);
@@ -288,30 +289,73 @@ export function useGenerateReport() {
         downloadBlob(blob, `${fileName}.csv`);
 
     } else {
-
-      const doc = new jsPDF();
-        doc.setFontSize(16);
+        const doc = new jsPDF();
+        
+        doc.setFillColor(103, 58, 244); 
+        doc.rect(0, 0, 210, 40, 'F');
+        
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(18);
+        doc.setFont("helvetica", "bold");
         doc.text(template.title, 14, 20);
+        
         doc.setFontSize(10);
-        doc.text(`Academic Year: ${academicYear} | Period: ${dateRange}`, 14, 28);
+        doc.setFont("helvetica", "normal");
+        const periodDisplay = dateRange === 'custom' ? `${startDate} to ${endDate}` : dateRange.replace('_', ' ');
+        doc.text(`Academic Year: ${academicYear}   |   Period: ${periodDisplay}`, 14, 28);
 
-
-        let yPos = 40;
-        doc.setFontSize(11);
+        let yPos = 50;
         
         if (Array.isArray(rawData)) {
           rawData.forEach((item, index) => {
-            const line = Object.entries(item)
-              .map(([key, val]) => `${key}: ${val}`)
-              .join(" | ");
-            doc.text(`${index + 1}. ${line}`, 14, yPos);
+            doc.setFontSize(12);
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(30, 30, 30);
+            doc.text(`Record #${index + 1}`, 14, yPos);
             yPos += 8;
-            if (yPos > 280) { doc.addPage(); yPos = 20; }
+            
+            Object.entries(item).forEach(([key, val]) => {
+              const formattedKey = key.replace(/_/g, ' ').toUpperCase();
+              const formattedVal = typeof val === 'object' ? JSON.stringify(val) : String(val);
+              
+              doc.setFontSize(9);
+              doc.setFont('helvetica', 'bold');
+              doc.setTextColor(120, 120, 120);
+              doc.text(`${formattedKey}:`, 18, yPos);
+              
+              doc.setFont('helvetica', 'normal');
+              doc.setTextColor(50, 50, 50);
+              doc.text(formattedVal, 80, yPos);
+              yPos += 7;
+            });
+            
+            yPos += 5;
+            doc.setDrawColor(220, 220, 220);
+            doc.line(14, yPos, 196, yPos);
+            yPos += 10;
+
+            if (yPos > 270) { doc.addPage(); yPos = 20; }
           });
         } else {
           Object.entries(rawData).forEach(([key, val]) => {
-            doc.text(`${key.replace(/_/g, ' ')}: ${typeof val === 'object' ? JSON.stringify(val) : String(val)}`, 14, yPos);
-            yPos += 8;
+            const formattedKey = key.replace(/_/g, ' ').toUpperCase();
+            const formattedVal = typeof val === 'object' ? JSON.stringify(val) : String(val);
+            
+            doc.setFillColor(248, 248, 250);
+            doc.rect(14, yPos - 6, 182, 12, 'F');
+            
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(100, 100, 100);
+            doc.text(formattedKey, 18, yPos + 2);
+            
+            doc.setFontSize(11);
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(21, 20, 44);
+            doc.text(formattedVal, 110, yPos + 2);
+            
+            yPos += 16;
+            if (yPos > 270) { doc.addPage(); yPos = 20; }
           });
         }
 

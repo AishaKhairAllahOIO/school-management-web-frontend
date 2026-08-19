@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
 import { 
   FileCheck, 
   Settings, 
@@ -7,9 +8,10 @@ import {
   GraduationCap, 
   AlertCircle,
   CheckCircle2,
-  XCircle,
   Loader2,
   EyeOff,
+  Eye,
+  ArrowLeft,
   Trophy,
   ChevronLeft,
   ChevronRight,
@@ -32,14 +34,14 @@ import { useClassrooms } from "../../academics/classrooms/hooks/useClassrooms.ts
 
 export function ReportCardsPage() {
   const queryClient = useQueryClient();
-
+  const navigate = useNavigate();
+  
   const [isTopModalOpen, setIsTopModalOpen] = useState(false);
   const [semesterId, setSemesterId] = useState<string>("");
   const [gradeId, setGradeId] = useState<string>(""); 
   const [classRoomId, setClassRoomId] = useState<string>("");
   const [page, setPage] = useState<number>(1);
   const [isPromoteModalOpen, setIsPromoteModalOpen] = useState(false);
-  
   const [selectedStudentForModal, setSelectedStudentForModal] = useState<any | null>(null);
 
   const { data: terms, isLoading: isTermsLoading } = useAcademicTerms();
@@ -95,42 +97,59 @@ export function ReportCardsPage() {
   };
 
   const handlePublish = (isPublished: boolean) => {
-    publishMutation.mutate(
-      { semester_id: semesterId, grade_id: effectiveGradeId, class_room_id: effectiveClassRoomId, is_published: isPublished },
-      {
-        onSuccess: () => {
-          queryClient.setQueryData(reportCardKeys.list(semesterId, effectiveGradeId, effectiveClassRoomId, page), (oldData: any) => {
-            if (!oldData) return oldData;
-            const updateList = (list: any[]) => list.map((s: any) => ({ ...s, is_published: isPublished }));
-            if (Array.isArray(oldData)) return updateList(oldData);
-            return {
-              ...oldData,
-              data: oldData.data ? updateList(oldData.data) : []
-            };
-          });
-          queryClient.invalidateQueries({ queryKey: reportCardKeys.all });
-        }
+    // بناء البارامترات حسب الفلاتر المحددة
+    const payload: any = { 
+      semester_id: semesterId, 
+      is_published: isPublished ? 1 : 0 
+    };
+    if (effectiveGradeId) payload.grade_id = effectiveGradeId;
+    if (effectiveClassRoomId) payload.class_room_id = effectiveClassRoomId;
+
+    publishMutation.mutate(payload, {
+      onSuccess: () => {
+        // 🌟 السحر هنا: تحديث عميق ومضمون للجدول ليظهر التغيير فور نجاح الطلب 🌟
+        queryClient.setQueriesData({ queryKey: reportCardKeys.all }, (oldData: any) => {
+          if (!oldData) return oldData;
+          
+          const targetValue = isPublished ? 1 : 0;
+          
+          // دالة لتعديل الأسطر بقلب الجدول
+          const updateList = (list: any[]) => list.map((s: any) => ({ ...s, is_published: targetValue }));
+          
+          // البحث ضمن جميع أشكال استجابات الباك إند (مصفوفة مباشرة أو Pagination)
+          if (Array.isArray(oldData)) {
+            return updateList(oldData);
+          }
+          if (oldData.data && Array.isArray(oldData.data)) {
+            return { ...oldData, data: updateList(oldData.data) };
+          }
+          if (oldData.data?.data && Array.isArray(oldData.data.data)) {
+            return { ...oldData, data: { ...oldData.data, data: updateList(oldData.data.data) } };
+          }
+          
+          return oldData;
+        });
+
+        // طلب جلب البيانات بالخلفية لضمان التزامن
+        queryClient.invalidateQueries({ queryKey: reportCardKeys.all });
       }
-    );
+    });
   };
 
   const renderAcademicResult = (result: string) => {
+    const base = "inline-flex items-center px-3 py-1 rounded-full text-[11.5px] font-semibold border shadow-2xs capitalize";
     switch (result) {
-      case 'passed': 
-        return <span className="inline-flex items-center px-3 py-1 rounded-full text-[11.5px] font-semibold bg-success/10 text-success border border-success/20 shadow-2xs">Passed</span>;
-      case 'failed': 
-        return <span className="inline-flex items-center px-3 py-1 rounded-full text-[11.5px] font-semibold bg-destructive/10 text-destructive border border-destructive/20 shadow-2xs">Failed</span>;
-      case 'graduated': 
-        return <span className="inline-flex items-center px-3 py-1 rounded-full text-[11.5px] font-semibold bg-primary/10 text-primary border border-primary/20 shadow-2xs">Graduated</span>;
-      default: 
-        return <span className="inline-flex items-center px-3 py-1 rounded-full text-[11.5px] font-semibold bg-muted text-muted-foreground border border-border shadow-2xs">N/A</span>;
+      case 'passed': return <span className={`${base} bg-success/10 text-success border-success/20`}>Passed</span>;
+      case 'failed': return <span className={`${base} bg-destructive/10 text-destructive border-destructive/20`}>Failed</span>;
+      case 'graduated': return <span className={`${base} bg-primary/10 text-primary border-primary/20`}>Graduated</span>;
+      default: return <span className={`${base} bg-muted text-muted-foreground border-border`}>N/A</span>;
     }
   };
 
   const renderFinancialStatus = (status: string) => {
     const isCleared = status === 'cleared';
     return (
-      <span className={`inline-flex items-center gap-1.5 text-[12px] font-semibold ${isCleared ? 'text-warning dark:text-warning' : 'text-destructive dark:text-destructive'}`}>
+      <span className={`inline-flex items-center gap-1.5 text-[12px] font-semibold ${isCleared ? 'text-success' : 'text-destructive'}`}>
         {isCleared ? <CheckCircle2 size={14} /> : <AlertCircle size={14} />}
         {isCleared ? 'Cleared' : 'Blocked'}
       </span>
@@ -140,11 +159,15 @@ export function ReportCardsPage() {
   const isLoading = isReportCardsLoading || isFetching || isTermsLoading || isClassroomsLoading || isGradesLoading;
 
   return (
-    <div className="space-y-6 pb-12 animate-in fade-in duration-300">
-      
-      {/* Header Section */}
+    <div className="space-y-6 pb-12 animate-in fade-in duration-300 pt-5">
       <header className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between rounded-[24px] border border-border/70 bg-card p-6 shadow-sm backdrop-blur-xl">
         <div className="flex items-center gap-4">
+          <button
+            onClick={() => navigate('/reports')}
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[14px] border border-border/70 bg-background text-muted-foreground hover:bg-muted/50 hover:text-foreground transition-colors"
+          >
+            <ArrowLeft className="h-5 w-5 rtl:rotate-180" />
+          </button>
           <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[16px] border border-primary/20 bg-primary/10 text-primary shadow-xs">
             <FileCheck size={22} strokeWidth={2} />
           </span>
@@ -154,7 +177,6 @@ export function ReportCardsPage() {
           </div>
         </div>
 
-        {/* Action Buttons */}
         <div className="flex flex-wrap items-center gap-3">
           <button
             onClick={handleGenerate}
@@ -164,7 +186,6 @@ export function ReportCardsPage() {
             {generateMutation.isPending ? <Loader2 size={16} className="animate-spin text-primary" /> : <Settings size={16} className="text-muted-foreground" />}
             Generate Cards
           </button>
-
           <button
             onClick={() => setIsPromoteModalOpen(true)}
             className="inline-flex h-10 items-center justify-center gap-2 rounded-[14px] border border-border/80 bg-background px-4 text-[12px] font-semibold text-foreground transition-all hover:bg-muted/60 shadow-2xs"
@@ -191,7 +212,6 @@ export function ReportCardsPage() {
               <EyeOff size={15} />
             </button>
           </div>
-
           <button 
            onClick={() => setIsTopModalOpen(true)}
            className="inline-flex h-10 items-center justify-center gap-2 rounded-[14px] bg-primary px-5 text-[12px] font-semibold text-primary-foreground shadow-sm hover:bg-primary/90 transition-all"
@@ -202,7 +222,6 @@ export function ReportCardsPage() {
         </div>
       </header>
 
-      {/* Filters Section */}
       <section className="grid grid-cols-1 md:grid-cols-3 gap-4 rounded-[20px] border border-border/70 bg-card p-5 shadow-2xs">
         <label className="flex flex-col">
           <span className="text-[11.5px] font-bold text-muted-foreground mb-2 block">Semester</span>
@@ -212,18 +231,9 @@ export function ReportCardsPage() {
             disabled={isTermsLoading}
             className="block h-11 w-full rounded-[14px] border border-border/80 bg-background px-4 text-[13px] font-medium text-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/10 disabled:opacity-50 cursor-pointer shadow-2xs"
           >
-            {isTermsLoading ? (
-              <option value="">Loading...</option>
-            ) : terms?.length ? (
-              terms.map((term: any) => (
-                <option key={term.id} value={String(term.id)}>{term.semesterName}</option>
-              ))
-            ) : (
-              <option value="">No Semesters</option>
-            )}
+            {isTermsLoading ? <option value="">Loading...</option> : terms?.length ? terms.map((term: any) => <option key={term.id} value={String(term.id)}>{term.semesterName}</option>) : <option value="">No Semesters</option>}
           </select>
         </label>
-        
         <label className="flex flex-col">
           <span className="text-[11.5px] font-bold text-muted-foreground mb-2 block">Grade (Optional)</span>
           <select 
@@ -233,12 +243,9 @@ export function ReportCardsPage() {
             className="block h-11 w-full rounded-[14px] border border-border/80 bg-background px-4 text-[13px] font-medium text-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/10 disabled:opacity-50 cursor-pointer shadow-2xs"
           >
             <option value="">All Grades</option>
-            {grades?.map((grade: any) => (
-              <option key={grade.id} value={String(grade.id)}>{grade.name}</option>
-            ))}
+            {grades?.map((grade: any) => <option key={grade.id} value={String(grade.id)}>{grade.name}</option>)}
           </select>
         </label>
-
         <label className="flex flex-col">
           <span className="text-[11.5px] font-bold text-muted-foreground mb-2 block">Classroom (Optional)</span>
           <select 
@@ -248,16 +255,11 @@ export function ReportCardsPage() {
             className="block h-11 w-full rounded-[14px] border border-border/80 bg-background px-4 text-[13px] font-medium text-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/10 disabled:opacity-50 cursor-pointer shadow-2xs"
           >
             <option value="">All Classrooms</option>
-            {filteredClassrooms?.map((room: any) => (
-              <option key={room.id} value={String(room.id)}>
-                {room.name}
-              </option>
-            ))}
+            {filteredClassrooms?.map((room: any) => <option key={room.id} value={String(room.id)}>{room.name}</option>)}
           </select>
         </label>
       </section>
 
-      {/* Table Section */}
       <section className="overflow-hidden rounded-[24px] border border-border/70 bg-card shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full min-w-[750px] text-left border-collapse">
@@ -287,109 +289,93 @@ export function ReportCardsPage() {
                   </td>
                 </tr>
               ) : (
-                reportCards.map((student: any) => (
-                  <tr 
-                    key={student.student_id} 
-                    onClick={() => setSelectedStudentForModal(student)}
-                    className="cursor-pointer transition-colors hover:bg-muted/30 group"
-                  >
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-3">
-                        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary border border-primary/20 shadow-2xs">
-                          <CapIcon size={16} />
-                        </span>
-                        <div>
-                          <div className="text-[13px] font-bold text-foreground group-hover:text-primary transition-colors">
-                            {student.student_name}
-                          </div>
-                          <div className="text-[11px] text-muted-foreground font-medium">
-                            Active enrollment
+                reportCards.map((student: any) => {
+                  
+                  // 🌟 التحقق الشامل للحالة (يقبل 1, 0, true, false، أو النص "1") 🌟
+                  const isPub = student.is_published === true || 
+                                Number(student.is_published) === 1 || 
+                                String(student.is_published).toLowerCase() === "true";
+
+                  return (
+                    <tr 
+                      key={student.student_id} 
+                      onClick={() => setSelectedStudentForModal(student)}
+                      className="cursor-pointer transition-colors hover:bg-muted/30 group"
+                    >
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-3">
+                          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary border border-primary/20 shadow-2xs">
+                            <CapIcon size={16} />
+                          </span>
+                          <div>
+                            <div className="text-[13px] font-bold text-foreground group-hover:text-primary transition-colors">
+                              {student.student_name}
+                            </div>
+                            <div className="text-[11px] text-muted-foreground font-medium">
+                              Active enrollment
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    </td>
-                    
-                    <td className="px-6 py-4 text-[13px] font-semibold text-muted-foreground">
-                      {student.summary?.total_marks ?? student.total_marks ?? '0.00'}
-                    </td>
-                    
-                    <td className="px-6 py-4 text-[13px] font-bold text-foreground">
-                      {typeof student.gpa === 'number' 
-                        ? `${student.gpa.toFixed(1)}%` 
-                        : student.summary?.total_marks && student.summary?.max_total_marks
-                          ? `${((Number(student.summary.total_marks) / Number(student.summary.max_total_marks)) * 100).toFixed(1)}%`
-                          : '0.0%'}
-                    </td>
-                    
-                    <td className="px-6 py-4">
-                      {renderAcademicResult(student.summary?.final_result ?? student.academic_result)}
-                    </td>
+                      </td>
+                      
+                      <td className="px-6 py-4 text-[13px] font-semibold text-muted-foreground">
+                        {student.summary?.total_marks ?? student.total_marks ?? '0.00'}
+                      </td>
+                      
+                      <td className="px-6 py-4 text-[13px] font-bold text-foreground">
+                        {typeof student.gpa === 'number' 
+                          ? `${student.gpa.toFixed(1)}%` 
+                          : student.summary?.total_marks && student.summary?.max_total_marks
+                            ? `${((Number(student.summary.total_marks) / Number(student.summary.max_total_marks)) * 100).toFixed(1)}%`
+                            : '0.0%'}
+                      </td>
+                      
+                      <td className="px-6 py-4">
+                        {renderAcademicResult(student.summary?.final_result ?? student.academic_result)}
+                      </td>
 
-                    <td className="px-6 py-4">
-                      {renderFinancialStatus(student.financial_status ?? 'cleared')}
-                    </td>
+                      <td className="px-6 py-4">
+                        {renderFinancialStatus(student.financial_status ?? 'cleared')}
+                      </td>
 
-                    <td className="px-6 py-4">
-                      <span className={`inline-flex items-center gap-1.5 text-[12px] font-semibold ${
-                        student.is_published ? 'text-success' : 'text-muted-foreground'
-                      }`}>
-                        {student.is_published ? <CheckCircle2 size={14} /> : <XCircle size={14} />}
-                        {student.is_published ? 'Published' : 'Hidden'}
-                      </span>
-                    </td>
-                  </tr>
-                ))
+                      <td className="px-6 py-4">
+                        {/* 🌟 الزر الحيوي لحالة النشر 🌟 */}
+                        <span className={`inline-flex items-center gap-1.5 text-[12px] font-bold transition-colors ${
+                          isPub ? 'text-primary' : 'text-muted-foreground'
+                        }`}>
+                          {isPub ? <Eye size={15} /> : <EyeOff size={15} />}
+                          {isPub ? 'Published' : 'Hidden'}
+                        </span>
+                      </td>
+                    </tr>
+                  )
+                })
               )}
             </tbody>
           </table>
         </div>
 
-        {/* Pagination Bar */}
         <div className="flex items-center justify-between px-6 py-4 border-t border-border/70 bg-card text-[12.5px] text-muted-foreground">
           <div className="font-medium">
             Showing <span className="font-bold text-foreground">{from}-{to}</span> of <span className="font-bold text-foreground">{total}</span>
           </div>
-          
           <div className="flex items-center gap-2">
-            <button
-              onClick={() => setPage(p => Math.max(p - 1, 1))}
-              disabled={page === 1}
-              className="flex h-9 w-9 items-center justify-center rounded-full border border-border/80 bg-background hover:bg-muted/60 disabled:opacity-40 transition-colors shadow-2xs"
-            >
+            <button onClick={() => setPage(p => Math.max(p - 1, 1))} disabled={page === 1} className="flex h-9 w-9 items-center justify-center rounded-[10px] border border-border/80 bg-background hover:bg-muted/60 disabled:opacity-40 transition-colors shadow-2xs">
               <ChevronLeft size={16} />
             </button>
-
-            {/* تم تعديل لون الصفحة النشطة لتتوافق مع الـ Primary بدلاً من الوردي */}
-            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/90 text-primary-foreground font-bold shadow-xs text-[12px]">
+            <span className="flex h-9 w-9 items-center justify-center rounded-[10px] bg-primary text-primary-foreground font-bold shadow-xs text-[12px]">
               {page}
             </span>
-
-            <button
-              onClick={() => setPage(p => (p < lastPage ? p + 1 : p))}
-              disabled={page >= lastPage}
-              className="flex h-9 w-9 items-center justify-center rounded-full border border-border/80 bg-background hover:bg-muted/60 disabled:opacity-40 transition-colors shadow-2xs"
-            >
+            <button onClick={() => setPage(p => (p < lastPage ? p + 1 : p))} disabled={page >= lastPage} className="flex h-9 w-9 items-center justify-center rounded-[10px] border border-border/80 bg-background hover:bg-muted/60 disabled:opacity-40 transition-colors shadow-2xs">
               <ChevronRight size={16} />
             </button>
           </div>
         </div>
       </section>
 
-      {isPromoteModalOpen && (
-        <PromoteStudentsDialog onClose={() => setIsPromoteModalOpen(false)} />
-      )}
-
-      <TopStudentsModal 
-        reportCards={Array.isArray(reportCards) ? reportCards : []} 
-        isOpen={isTopModalOpen} 
-        onClose={() => setIsTopModalOpen(false)} 
-      />
-
-      <StudentReportCardModal 
-        student={selectedStudentForModal}
-        isOpen={!!selectedStudentForModal}
-        onClose={() => setSelectedStudentForModal(null)}
-      />
+      {isPromoteModalOpen && <PromoteStudentsDialog onClose={() => setIsPromoteModalOpen(false)} />}
+      <TopStudentsModal reportCards={Array.isArray(reportCards) ? reportCards : []} isOpen={isTopModalOpen} onClose={() => setIsTopModalOpen(false)} />
+      <StudentReportCardModal student={selectedStudentForModal} isOpen={!!selectedStudentForModal} onClose={() => setSelectedStudentForModal(null)} />
     </div>
   );
 }

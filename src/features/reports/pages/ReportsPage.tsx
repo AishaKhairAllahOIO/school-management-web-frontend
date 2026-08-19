@@ -123,19 +123,20 @@ export function ReportsPage() {
             ))}
           </div>
 
-          <label className="relative min-w-0 xl:w-[300px]">
-            <Search
-              aria-hidden="true"
-              size={15}
-              className="absolute start-3 top-1/2 -translate-y-1/2 text-muted-foreground"
-            />
-            <input
-              value={searchValue}
-              onChange={(event) => setSearchValue(event.target.value)}
-              placeholder="Search reports"
-              className="h-10 w-full rounded-[12px] border border-border/60 bg-background/55 ps-9 pe-3 text-[11.5px] text-foreground outline-none transition placeholder:text-muted-foreground focus:border-primary/25 focus:ring-4 focus:ring-primary/8"
-            />
-          </label>
+
+        <label className="relative min-w-0 w-full xl:w-[300px]">
+                  <Search
+            aria-hidden="true"
+            size={15}
+            className="absolute start-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+          />
+          <input
+            value={searchValue}
+            onChange={(event) => setSearchValue(event.target.value)}
+            placeholder="Search reports..."
+            className="h-10 w-full rounded-[12px] border border-border/60 bg-background ps-9 pe-3 text-[12px] text-foreground outline-none transition placeholder:text-muted-foreground focus:border-primary/50 focus:ring-4 focus:ring-primary/10"
+          />
+        </label>
         </div>
       </section>
 
@@ -147,7 +148,7 @@ export function ReportsPage() {
         <StaffAttendanceDetails report={data.staffAttendance} />
       )}
 
-      {/* 🌟 تفعيل قسم المالية اللي كان الباك إند عم يبعته ونحنا مو عارضينه 🌟 */}
+
       {selectedCategory === "Finance" && (
         <div className="grid gap-4 md:grid-cols-2">
           <FinanceReportDetails type="student" report={data.studentFinance} />

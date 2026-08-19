@@ -16,7 +16,7 @@ import {
   SelectValue,
 } from "@/shared/ui/select";
 import { Edit } from "lucide-react";
-import type { StaffAttendanceStatus , AbsenceType } from "../types/staffAttendance.types";
+import type { StaffAttendanceStatus, AbsenceType } from "../types/staffAttendance.types";
 import { useUpdateStaffAttendance } from "../hooks/useStaffAttendance";
 import { useState } from "react";
 
@@ -27,11 +27,11 @@ interface AttendanceItem {
   [key: string]: any;
 }
 
-interface Props {
+interface EditProps {
   attendance: AttendanceItem;
 }
 
-export const EditStaffAttendanceDialog = ({ attendance }: Props) => {
+export const EditStaffAttendanceDialog = ({ attendance }: EditProps) => {
   const [open, setOpen] = useState(false);
   const updateMutation = useUpdateStaffAttendance();
 
@@ -62,42 +62,43 @@ export const EditStaffAttendanceDialog = ({ attendance }: Props) => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button size="icon" variant="outline">
-          <Edit size={16} />
+        <Button size="icon" variant="outline" className="h-8 w-8 rounded-[10px] border-border/60 text-primary hover:bg-primary/10">
+          <Edit size={15} />
         </Button>
       </DialogTrigger>
 
-      <DialogContent>
+      <DialogContent className="sm:max-w-md rounded-[24px] bg-card text-card-foreground border-border p-6 shadow-xl">
         <DialogHeader>
-          <DialogTitle>Edit Attendance</DialogTitle>
+          <DialogTitle className="text-[18px] font-extrabold text-foreground">Edit Attendance</DialogTitle>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <div>
-            <Label>Status</Label>
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 mt-2">
+          <div className="space-y-1.5">
+            <Label className="text-[12.5px] font-semibold text-foreground">Status</Label>
             <Select
               value={watch("status")}
               onValueChange={(value) => setValue("status", value as StaffAttendanceStatus)}
             >
-              <SelectTrigger>
+              <SelectTrigger className="h-11 rounded-[12px] border-border bg-background text-foreground">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="present">Present</SelectItem>
                 <SelectItem value="absent">Absent</SelectItem>
                 <SelectItem value="partial_absence">Partial Absence</SelectItem>
+                <SelectItem value="on_leave">On Leave</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           {(status === "absent" || status === "partial_absence") && (
-            <div>
-              <Label>Absence Type</Label>
+            <div className="space-y-1.5">
+              <Label className="text-[12.5px] font-semibold text-foreground">Absence Type</Label>
               <Select
                 value={watch("absence_type")}
                 onValueChange={(value) => setValue("absence_type", value as AbsenceType)}
               >
-                <SelectTrigger>
+                <SelectTrigger className="h-11 rounded-[12px] border-border bg-background text-foreground">
                   <SelectValue placeholder="Select type" />
                 </SelectTrigger>
                 <SelectContent>
@@ -108,7 +109,7 @@ export const EditStaffAttendanceDialog = ({ attendance }: Props) => {
             </div>
           )}
 
-          <Button type="submit" className="w-full" disabled={updateMutation.isPending}>
+          <Button type="submit" className="w-full h-11 rounded-[14px] bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-[13.5px] mt-4" disabled={updateMutation.isPending}>
             {updateMutation.isPending ? "Saving..." : "Save Changes"}
           </Button>
         </form>

@@ -17,7 +17,7 @@ type Props = {
   className: string;
 };
 
-const inlineControlClass = "h-9 rounded-[12px] border-border/60 bg-background/80 text-[12px] shadow-none outline-none focus:ring-1 focus:ring-violet-500/30 transition-all";
+const inlineControlClass = "h-9 rounded-[12px] border-border/60 bg-background/80 text-[12px] text-foreground shadow-none outline-none focus:ring-1 focus:ring-primary/30 transition-all";
 
 export function AttendanceTable({ data, isLoading = false, onUpdate, pagination, currentPage, onPageChange, gradeName, className }: Props) {
   const [selectedStudent, setSelectedStudent] = useState<StudentAttendance | null>(null);
@@ -68,45 +68,43 @@ export function AttendanceTable({ data, isLoading = false, onUpdate, pagination,
                             {student.photo_url ? (
                               <img src={student.photo_url} alt={student.full_name} className="h-10 w-10 rounded-[14px] object-cover shadow-sm" />
                             ) : (
-                              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px] bg-violet-600/10 text-[13.5px] font-bold text-violet-700 border border-violet-600/20">{student.full_name.charAt(0)}</span>
+                              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px] bg-primary/10 text-[13.5px] font-bold text-primary border border-primary/25">{student.full_name.charAt(0)}</span>
                             )}
                             <div className="min-w-0">
-                              <p className="truncate font-bold text-slate-800 dark:text-slate-200 group-hover:text-violet-600 transition-colors">{student.full_name}</p>
-                              {/* 🌟 تم إزالة الـ ID من هنا بناءً على طلبك 🌟 */}
+                              <p className="truncate font-bold text-foreground group-hover:text-primary transition-colors">{student.full_name}</p>
                             </div>
                           </div>
                         </td>
                         <td className="px-6 py-4">
                           <Select value={currentStatus} onValueChange={(value) => onUpdate(student, { status: value as AttendanceStatus, absence_type: value === "present" ? null : currentAbsenceType })}>
-                            <SelectTrigger className={`${inlineControlClass} ${currentStatus === 'present' ? 'text-emerald-600 font-semibold' : 'text-rose-600 font-semibold'}`}>
+                            <SelectTrigger className={`${inlineControlClass} ${currentStatus === 'present' ? 'text-success font-semibold' : 'text-destructive font-semibold'}`}>
                               <SelectValue placeholder="Mark attendance" />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="present" className="font-medium text-emerald-600 focus:text-emerald-700">Present</SelectItem>
-                              <SelectItem value="absent" className="font-medium text-rose-600 focus:text-rose-700">Absent</SelectItem>
+                              <SelectItem value="present" className="font-medium text-success focus:text-success">Present</SelectItem>
+                              <SelectItem value="absent" className="font-medium text-destructive focus:text-destructive">Absent</SelectItem>
                             </SelectContent>
                           </Select>
                         </td>
                         <td className="px-6 py-4">
                           {currentStatus === "absent" ? (
                             <Select value={currentAbsenceType} onValueChange={(value) => onUpdate(student, { status: currentStatus as AttendanceStatus, absence_type: value as AbsenceType })}>
-                              <SelectTrigger className={`${inlineControlClass} font-medium ${currentAbsenceType === 'excused' ? 'text-sky-600' : 'text-amber-600'}`}>
+                              <SelectTrigger className={`${inlineControlClass} font-medium ${currentAbsenceType === 'excused' ? 'text-info' : 'text-warning'}`}>
                                 <SelectValue placeholder="Absence type" />
                               </SelectTrigger>
                               <SelectContent>
-                                <SelectItem value="excused" className="font-medium text-sky-600 focus:text-sky-700">Excused</SelectItem>
-                                <SelectItem value="unexcused" className="font-medium text-amber-600 focus:text-amber-700">Unexcused</SelectItem>
+                                <SelectItem value="excused" className="font-medium text-info focus:text-info">Excused</SelectItem>
+                                <SelectItem value="unexcused" className="font-medium text-warning focus:text-warning">Unexcused</SelectItem>
                               </SelectContent>
                             </Select>
                           ) : <span className="text-muted-foreground font-medium">—</span>}
                         </td>
                         <td className="px-6 py-4">
-                          {/* 🌟 إضافة زرين: الأول للتفاصيل (المودال) والثاني لصفحة الـ History 🌟 */}
                           <div className="flex items-center justify-center gap-1.5">
-                            <Button type="button" variant="outline" size="icon" onClick={() => setSelectedStudent(student)} className="h-9 w-9 rounded-[12px] border-violet-200 text-violet-600 hover:bg-violet-50 transition-colors" title="Quick Summary">
+                            <Button type="button" variant="outline" size="icon" onClick={() => setSelectedStudent(student)} className="h-9 w-9 rounded-[12px] border-border/60 text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors" title="Quick Summary">
                               <Eye className="h-4 w-4" />
                             </Button>
-                            <Button asChild variant="outline" size="icon" className="h-9 w-9 rounded-[12px] border-slate-200 text-slate-500 hover:text-foreground hover:bg-slate-100 transition-colors" title="View Full History">
+                            <Button asChild variant="outline" size="icon" className="h-9 w-9 rounded-[12px] border-border/60 text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors" title="View Full History">
                               <Link to={`/attendance/students/${student.enrollment_id}`}>
                                 <Clock className="h-4 w-4" />
                               </Link>
@@ -141,10 +139,10 @@ export function AttendanceTable({ data, isLoading = false, onUpdate, pagination,
       </div>
 
       <Dialog open={!!selectedStudent} onOpenChange={(open) => !open && setSelectedStudent(null)}>
-        <DialogContent className="sm:max-w-[425px] rounded-[24px]">
+        <DialogContent className="sm:max-w-[425px] rounded-[24px] bg-card text-card-foreground border-border">
           <DialogHeader>
-            <DialogTitle className="text-[18px] font-bold">Student Details</DialogTitle>
-            <DialogDescription className="text-[13px]">Current absence summary and remaining balances.</DialogDescription>
+            <DialogTitle className="text-[18px] font-bold text-foreground">Student Details</DialogTitle>
+            <DialogDescription className="text-[13px] text-muted-foreground">Current absence summary and remaining balances.</DialogDescription>
           </DialogHeader>
           {selectedStudent && (
             <div className="mt-4 flex flex-col gap-5">
@@ -153,36 +151,35 @@ export function AttendanceTable({ data, isLoading = false, onUpdate, pagination,
                   {selectedStudent.photo_url ? (
                     <img src={selectedStudent.photo_url} alt={selectedStudent.full_name} className="h-14 w-14 rounded-[16px] object-cover shadow-sm" />
                   ) : (
-                    <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[16px] bg-violet-600/10 text-[18px] font-bold text-violet-700 border border-violet-600/20">{selectedStudent.full_name.charAt(0)}</span>
+                    <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[16px] bg-primary/10 text-[18px] font-bold text-primary border border-primary/25">{selectedStudent.full_name.charAt(0)}</span>
                   )}
                   <div>
                     <h4 className="font-bold text-foreground text-[15px]">{selectedStudent.full_name}</h4>
-                    {/* يمكنك إخفاء الـ ID من هنا أيضاً إذا رغبت، أو تركه لأنه داخل التفاصيل */}
                     <p className="text-[12px] text-muted-foreground font-medium mt-0.5">Enrollment ID: {selectedStudent.enrollment_id}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2 mt-2 bg-background/60 rounded-[12px] p-2.5 border border-border/40">
-                  <GraduationCap className="h-4 w-4 text-violet-600" />
+                  <GraduationCap className="h-4 w-4 text-primary" />
                   <span className="text-[12px] font-semibold text-foreground">{gradeName}</span>
                   <span className="text-muted-foreground mx-1 text-[10px]">/</span>
                   <span className="text-[12px] font-semibold text-muted-foreground">{className}</span>
                 </div>
               </div>
               <div className="grid grid-cols-3 gap-3">
-                <div className="flex flex-col items-center justify-center rounded-[16px] border border-success/15 bg-success/[0.08] p-3 text-center">
+                <div className="flex flex-col items-center justify-center rounded-[16px] border border-success/20 bg-success/[0.08] p-3 text-center">
                   <CheckCircle2 className="h-5 w-5 text-success mb-1.5" />
                   <span className="text-[20px] font-bold text-success leading-none">{selectedStudent.allowed_absence_days}</span>
                   <span className="text-[10.5px] font-semibold text-success mt-1">Allowed</span>
                 </div>
-                <div className="flex flex-col items-center justify-center rounded-[16px] border border-destructive/15 bg-destructive/[0.08] p-3 text-center">
+                <div className="flex flex-col items-center justify-center rounded-[16px] border border-destructive/20 bg-destructive/[0.08] p-3 text-center">
                   <ShieldAlert className="h-5 w-5 text-destructive mb-1.5" />
                   <span className="text-[20px] font-bold text-destructive leading-none">{selectedStudent.total_unexcused_absent}</span>
                   <span className="text-[10.5px] font-semibold text-destructive mt-1">Unexcused</span>
                 </div>
-                <div className="flex flex-col items-center justify-center rounded-[16px] border border-violet-200 bg-violet-50 p-3 text-center">
-                  <Info className="h-5 w-5 text-violet-600 mb-1.5" />
-                  <span className="text-[20px] font-bold text-violet-700 leading-none">{selectedStudent.remaining_absence_days}</span>
-                  <span className="text-[10.5px] font-semibold text-violet-700 mt-1">Remaining</span>
+                <div className="flex flex-col items-center justify-center rounded-[16px] border border-primary/20 bg-primary/[0.08] p-3 text-center">
+                  <Info className="h-5 w-5 text-primary mb-1.5" />
+                  <span className="text-[20px] font-bold text-primary leading-none">{selectedStudent.remaining_absence_days}</span>
+                  <span className="text-[10.5px] font-semibold text-primary mt-1">Remaining</span>
                 </div>
               </div>
             </div>

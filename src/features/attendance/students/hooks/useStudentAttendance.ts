@@ -68,7 +68,7 @@ export const useCreateAttendance = () => {
   });
 };
 
-// 🌟 هوك الحفظ بالجملة (Bulk)
+
 export const useBulkAttendance = () => {
   const queryClient = useQueryClient();
 
