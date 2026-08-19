@@ -6,6 +6,7 @@ import { Button } from "@/shared/ui/button";
 import { FeePlansTable } from "../fee-plans/FeePlansTable";
 import { CreateFeePlanDialog } from "../fee-plans/CreateFeePlanDialog";
 import { EditFeePlanDialog } from "../fee-plans/EditFeePlanDialog";
+import { ViewFeePlanDialog } from "../../components/fee-plans/ViewFeePlanDialog"; // ← جديد
 import { ConfirmationDialog } from "@/shared/ui/confirmation-dialog";
 import { FeePlansSkeleton } from "../fee-plans/FeePlansSkeleton";
 import { FinancialSectionHeader } from "../shared/FinancialSectionHeader";
@@ -41,6 +42,7 @@ export function FeePlansSection({ academicYears, gradeLevels }: Props) {
 
   const [createOpen, setCreateOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
+  const [viewOpen, setViewOpen] = useState(false); // ← جديد
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<FeePlan | null>(null);
 
@@ -78,15 +80,9 @@ export function FeePlansSection({ academicYears, gradeLevels }: Props) {
     });
   }
 
-  // ← أضف دالة handleView
   function handleView(plan: FeePlan) {
-    // يمكنك هنا فتح صفحة التفاصيل أو عرض الـ plan في dialog
-    // مثال: navigate(`/settings/financial/fee-plans/${plan.id}`)
-    console.log("View fee plan:", plan);
-    // يمكنك أيضاً فتح dialog لعرض التفاصيل
     setSelectedPlan(plan);
-    // أو فتح صفحة جديدة
-    // navigate(`/financial/fee-plans/${plan.id}`);
+    setViewOpen(true);
   }
 
   if (isLoading) {
@@ -138,7 +134,7 @@ export function FeePlansSection({ academicYears, gradeLevels }: Props) {
 
         <FeePlansTable
           feePlans={feePlans}
-          onView={handleView}  // ← أضف هذا
+          onView={handleView}
           onEdit={(plan) => {
             setSelectedPlan(plan);
             setEditOpen(true);
@@ -181,6 +177,15 @@ export function FeePlansSection({ academicYears, gradeLevels }: Props) {
           onSubmit={handleEdit}
         />
       ) : null}
+
+      <ViewFeePlanDialog
+        open={viewOpen}
+        onOpenChange={(open) => {
+          setViewOpen(open);
+          if (!open) setSelectedPlan(null);
+        }}
+        plan={selectedPlan}
+      />
 
       <ConfirmationDialog
         open={deleteOpen}
