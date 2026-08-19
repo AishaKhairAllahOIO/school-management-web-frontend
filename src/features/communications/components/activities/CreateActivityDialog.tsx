@@ -1,5 +1,4 @@
 import {
-  CalendarDays,
   Clock3,
   Sparkles,
 } from "lucide-react";
@@ -16,7 +15,7 @@ import {
 import {
   Button,
 } from "@/shared/ui/button";
-import { DatePicker } from "@/shared/ui/date-picker";
+import { DatePicker } from "./date-picker";
 import {
   Select,
   SelectContent,
@@ -24,7 +23,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/shared/ui/select";
-import { TimePicker } from "@/shared/ui/time-picker";
+import { TimePicker } from "./time-picker";
 import {
   Dialog,
   DialogContent,
@@ -63,7 +62,7 @@ type Props = {
 };
 
 const inputClassName =
-  "h-11 w-full rounded-[13px] border border-input bg-background px-3 text-[12px] outline-none transition focus:border-info/35 focus:ring-4 focus:ring-info/[0.07]";
+  "h-11 w-full rounded-[13px] border border-input bg-background px-3 text-[12px] outline-none transition hover:border-info/35 focus:border-info/35 focus:ring-4 focus:ring-info/[0.07]";
 
 export function CreateActivityDialog({
   open,
@@ -101,23 +100,16 @@ export function CreateActivityDialog({
   const editSource =
     detailsQuery.data ?? activityToEdit;
 
-  const [activityName, setActivityName] =
-    useState("");
+  // الحفاظ على الحالة نقية كـ Strings بفضل المكونات الجديدة
+  const [activityName, setActivityName] = useState("");
   const [type, setType] = useState("");
-  const [activityDate, setActivityDate] =
-    useState("");
-  const [startTime, setStartTime] =
-    useState("");
-  const [endTime, setEndTime] =
-    useState("");
-  const [gradeLevelId, setGradeLevelId] =
-    useState<string | number>("");
-  const [selectedClassRoomIds, setSelectedClassRoomIds] =
-    useState<(string | number)[]>([]);
-  const [description, setDescription] =
-    useState("");
-  const [formError, setFormError] =
-    useState<string | null>(null);
+  const [activityDate, setActivityDate] = useState("");
+  const [startTime, setStartTime] = useState("");
+  const [endTime, setEndTime] = useState("");
+  const [gradeLevelId, setGradeLevelId] = useState<string | number>("");
+  const [selectedClassRoomIds, setSelectedClassRoomIds] = useState<(string | number)[]>([]);
+  const [description, setDescription] = useState("");
+  const [formError, setFormError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!open) {
@@ -134,28 +126,25 @@ export function CreateActivityDialog({
     }
 
     if (editSource) {
-      setActivityName(
-        editSource.activity_name ?? "",
-      );
-      setType(editSource.type ?? "");
-      setActivityDate(
-        editSource.activity_date ?? "",
-      );
-      setStartTime(
-        (editSource.start_time ?? "").slice(0, 5),
-      );
-      setEndTime(
-        (editSource.end_time ?? "").slice(0, 5),
-      );
-      setGradeLevelId(
-        editSource.grade_level_id ?? "",
-      );
-      setSelectedClassRoomIds(
-        editSource.class_room_ids ?? [],
-      );
-      setDescription(
-        editSource.description ?? "",
-      );
+      const source = editSource as any;
+
+      setActivityName(source.activity_name ?? source.name ?? "");
+      setType(source.type ?? "");
+      
+      setActivityDate(source.activity_date ?? source.date ?? "");
+      setStartTime((source.start_time ?? "").slice(0, 5));
+      setEndTime((source.end_time ?? "").slice(0, 5));
+      
+      const resolvedGradeId = source.grade_level_id ?? source.grade_id ?? source.grade?.id ?? "";
+      setGradeLevelId(resolvedGradeId);
+
+      const rawRooms = source.class_room_ids ?? source.classroom_ids ?? source.classrooms ?? [];
+      const resolvedRoomIds = Array.isArray(rawRooms)
+        ? rawRooms.map((item: any) => (typeof item === "object" && item !== null ? item.id : item))
+        : [];
+      setSelectedClassRoomIds(resolvedRoomIds);
+
+      setDescription(source.description ?? source.notes ?? "");
       setFormError(null);
     }
   }, [editSource, open]);
@@ -183,16 +172,12 @@ export function CreateActivityDialog({
       !endTime ||
       !gradeLevelId
     ) {
-      setFormError(
-        "Complete all required activity fields before saving.",
-      );
+      setFormError("Complete all required activity fields before saving.");
       return;
     }
 
     if (endTime <= startTime) {
-      setFormError(
-        "End time must be later than start time.",
-      );
+      setFormError("End time must be later than start time.");
       return;
     }
 
@@ -207,8 +192,7 @@ export function CreateActivityDialog({
     };
 
     if (selectedClassRoomIds.length) {
-      payload.class_room_ids =
-        selectedClassRoomIds.map(Number);
+      payload.class_room_ids = selectedClassRoomIds.map(Number);
     }
 
     const options = {
@@ -236,8 +220,7 @@ export function CreateActivityDialog({
     createActivity.mutate(payload, options);
   }
 
-  const isLoadingEdit =
-    isEditing && detailsQuery.isLoading;
+  const isLoadingEdit = isEditing && detailsQuery.isLoading;
 
   return (
     <Dialog
@@ -248,8 +231,8 @@ export function CreateActivityDialog({
         }
       }}
     >
-      <DialogContent className="max-h-[92dvh] overflow-hidden rounded-[24px] border border-border/70 bg-card p-0 shadow-[0_28px_90px_rgba(27,19,66,0.20)] sm:max-w-3xl">
-        <div className="border-b border-border/50 bg-info/[0.025] px-5 py-5 sm:px-6">
+      <DialogContent className="flex max-h-[92dvh] flex-col overflow-hidden rounded-[24px] border border-border/70 bg-card p-0 shadow-[0_28px_90px_rgba(27,19,66,0.20)] sm:max-w-3xl">
+        <div className="border-b border-border/50 bg-info/[0.025] px-5 py-5 sm:px-6 shrink-0">
           <DialogHeader className="text-start">
             <div className="flex items-start gap-3.5">
               <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[15px] border border-info/10 bg-info/[0.09] text-info">
@@ -258,9 +241,7 @@ export function CreateActivityDialog({
 
               <div className="min-w-0">
                 <DialogTitle className="text-[18px] font-semibold tracking-[-0.02em] text-foreground">
-                  {isEditing
-                    ? "Edit school activity"
-                    : "Create school activity"}
+                  {isEditing ? "Edit school activity" : "Create school activity"}
                 </DialogTitle>
                 <DialogDescription className="mt-1 text-[12.5px] leading-5 text-muted-foreground">
                   Define the event, schedule, grade, and participating classrooms in one focused form.
@@ -270,35 +251,24 @@ export function CreateActivityDialog({
           </DialogHeader>
         </div>
 
-        <div className="max-h-[calc(92dvh-96px)] overflow-y-auto px-5 py-5 sm:px-6">
+        <div className="flex-1 overflow-y-auto px-5 py-5 sm:px-6">
           {isLoadingEdit ? (
             <DialogFormSkeleton rows={5} />
           ) : detailsQuery.isError ? (
             <div className="rounded-[16px] border border-destructive/20 bg-destructive/[0.035] p-5">
-              <p className="text-[13px] font-medium text-foreground">
-                Activity details could not be loaded.
-              </p>
-              <p className="mt-1 text-[11.5px] leading-5 text-muted-foreground">
-                Retry the request before editing this activity.
-              </p>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => void detailsQuery.refetch()}
-                className="mt-4 h-10 rounded-[12px] border-border/70 bg-transparent px-4 text-[12px]"
-              >
+              <p className="text-[13px] font-medium text-foreground">Activity details could not be loaded.</p>
+              <p className="mt-1 text-[11.5px] leading-5 text-muted-foreground">Retry the request before editing this activity.</p>
+              <Button type="button" variant="outline" onClick={() => void detailsQuery.refetch()} className="mt-4 h-10 rounded-[12px] border-border/70 bg-transparent px-4 text-[12px]">
                 Try again
               </Button>
             </div>
           ) : (
-            <form onSubmit={submit} noValidate className="space-y-5">
+            <form id="activity-form" onSubmit={submit} noValidate className="space-y-5">
               <div className="grid gap-4 sm:grid-cols-2">
                 <Field label="Activity name">
                   <input
                     value={activityName}
-                    onChange={(event) =>
-                      setActivityName(event.target.value)
-                    }
+                    onChange={(event) => setActivityName(event.target.value)}
                     placeholder="Science fair"
                     className={inputClassName}
                   />
@@ -307,9 +277,7 @@ export function CreateActivityDialog({
                 <Field label="Activity type">
                   <input
                     value={type}
-                    onChange={(event) =>
-                      setType(event.target.value)
-                    }
+                    onChange={(event) => setType(event.target.value)}
                     placeholder="Academic, sports, cultural..."
                     className={inputClassName}
                   />
@@ -322,23 +290,16 @@ export function CreateActivityDialog({
                   value={activityDate}
                   onChange={setActivityDate}
                   required
-                  icon={<CalendarDays className="h-3.5 w-3.5" />}
                 />
 
-                <Field
-                  label="Start time"
-                  icon={<Clock3 className="h-3.5 w-3.5" />}
-                >
+                <Field label="Start time" icon={<Clock3 className="h-3.5 w-3.5" />}>
                   <TimePicker
                     value={startTime}
                     onChange={setStartTime}
                   />
                 </Field>
 
-                <Field
-                  label="End time"
-                  icon={<Clock3 className="h-3.5 w-3.5" />}
-                >
+                <Field label="End time" icon={<Clock3 className="h-3.5 w-3.5" />}>
                   <TimePicker
                     value={endTime}
                     onChange={setEndTime}
@@ -348,21 +309,13 @@ export function CreateActivityDialog({
 
               <div className="space-y-4 rounded-[18px] border border-info/[0.12] bg-info/[0.025] p-4">
                 <Field label="Grade">
-                  <Select
-                    value={String(gradeLevelId || "")}
-                    onValueChange={(value) => {
-                      setGradeLevelId(value);
-                      setSelectedClassRoomIds([]);
-                    }}
-                  >
+                  <Select value={String(gradeLevelId || "")} onValueChange={(value) => { setGradeLevelId(value); setSelectedClassRoomIds([]); }}>
                     <SelectTrigger className="h-11 rounded-[13px] border-border/70 bg-background text-[12px] shadow-none">
                       <SelectValue placeholder="Select grade" />
                     </SelectTrigger>
                     <SelectContent>
                       {gradeLevels.map((grade) => (
-                        <SelectItem key={grade.id} value={String(grade.id)}>
-                          {grade.name}
-                        </SelectItem>
+                        <SelectItem key={grade.id} value={String(grade.id)}>{grade.name}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
@@ -381,11 +334,9 @@ export function CreateActivityDialog({
               <Field label="Activity notes">
                 <textarea
                   value={description}
-                  onChange={(event) =>
-                    setDescription(event.target.value)
-                  }
+                  onChange={(event) => setDescription(event.target.value)}
                   placeholder="Add location, instructions, or preparation notes."
-                  className="min-h-[120px] w-full resize-none rounded-[14px] border border-input bg-background p-3 text-[12px] leading-5 outline-none transition focus:border-info/35 focus:ring-4 focus:ring-info/[0.07]"
+                  className="min-h-[120px] w-full resize-none rounded-[14px] border border-input bg-background p-3 text-[12px] leading-5 outline-none transition hover:border-info/35 focus:border-info/35 focus:ring-4 focus:ring-info/[0.07]"
                 />
               </Field>
 
@@ -394,52 +345,30 @@ export function CreateActivityDialog({
                   {formError}
                 </p>
               ) : null}
-
-              <div className="sticky bottom-0 z-10 -mx-5 flex flex-col-reverse gap-2 border-t border-border/50 bg-card/95 px-5 pb-1 pt-4 backdrop-blur sm:-mx-6 sm:flex-row sm:justify-end sm:px-6">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => onOpenChange(false)}
-                  disabled={isPending}
-                  className="h-10 rounded-[12px] border-border/70 bg-transparent px-4 text-[12px]"
-                >
-                  Cancel
-                </Button>
-
-                <Button
-                  type="submit"
-                  disabled={isPending}
-                  className="h-10 rounded-[12px] bg-info px-5 text-[12px] font-semibold text-white shadow-[0_10px_24px_rgba(59,130,246,0.17)] hover:bg-info/90"
-                >
-                  {isPending ? (
-                    <span className="h-3 w-24 animate-pulse rounded-full bg-primary-foreground/60" />
-                  ) : isEditing ? (
-                    "Save changes"
-                  ) : (
-                    "Create activity"
-                  )}
-                </Button>
-              </div>
             </form>
           )}
         </div>
+
+        {!isLoadingEdit && !detailsQuery.isError && (
+          <div className="flex flex-col-reverse gap-2 border-t border-border/50 bg-card px-5 py-4 shrink-0 sm:flex-row sm:justify-end sm:px-6">
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={isPending} className="h-10 rounded-[12px] border-border/70 bg-transparent px-4 text-[12px]">
+              Cancel
+            </Button>
+
+            <Button type="submit" form="activity-form" disabled={isPending} className="h-10 rounded-[12px] bg-info px-5 text-[12px] font-semibold text-white shadow-[0_4px_14px_rgba(59,130,246,0.25)] hover:bg-info/90 transition">
+              {isPending ? <span className="h-3 w-24 animate-pulse rounded-full bg-primary-foreground/60" /> : isEditing ? "Save changes" : "Create activity"}
+            </Button>
+          </div>
+        )}
       </DialogContent>
     </Dialog>
   );
 }
 
-function Field({
-  label,
-  icon,
-  children,
-}: {
-  label: string;
-  icon?: ReactNode;
-  children: ReactNode;
-}) {
+function Field({ label, icon, children }: { label: string; icon?: ReactNode; children: ReactNode; }) {
   return (
     <div className="space-y-1.5">
-      <label className="flex items-center gap-1.5 text-[11px] font-medium text-foreground">
+      <label className="flex items-center gap-1.5 text-[11.5px] font-medium text-foreground">
         {icon}
         {label}
       </label>
