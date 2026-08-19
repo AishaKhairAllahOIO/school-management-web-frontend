@@ -3,6 +3,7 @@ import { ConfirmationDialog } from "@/shared/ui/confirmation-dialog";
 import { InstallmentPoliciesTable } from "../installment-policies/InstallmentPoliciesTable";
 import { CreateInstallmentPolicyDialog } from "../installment-policies/CreateInstallmentPolicyDialog";
 import { EditInstallmentPolicyDialog } from "../installment-policies/EditInstallmentPolicyDialog";
+import { ViewInstallmentPolicyDialog } from "../installment-policies/ViewInstallmentPolicyDialog"; // ← جديد
 import { InstallmentPoliciesSkeleton } from "../installment-policies/InstallmentPoliciesSkeleton";
 import { FinancialSectionHeader } from "../shared/FinancialSectionHeader";
 import { useInstallmentPolicies } from "../../hooks/useInstallmentPolicies";
@@ -24,6 +25,7 @@ export function InstallmentPoliciesSection() {
 
   const [createOpen, setCreateOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
+  const [viewOpen, setViewOpen] = useState(false); // ← جديد
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [selectedPolicy, setSelectedPolicy] =
     useState<InstallmentPolicy | null>(null);
@@ -62,11 +64,9 @@ export function InstallmentPoliciesSection() {
     });
   }
 
-  // ← أضف دالة handleView
   function handleView(policy: InstallmentPolicy) {
-    // يمكنك هنا فتح صفحة التفاصيل أو عرض الـ policy في dialog
-    console.log("View installment policy:", policy);
-    // مثال: navigate(`/settings/financial/installment-policies/${policy.id}`)
+    setSelectedPolicy(policy);
+    setViewOpen(true);
   }
 
   if (isLoading) {
@@ -85,7 +85,7 @@ export function InstallmentPoliciesSection() {
 
         <InstallmentPoliciesTable
           policies={policies}
-          onView={handleView}  // ← أضف هذا
+          onView={handleView}
           onEdit={(policy) => {
             setSelectedPolicy(policy);
             setEditOpen(true);
@@ -119,6 +119,15 @@ export function InstallmentPoliciesSection() {
           onSubmit={handleEdit}
         />
       ) : null}
+
+      <ViewInstallmentPolicyDialog
+        open={viewOpen}
+        onOpenChange={(open) => {
+          setViewOpen(open);
+          if (!open) setSelectedPolicy(null);
+        }}
+        policy={selectedPolicy}
+      />
 
       <ConfirmationDialog
         open={deleteOpen}
