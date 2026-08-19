@@ -1,12 +1,8 @@
-import { AuthenticatedUserImage } from "../../../shared/components/AuthenticatedUserImage";
+import { UserAvatar } from "../../../shared/components/UserAvatar";
 
-import type {
-  ReactNode,
-} from "react";
+import type { ReactNode } from "react";
 
-import type {
-  LucideIcon,
-} from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 
 import {
   ArrowLeft,
@@ -18,10 +14,7 @@ import {
   UserPlus,
 } from "lucide-react";
 
-type StaffPageHeroMode =
-  | "view"
-  | "edit"
-  | "create";
+type StaffPageHeroMode = "view" | "edit" | "create";
 
 type StaffPageHeroColor = {
   background: string;
@@ -49,9 +42,7 @@ type StaffPageHeroProps = {
 
   staffId?: string | number;
 
-  accountStatus?:
-    | "active"
-    | "disabled";
+  accountStatus?: "active" | "disabled";
 
   roleLabel?: string;
 
@@ -78,26 +69,18 @@ const defaultColor: StaffPageHeroColor = {
   light: "bg-primary/[0.08]",
   text: "text-primary",
   border: "border-primary/20",
-  hover:
-    "hover:border-primary/30 hover:bg-primary/[0.07] hover:text-primary",
-  ring:
-    "focus-visible:ring-primary/15",
-  button:
-    "bg-primary text-primary-foreground hover:bg-primary/90",
-  footer:
-    "bg-primary/[0.035] hover:bg-primary/[0.07]",
+  hover: "hover:border-primary/30 hover:bg-primary/[0.07] hover:text-primary",
+  ring: "focus-visible:ring-primary/15",
+  button: "bg-primary text-primary-foreground hover:bg-primary/90",
+  footer: "bg-primary/[0.035] hover:bg-primary/[0.07]",
 };
 
-function getInitials(
-  value: string,
-): string {
+function getInitials(value: string): string {
   return value
     .split(/\s+/)
     .filter(Boolean)
     .slice(0, 2)
-    .map((part) =>
-      part.charAt(0),
-    )
+    .map((part) => part.charAt(0))
     .join("")
     .toUpperCase();
 }
@@ -125,20 +108,15 @@ export function StaffPageHero({
   onCancel,
   children,
 }: StaffPageHeroProps) {
-  const isView =
-    mode === "view";
+  const isView = mode === "view";
 
-  const isCreate =
-    mode === "create";
+  const isCreate = mode === "create";
 
-  const isActive =
-    accountStatus === "active";
+  const isActive = accountStatus === "active";
 
-  const initials =
-    getInitials(title);
+  const initials = getInitials(title);
 
-  const RoleIcon =
-    icon ?? ShieldCheck;
+  const RoleIcon = icon ?? ShieldCheck;
 
   return (
     <section
@@ -153,11 +131,7 @@ export function StaffPageHero({
     >
       <div
         aria-hidden="true"
-        className={[
-          "absolute inset-0",
-          color.light,
-          "opacity-70",
-        ].join(" ")}
+        className={["absolute inset-0", color.light, "opacity-70"].join(" ")}
       />
 
       <div
@@ -186,28 +160,25 @@ export function StaffPageHero({
 
       <div className="relative p-4 sm:px-5 sm:py-4">
         {showBackButton ? (
-        <button
-          type="button"
-          onClick={onBack}
-          className={[
-            "inline-flex items-center gap-2",
-            "rounded-lg px-1 py-1",
-            "text-xs font-medium",
-            "text-muted-foreground",
-            "transition-colors",
-            color.hover,
-            "focus-visible:outline-none",
-            "focus-visible:ring-4",
-            color.ring,
-          ].join(" ")}
-        >
-          <ArrowLeft
-            className="h-4 w-4"
-            strokeWidth={1.8}
-          />
+          <button
+            type="button"
+            onClick={onBack}
+            className={[
+              "inline-flex items-center gap-2",
+              "rounded-lg px-1 py-1",
+              "text-xs font-medium",
+              "text-muted-foreground",
+              "transition-colors",
+              color.hover,
+              "focus-visible:outline-none",
+              "focus-visible:ring-4",
+              color.ring,
+            ].join(" ")}
+          >
+            <ArrowLeft className="h-4 w-4" strokeWidth={1.8} />
 
-          {backLabel}
-        </button>
+            {backLabel}
+          </button>
         ) : null}
 
         <div
@@ -223,10 +194,7 @@ export function StaffPageHero({
             <HeroPhoto
               mode={mode}
               photoUrl={photoUrl}
-              photoAlt={
-                photoAlt ??
-                title
-              }
+              photoAlt={photoAlt ?? title}
               initials={initials}
               icon={RoleIcon}
               color={color}
@@ -235,10 +203,7 @@ export function StaffPageHero({
             <div className="min-w-0">
               <HeroBadge
                 mode={mode}
-                label={
-                  badgeLabel ??
-                  roleLabel
-                }
+                label={badgeLabel ?? roleLabel}
                 icon={RoleIcon}
                 color={color}
               />
@@ -266,8 +231,7 @@ export function StaffPageHero({
 
               {isView ? (
                 <div className="mt-3 flex flex-wrap gap-2">
-                  {staffId !==
-                  undefined ? (
+                  {staffId !== undefined ? (
                     <span
                       className={[
                         "inline-flex items-center gap-2",
@@ -279,11 +243,7 @@ export function StaffPageHero({
                         color.text,
                       ].join(" ")}
                     >
-                      <IdCard
-                        className="h-3.5 w-3.5"
-                        strokeWidth={1.8}
-                      />
-
+                      <IdCard className="h-3.5 w-3.5" strokeWidth={1.8} />
                       Staff #{staffId}
                     </span>
                   ) : null}
@@ -309,14 +269,9 @@ export function StaffPageHero({
                             ].join(" "),
                       ].join(" ")}
                     >
-                      <ShieldCheck
-                        className="h-3.5 w-3.5"
-                        strokeWidth={1.8}
-                      />
+                      <ShieldCheck className="h-3.5 w-3.5" strokeWidth={1.8} />
 
-                      {isActive
-                        ? "Active account"
-                        : "Disabled account"}
+                      {isActive ? "Active account" : "Disabled account"}
                     </span>
                   ) : null}
                 </div>
@@ -347,11 +302,7 @@ export function StaffPageHero({
                 "lg:self-center",
               ].join(" ")}
             >
-              <Pencil
-                className="h-4 w-4"
-                strokeWidth={1.8}
-              />
-
+              <Pencil className="h-4 w-4" strokeWidth={1.8} />
               Edit profile
             </button>
           ) : null}
@@ -414,25 +365,18 @@ export function StaffPageHero({
                 ].join(" ")}
               >
                 <Save
-                  className={[
-                    "h-4 w-4",
-                    loading
-                      ? "animate-pulse"
-                      : "",
-                  ].join(" ")}
+                  className={["h-4 w-4", loading ? "animate-pulse" : ""].join(
+                    " ",
+                  )}
                   strokeWidth={1.8}
                 />
 
-                {loading
-                  ? "Saving..."
-                  : submitLabel}
+                {loading ? "Saving..." : submitLabel}
               </button>
             </div>
           ) : null}
 
-          {isCreate &&
-          roleLabel &&
-          !showFormActions ? (
+          {isCreate && roleLabel && !showFormActions ? (
             <aside
               className={[
                 "rounded-[18px]",
@@ -465,10 +409,7 @@ export function StaffPageHero({
                     color.text,
                   ].join(" ")}
                 >
-                  <RoleIcon
-                    className="h-[18px] w-[18px]"
-                    strokeWidth={1.8}
-                  />
+                  <RoleIcon className="h-[18px] w-[18px]" strokeWidth={1.8} />
                 </span>
 
                 <div>
@@ -504,13 +445,10 @@ function HeroPhoto({
   icon: LucideIcon;
   color: StaffPageHeroColor;
 }) {
-  const isCreate =
-    mode === "create";
+  const isCreate = mode === "create";
 
   const sizeClassName =
-    mode === "view"
-      ? "h-16 w-16 rounded-[18px]"
-      : "h-12 w-12 rounded-[14px]";
+    mode === "view" ? "h-16 w-16 rounded-[18px]" : "h-12 w-12 rounded-[14px]";
 
   if (photoUrl) {
     return (
@@ -524,7 +462,7 @@ function HeroPhoto({
           sizeClassName,
         ].join(" ")}
       >
-        <AuthenticatedUserImage
+        <UserAvatar
           src={photoUrl}
           alt={photoAlt}
           className="h-full w-full object-cover"
@@ -544,10 +482,7 @@ function HeroPhoto({
           sizeClassName,
         ].join(" ")}
       >
-        <UserPlus
-          className="h-5 w-5"
-          strokeWidth={1.8}
-        />
+        <UserPlus className="h-5 w-5" strokeWidth={1.8} />
       </span>
     );
   }
@@ -573,9 +508,7 @@ function HeroPhoto({
         strokeWidth={1.5}
       />
 
-      <span className="relative">
-        {initials}
-      </span>
+      <span className="relative">{initials}</span>
     </span>
   );
 }
@@ -616,15 +549,9 @@ function HeroBadge({
       ].join(" ")}
     >
       {mode === "view" ? (
-        <RoleIcon
-          className="h-3 w-3"
-          strokeWidth={1.9}
-        />
+        <RoleIcon className="h-3 w-3" strokeWidth={1.9} />
       ) : (
-        <Sparkles
-          className="h-3 w-3"
-          strokeWidth={1.9}
-        />
+        <Sparkles className="h-3 w-3" strokeWidth={1.9} />
       )}
 
       {content}

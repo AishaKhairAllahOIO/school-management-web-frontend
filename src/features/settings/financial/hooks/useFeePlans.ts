@@ -24,6 +24,7 @@ export function useFeePlans() {
   const create = useMutation({
     mutationFn: (payload: CreateFeePlanPayload) =>
       financialService.createFeePlan(payload),
+
     onSuccess: async () => {
       await queryClient.invalidateQueries({
         queryKey: QUERY_KEY,
@@ -39,18 +40,22 @@ export function useFeePlans() {
       id: number;
       payload: UpdateFeePlanPayload;
     }) => financialService.updateFeePlan(id, payload),
+
     onSuccess: async () => {
       await queryClient.invalidateQueries({
         queryKey: QUERY_KEY,
       });
     },
+
     onError(error) {
       console.error(error);
     },
   });
 
   const remove = useMutation({
-    mutationFn: (id: number) => financialService.deleteFeePlan(id),
+    mutationFn: (id: number) =>
+      financialService.deleteFeePlan(id),
+
     onSuccess: async () => {
       await queryClient.invalidateQueries({
         queryKey: QUERY_KEY,
@@ -58,10 +63,20 @@ export function useFeePlans() {
     },
   });
 
+  /**
+   * Get one fee plan by ID
+   */
+  const getFeePlan = async (id: number) => {
+    return financialService.getFeePlan(id);
+  };
+
   return {
-    ...query, 
+    ...query,
+
     createFeePlan: create,
     updateFeePlan: update,
     deleteFeePlan: remove,
+
+    getFeePlan,
   };
 }

@@ -1,14 +1,10 @@
 import { useRef, useState } from "react";
-import type {
-  ChangeEvent,
-  DragEvent,
-  ReactNode,
-} from "react";
+import type { ChangeEvent, DragEvent, ReactNode } from "react";
 import { Camera, ImagePlus } from "lucide-react";
 
 import { useLocale } from "@/app/providers/locale";
 
-import { AuthenticatedUserImage } from "./AuthenticatedUserImage";
+import { UserAvatar } from "./UserAvatar";
 
 type UserPhotoCardProps = {
   title: string;
@@ -43,9 +39,7 @@ export function UserPhotoCard({
   const inputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);
 
-  function handleDroppedFile(
-    event: DragEvent<HTMLLabelElement>,
-  ) {
+  function handleDroppedFile(event: DragEvent<HTMLLabelElement>) {
     event.preventDefault();
     event.stopPropagation();
     setIsDragging(false);
@@ -60,9 +54,7 @@ export function UserPhotoCard({
 
     if (inputRef.current) {
       inputRef.current.files = transfer.files;
-      inputRef.current.dispatchEvent(
-        new Event("change", { bubbles: true }),
-      );
+      inputRef.current.dispatchEvent(new Event("change", { bubbles: true }));
     }
   }
 
@@ -76,17 +68,12 @@ export function UserPhotoCard({
           ].join(" ")}
         >
           {icon ?? (
-            <ImagePlus
-              className="h-[18px] w-[18px]"
-              strokeWidth={1.8}
-            />
+            <ImagePlus className="h-[18px] w-[18px]" strokeWidth={1.8} />
           )}
         </span>
 
         <div className="min-w-0">
-          <h3 className="text-[14px] font-semibold text-foreground">
-            {title}
-          </h3>
+          <h3 className="text-[14px] font-semibold text-foreground">{title}</h3>
           {description ? (
             <p className="mt-0.5 text-[11px] leading-4 text-muted-foreground">
               {description}
@@ -98,7 +85,7 @@ export function UserPhotoCard({
       <div className="mx-4 mb-4 flex aspect-square items-center justify-center overflow-hidden rounded-[18px] border border-border/55 bg-muted/[0.16]">
         {photoUrl ? (
           authenticated ? (
-            <AuthenticatedUserImage
+            <UserAvatar
               src={photoUrl}
               alt={alt}
               className="h-full w-full object-cover"
@@ -118,16 +105,11 @@ export function UserPhotoCard({
                 accentClassName,
               ].join(" ")}
             >
-              <Camera
-                className="h-6 w-6"
-                strokeWidth={1.7}
-              />
+              <Camera className="h-6 w-6" strokeWidth={1.7} />
             </span>
 
             <p className="text-[11px] leading-5">
-              {editable
-                ? copy.uploadHint
-                : copy.noPhoto}
+              {editable ? copy.uploadHint : copy.noPhoto}
             </p>
           </div>
         )}
@@ -155,11 +137,7 @@ export function UserPhotoCard({
       }}
       onDragLeave={(event) => {
         event.preventDefault();
-        if (
-          !event.currentTarget.contains(
-            event.relatedTarget as Node | null,
-          )
-        ) {
+        if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
           setIsDragging(false);
         }
       }}

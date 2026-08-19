@@ -1,11 +1,6 @@
-import {
-  GraduationCap,
-  IdCard,
-  Phone,
-  UserRound,
-} from "lucide-react";
+import { GraduationCap, IdCard, Phone, UserRound } from "lucide-react";
 
-import { AuthenticatedUserImage } from "../../../shared/components/AuthenticatedUserImage";
+import { UserAvatar } from "../../../shared/components/UserAvatar";
 
 import type {
   PersonProfile,
@@ -18,17 +13,12 @@ type StudentProfileHeroProps = {
   enrollment: StudentEnrollment;
 };
 
-function gradeLabel(
-  enrollment: StudentEnrollment,
-) {
+function gradeLabel(enrollment: StudentEnrollment) {
   if (enrollment.grade?.name) {
     return enrollment.grade.name;
   }
 
-  if (
-    enrollment.gradeId !== null &&
-    enrollment.gradeId !== undefined
-  ) {
+  if (enrollment.gradeId !== null && enrollment.gradeId !== undefined) {
     return `Grade #${enrollment.gradeId}`;
   }
 
@@ -47,7 +37,7 @@ export function StudentProfileHero({
       <div className="relative grid gap-6 p-5 sm:p-7 lg:grid-cols-[260px_1fr] lg:items-end">
         <div className="relative overflow-hidden rounded-[30px] border border-card/70 bg-muted shadow-[var(--shadow-floating)]">
           {student.photoUrl ? (
-            <AuthenticatedUserImage
+            <UserAvatar
               src={student.photoUrl}
               alt={student.fullName}
               className="h-72 w-full object-cover lg:h-[330px]"
@@ -69,9 +59,7 @@ export function StudentProfileHero({
         </div>
 
         <div className="min-w-0 pb-1">
-          <StudentStatusBadge
-            status={enrollment.enrollmentStatus}
-          />
+          <StudentStatusBadge status={enrollment.enrollmentStatus} />
 
           <h1 className="mt-4 text-2xl font-semibold tracking-[-0.035em] text-foreground sm:text-3xl">
             {student.fullName}
