@@ -31,7 +31,7 @@ import {
   CashierSection,
   FullFinancialStatementDialog,
   ProcessPaymentDialog,
-} from "../components/CashierSection";
+} from "../components/PaymentProcess";
 import { FinalizeContractDialog } from "../components/FinalizeContractDialog";
 import { UpdateContractDialog } from "../components/UpdateContractDialog";
 

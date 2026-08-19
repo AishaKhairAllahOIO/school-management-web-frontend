@@ -16,7 +16,10 @@ import { studentApi } from "../../../users/students/api/student.api";
 import { useStudents } from "../../../users/students/hooks/useStudents";
 import { studentKeys } from "../../../users/students/hooks/student.keys";
 import { useFinanceAccounts } from "../hooks/useFinancialAccounts";
-import type { FinancialAccount, PaymentStatus } from "../types/finance.types";
+import type {
+  FinancialAccount,
+  PaymentStatus,
+} from "../types/finance.types";
 import { FinanceTableSkeleton } from "./FinanceTableSkeleton";
 
 type ContractsSectionProps = {
@@ -42,46 +45,46 @@ const STATUS_TABS: StatusTabConfig[] = [
     value: "all",
     label: "All",
     icon: Users,
-    activeClass: "bg-info text-white shadow-sm",
+    activeClass: "bg-info text-white",
     inactiveClass:
-      "bg-info/[0.08] text-info border border-info/20 hover:bg-info/[0.13]",
-    iconClass: "bg-info/[0.12] text-info",
+      "border border-info/15 bg-info/[0.05] text-info hover:bg-info/[0.09]",
+    iconClass: "bg-info/[0.07] text-info",
   },
   {
     value: "draft",
     label: "Draft",
     icon: FileText,
-    activeClass: "bg-secondary-foreground text-white shadow-sm",
+    activeClass: "bg-secondary-foreground text-white",
     inactiveClass:
-      "bg-secondary/[0.55] text-secondary-foreground border border-border/50 hover:bg-secondary",
-    iconClass: "bg-secondary/[0.55] text-secondary-foreground",
+      "border border-border/45 bg-secondary/[0.35] text-secondary-foreground hover:bg-secondary/[0.55]",
+    iconClass: "bg-secondary/[0.35] text-secondary-foreground",
   },
   {
     value: "unpaid",
     label: "Unpaid",
     icon: CircleAlert,
-    activeClass: "bg-destructive text-white shadow-sm",
+    activeClass: "bg-destructive text-white",
     inactiveClass:
-      "bg-destructive/[0.08] text-destructive border border-destructive/20 hover:bg-destructive/[0.13]",
-    iconClass: "bg-destructive/[0.12] text-destructive",
+      "border border-destructive/15 bg-destructive/[0.05] text-destructive hover:bg-destructive/[0.09]",
+    iconClass: "bg-destructive/[0.07] text-destructive",
   },
   {
     value: "partially_paid",
     label: "Partially paid",
     icon: Clock3,
-    activeClass: "bg-warning text-white shadow-sm",
+    activeClass: "bg-warning text-white",
     inactiveClass:
-      "bg-warning/[0.10] text-warning border border-warning/20 hover:bg-warning/[0.15]",
-    iconClass: "bg-warning/[0.12] text-warning",
+      "border border-warning/15 bg-warning/[0.06] text-warning hover:bg-warning/[0.10]",
+    iconClass: "bg-warning/[0.07] text-warning",
   },
   {
     value: "fully_paid",
     label: "Fully paid",
     icon: CheckCircle2,
-    activeClass: "bg-success text-white shadow-sm",
+    activeClass: "bg-success text-white",
     inactiveClass:
-      "bg-success/[0.08] text-success border border-success/20 hover:bg-success/[0.13]",
-    iconClass: "bg-success/[0.12] text-success",
+      "border border-success/15 bg-success/[0.05] text-success hover:bg-success/[0.09]",
+    iconClass: "bg-success/[0.07] text-success",
   },
 ];
 
@@ -92,8 +95,6 @@ const STATUS_TABS: StatusTabConfig[] = [
 function getEffectivePaymentStatus(
   account: FinancialAccount | undefined,
 ): PaymentStatus {
-  // Draft means the student does not have a financial account/contract yet.
-  // Once an account exists, always trust the backend payment status.
   return account?.paymentStatus ?? "draft";
 }
 
@@ -109,7 +110,9 @@ function statusLabel(status: PaymentStatus) {
 
 function photoUrl(student: unknown) {
   if (!student || typeof student !== "object") return null;
+
   const value = (student as { photoUrl?: unknown }).photoUrl;
+
   return typeof value === "string" && value.trim() ? value : null;
 }
 
@@ -131,7 +134,13 @@ export function ContractsSection({
   onOpenStudentAccount,
 }: ContractsSectionProps = {}) {
   const { accountsQuery } = useFinanceAccounts();
-  const { data: accounts = [], isLoading, isError, refetch } = accountsQuery;
+
+  const {
+    data: accounts = [],
+    isLoading,
+    isError,
+    refetch,
+  } = accountsQuery;
 
   const {
     data: studentsResponse,
@@ -153,17 +162,22 @@ export function ContractsSection({
   );
 
   // Keep the list driven by registered students as well as financial accounts.
-  // A registered student with no activated contract is a Draft entry; the
-  // contract is created later from that student's profile.
+  // A registered student with no activated contract is a Draft entry.
   const unionStudentIds = useMemo(() => {
     const ids = new Set<string>();
 
-    studentItems.forEach((student) => ids.add(String(student.studentId)));
+    studentItems.forEach((student) =>
+      ids.add(String(student.studentId)),
+    );
 
-    accounts.forEach((account) => ids.add(String(account.studentId)));
+    accounts.forEach((account) =>
+      ids.add(String(account.studentId)),
+    );
 
     if (studentId !== undefined) {
-      return [...ids].filter((id) => id === String(studentId));
+      return [...ids].filter(
+        (id) => id === String(studentId),
+      );
     }
 
     return [...ids];
@@ -183,7 +197,10 @@ export function ContractsSection({
     () =>
       new Map(
         unionStudentIds.map(
-          (id, index) => [id, detailQueries[index]?.data] as const,
+          (id, index) => [
+            id,
+            detailQueries[index]?.data,
+          ] as const,
         ),
       ),
     [detailQueries, unionStudentIds],
@@ -193,7 +210,8 @@ export function ContractsSection({
     () =>
       new Map(
         accounts.map(
-          (account) => [String(account.studentId), account] as const,
+          (account) =>
+            [String(account.studentId), account] as const,
         ),
       ),
     [accounts],
@@ -209,24 +227,35 @@ export function ContractsSection({
         return {
           studentId: id,
           fullName:
-            details?.student?.fullName ?? listedStudent?.fullName ?? "Student",
+            details?.student?.fullName ??
+            listedStudent?.fullName ??
+            "Student",
           account,
         };
       }),
-    [accountByStudentId, detailByStudentId, listedStudentById, unionStudentIds],
+    [
+      accountByStudentId,
+      detailByStudentId,
+      listedStudentById,
+      unionStudentIds,
+    ],
   );
 
-  const [activeTab, setActiveTab] = useState<StatusTab>("all");
+  const [activeTab, setActiveTab] =
+    useState<StatusTab>("all");
+
   const [search, setSearch] = useState("");
 
- 
   const filteredRows = useMemo(() => {
     const query = search.trim().toLowerCase();
 
     return rows.filter((row) => {
       const status = getEffectivePaymentStatus(row.account);
 
-      if (activeTab !== "all" && status !== activeTab) {
+      if (
+        activeTab !== "all" &&
+        status !== activeTab
+      ) {
         return false;
       }
 
@@ -234,15 +263,19 @@ export function ContractsSection({
         return true;
       }
 
-      return row.fullName.toLowerCase().includes(query);
+      return row.fullName
+        .toLowerCase()
+        .includes(query);
     });
   }, [activeTab, rows, search]);
 
-  const activeTabConfig = STATUS_TABS.find((tab) => tab.value === activeTab);
+  const activeTabConfig = STATUS_TABS.find(
+    (tab) => tab.value === activeTab,
+  );
 
   if (isLoading || isLoadingStudents) {
     return (
-      <div className="space-y-5 pb-10 pt-4 sm:pt-5 lg:pt-6">
+      <div className="space-y-4 pb-8 pt-2 sm:pt-3">
         <FinanceTableSkeleton />
       </div>
     );
@@ -250,21 +283,25 @@ export function ContractsSection({
 
   if (isError || isStudentsError) {
     return (
-      <div className="space-y-5 pb-10 pt-4 sm:pt-5 lg:pt-6">
-        <section className="overflow-hidden rounded-[24px] border border-border/45 bg-card shadow-[0_12px_34px_rgba(31,22,73,0.045)]">
-          <div className="flex flex-col items-center justify-center px-6 py-16 text-center">
-            <div className="flex size-12 items-center justify-center rounded-2xl bg-destructive/[0.08] text-destructive">
+      <div className="space-y-4 pb-8 pt-2 sm:pt-3">
+        <section className="overflow-hidden rounded-[18px] border border-border/50 bg-card">
+          <div className="flex flex-col items-center justify-center px-6 py-14 text-center">
+            <div className="flex size-11 items-center justify-center rounded-xl bg-destructive/[0.06] text-destructive">
               <Users className="size-5" />
             </div>
+
             <p className="mt-4 text-sm font-semibold text-destructive">
               Failed to load students.
             </p>
-            <p className="mt-1 max-w-sm text-xs text-muted-foreground">
-              Something went wrong while loading the student financial accounts.
+
+            <p className="mt-1 max-w-sm text-xs leading-5 text-muted-foreground">
+              Something went wrong while loading the
+              student financial accounts.
             </p>
+
             <Button
               variant="outline"
-              className="mt-5 rounded-xl"
+              className="mt-5 h-8 rounded-lg px-3 text-xs"
               onClick={() => {
                 void refetch();
                 void refetchStudents();
@@ -279,68 +316,78 @@ export function ContractsSection({
   }
 
   return (
-    <div className="space-y-5 pb-10 pt-4 sm:pt-5 lg:pt-6">
-      {/* FILTERS — intentionally mirrors the staff finance page */}
-      <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-        <div className="order-2 flex min-w-0 flex-1 flex-wrap gap-2 lg:order-1">
+    <div className="space-y-4 pb-8 pt-2 sm:pt-3">
+      {/* FILTERS */}
+      <div className="flex flex-col gap-2.5 lg:flex-row lg:items-center lg:justify-between">
+        <div className="order-2 flex min-w-0 flex-1 flex-wrap gap-1.5 lg:order-1">
           {STATUS_TABS.map((item) => {
             const Icon = item.icon;
-            const isActive = activeTab === item.value;
+            const isActive =
+              activeTab === item.value;
 
             return (
               <button
                 key={item.value}
                 type="button"
-                onClick={() => setActiveTab(item.value)}
+                onClick={() =>
+                  setActiveTab(item.value)
+                }
                 className={[
-                  "inline-flex shrink-0 items-center gap-2",
-                  "rounded-xl px-3.5 py-2.5",
-                  "text-xs font-semibold",
-                  "transition-all duration-200",
+                  "inline-flex shrink-0 items-center gap-1.5",
+                  "rounded-lg px-3 py-2",
+                  "text-[11px] font-semibold",
+                  "transition-colors duration-150",
                   "focus-visible:outline-none",
                   "focus-visible:ring-2",
-                  "focus-visible:ring-primary/30",
-                  isActive ? item.activeClass : item.inactiveClass,
+                  "focus-visible:ring-primary/20",
+                  isActive
+                    ? item.activeClass
+                    : item.inactiveClass,
                 ].join(" ")}
               >
-                <Icon aria-hidden="true" className="size-3.5" strokeWidth={2} />
+                <Icon
+                  aria-hidden="true"
+                  className="size-3.5"
+                  strokeWidth={2}
+                />
+
                 {item.label}
-              
               </button>
             );
           })}
         </div>
 
-        <div className="order-1 w-full lg:order-2 lg:w-[280px] lg:shrink-0">
+        <div className="order-1 w-full lg:order-2 lg:w-[260px] lg:shrink-0">
           <div
             className={[
-              "flex h-10 items-center gap-2",
-              "rounded-xl",
-              "border border-border/60",
+              "flex h-9 items-center gap-2",
+              "rounded-lg",
+              "border border-border/55",
               "bg-card",
-              "px-3",
-              "shadow-sm",
-              "transition",
-              "focus-within:border-primary/40",
-              "focus-within:ring-2",
-              "focus-within:ring-primary/10",
+              "px-2.5",
+              "transition-colors",
+              "focus-within:border-primary/30",
             ].join(" ")}
           >
             <Search
               aria-hidden="true"
-              className="size-4 shrink-0 text-muted-foreground"
+              className="size-3.5 shrink-0 text-muted-foreground"
             />
+
             <input
               value={search}
-              onChange={(event) => setSearch(event.target.value)}
+              onChange={(event) =>
+                setSearch(event.target.value)
+              }
               placeholder="Search students by name"
-              className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
+              className="min-w-0 flex-1 bg-transparent text-xs outline-none placeholder:text-muted-foreground"
             />
+
             {search && (
               <button
                 type="button"
                 onClick={() => setSearch("")}
-                className="shrink-0 text-xs font-medium text-muted-foreground transition hover:text-foreground"
+                className="shrink-0 text-[10px] font-medium text-muted-foreground transition-colors hover:text-foreground"
                 aria-label="Clear search"
               >
                 Clear
@@ -350,24 +397,29 @@ export function ContractsSection({
         </div>
       </div>
 
-      {/* STUDENT CONTAINER — same structure as StaffPayrollPage */}
-      <section className="overflow-hidden rounded-[24px] border border-border/45 bg-card shadow-[0_12px_34px_rgba(31,22,73,0.045)]">
-        <div className="flex items-center gap-3 border-b border-border/50 px-4 py-3.5 sm:px-5 sm:py-4">
-          <div className="flex min-w-0 flex-1 items-center gap-3">
+      {/* STUDENT CONTAINER */}
+      <section className="overflow-hidden rounded-[18px] border border-border/50 bg-card">
+        <div className="flex items-center gap-3 border-b border-border/45 px-4 py-3 sm:px-4.5 sm:py-3.5">
+          <div className="flex min-w-0 flex-1 items-center gap-2.5">
             <div
               className={[
-                "flex size-10 shrink-0 items-center justify-center rounded-xl",
-                activeTabConfig?.iconClass ?? "bg-primary/[0.10] text-primary",
+                "flex size-8.5 shrink-0 items-center justify-center rounded-lg",
+                activeTabConfig?.iconClass ??
+                  "bg-primary/[0.06] text-primary",
               ].join(" ")}
             >
-              <Users aria-hidden="true" className="size-4" />
+              <Users
+                aria-hidden="true"
+                className="size-3.5"
+              />
             </div>
 
             <div className="min-w-0">
-              <h2 className="truncate text-sm font-bold text-foreground">
+              <h2 className="truncate text-[13px] font-semibold text-foreground">
                 {activeTabConfig?.label ?? title}
               </h2>
-              <p className="mt-0.5 text-xs text-muted-foreground">
+
+              <p className="mt-0.5 truncate text-[10px] text-muted-foreground">
                 {description}
               </p>
             </div>
@@ -375,21 +427,24 @@ export function ContractsSection({
         </div>
 
         {!filteredRows.length ? (
-          <div className="flex flex-col items-center justify-center px-6 py-16 text-center">
+          <div className="flex flex-col items-center justify-center px-6 py-14 text-center">
             <div
               className={[
-                "flex size-12 items-center justify-center rounded-2xl",
-                activeTabConfig?.iconClass ?? "bg-primary/[0.10] text-primary",
+                "flex size-11 items-center justify-center rounded-xl",
+                activeTabConfig?.iconClass ??
+                  "bg-primary/[0.06] text-primary",
               ].join(" ")}
             >
-              <Search className="size-5" />
+              <Search className="size-4.5" />
             </div>
 
             <p className="mt-4 text-sm font-semibold text-foreground">
               No students found
             </p>
-            <p className="mt-1 max-w-sm text-xs text-muted-foreground">
-              No students match the selected payment status or search.
+
+            <p className="mt-1 max-w-sm text-xs leading-5 text-muted-foreground">
+              No students match the selected payment
+              status or search.
             </p>
 
             {search && (
@@ -403,27 +458,47 @@ export function ContractsSection({
             )}
           </div>
         ) : (
-          <div className="divide-y divide-border/40">
+          <div className="divide-y divide-border/35">
             {filteredRows.map((row) => {
-              const student = detailByStudentId.get(row.studentId);
-              const name = row.fullName || "Student unavailable";
-              const listedStudent = listedStudentById.get(row.studentId);
+              const student =
+                detailByStudentId.get(
+                  row.studentId,
+                );
+
+              const name =
+                row.fullName ||
+                "Student unavailable";
+
+              const listedStudent =
+                listedStudentById.get(
+                  row.studentId,
+                );
+
               const image =
-                photoUrl(student?.student) ?? photoUrl(listedStudent);
-              const status = getEffectivePaymentStatus(row.account);
+                photoUrl(student?.student) ??
+                photoUrl(listedStudent);
+
+              const status =
+                getEffectivePaymentStatus(
+                  row.account,
+                );
 
               return (
                 <button
                   key={row.studentId}
                   type="button"
-                  onClick={() => onOpenStudentAccount?.(row.studentId)}
+                  onClick={() =>
+                    onOpenStudentAccount?.(
+                      row.studentId,
+                    )
+                  }
                   className={[
-                    "group flex w-full items-center gap-4",
-                    "px-5 py-4",
+                    "group flex w-full items-center gap-3.5",
+                    "px-4 py-3.5",
                     "text-start",
-                    "transition-colors duration-200",
-                    "hover:bg-primary/[0.025]",
-                    "focus-visible:bg-primary/[0.035]",
+                    "transition-colors duration-150",
+                    "hover:bg-muted/30",
+                    "focus-visible:bg-muted/35",
                     "focus-visible:outline-none",
                   ].join(" ")}
                 >
@@ -432,32 +507,34 @@ export function ContractsSection({
                       <img
                         src={image}
                         alt=""
-                        className="size-12 rounded-[16px] object-cover ring-1 ring-border/40"
+                        className="size-10.5 rounded-xl object-cover ring-1 ring-border/35"
                       />
                     ) : (
-                      <div className="flex size-12 items-center justify-center rounded-[16px] bg-primary/[0.09] text-sm font-bold text-primary">
+                      <div className="flex size-10.5 items-center justify-center rounded-xl bg-primary/[0.06] text-xs font-semibold text-primary">
                         {initials(name)}
                       </div>
                     )}
                   </div>
 
                   <div className="min-w-0 flex-1">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <p className="truncate text-sm font-semibold text-foreground">
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      <p className="truncate text-[12px] font-semibold text-foreground">
                         {name}
                       </p>
 
                       <span
                         className={[
-                          "rounded-full px-2 py-0.5",
-                          "text-[10px] font-semibold",
+                          "rounded-full px-1.5 py-0.5",
+                          "text-[9px] font-semibold",
                           status === "fully_paid"
-                            ? "bg-success/[0.09] text-success"
-                            : status === "partially_paid"
-                              ? "bg-warning/[0.10] text-warning"
-                              : status === "unpaid"
-                                ? "bg-destructive/[0.09] text-destructive"
-                                : "bg-secondary/[0.65] text-secondary-foreground",
+                            ? "bg-success/[0.07] text-success"
+                            : status ===
+                                "partially_paid"
+                              ? "bg-warning/[0.08] text-warning"
+                              : status ===
+                                  "unpaid"
+                                ? "bg-destructive/[0.07] text-destructive"
+                                : "bg-secondary/[0.45] text-secondary-foreground",
                         ].join(" ")}
                       >
                         {statusLabel(status)}
@@ -465,10 +542,10 @@ export function ContractsSection({
                     </div>
                   </div>
 
-                  <div className="flex size-9 shrink-0 items-center justify-center rounded-xl text-muted-foreground transition-all duration-200 group-hover:bg-primary/[0.08] group-hover:text-primary">
+                  <div className="flex size-8 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors duration-150 group-hover:bg-muted/50 group-hover:text-foreground">
                     <ChevronRight
                       aria-hidden="true"
-                      className="size-4 rtl:rotate-180"
+                      className="size-3.5 rtl:rotate-180"
                     />
                   </div>
                 </button>
