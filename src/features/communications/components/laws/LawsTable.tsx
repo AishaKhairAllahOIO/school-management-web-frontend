@@ -54,7 +54,7 @@ export function LawsTable({
           <TableHeader>
             <TableRow className="border-border/45 hover:bg-transparent">
               <TableHead className="px-5 py-4">Law</TableHead>
-              <TableHead className="px-5 py-4">Official description</TableHead>
+<TableHead className="px-5 py-4 text-center">Official description</TableHead>
               <TableHead className="w-[180px] px-5 py-4 text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
