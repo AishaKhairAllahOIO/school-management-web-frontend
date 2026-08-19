@@ -55,7 +55,8 @@ export function LawsTable({
             <TableRow className="border-border/45 hover:bg-transparent">
               <TableHead className="px-5 py-4">Law</TableHead>
               <TableHead className="px-5 py-4">Official description</TableHead>
-              <TableHead className="w-[180px] px-5 py-4 text-right">Actions</TableHead>
+              {/* 🌟 إخفاء رأس عمود الإجراءات في الطباعة */}
+              <TableHead className="w-[180px] px-5 py-4 text-right print:hidden">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -78,8 +79,8 @@ export function LawsTable({
                     {law.description || "No additional details were provided for this law."}
                   </p>
                 </TableCell>
-                {/* Actions */}
-                <TableCell className="w-[180px] px-5 py-4 align-top">
+                {/* Actions - 🌟 إخفاء أزرار الإجراءات في الطباعة */}
+                <TableCell className="w-[180px] px-5 py-4 align-top print:hidden">
                   <div className="flex items-center justify-end gap-1.5 whitespace-nowrap">
                     <Button
                       type="button"
@@ -112,7 +113,7 @@ export function LawsTable({
         {laws.map((law) => (
           <div
             key={law.id}
-            className="rounded-[16px] border border-border/45 bg-background p-4 shadow-sm"
+            className="rounded-[16px] border border-border/45 bg-background p-4 shadow-sm break-inside-avoid"
           >
             {/* Law title */}
             <div className="flex items-start gap-3">
@@ -144,8 +145,8 @@ export function LawsTable({
               </p>
             </div>
 
-            {/* Actions */}
-            <div className="mt-3 grid grid-cols-2 gap-2">
+            {/* Actions - 🌟 إخفاء الإجراءات في الشاشات الصغيرة عند الطباعة */}
+            <div className="mt-3 grid grid-cols-2 gap-2 print:hidden">
               <Button
                 type="button"
                 variant="outline"

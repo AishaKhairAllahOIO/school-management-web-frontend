@@ -3,7 +3,6 @@ import {
   Edit3,
   Megaphone,
   School,
-  Printer,
   Trash2,
   Users,
 } from "lucide-react";
@@ -47,7 +46,6 @@ export function AnnouncementsList({
 
   const [pendingDelete, setPendingDelete] =
     useState<Announcement | null>(null);
-  
 
   const announcements = myAnnouncements;
   const isLoading = isLoadingMy;
@@ -141,16 +139,6 @@ export function AnnouncementsList({
                     type="button"
                     variant="outline"
                     size="sm"
-                   
-                    className="h-9 rounded-[11px] border-border/65 bg-transparent px-3 text-[11px] font-medium text-primary hover:bg-primary/[0.06] hover:text-primary"
-                  >
-                    <Printer className="h-3.5 w-3.5" />
-                    Poster
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
                     onClick={() => onEdit(item)}
                     className="h-9 rounded-[11px] border-border/65 bg-transparent px-3 text-[11px] font-medium text-info hover:bg-info/[0.06] hover:text-info"
                   >
@@ -173,8 +161,6 @@ export function AnnouncementsList({
           );
         })}
       </div>
-
-    
 
       <DeleteConfirmationDialog
         open={Boolean(pendingDelete)}

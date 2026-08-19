@@ -3,7 +3,6 @@ import {
   Clock3,
   Edit3,
   Sparkles,
-  Printer,
   Trash2,
   Users,
 } from "lucide-react";
@@ -30,10 +29,10 @@ import {
   DeleteConfirmationDialog,
 } from "../shared/DeleteConfirmationDialog";
 
-
 type Props = {
   onEdit: (activity: Activity) => void;
 };
+
 function formatActivityDate(value: string) {
   if (!value) return "Date not set";
 
@@ -59,7 +58,6 @@ function formatActivityTime(value: string) {
     minute: "2-digit",
   }).format(date);
 }
-
 
 export function ActivitiesList({ onEdit }: Props) {
   const {
@@ -143,9 +141,6 @@ export function ActivitiesList({ onEdit }: Props) {
             </div>
 
             <footer className="flex h-11 items-center justify-end gap-1.5 border-t border-info/[0.10] bg-info/[0.035] px-4">
-              <Button type="button" variant="ghost" size="sm"  className="h-8 rounded-[10px] px-2.5 text-[11px] font-medium text-primary hover:bg-primary/[0.08] hover:text-primary">
-                <Printer className="h-3.5 w-3.5" /> Poster
-              </Button>
               <Button type="button" variant="ghost" size="sm" onClick={() => onEdit(activity)} className="h-8 rounded-[10px] px-2.5 text-[11px] font-medium text-info hover:bg-info/[0.08] hover:text-info">
                 <Edit3 className="h-3.5 w-3.5" /> Edit
               </Button>
@@ -156,8 +151,6 @@ export function ActivitiesList({ onEdit }: Props) {
           </article>
         ))}
       </div>
-
-    
 
       <DeleteConfirmationDialog
         open={Boolean(pendingDelete)}

@@ -2,6 +2,7 @@ import { AlertTriangle } from "lucide-react";
 import type { ReactNode } from "react";
 
 import { DatePicker } from "@/shared/ui/date-picker";
+import { MonthPicker } from "./month-picker";
 import {
   Select,
   SelectContent,
@@ -41,9 +42,6 @@ type Props = {
   tone?: "student" | "staff";
 };
 
-const inputClassName =
-  "h-11 w-full rounded-[13px] border border-input bg-background px-3.5 text-[12px] outline-none transition focus:border-primary/35 focus:ring-4 focus:ring-primary/[0.07]";
-
 export function AlertTypeForm({
   audience,
   alertType,
@@ -69,6 +67,13 @@ export function AlertTypeForm({
     tone === "student"
       ? "border-info/[0.14] bg-info/[0.035]"
       : "border-warning/[0.16] bg-warning/[0.035]";
+
+  // 🌟 هنا السر: جعلنا التأثير اللوني (Focus) ديناميكياً ليطابق الكارد تماماً بدلاً من الموف الثابت
+  const inputClassName = `h-11 w-full rounded-[13px] border border-input bg-background px-3.5 text-[12px] outline-none transition ${
+    tone === "student"
+      ? "focus:border-info/35 focus:ring-4 focus:ring-info/[0.07]"
+      : "focus:border-warning/35 focus:ring-4 focus:ring-warning/[0.07]"
+  }`;
 
   return (
     <div className="space-y-4">
@@ -122,20 +127,17 @@ export function AlertTypeForm({
                 onChange={(event) => onAmountChange(event.target.value)}
                 placeholder="0.00"
                 required
-                className={inputClassName}
+                className={inputClassName} // 🌟 تطبيق الكلاس الديناميكي هنا
               />
             </Field>
 
             {alertType === "salary" ? (
-              <Field label="Salary month">
-                <input
-                  type="month"
-                  value={monthName}
-                  onChange={(event) => onMonthNameChange(event.target.value)}
-                  required
-                  className={inputClassName}
-                />
-              </Field>
+              <MonthPicker
+                label="Salary month"
+                value={monthName}
+                onChange={onMonthNameChange}
+                required
+              />
             ) : null}
 
             {alertType === "payment" ? (
@@ -144,7 +146,6 @@ export function AlertTypeForm({
                 value={dueDate}
                 onChange={onDueDateChange}
                 required
-                className="sm:col-span-1"
               />
             ) : null}
           </div>
@@ -178,7 +179,7 @@ export function AlertTypeForm({
                 onChange={(event) => onSessionNameChange(event.target.value)}
                 placeholder="Example: Period 3"
                 required
-                className={inputClassName}
+                className={inputClassName} // 🌟 وتطبيقه هنا
               />
             </Field>
 
@@ -190,7 +191,7 @@ export function AlertTypeForm({
                   value={minutesLate}
                   onChange={(event) => onMinutesLateChange(event.target.value)}
                   required
-                  className={inputClassName}
+                  className={inputClassName} // 🌟 وتطبيقه هنا
                 />
               </Field>
             ) : null}
@@ -205,7 +206,7 @@ export function AlertTypeForm({
                 onChange={(event) => onSubjectNameChange(event.target.value)}
                 placeholder="Subject name"
                 required
-                className={inputClassName}
+                className={inputClassName} // 🌟 وتطبيقه هنا
               />
             </Field>
 

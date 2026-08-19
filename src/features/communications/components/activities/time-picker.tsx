@@ -83,68 +83,69 @@ export function TimePicker({ value, onChange, placeholder = "Choose a time" }: T
       </div>
 
       {isOpen && (
-        <div className="absolute top-[52px] left-0 z-50 w-[290px] rounded-[20px] border border-border/70 bg-card p-5 shadow-[0_24px_50px_rgba(0,0,0,0.12)]">
-          <div className="flex items-center justify-between mb-5">
-            <span className="text-[14px] font-semibold text-foreground">Select time</span>
-            <div className="flex rounded-full bg-secondary/80 p-1">
+        // 🌟 عرض أصغر (230px) مع ضبط التوسيط التلقائي لتجنب الـ Horizontal Scroll
+        <div className="absolute top-[calc(100%+8px)] left-1/2 z-[60] w-[230px] -translate-x-1/2 sm:left-0 sm:translate-x-0 rounded-[18px] border border-border/70 bg-card p-4 shadow-[0_20px_40px_rgba(0,0,0,0.12)]">
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-[13px] font-semibold text-foreground">Select time</span>
+            <div className="flex rounded-full bg-secondary/80 p-0.5">
               <button
                 type="button"
                 onClick={() => setAmpm('AM')}
-                className={`rounded-full px-3.5 py-1 text-[11px] font-semibold transition ${ampm === 'AM' ? 'bg-background shadow-sm text-info' : 'text-muted-foreground hover:text-foreground'}`}
+                className={`rounded-full px-3 py-1 text-[10.5px] font-semibold transition ${ampm === 'AM' ? 'bg-background shadow-sm text-info' : 'text-muted-foreground hover:text-foreground'}`}
               >
                 AM
               </button>
               <button
                 type="button"
                 onClick={() => setAmpm('PM')}
-                className={`rounded-full px-3.5 py-1 text-[11px] font-semibold transition ${ampm === 'PM' ? 'bg-background shadow-sm text-info' : 'text-muted-foreground hover:text-foreground'}`}
+                className={`rounded-full px-3 py-1 text-[10.5px] font-semibold transition ${ampm === 'PM' ? 'bg-background shadow-sm text-info' : 'text-muted-foreground hover:text-foreground'}`}
               >
                 PM
               </button>
             </div>
           </div>
 
-          <div className="flex items-center justify-center gap-6 py-2">
-            <div className="flex flex-col items-center gap-2">
-              <span className="text-[10px] font-bold tracking-wider text-muted-foreground">HOUR</span>
-              <button type="button" onClick={() => setHour(h => h === 12 ? 1 : h + 1)} className="text-muted-foreground hover:text-info transition p-1"><ChevronUp className="h-5 w-5" /></button>
-              <div className="flex h-14 w-16 items-center justify-center rounded-[14px] border border-border/50 bg-background text-[22px] font-semibold text-foreground shadow-sm">
+          <div className="flex items-center justify-center gap-4 py-1">
+            <div className="flex flex-col items-center gap-1.5">
+              <span className="text-[9px] font-bold tracking-wider text-muted-foreground">HOUR</span>
+              <button type="button" onClick={() => setHour(h => h === 12 ? 1 : h + 1)} className="text-muted-foreground hover:text-info transition p-1"><ChevronUp className="h-4 w-4" /></button>
+              <div className="flex h-11 w-12 items-center justify-center rounded-[12px] border border-border/50 bg-background text-[18px] font-semibold text-foreground shadow-sm">
                 {hour.toString().padStart(2, '0')}
               </div>
-              <button type="button" onClick={() => setHour(h => h === 1 ? 12 : h - 1)} className="text-muted-foreground hover:text-info transition p-1"><ChevronDown className="h-5 w-5" /></button>
+              <button type="button" onClick={() => setHour(h => h === 1 ? 12 : h - 1)} className="text-muted-foreground hover:text-info transition p-1"><ChevronDown className="h-4 w-4" /></button>
             </div>
 
-            <span className="text-[20px] font-bold text-muted-foreground mt-4">:</span>
+            <span className="text-[18px] font-bold text-muted-foreground mt-3">:</span>
 
-            <div className="flex flex-col items-center gap-2">
-              <span className="text-[10px] font-bold tracking-wider text-muted-foreground">MINUTE</span>
-              <button type="button" onClick={() => setMinute(m => m === 59 ? 0 : m + 1)} className="text-muted-foreground hover:text-info transition p-1"><ChevronUp className="h-5 w-5" /></button>
-              <div className="flex h-14 w-16 items-center justify-center rounded-[14px] border border-border/50 bg-background text-[22px] font-semibold text-foreground shadow-sm">
+            <div className="flex flex-col items-center gap-1.5">
+              <span className="text-[9px] font-bold tracking-wider text-muted-foreground">MINUTE</span>
+              <button type="button" onClick={() => setMinute(m => m === 59 ? 0 : m + 1)} className="text-muted-foreground hover:text-info transition p-1"><ChevronUp className="h-4 w-4" /></button>
+              <div className="flex h-11 w-12 items-center justify-center rounded-[12px] border border-border/50 bg-background text-[18px] font-semibold text-foreground shadow-sm">
                 {minute.toString().padStart(2, '0')}
               </div>
-              <button type="button" onClick={() => setMinute(m => m === 0 ? 59 : m - 1)} className="text-muted-foreground hover:text-info transition p-1"><ChevronDown className="h-5 w-5" /></button>
+              <button type="button" onClick={() => setMinute(m => m === 0 ? 59 : m - 1)} className="text-muted-foreground hover:text-info transition p-1"><ChevronDown className="h-4 w-4" /></button>
             </div>
           </div>
 
-          <div className="flex justify-center gap-2 mb-6 mt-4">
+          <div className="flex justify-center gap-1.5 mb-5 mt-3">
             {[0, 15, 30, 45].map(m => (
               <button
                 key={m}
                 type="button"
                 onClick={() => setMinute(m)}
-                className={`rounded-[9px] px-3.5 py-1.5 text-[11.5px] font-semibold transition ${minute === m ? 'bg-info text-white' : 'bg-secondary/70 text-muted-foreground hover:bg-secondary hover:text-foreground'}`}
+                className={`rounded-[8px] px-3 py-1.5 text-[11px] font-semibold transition ${minute === m ? 'bg-info text-white' : 'bg-secondary/70 text-muted-foreground hover:bg-secondary hover:text-foreground'}`}
               >
                 :{m.toString().padStart(2, '0')}
               </button>
             ))}
           </div>
 
-          <div className="flex items-center justify-between border-t border-border/50 pt-4 mt-2">
-            <button type="button" onClick={handleNow} className="flex items-center gap-1.5 text-[12px] font-medium text-muted-foreground hover:text-foreground transition">
+          <div className="flex items-center justify-between border-t border-border/50 pt-3 mt-1">
+            <button type="button" onClick={handleNow} className="flex items-center gap-1.5 text-[11.5px] font-medium text-muted-foreground hover:text-foreground transition">
               <RotateCcw className="h-3.5 w-3.5" />
               Now
             </button>
-            <button type="button" onClick={handleApply} className="rounded-[10px] bg-info px-6 py-2.5 text-[12px] font-semibold text-white shadow-[0_4px_14px_rgba(59,130,246,0.25)] hover:bg-info/90 transition">
+            <button type="button" onClick={handleApply} className="rounded-[10px] bg-info px-5 py-2 text-[11.5px] font-semibold text-white shadow-[0_4px_14px_rgba(59,130,246,0.25)] hover:bg-info/90 transition">
               Apply
             </button>
           </div>
