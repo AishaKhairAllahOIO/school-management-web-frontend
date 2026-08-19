@@ -12,7 +12,35 @@ export const financeInstallmentsKeys = {
       "finance-installment",
       installmentId,
     ] as const,
+
+     byAccount: (accountId: string | number) =>
+    ["finance-installments", "account", accountId] as const,
 };
+
+export function useAccountInstallments(
+  accountId: string | number | undefined,
+  enabled = true,
+) {
+  const hasAccountId =
+    accountId !== undefined &&
+    accountId !== null;
+
+  return useQuery({
+    queryKey: hasAccountId
+      ? financeInstallmentsKeys.byAccount(accountId)
+      : ["finance-installments", "account", "missing"],
+
+    queryFn: () =>
+      financeApi.getInstallmentsByAccount(
+        accountId!,
+      ),
+
+    enabled:
+      enabled && hasAccountId,
+
+    retry: false,
+  });
+}
 
 export function useFinanceInstallments() {
   return useQuery({

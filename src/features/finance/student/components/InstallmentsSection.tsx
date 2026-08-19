@@ -22,6 +22,7 @@ import { FinanceTableSkeleton } from "./FinanceTableSkeleton";
 
 type InstallmentsSectionProps = {
   installments: Installment[];
+  isLoading?: boolean;
   title?: string;
   description?: string;
 };
@@ -286,6 +287,7 @@ function InstallmentsTable({
 
 export function InstallmentsSection({
   installments,
+  isLoading = false,
   title = "Installment Schedule",
   description = "Track what is due, what has been paid, and what remains.",
 }: InstallmentsSectionProps) {
@@ -302,6 +304,19 @@ export function InstallmentsSection({
     installments.find(
       (item) => String(item.id) === String(selectedInstallmentId),
     );
+
+  // ✅ عرض Skeleton أثناء التحميل
+  if (isLoading) {
+    return (
+      <FinanceSectionShell
+        title={title}
+        description={description}
+        icon={CalendarDays}
+      >
+        <FinanceTableSkeleton />
+      </FinanceSectionShell>
+    );
+  }
 
   return (
     <FinanceSectionShell
