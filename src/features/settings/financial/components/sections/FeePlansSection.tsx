@@ -78,6 +78,17 @@ export function FeePlansSection({ academicYears, gradeLevels }: Props) {
     });
   }
 
+  // ← أضف دالة handleView
+  function handleView(plan: FeePlan) {
+    // يمكنك هنا فتح صفحة التفاصيل أو عرض الـ plan في dialog
+    // مثال: navigate(`/settings/financial/fee-plans/${plan.id}`)
+    console.log("View fee plan:", plan);
+    // يمكنك أيضاً فتح dialog لعرض التفاصيل
+    setSelectedPlan(plan);
+    // أو فتح صفحة جديدة
+    // navigate(`/financial/fee-plans/${plan.id}`);
+  }
+
   if (isLoading) {
     return <FeePlansSkeleton />;
   }
@@ -114,6 +125,7 @@ export function FeePlansSection({ academicYears, gradeLevels }: Props) {
       </div>
     );
   }
+
   return (
     <div>
       <div>
@@ -126,6 +138,7 @@ export function FeePlansSection({ academicYears, gradeLevels }: Props) {
 
         <FeePlansTable
           feePlans={feePlans}
+          onView={handleView}  // ← أضف هذا
           onEdit={(plan) => {
             setSelectedPlan(plan);
             setEditOpen(true);

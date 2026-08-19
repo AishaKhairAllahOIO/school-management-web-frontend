@@ -62,6 +62,13 @@ export function InstallmentPoliciesSection() {
     });
   }
 
+  // ← أضف دالة handleView
+  function handleView(policy: InstallmentPolicy) {
+    // يمكنك هنا فتح صفحة التفاصيل أو عرض الـ policy في dialog
+    console.log("View installment policy:", policy);
+    // مثال: navigate(`/settings/financial/installment-policies/${policy.id}`)
+  }
+
   if (isLoading) {
     return <InstallmentPoliciesSkeleton />;
   }
@@ -78,6 +85,7 @@ export function InstallmentPoliciesSection() {
 
         <InstallmentPoliciesTable
           policies={policies}
+          onView={handleView}  // ← أضف هذا
           onEdit={(policy) => {
             setSelectedPolicy(policy);
             setEditOpen(true);
