@@ -5,8 +5,8 @@ type SidebarSectionSeparatorProps = {
 };
 
 const SEPARATOR_LINE_CLASS_NAME = [
-  "block h-[4px] shrink-0",
-  "border-y border-solid border-sidebar-muted",
+  "block h-px shrink-0",
+  "bg-sidebar-muted/40",
 ].join(" ");
 
 function SeparatorLines({
@@ -19,9 +19,7 @@ function SeparatorLines({
       aria-hidden="true"
       className={[
         SEPARATOR_LINE_CLASS_NAME,
-        compact
-          ? "w-8"
-          : "min-w-0 flex-1",
+        compact ? "w-8" : "min-w-0 flex-1",
       ].join(" ")}
     />
   );
