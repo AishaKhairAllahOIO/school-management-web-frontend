@@ -112,39 +112,51 @@ export function StaffAttendanceTable({
                   const isTeacher = roleString.toLowerCase().includes('teach') || roleString.includes('معلم');
 
                   const highlightEdit = pendingEdits[item.id] ? 'bg-warning/[0.05]' : '';
-                  const teacherScheduleEntries = teacherSchedule?.[item.user_id]?.[currentDay || ''] || [];
                   
+
+                  const fullName = `${item?.user?.first_name || ''} ${item?.user?.last_name || ''}`.trim();
+
+                  const dayLower = (currentDay || '').toLowerCase();
+                  const dayCapitalized = dayLower.charAt(0).toUpperCase() + dayLower.slice(1);
+
+
+                  const teacherScheduleEntries = 
+                    teacherSchedule?.[fullName]?.[dayLower] ||
+                    teacherSchedule?.[fullName]?.[dayCapitalized] ||
+                    teacherSchedule?.[item.id]?.[dayLower] ||
+                    teacherSchedule?.[item.user_id]?.[dayLower] ||
+                    [];
                   const standardStatuses = ["present", "absent", "partial_absence", "on_leave"];
 
                   return (
-                  <tr key={item?.id || index} className={`border-t border-border/50 text-[13px] transition-colors hover:bg-muted/30 group ${highlightEdit}`}> 
-                    <td className="px-6 py-3.5"> 
-                      <div className="flex items-center gap-3 min-w-0"> 
-                        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[12px] bg-primary/10 text-[13px] font-bold text-primary border border-primary/25 uppercase"> 
-                          {item?.user?.first_name?.charAt(0) || index + 1} 
-                        </span> 
-                        <div className="min-w-0"> 
-                          <p className="truncate font-bold text-foreground group-hover:text-primary transition-colors text-[12.5px]">
-                            {item?.user?.first_name} {item?.user?.last_name}
-                          </p> 
-                          <p className="truncate text-[11px] font-medium text-muted-foreground capitalize mt-0.5">
-                            {roleString}
-                          </p>
+                    <tr key={item?.id || index} className={`border-t border-border/50 text-[13px] transition-colors hover:bg-muted/30 group ${highlightEdit}`}> 
+                      <td className="px-6 py-3.5"> 
+                        <div className="flex items-center gap-3 min-w-0"> 
+                          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[12px] bg-primary/10 text-[13px] font-bold text-primary border border-primary/25 uppercase"> 
+                            {item?.user?.first_name?.charAt(0) || index + 1} 
+                          </span> 
+                          <div className="min-w-0"> 
+                            <p className="truncate font-bold text-foreground group-hover:text-primary transition-colors text-[12.5px]">
+                              {item?.user?.first_name} {item?.user?.last_name}
+                            </p> 
+                            <p className="truncate text-[11px] font-medium text-muted-foreground capitalize mt-0.5">
+                              {roleString}
+                            </p>
+                          </div> 
                         </div> 
-                      </div> 
-                    </td> 
+                      </td> 
  
-                    <td className="px-4 py-3.5"> 
-                      <Select 
-                        value={currentStatus} 
-                        onValueChange={(value) => {
-                          onUpdateLocal(item.id, 'status', value);
-                          if (value === 'present' || value === 'on_leave') {
-                            onUpdateLocal(item.id, 'absence_type', null);
-                            onUpdateLocal(item.id, 'missing_periods', []);
+                      <td className="px-4 py-3.5"> 
+                        <Select 
+                          value={currentStatus} 
+                          onValueChange={(value) => {
+                            onUpdateLocal(item.id, 'status', value);
+                            if (value === 'present' || value === 'on_leave') {
+                              onUpdateLocal(item.id, 'absence_type', null);
+                              onUpdateLocal(item.id, 'missing_periods', []);
                           } else if (value === 'partial_absence' && currentPeriods.length === 0) {
                             onUpdateLocal(item.id, 'missing_periods', []);
-                          }
+                        }
                         }} 
                       > 
                         <SelectTrigger className={`h-8 w-[120px] text-[11.5px] px-3 transition-all ${getStatusBadgeStyles(currentStatus)}`}>
@@ -166,126 +178,126 @@ export function StaffAttendanceTable({
                     </td> 
  
                     <td className="px-4 py-3.5"> 
-                      {currentStatus === "absent" || currentStatus === "partial_absence" ? ( 
-                        <Select 
-                          value={currentAbsenceType} 
-                          onValueChange={(value) => onUpdateLocal(item.id, 'absence_type', value)} 
-                        > 
-                          <SelectTrigger className={`h-8 w-[110px] text-[11.5px] px-3 transition-all ${getAbsenceBadgeStyles(currentAbsenceType)}`}>
-                            <SelectValue />
-                          </SelectTrigger> 
-                          <SelectContent className="bg-popover text-popover-foreground border-border"> 
-                            <SelectItem value="excused" className="font-medium text-info focus:text-info">Excused</SelectItem> 
-                            <SelectItem value="unexcused" className="font-medium text-warning focus:text-warning">Unexcused</SelectItem> 
-                          </SelectContent> 
-                        </Select> 
-                      ) : ( 
-                        <span className="text-muted-foreground font-medium">—</span> 
-                      )} 
-                    </td> 
+                    {currentStatus === "absent" || currentStatus === "partial_absence" ? ( 
+                    <Select 
+                      value={currentAbsenceType} 
+                      onValueChange={(value) => onUpdateLocal(item.id, 'absence_type', value)} 
+                    > 
+                      <SelectTrigger className={`h-8 w-[110px] text-[11.5px] px-3 transition-all ${getAbsenceBadgeStyles(currentAbsenceType)}`}>
+                        <SelectValue />
+                      </SelectTrigger> 
+                      <SelectContent className="bg-popover text-popover-foreground border-border"> 
+                        <SelectItem value="excused" className="font-medium text-info focus:text-info">Excused</SelectItem> 
+                        <SelectItem value="unexcused" className="font-medium text-warning focus:text-warning">Unexcused</SelectItem> 
+                      </SelectContent> 
+                    </Select> 
+                  ) : ( 
+                    <span className="text-muted-foreground font-medium">—</span> 
+                  )} 
+                </td> 
 
-                    <td className="px-4 py-3.5"> 
-                      {isTeacher ? (
-                        currentStatus === "partial_absence" ? (
-                          <Popover>
-                            <PopoverTrigger asChild>
-                              <Button variant="outline" className="h-8 px-2.5 rounded-[10px] border-primary/30 bg-primary/10 text-primary text-[11px] font-semibold hover:bg-primary/20 transition-colors">
-                                {currentPeriods.length > 0 ? `P: ${currentPeriods.length} selected` : "Select Periods"}
-                              </Button>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-[220px] p-3 rounded-[16px] bg-popover text-popover-foreground border-border" align="start">
-                              <div className="mb-2 px-1 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Scheduled Periods</div>
-                              
-                              {teacherScheduleEntries.length > 0 ? (
-                                <div className="flex flex-col gap-1 max-h-[180px] overflow-y-auto">
-                                  {teacherScheduleEntries.map((period: any) => {
-                                    const periodId = period.entry_id;
-                                    const isSelected = currentPeriods.includes(periodId);
-                                    
-                                    return (
-                                      <button
-                                        key={periodId}
-                                        type="button"
-                                        onClick={() => {
-                                          const newPeriods = isSelected 
-                                            ? currentPeriods.filter((id: any) => id !== periodId) 
-                                            : [...currentPeriods, periodId];
-                                          onUpdateLocal(item.id, 'missing_periods', newPeriods);
-                                        }}
-                                        className={`flex items-center justify-between px-2.5 py-1.5 rounded-[8px] text-[11.5px] font-semibold transition-all ${
-                                          isSelected ? "bg-primary text-primary-foreground shadow-sm" : "bg-muted/50 text-foreground hover:bg-muted"
-                                        }`}
-                                      >
-                                        <span>Period {period.period_index || ''}</span>
-                                        {period.subject_name && <span className="text-[10px] opacity-80">{period.subject_name}</span>}
-                                        <span>{period.start_time}</span>
-                                      </button>
-                                    );
-                                  })}
-                                </div>
-                              ) : (
-                                <p className="text-[11px] text-muted-foreground text-center py-2">No periods found for this teacher today.</p>
-                              )}
-                            </PopoverContent>
-                          </Popover>
-                        ) : (
-                          <span className="text-muted-foreground font-medium">—</span> 
-                        )
-                      ) : (
-                        <span className="text-muted-foreground/50 text-[11px] font-medium uppercase tracking-wider">N/A</span>
-                      )}
-                    </td>
+                <td className="px-4 py-3.5"> 
+                  {isTeacher ? (
+                    currentStatus === "partial_absence" ? (
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button variant="outline" className="h-8 px-2.5 rounded-[10px] border-primary/30 bg-primary/10 text-primary text-[11px] font-semibold hover:bg-primary/20 transition-colors">
+                            {currentPeriods.length > 0 ? `P: ${currentPeriods.length} selected` : "Select Periods"}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-[220px] p-3 rounded-[16px] bg-popover text-popover-foreground border-border" align="start">
+                          <div className="mb-2 px-1 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Scheduled Periods</div>
+                          
+                          {teacherScheduleEntries.length > 0 ? (
+                            <div className="flex flex-col gap-1 max-h-[180px] overflow-y-auto">
+                              {teacherScheduleEntries.map((period: any) => {
+                                const periodId = period.entry_id;
+                                const isSelected = currentPeriods.includes(periodId);
+                                
+                                return (
+                                  <button
+                                    key={periodId}
+                                    type="button"
+                                    onClick={() => {
+                                      const newPeriods = isSelected 
+                                        ? currentPeriods.filter((id: any) => id !== periodId) 
+                                        : [...currentPeriods, periodId];
+                                      onUpdateLocal(item.id, 'missing_periods', newPeriods);
+                                    }}
+                                    className={`flex items-center justify-between px-2.5 py-1.5 rounded-[8px] text-[11.5px] font-semibold transition-all ${
+                                      isSelected ? "bg-primary text-primary-foreground shadow-sm" : "bg-muted/50 text-foreground hover:bg-muted"
+                                    }`}
+                                  >
+                                    <span>Period {period.period_index || ''}</span>
+                                    {period.subject_name && <span className="text-[10px] opacity-80">{period.subject_name}</span>}
+                                    <span>{period.start_time}</span>
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          ) : (
+                            <p className="text-[11px] text-muted-foreground text-center py-2">No periods found for this teacher today.</p>
+                          )}
+                        </PopoverContent>
+                      </Popover>
+                    ) : (
+                      <span className="text-muted-foreground font-medium">—</span> 
+                    )
+                  ) : (
+                    <span className="text-muted-foreground/50 text-[11px] font-medium uppercase tracking-wider">N/A</span>
+                  )}
+                </td>
  
-                    <td className="px-6 py-3.5 text-center"> 
-                      <div className="flex items-center justify-center gap-1.5">
-                        <Button 
-                          type="button"
-                          variant="outline" 
-                          size="icon" 
-                          onClick={() => onViewDetails(item)}
-                          className="h-8 w-8 rounded-[10px] border-border/60 text-primary hover:bg-primary/10 transition-colors"
-                          title="Quick Summary"
-                        > 
-                          <Eye className="h-4 w-4" /> 
-                        </Button> 
-                      </div>
-                    </td> 
-                  </tr> 
-                )})} 
-            {!isLoading && safeData.length === 0 && (
-              <tr><td colSpan={5} className="px-6 py-16 text-center text-[13px] font-medium text-muted-foreground">No records match the selected filters.</td></tr>
-            )}
-          </tbody> 
-        </table> 
-      </div> 
+                <td className="px-6 py-3.5 text-center"> 
+                <div className="flex items-center justify-center gap-1.5">
+                  <Button 
+                    type="button"
+                    variant="outline" 
+                    size="icon" 
+                    onClick={() => onViewDetails(item)}
+                    className="h-8 w-8 rounded-[10px] border-border/60 text-primary hover:bg-primary/10 transition-colors"
+                    title="Quick Summary"
+                  > 
+                    <Eye className="h-4 w-4" /> 
+                  </Button> 
+                </div>
+              </td> 
+            </tr> 
+          )})} 
+          {!isLoading && safeData.length === 0 && (
+            <tr><td colSpan={5} className="px-6 py-16 text-center text-[13px] font-medium text-muted-foreground">No records match the selected filters.</td></tr>
+          )}
+      </tbody> 
+    </table> 
+  </div> 
 
-      {pagination.lastPage >= 1 && (
-        <div className="flex items-center justify-between border-t border-border/60 px-6 py-4 bg-muted/10">
-          <p className="text-[12px] font-medium text-muted-foreground">
-            Page {pagination.currentPage} of {pagination.lastPage}
-          </p>
-          <div className="flex items-center gap-2">
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={() => onPageChange(pagination.currentPage - 1)} 
-              disabled={pagination.currentPage <= 1 || isLoading} 
-              className="h-8 rounded-[10px] text-[12px] font-semibold text-foreground border-border/60"
-            >
-              <ChevronLeft className="h-4 w-4 mr-1" /> Prev
-            </Button>
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={() => onPageChange(pagination.currentPage + 1)} 
-              disabled={pagination.currentPage >= pagination.lastPage || isLoading} 
-              className="h-8 rounded-[10px] text-[12px] font-semibold text-foreground border-border/60"
-            >
-              Next <ChevronRight className="h-4 w-4 ml-1" />
-            </Button>
-          </div>
-        </div>
-      )}
-    </div> 
-  ); 
+  {pagination.lastPage >= 1 && (
+    <div className="flex items-center justify-between border-t border-border/60 px-6 py-4 bg-muted/10">
+      <p className="text-[12px] font-medium text-muted-foreground">
+        Page {pagination.currentPage} of {pagination.lastPage}
+      </p>
+      <div className="flex items-center gap-2">
+        <Button 
+          variant="outline" 
+          size="sm" 
+          onClick={() => onPageChange(pagination.currentPage - 1)} 
+          disabled={pagination.currentPage <= 1 || isLoading} 
+          className="h-8 rounded-[10px] text-[12px] font-semibold text-foreground border-border/60"
+        >
+          <ChevronLeft className="h-4 w-4 mr-1" /> Prev
+        </Button>
+        <Button 
+          variant="outline" 
+          size="sm" 
+          onClick={() => onPageChange(pagination.currentPage + 1)} 
+          disabled={pagination.currentPage >= pagination.lastPage || isLoading} 
+          className="h-8 rounded-[10px] text-[12px] font-semibold text-foreground border-border/60"
+        >
+          Next <ChevronRight className="h-4 w-4 ml-1" />
+        </Button>
+      </div>
+    </div>
+  )}
+</div> 
+); 
 }

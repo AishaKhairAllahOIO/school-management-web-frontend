@@ -1,7 +1,7 @@
 import { AlertTriangle } from "lucide-react";
 import type { ReactNode } from "react";
 
-import { DatePicker } from "@/shared/ui/date-picker";
+import { DatePicker } from "../activities/date-picker";
 import { MonthPicker } from "./month-picker";
 import {
   Select,
@@ -68,16 +68,20 @@ export function AlertTypeForm({
       ? "border-info/[0.14] bg-info/[0.035]"
       : "border-warning/[0.16] bg-warning/[0.035]";
 
-  // 🌟 هنا السر: جعلنا التأثير اللوني (Focus) ديناميكياً ليطابق الكارد تماماً بدلاً من الموف الثابت
-  const inputClassName = `h-11 w-full rounded-[13px] border border-input bg-background px-3.5 text-[12px] outline-none transition ${
-    tone === "student"
-      ? "focus:border-info/35 focus:ring-4 focus:ring-info/[0.07]"
-      : "focus:border-warning/35 focus:ring-4 focus:ring-warning/[0.07]"
-  }`;
+  // 🌟 1. توحيد كلاسات التأثير اللوني (Focus) لتشمل حالة الفتح (data-[state=open])
+  const dynamicFocusClasses = tone === "student"
+    ? "focus:border-info/35 focus:ring-4 focus:ring-info/[0.07] data-[state=open]:border-info/35 data-[state=open]:ring-4 data-[state=open]:ring-info/[0.07]"
+    : "focus:border-warning/35 focus:ring-4 focus:ring-warning/[0.07] data-[state=open]:border-warning/35 data-[state=open]:ring-4 data-[state=open]:ring-warning/[0.07]";
+
+  // 🌟 2. تطبيق الكلاسات على الحقول العادية
+  const inputClassName = `h-11 w-full rounded-[13px] border border-input bg-background px-3.5 text-[12px] outline-none transition focus:ring-offset-0 ${dynamicFocusClasses}`;
+
+  // 🌟 3. كلاس مخصص للـ SelectTrigger ليعمل Override للون البنفسجي الافتراضي
+  const selectTriggerClassName = `h-11 w-full rounded-[13px] border-border/70 bg-background text-[12px] shadow-none outline-none transition focus:ring-offset-0 ${dynamicFocusClasses}`;
 
   return (
-    <div className="space-y-4">
-      <div className="space-y-2">
+    <div className="space-y-4 relative">
+      <div className="space-y-2 relative z-20">
         <label className="text-[11px] font-medium text-foreground">
           Alert category
         </label>
@@ -88,7 +92,8 @@ export function AlertTypeForm({
             onAlertTypeChange(value as AlertCategory)
           }
         >
-          <SelectTrigger className="h-11 rounded-[13px] border-border/70 bg-background text-[12px] shadow-none">
+          {/* 🌟 تمرير الكلاس الجديد هنا للـ Select الأساسي 🌟 */}
+          <SelectTrigger className={selectTriggerClassName}>
             <SelectValue placeholder="Choose an alert category" />
           </SelectTrigger>
           <SelectContent>
@@ -113,11 +118,11 @@ export function AlertTypeForm({
         </Select>
       </div>
 
-      <div className={`space-y-4 rounded-[18px] border p-4 ${surface}`}>
+      <div className={`relative z-10 space-y-4 rounded-[18px] border p-4 ${surface}`}>
         {(alertType === "payment" ||
           alertType === "payed" ||
           alertType === "salary") && (
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-4 sm:grid-cols-2 items-end">
             <Field label="Amount">
               <input
                 type="number"
@@ -127,7 +132,7 @@ export function AlertTypeForm({
                 onChange={(event) => onAmountChange(event.target.value)}
                 placeholder="0.00"
                 required
-                className={inputClassName} // 🌟 تطبيق الكلاس الديناميكي هنا
+                className={inputClassName}
               />
             </Field>
 
@@ -159,7 +164,8 @@ export function AlertTypeForm({
                 onSeverityChange(value as "low" | "medium" | "high")
               }
             >
-              <SelectTrigger className="h-11 rounded-[13px] border-border/70 bg-background text-[12px] shadow-none">
+              {/* 🌟 تمرير الكلاس الجديد هنا أيضاً لـ Select الخاص بـ Severity 🌟 */}
+              <SelectTrigger className={selectTriggerClassName}>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -179,7 +185,7 @@ export function AlertTypeForm({
                 onChange={(event) => onSessionNameChange(event.target.value)}
                 placeholder="Example: Period 3"
                 required
-                className={inputClassName} // 🌟 وتطبيقه هنا
+                className={inputClassName}
               />
             </Field>
 
@@ -191,7 +197,7 @@ export function AlertTypeForm({
                   value={minutesLate}
                   onChange={(event) => onMinutesLateChange(event.target.value)}
                   required
-                  className={inputClassName} // 🌟 وتطبيقه هنا
+                  className={inputClassName}
                 />
               </Field>
             ) : null}
@@ -199,14 +205,14 @@ export function AlertTypeForm({
         ) : null}
 
         {alertType === "homework" ? (
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-4 sm:grid-cols-2 items-end">
             <Field label="Subject">
               <input
                 value={subjectName}
                 onChange={(event) => onSubjectNameChange(event.target.value)}
                 placeholder="Subject name"
                 required
-                className={inputClassName} // 🌟 وتطبيقه هنا
+                className={inputClassName}
               />
             </Field>
 
