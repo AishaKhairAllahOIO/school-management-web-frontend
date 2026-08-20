@@ -21,7 +21,7 @@ import { useStudentFullProfile } from "../../../users/students/hooks/useStudents
 import {
   contractSchema,
   type ContractFormValues,
-} from "../schemas/contract.schema";
+} from "../schemas/studentContract.schema";
 
 type Option = { id: number | string; name: string };
 type FeePlanOption = Option & {
@@ -46,7 +46,7 @@ type Props = {
   backgroundAcademicYearId?: number | string;
 };
 
-export function FinalizeContractDialog({
+export function CreateStudentContractDialog({
   open,
   onOpenChange,
   students,

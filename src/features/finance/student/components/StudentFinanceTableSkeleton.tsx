@@ -18,7 +18,7 @@ export function FinanceSummarySkeleton() {
   );
 }
 
-export function FinanceTableSkeleton({ rows = 6 }: { rows?: number }) {
+export function StudentFinanceTableSkeleton({ rows = 6 }: { rows?: number }) {
   return (
     <div className="overflow-hidden rounded-[20px] border border-border/45 bg-card shadow-[0_12px_34px_rgba(31,22,73,0.04)]">
       <div className="grid grid-cols-6 items-center gap-4 border-b border-border/40 bg-muted/20 px-5 py-2.5">

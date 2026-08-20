@@ -1,5 +1,12 @@
+// features/finance/components/PaymentProcess.tsx
+
 import * as React from "react";
-import { useEffect, useMemo, useState } from "react";
+import {
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
+
 import {
   AlertTriangle,
   Banknote,
@@ -8,7 +15,12 @@ import {
   ReceiptText,
   Trash2,
 } from "lucide-react";
-import { Controller, useForm } from "react-hook-form";
+
+import {
+  Controller,
+  useForm,
+} from "react-hook-form";
+
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -45,19 +57,24 @@ import { cn } from "@/shared/lib/utils";
 
 import {
   useFinancePayment,
-  useFinancePayments,
-} from "../hooks/usePayments";
+  useStudentPayments,
+} from "../hooks/useStudentPayments";
 
-import type { PaymentReceipt } from "../types/finance.types";
-import type { UpdatePaymentPayload } from "../types/finance.payloads";
+import type {
+  PaymentReceipt,
+} from "../types/studentFinance.types";
+
+import type {
+  UpdatePaymentPayload,
+} from "../types/studentFinance.payloads";
 
 import {
   paymentSchema,
   type PaymentFormValues,
-} from "../schemas/payment.schema";
+} from "../schemas/studentPayment.schema";
 
-import { FinanceSectionShell } from "./FinanceSectionShell";
-import { FinanceTableSkeleton } from "./FinanceTableSkeleton";
+import { StudentFinanceSectionShell } from "./StudentFinanceSectionShell";
+import { StudentFinanceTableSkeleton } from "./StudentFinanceTableSkeleton";
 
 type PaymentFormOption = {
   id: number | string;
@@ -68,26 +85,38 @@ type PaymentFormProps = {
   students: PaymentFormOption[];
   initialStudentId?: string | number;
   isLoading?: boolean;
-  onSubmit: (values: PaymentFormValues) => void;
+  onSubmit: (
+    values: PaymentFormValues,
+  ) => void;
 };
 
-type ProcessPaymentDialogProps = {
+type StudentPaymentDialogProps = {
   open: boolean;
-  onOpenChange: (open: boolean) => void;
+  onOpenChange: (
+    open: boolean,
+  ) => void;
   students: PaymentFormOption[];
   initialStudentId?: string | number;
   isLoading?: boolean;
-  onSubmit: (values: PaymentFormValues) => void;
+  onSubmit: (
+    values: PaymentFormValues,
+  ) => void;
 };
 
 type PaymentsTableProps = {
   payments: PaymentReceipt[];
   headerAction?: React.ReactNode;
-  onEdit?: (payment: PaymentReceipt) => void;
-  onDelete?: (paymentId: string | number) => void;
+  onEdit?: (
+    payment: PaymentReceipt,
+  ) => void;
+  onDelete?: (
+    paymentId: string | number,
+  ) => void;
 };
 
-const methodLabel = (method: string) =>
+const methodLabel = (
+  method: string,
+) =>
   ({
     cash: "Cash",
     bank_transfer: "Bank transfer",
@@ -95,12 +124,17 @@ const methodLabel = (method: string) =>
     electronic_wallet: "E-wallet",
   })[method] ?? method;
 
-const statusLabel = (status?: string) =>
+const statusLabel = (
+  status?: string,
+) =>
   !status
     ? "Completed"
-    : status.charAt(0).toUpperCase() + status.slice(1);
+    : status.charAt(0).toUpperCase() +
+      status.slice(1);
 
-const statusColor = (status?: string) => {
+const statusColor = (
+  status?: string,
+) => {
   switch (status) {
     case "completed":
       return "bg-success/[0.06] text-success";
@@ -116,10 +150,6 @@ const statusColor = (status?: string) => {
   }
 };
 
-/* -------------------------------------------------------------------------- */
-/* Shared dialog styling                                                      */
-/* -------------------------------------------------------------------------- */
-
 const FINANCE_DIALOG_CONTENT =
   "w-[calc(100%-1rem)] overflow-hidden rounded-[24px] border-border/45 bg-background p-0 shadow-[0_18px_45px_rgba(31,22,73,0.08)] sm:w-full";
 
@@ -129,26 +159,17 @@ const FINANCE_DIALOG_HEADER =
 const FINANCE_DIALOG_BODY =
   "px-5 pb-5 pt-5 sm:px-6 sm:pb-6 sm:pt-5";
 
-/*
- * Very soft focus style.
- *
- * Reduced from ring-2 to ring-1 and lowered opacity
- * so the focus state remains accessible without creating
- * a visible glow around the controls.
- */
 const FINANCE_INPUT_CLASS =
   "h-11 rounded-[13px] border-border/50 bg-background shadow-none outline-none transition-[border-color,box-shadow] focus-visible:border-primary/15 focus-visible:ring-1 focus-visible:ring-primary/[0.035] focus-visible:ring-offset-0";
 
 const FINANCE_SELECT_TRIGGER_CLASS =
   "h-11 rounded-[13px] border-border/50 bg-background text-[12px] text-foreground shadow-none outline-none transition-[border-color,box-shadow] focus:ring-1 focus:ring-primary/[0.035] focus:ring-offset-0";
 
-/* -------------------------------------------------------------------------- */
-/* Update payment                                                             */
-/* -------------------------------------------------------------------------- */
-
 type UpdatePaymentDialogProps = {
   open: boolean;
-  onOpenChange: (open: boolean) => void;
+  onOpenChange: (
+    open: boolean,
+  ) => void;
   payment: PaymentReceipt | null;
   isLoading?: boolean;
   onSubmit: (
@@ -157,35 +178,36 @@ type UpdatePaymentDialogProps = {
   ) => void;
 };
 
-const updatePaymentSchema = z.object({
-  paymentMethod: z.string().min(
-    1,
-    "Please select a payment method",
-  ) as z.ZodType<
-    "cash" | "bank_transfer" | "cheque" | "electronic_wallet"
-  >,
+const updatePaymentSchema =
+  z.object({
+    paymentMethod:
+      z.string().min(
+        1,
+        "Please select a payment method",
+      ) as z.ZodType<
+        | "cash"
+        | "bank_transfer"
+        | "cheque"
+        | "electronic_wallet"
+      >,
 
-  paperReceiptNo: z.string().optional(),
+    paperReceiptNo:
+      z.string().optional(),
 
-  digitalReference: z.string().optional(),
-});
-
-/* -------------------------------------------------------------------------- */
-/* Delete payment                                                             */
-/* -------------------------------------------------------------------------- */
+    digitalReference:
+      z.string().optional(),
+  });
 
 type DeletePaymentDialogProps = {
   open: boolean;
-  onOpenChange: (open: boolean) => void;
+  onOpenChange: (
+    open: boolean,
+  ) => void;
   isLoading?: boolean;
   onConfirm: () => void;
 };
 
-/* -------------------------------------------------------------------------- */
-/* Cashier section                                                            */
-/* -------------------------------------------------------------------------- */
-
-type CashierSectionProps = {
+type StudentPaymentHistoryProps = {
   studentId?: string | number;
   studentName?: string;
   accountId?: string | number;
@@ -193,12 +215,12 @@ type CashierSectionProps = {
   description?: string;
 };
 
-export function CashierSection({
+export function StudentPaymentHistory({
   studentId,
   accountId,
   title = "Payment History",
   description = "Review and manage recorded payments.",
-}: CashierSectionProps = {}) {
+}: StudentPaymentHistoryProps = {}) {
   const {
     data: payments = [],
     isLoading: isLoadingPayments,
@@ -207,40 +229,55 @@ export function CashierSection({
     refetch,
     updatePayment,
     deletePayment,
-  } = useFinancePayments();
+  } = useStudentPayments(studentId, accountId, studentId !== undefined);
 
-  const visiblePayments = useMemo(
-    () =>
-      studentId === undefined
-        ? payments
-        : payments.filter(
-            (payment) =>
-              String(payment.studentId) === String(studentId) ||
-              (accountId !== undefined &&
-                String(payment.accountId) === String(accountId)),
-          ),
-    [accountId, payments, studentId],
-  );
+  const visiblePayments =
+    useMemo(
+      () =>
+        payments.filter(
+          (payment) =>
+            String(payment.studentId) === String(studentId) &&
+            (accountId === undefined ||
+              String(payment.accountId) === String(accountId)),
+        ),
+      [
+        accountId,
+        payments,
+        studentId,
+      ],
+    );
 
-  const [editOpen, setEditOpen] = useState(false);
+  const [editOpen, setEditOpen] =
+    useState(false);
 
-  const [selectedPayment, setSelectedPayment] =
-    useState<PaymentReceipt | null>(null);
+  const [
+    selectedPayment,
+    setSelectedPayment,
+  ] =
+    useState<PaymentReceipt | null>(
+      null,
+    );
 
-  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deleteOpen, setDeleteOpen] =
+    useState(false);
 
-  const [selectedPaymentIdToDelete, setSelectedPaymentIdToDelete] =
-    useState<string | number | null>(null);
+  const [
+    selectedPaymentIdToDelete,
+    setSelectedPaymentIdToDelete,
+  ] =
+    useState<
+      string | number | null
+    >(null);
 
   if (isLoadingPayments) {
     return (
-      <FinanceSectionShell
+      <StudentFinanceSectionShell
         title={title}
         description={description}
         icon={ReceiptText}
       >
-        <FinanceTableSkeleton />
-      </FinanceSectionShell>
+        <StudentFinanceTableSkeleton />
+      </StudentFinanceSectionShell>
     );
   }
 
@@ -257,51 +294,52 @@ export function CashierSection({
           disabled={isFetching}
           className="mt-4 h-9 rounded-[12px] text-xs"
         >
-          {isFetching ? "Retrying..." : "Retry"}
+          {isFetching
+            ? "Retrying..."
+            : "Retry"}
         </Button>
       </div>
     );
   }
 
-  function handleDelete(id: string | number) {
+  function handleDelete(
+    id: string | number,
+  ) {
     setSelectedPaymentIdToDelete(id);
     setDeleteOpen(true);
   }
 
-async function confirmDelete() {
-  if (
-    selectedPaymentIdToDelete == null ||
-    deletePayment.isPending
-  ) {
-    return;
-  }
+  async function confirmDelete() {
+    if (
+      selectedPaymentIdToDelete ==
+        null ||
+      deletePayment.isPending
+    ) {
+      return;
+    }
 
-  try {
-    await deletePayment.mutateAsync({
-      id: selectedPaymentIdToDelete,
-      studentId,
-    });
+    try {
+      await deletePayment.mutateAsync({
+        id: selectedPaymentIdToDelete,
+        studentId,
+      });
 
-    /*
-     * The DELETE request succeeded.
-     * Close the dialog immediately.
-     */
-    setDeleteOpen(false);
-    setSelectedPaymentIdToDelete(null);
-  } catch (error) {
-    /*
-     * Keep the dialog open because the actual
-     * DELETE request failed.
-     */
-    console.error(
-      "Failed to delete payment:",
-      error,
-    );
+      setDeleteOpen(false);
+      setSelectedPaymentIdToDelete(
+        null,
+      );
+
+      await refetch();
+    } catch (error) {
+      console.error(
+        "Failed to delete payment:",
+        error,
+      );
+    }
   }
-}
 
   return (
-    <FinanceSectionShell
+    <StudentFinanceSectionShell
       title={title}
       description={description}
       icon={ReceiptText}
@@ -317,7 +355,7 @@ async function confirmDelete() {
 
       <UpdatePaymentDialog
         open={editOpen}
-        onOpenChange={(open: boolean) => {
+        onOpenChange={(open) => {
           setEditOpen(open);
 
           if (!open) {
@@ -325,13 +363,19 @@ async function confirmDelete() {
           }
         }}
         payment={selectedPayment}
-        isLoading={updatePayment.isPending}
-        onSubmit={(id, payload) =>
+        isLoading={
+          updatePayment.isPending
+        }
+        onSubmit={(
+          id,
+          payload,
+        ) =>
           updatePayment.mutate(
             {
               id,
               studentId:
-                selectedPayment?.studentId ?? studentId,
+                selectedPayment?.studentId ??
+                studentId,
               payload,
             },
             {
@@ -348,23 +392,23 @@ async function confirmDelete() {
 
       <DeletePaymentDialog
         open={deleteOpen}
-        onOpenChange={(open: boolean) => {
+        onOpenChange={(open) => {
           setDeleteOpen(open);
 
           if (!open) {
-            setSelectedPaymentIdToDelete(null);
+            setSelectedPaymentIdToDelete(
+              null,
+            );
           }
         }}
-        isLoading={deletePayment.isPending}
+        isLoading={
+          deletePayment.isPending
+        }
         onConfirm={confirmDelete}
       />
-    </FinanceSectionShell>
+    </StudentFinanceSectionShell>
   );
 }
-
-/* -------------------------------------------------------------------------- */
-/* Payment form                                                               */
-/* -------------------------------------------------------------------------- */
 
 export function PaymentForm({
   students,
@@ -378,41 +422,65 @@ export function PaymentForm({
     register,
     watch,
     formState: { errors },
-  } = useForm<PaymentFormValues>({
-    resolver: zodResolver(paymentSchema) as any,
+  } =
+    useForm<PaymentFormValues>({
+      resolver:
+        zodResolver(
+          paymentSchema,
+        ) as any,
 
-    defaultValues: {
-      studentId: initialStudentId
-        ? Number(initialStudentId)
-        : 0,
+      defaultValues: {
+        studentId:
+          initialStudentId
+            ? Number(
+                initialStudentId,
+              )
+            : 0,
 
-      paidAmount: 0,
+        paidAmount: 0,
 
-      paymentMethod: "cash",
+        paymentMethod: "cash",
 
-      paperReceiptNo: "",
+        paperReceiptNo: "",
 
-      digitalReference: "",
-    },
-  });
+        digitalReference: "",
+      },
+    });
 
-  const selectedMethod = watch("paymentMethod");
+  const selectedMethod =
+    watch("paymentMethod");
 
-  const fixedStudent = useMemo(() => {
-    if (initialStudentId === undefined) return undefined;
+  const fixedStudent =
+    useMemo(() => {
+      if (
+        initialStudentId ===
+        undefined
+      ) {
+        return undefined;
+      }
 
-    return students.find(
-      (student) =>
-        String(student.id) === String(initialStudentId),
-    );
-  }, [initialStudentId, students]);
+      return students.find(
+        (student) =>
+          String(student.id) ===
+          String(
+            initialStudentId,
+          ),
+      );
+    }, [
+      initialStudentId,
+      students,
+    ]);
 
-  const hasFixedStudent = initialStudentId !== undefined;
+  const hasFixedStudent =
+    initialStudentId !== undefined;
 
   return (
     <form
-      onSubmit={handleSubmit((data) =>
-        onSubmit(data as PaymentFormValues),
+      onSubmit={handleSubmit(
+        (data) =>
+          onSubmit(
+            data as PaymentFormValues,
+          ),
       )}
       className="space-y-5"
     >
@@ -425,7 +493,8 @@ export function PaymentForm({
           {hasFixedStudent ? (
             <div className="flex h-11 items-center rounded-[13px] border border-border/50 bg-muted/[0.22] px-3.5 text-[12px] text-foreground/85">
               <span className="truncate">
-                {fixedStudent?.name ?? "Student account"}
+                {fixedStudent?.name ??
+                  "Student account"}
               </span>
 
               <span className="ml-auto shrink-0 rounded-full bg-muted/50 px-2 py-1 text-[9.5px] font-medium text-muted-foreground">
@@ -438,38 +507,62 @@ export function PaymentForm({
               name="studentId"
               render={({ field }) => (
                 <Select
-                  value={field.value ? String(field.value) : ""}
-                  onValueChange={(val) =>
-                    field.onChange(Number(val))
+                  value={
+                    field.value
+                      ? String(
+                          field.value,
+                        )
+                      : ""
+                  }
+                  onValueChange={(
+                    val,
+                  ) =>
+                    field.onChange(
+                      Number(val),
+                    )
                   }
                 >
                   <SelectTrigger
-                    className={FINANCE_SELECT_TRIGGER_CLASS}
+                    className={
+                      FINANCE_SELECT_TRIGGER_CLASS
+                    }
                   >
                     <SelectValue placeholder="Select Student" />
                   </SelectTrigger>
 
                   <SelectContent className="rounded-[14px] border-border/50 bg-popover text-popover-foreground shadow-md">
-                    {students.map((student) => (
-                      <SelectItem
-                        key={student.id}
-                        value={String(student.id)}
-                        className="cursor-pointer rounded-[10px]"
-                      >
-                        {student.name}
-                      </SelectItem>
-                    ))}
+                    {students.map(
+                      (student) => (
+                        <SelectItem
+                          key={
+                            student.id
+                          }
+                          value={String(
+                            student.id,
+                          )}
+                          className="cursor-pointer rounded-[10px]"
+                        >
+                          {
+                            student.name
+                          }
+                        </SelectItem>
+                      ),
+                    )}
                   </SelectContent>
                 </Select>
               )}
             />
           )}
 
-          {errors.studentId && !hasFixedStudent && (
-            <p className="text-[10.5px] font-medium text-destructive">
-              {String(errors.studentId.message)}
-            </p>
-          )}
+          {errors.studentId &&
+            !hasFixedStudent && (
+              <p className="text-[10.5px] font-medium text-destructive">
+                {String(
+                  errors.studentId
+                    .message,
+                )}
+              </p>
+            )}
         </div>
 
         <div className="space-y-2">
@@ -483,12 +576,17 @@ export function PaymentForm({
               FINANCE_INPUT_CLASS,
               "text-[14px] font-semibold text-primary",
             )}
-            {...register("paidAmount")}
+            {...register(
+              "paidAmount",
+            )}
           />
 
           {errors.paidAmount && (
             <p className="text-[10.5px] font-medium text-destructive">
-              {String(errors.paidAmount.message)}
+              {String(
+                errors.paidAmount
+                  .message,
+              )}
             </p>
           )}
         </div>
@@ -504,10 +602,14 @@ export function PaymentForm({
             render={({ field }) => (
               <Select
                 value={field.value}
-                onValueChange={field.onChange}
+                onValueChange={
+                  field.onChange
+                }
               >
                 <SelectTrigger
-                  className={FINANCE_SELECT_TRIGGER_CLASS}
+                  className={
+                    FINANCE_SELECT_TRIGGER_CLASS
+                  }
                 >
                   <SelectValue placeholder="Select Method" />
                 </SelectTrigger>
@@ -547,7 +649,10 @@ export function PaymentForm({
 
           {errors.paymentMethod && (
             <p className="text-[10.5px] font-medium text-destructive">
-              {String(errors.paymentMethod.message)}
+              {String(
+                errors.paymentMethod
+                  .message,
+              )}
             </p>
           )}
         </div>
@@ -564,11 +669,14 @@ export function PaymentForm({
               "text-[12px]",
             )}
             placeholder="Optional"
-            {...register("paperReceiptNo")}
+            {...register(
+              "paperReceiptNo",
+            )}
           />
         </div>
 
-        {selectedMethod !== "cash" && (
+        {selectedMethod !==
+          "cash" && (
           <div className="space-y-2">
             <label className="text-[11px] font-semibold uppercase tracking-[0.07em] text-muted-foreground/75">
               Digital Reference
@@ -581,7 +689,9 @@ export function PaymentForm({
                 "text-[12px]",
               )}
               placeholder="Optional"
-              {...register("digitalReference")}
+              {...register(
+                "digitalReference",
+              )}
             />
           </div>
         )}
@@ -600,19 +710,17 @@ export function PaymentForm({
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/* Process payment dialog                                                     */
-/* -------------------------------------------------------------------------- */
-
-export function ProcessPaymentDialog({
+export function StudentPaymentDialog({
   open,
   onOpenChange,
   students,
   initialStudentId,
   isLoading,
   onSubmit,
-}: ProcessPaymentDialogProps) {
-  function handleSubmit(values: PaymentFormValues) {
+}: StudentPaymentDialogProps) {
+  function handleSubmit(
+    values: PaymentFormValues,
+  ) {
     onSubmit(values);
   }
 
@@ -624,7 +732,11 @@ export function ProcessPaymentDialog({
       <DialogContent
         className={`${FINANCE_DIALOG_CONTENT} sm:max-w-[540px]`}
       >
-        <DialogHeader className={FINANCE_DIALOG_HEADER}>
+        <DialogHeader
+          className={
+            FINANCE_DIALOG_HEADER
+          }
+        >
           <div className="flex items-start gap-3">
             <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px] border border-primary/12 bg-primary/[0.055] text-primary">
               <ReceiptText
@@ -639,17 +751,25 @@ export function ProcessPaymentDialog({
               </DialogTitle>
 
               <DialogDescription className="mt-1 text-[12px] leading-5 text-muted-foreground/75">
-                Record a new payment receipt and update the
-                student balance automatically.
+                Record a new payment
+                receipt and update the
+                student balance
+                automatically.
               </DialogDescription>
             </div>
           </div>
         </DialogHeader>
 
-        <div className={FINANCE_DIALOG_BODY}>
+        <div
+          className={
+            FINANCE_DIALOG_BODY
+          }
+        >
           <PaymentForm
             students={students}
-            initialStudentId={initialStudentId}
+            initialStudentId={
+              initialStudentId
+            }
             isLoading={isLoading}
             onSubmit={handleSubmit}
           />
@@ -658,10 +778,6 @@ export function ProcessPaymentDialog({
     </Dialog>
   );
 }
-
-/* -------------------------------------------------------------------------- */
-/* Payments table                                                             */
-/* -------------------------------------------------------------------------- */
 
 export function PaymentsTable({
   payments,
@@ -690,7 +806,8 @@ export function PaymentsTable({
         </h3>
 
         <p className="mt-1.5 text-[12.5px] text-muted-foreground/78">
-          No payment records found for this account.
+          No payment records found
+          for this account.
         </p>
       </div>
     );
@@ -721,7 +838,10 @@ export function PaymentsTable({
 
               <TableHead className="h-11 w-28 px-4 text-right text-[11px] font-semibold uppercase tracking-[0.045em] text-muted-foreground/70">
                 <div className="flex items-center justify-end gap-2.5">
-                  <span>Actions</span>
+                  <span>
+                    Actions
+                  </span>
+
                   {headerAction}
                 </div>
               </TableHead>
@@ -729,123 +849,146 @@ export function PaymentsTable({
           </TableHeader>
 
           <TableBody>
-            {payments.map((payment) => (
-              <TableRow
-                key={payment.id}
-                className="border-border/30 transition-colors hover:bg-muted/[0.16]"
-              >
-                <TableCell className="px-5 py-4">
-                  <div className="flex items-center gap-3">
-                    <span className="flex h-9 w-9 items-center justify-center rounded-[13px] border border-primary/10 bg-primary/[0.045] text-primary">
-                      <ReceiptText
-                        className="h-4 w-4"
-                        strokeWidth={1.8}
-                      />
-                    </span>
+            {payments.map(
+              (payment) => (
+                <TableRow
+                  key={payment.id}
+                  className="border-border/30 transition-colors hover:bg-muted/[0.16]"
+                >
+                  <TableCell className="px-5 py-4">
+                    <div className="flex items-center gap-3">
+                      <span className="flex h-9 w-9 items-center justify-center rounded-[13px] border border-primary/10 bg-primary/[0.045] text-primary">
+                        <ReceiptText
+                          className="h-4 w-4"
+                          strokeWidth={
+                            1.8
+                          }
+                        />
+                      </span>
 
-                    <div>
-                      <p className="text-[13px] font-semibold text-foreground/86">
-                        Student payment
-                      </p>
+                      <div>
+                        <p className="text-[13px] font-semibold text-foreground/86">
+                          Student
+                          payment
+                        </p>
 
-                      <p className="mt-0.5 text-[10.5px] text-muted-foreground/65">
-                        Payment receipt
-                      </p>
+                        <p className="mt-0.5 text-[10.5px] text-muted-foreground/65">
+                          Payment
+                          receipt
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                </TableCell>
+                  </TableCell>
 
-                <TableCell className="px-5 py-4">
-                  <div className="flex items-center gap-2 text-success">
-                    <Banknote
-                      className="h-4 w-4"
-                      strokeWidth={1.8}
-                    />
+                  <TableCell className="px-5 py-4">
+                    <div className="flex items-center gap-2 text-success">
+                      <Banknote
+                        className="h-4 w-4"
+                        strokeWidth={
+                          1.8
+                        }
+                      />
 
-                    <span className="text-[13.5px] font-semibold">
-                      {payment.paidAmount?.toLocaleString()} $
+                      <span className="text-[13.5px] font-semibold">
+                        {payment.paidAmount?.toLocaleString()}{" "}
+                        $
+                      </span>
+                    </div>
+                  </TableCell>
+
+                  <TableCell className="px-5 py-4">
+                    <span className="rounded-full border border-border/40 bg-muted/30 px-2.5 py-1 text-[11px] font-medium text-foreground/72">
+                      {methodLabel(
+                        payment.paymentMethod,
+                      )}
                     </span>
-                  </div>
-                </TableCell>
+                  </TableCell>
 
-                <TableCell className="px-5 py-4">
-                  <span className="rounded-full border border-border/40 bg-muted/30 px-2.5 py-1 text-[11px] font-medium text-foreground/72">
-                    {methodLabel(payment.paymentMethod)}
-                  </span>
-                </TableCell>
+                  <TableCell className="max-w-[150px] px-5 py-4 text-[12.5px] text-muted-foreground">
+                    <span className="block truncate">
+                      {payment.paperReceiptNo ||
+                        payment.digitalReference ||
+                        "—"}
+                    </span>
+                  </TableCell>
 
-                <TableCell className="max-w-[150px] px-5 py-4 text-[12.5px] text-muted-foreground">
-                  <span className="block truncate">
-                    {payment.paperReceiptNo ||
-                      payment.digitalReference ||
-                      "—"}
-                  </span>
-                </TableCell>
+                  <TableCell className="px-5 py-4 text-[12.5px] text-foreground/74">
+                    {payment.createdAt
+                      ? new Date(
+                          payment.createdAt,
+                        ).toLocaleDateString()
+                      : "—"}
+                  </TableCell>
 
-                <TableCell className="px-5 py-4 text-[12.5px] text-foreground/74">
-                  {payment.createdAt
-                    ? new Date(
-                        payment.createdAt,
-                      ).toLocaleDateString()
-                    : "—"}
-                </TableCell>
-
-                <TableCell className="px-5 py-4">
-                  <span
-                    className={cn(
-                      "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-medium",
-                      statusColor("completed"),
-                    )}
-                  >
-                    <span className="h-1.5 w-1.5 rounded-full bg-current" />
-
-                    {statusLabel("completed")}
-                  </span>
-                </TableCell>
-
-                <TableCell className="px-5 py-4 text-[12.5px] text-muted-foreground">
-                  —
-                </TableCell>
-
-                <TableCell className="px-5 py-4 text-right">
-                  <div className="inline-flex gap-1.5">
-                    <button
-                      type="button"
-                      onClick={() => onEdit?.(payment)}
-                      className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border/45 bg-card text-muted-foreground transition-colors hover:border-primary/15 hover:bg-primary/[0.04] hover:text-primary"
-                      aria-label="Edit payment"
+                  <TableCell className="px-5 py-4">
+                    <span
+                      className={cn(
+                        "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-medium",
+                        statusColor(
+                          "completed",
+                        ),
+                      )}
                     >
-                      <Edit2
-                        className="h-4 w-4"
-                        strokeWidth={1.8}
-                      />
-                    </button>
+                      <span className="h-1.5 w-1.5 rounded-full bg-current" />
 
-                    <button
-                      type="button"
-                      onClick={() => onDelete?.(payment.id)}
-                      className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-destructive/12 bg-destructive/[0.035] text-destructive transition-colors hover:bg-destructive/[0.07]"
-                      aria-label="Delete payment"
-                    >
-                      <Trash2
-                        className="h-4 w-4"
-                        strokeWidth={1.8}
-                      />
-                    </button>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
+                      {statusLabel(
+                        "completed",
+                      )}
+                    </span>
+                  </TableCell>
+
+                  <TableCell className="px-5 py-4 text-[12.5px] text-muted-foreground">
+                    —
+                  </TableCell>
+
+                  <TableCell className="px-5 py-4 text-right">
+                    <div className="inline-flex gap-1.5">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          onEdit?.(
+                            payment,
+                          )
+                        }
+                        className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border/45 bg-card text-muted-foreground transition-colors hover:border-primary/15 hover:bg-primary/[0.04] hover:text-primary"
+                        aria-label="Edit payment"
+                      >
+                        <Edit2
+                          className="h-4 w-4"
+                          strokeWidth={
+                            1.8
+                          }
+                        />
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() =>
+                          onDelete?.(
+                            payment.id,
+                          )
+                        }
+                        className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-destructive/12 bg-destructive/[0.035] text-destructive transition-colors hover:bg-destructive/[0.07]"
+                        aria-label="Delete payment"
+                      >
+                        <Trash2
+                          className="h-4 w-4"
+                          strokeWidth={
+                            1.8
+                          }
+                        />
+                      </button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ),
+            )}
           </TableBody>
         </Table>
       </div>
     </div>
   );
 }
-
-/* -------------------------------------------------------------------------- */
-/* Update payment dialog                                                      */
-/* -------------------------------------------------------------------------- */
 
 export function UpdatePaymentDialog({
   open,
@@ -854,13 +997,15 @@ export function UpdatePaymentDialog({
   isLoading,
   onSubmit,
 }: UpdatePaymentDialogProps) {
-  const paymentDetailQuery = useFinancePayment(
-    payment?.id,
-    open,
-  );
+  const paymentDetailQuery =
+    useFinancePayment(
+      payment?.id,
+      open,
+    );
 
   const paymentForForm =
-    paymentDetailQuery.data ?? payment;
+    paymentDetailQuery.data ??
+    payment;
 
   const {
     control,
@@ -868,46 +1013,70 @@ export function UpdatePaymentDialog({
     register,
     reset,
     watch,
-  } = useForm<UpdatePaymentPayload>({
-    resolver: zodResolver(updatePaymentSchema) as any,
+  } =
+    useForm<UpdatePaymentPayload>({
+      resolver:
+        zodResolver(
+          updatePaymentSchema,
+        ) as any,
 
-    defaultValues: {
-      paymentMethod: "cash",
-      paperReceiptNo: "",
-      digitalReference: "",
-    },
-  });
+      defaultValues: {
+        paymentMethod: "cash",
+        paperReceiptNo: "",
+        digitalReference: "",
+      },
+    });
 
   useEffect(() => {
-    if (paymentForForm && open) {
+    if (
+      paymentForForm &&
+      open
+    ) {
       reset({
-        paymentMethod: paymentForForm.paymentMethod,
+        paymentMethod:
+          paymentForForm.paymentMethod,
+
         paperReceiptNo:
-          paymentForForm.paperReceiptNo || "",
+          paymentForForm.paperReceiptNo ||
+          "",
+
         digitalReference:
-          paymentForForm.digitalReference || "",
+          paymentForForm.digitalReference ||
+          "",
       });
     }
-  }, [paymentForForm, open, reset]);
+  }, [
+    paymentForForm,
+    open,
+    reset,
+  ]);
 
-  const selectedMethod = watch("paymentMethod");
+  const selectedMethod =
+    watch("paymentMethod");
 
   function handleFormSubmit(
     values: UpdatePaymentPayload,
   ) {
-    if (!paymentForForm) return;
+    if (!paymentForForm) {
+      return;
+    }
 
     const payload = {
       ...values,
 
       paperReceiptNo:
-        values.paperReceiptNo || null,
+        values.paperReceiptNo ||
+        null,
 
       digitalReference:
-        values.digitalReference || null,
+        values.digitalReference ||
+        null,
     };
 
-    onSubmit(paymentForForm.id, payload);
+    onSubmit(
+      String(paymentForForm.id),
+      payload,
+    );
   }
 
   return (
@@ -918,7 +1087,11 @@ export function UpdatePaymentDialog({
       <DialogContent
         className={`${FINANCE_DIALOG_CONTENT} sm:max-w-[540px]`}
       >
-        <DialogHeader className={FINANCE_DIALOG_HEADER}>
+        <DialogHeader
+          className={
+            FINANCE_DIALOG_HEADER
+          }
+        >
           <div className="flex items-start gap-3">
             <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px] border border-primary/12 bg-primary/[0.055] text-primary">
               <CreditCard
@@ -929,19 +1102,25 @@ export function UpdatePaymentDialog({
 
             <div className="min-w-0">
               <DialogTitle className="text-[18px] font-semibold tracking-[-0.025em] text-foreground/92">
-                Update Payment Details
+                Update Payment
+                Details
               </DialogTitle>
 
               <DialogDescription className="mt-1 text-[12px] leading-5 text-muted-foreground/75">
-                Modify the payment method or reference
-                numbers. The paid amount cannot be changed.
+                Modify the payment
+                method or reference
+                numbers. The paid
+                amount cannot be
+                changed.
               </DialogDescription>
             </div>
           </div>
         </DialogHeader>
 
         <form
-          onSubmit={handleSubmit(handleFormSubmit)}
+          onSubmit={handleSubmit(
+            handleFormSubmit,
+          )}
           className="space-y-4 px-5 pb-5 pt-5 sm:px-6 sm:pb-6"
         >
           <div className="flex items-center justify-between rounded-[18px] border border-primary/10 bg-primary/[0.025] px-4 py-3.5">
@@ -950,7 +1129,8 @@ export function UpdatePaymentDialog({
             </span>
 
             <span className="text-[17px] font-semibold text-primary">
-              {paymentForForm?.paidAmount?.toLocaleString()} $
+              {paymentForForm?.paidAmount?.toLocaleString()}{" "}
+              $
             </span>
           </div>
 
@@ -962,13 +1142,21 @@ export function UpdatePaymentDialog({
             <Controller
               control={control}
               name="paymentMethod"
-              render={({ field }) => (
+              render={({
+                field,
+              }) => (
                 <Select
-                  value={field.value as string}
-                  onValueChange={field.onChange}
+                  value={
+                    field.value as string
+                  }
+                  onValueChange={
+                    field.onChange
+                  }
                 >
                   <SelectTrigger
-                    className={FINANCE_SELECT_TRIGGER_CLASS}
+                    className={
+                      FINANCE_SELECT_TRIGGER_CLASS
+                    }
                   >
                     <SelectValue placeholder="Select Method" />
                   </SelectTrigger>
@@ -1017,11 +1205,14 @@ export function UpdatePaymentDialog({
                 FINANCE_INPUT_CLASS,
                 "text-[12px]",
               )}
-              {...register("paperReceiptNo")}
+              {...register(
+                "paperReceiptNo",
+              )}
             />
           </div>
 
-          {selectedMethod !== "cash" && (
+          {selectedMethod !==
+            "cash" && (
             <div className="space-y-2">
               <label className="text-[11px] font-semibold uppercase tracking-[0.07em] text-muted-foreground/75">
                 Digital Reference
@@ -1032,7 +1223,9 @@ export function UpdatePaymentDialog({
                   FINANCE_INPUT_CLASS,
                   "text-[12px]",
                 )}
-                {...register("digitalReference")}
+                {...register(
+                  "digitalReference",
+                )}
               />
             </div>
           )}
@@ -1041,7 +1234,9 @@ export function UpdatePaymentDialog({
             <Button
               type="button"
               variant="ghost"
-              onClick={() => onOpenChange(false)}
+              onClick={() =>
+                onOpenChange(false)
+              }
               className="h-10 rounded-[13px] px-4 text-[11.5px] text-muted-foreground hover:bg-muted/50"
             >
               Cancel
@@ -1062,10 +1257,6 @@ export function UpdatePaymentDialog({
     </Dialog>
   );
 }
-
-/* -------------------------------------------------------------------------- */
-/* Delete payment dialog                                                      */
-/* -------------------------------------------------------------------------- */
 
 export function DeletePaymentDialog({
   open,
@@ -1097,27 +1288,24 @@ export function DeletePaymentDialog({
                 </DialogTitle>
 
                 <DialogDescription className="mt-1.5 max-w-[310px] text-[12px] leading-5 text-muted-foreground/75">
-                  This reverses the payment amount in the
-                  student balance. This action cannot be
-                  undone.
+                  This reverses the
+                  payment amount in the
+                  student balance. This
+                  action cannot be undone.
                 </DialogDescription>
               </div>
             </div>
           </DialogHeader>
         </div>
 
-        {/*
-         * The footer is intentionally separated from the message
-         * with a subtle background and generous internal spacing.
-         * This keeps the buttons visually inside the dialog instead
-         * of making them appear attached to its edges.
-         */}
         <div className="border-t border-border/35 bg-muted/[0.10] px-6 py-5 sm:px-7 sm:py-5">
           <DialogFooter className="gap-2 sm:justify-end">
             <Button
               type="button"
               variant="ghost"
-              onClick={() => onOpenChange(false)}
+              onClick={() =>
+                onOpenChange(false)
+              }
               disabled={isLoading}
               className="h-10 rounded-[13px] px-5 text-[11.5px] text-muted-foreground hover:bg-muted/50"
             >
@@ -1146,38 +1334,47 @@ export function DeletePaymentDialog({
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/* Financial statement                                                        */
-/* -------------------------------------------------------------------------- */
-
-const statementMethodLabels: Record<string, string> = {
+const statementMethodLabels: Record<
+  string,
+  string
+> = {
   cash: "Cash",
   bank_transfer: "Bank transfer",
   cheque: "Cheque",
-  electronic_wallet: "Electronic wallet",
+  electronic_wallet:
+    "Electronic wallet",
 };
 
-function statementMoney(value: number) {
+function statementMoney(
+  value: number,
+) {
   return `${new Intl.NumberFormat().format(
     Number(value || 0),
   )} $`;
 }
 
-function statementDate(value?: string | null) {
-  if (!value) return "—";
+function statementDate(
+  value?: string | null,
+) {
+  if (!value) {
+    return "—";
+  }
 
   const date = new Date(value);
 
   return Number.isNaN(date.getTime())
     ? value
-    : new Intl.DateTimeFormat(undefined, {
-        year: "numeric",
-        month: "short",
-        day: "2-digit",
-      }).format(date);
+    : new Intl.DateTimeFormat(
+        undefined,
+        {
+          year: "numeric",
+          month: "short",
+          day: "2-digit",
+        },
+      ).format(date);
 }
 
-export function FullFinancialStatementDialog({
+export function StudentFinancialStatementDialog({
   open,
   onOpenChange,
   studentName,
@@ -1185,32 +1382,51 @@ export function FullFinancialStatementDialog({
   account,
 }: {
   open: boolean;
-  onOpenChange: (open: boolean) => void;
+  onOpenChange: (
+    open: boolean,
+  ) => void;
   studentName: string;
-  academicYearName?: string | null;
-  account: import("../types/finance.types").FinancialAccount;
+  academicYearName?:
+    | string
+    | null;
+  account: import("../types/studentFinance.types").FinancialAccount;
 }) {
   const {
     data: payments = [],
     isLoading,
-  } = useFinancePayments();
+  } = useStudentPayments();
 
-  const visiblePayments = useMemo(
-    () =>
-      payments.filter(
-        (payment) =>
-          String(payment.studentId) ===
-            String(account.studentId) ||
-          String(payment.accountId) ===
-            String(account.id),
-      ),
-    [account.id, account.studentId, payments],
-  );
+  const visiblePayments =
+    useMemo(
+      () =>
+        payments.filter(
+          (payment) =>
+            String(
+              payment.studentId,
+            ) ===
+              String(
+                account.studentId,
+              ) ||
+            String(
+              payment.accountId,
+            ) ===
+              String(account.id),
+        ),
+      [
+        account.id,
+        account.studentId,
+        payments,
+      ],
+    );
 
   const totalPaid = Math.max(
     0,
-    Number(account.totalRequiredAmount) -
-      Number(account.remainingBalance),
+    Number(
+      account.totalRequiredAmount,
+    ) -
+      Number(
+        account.remainingBalance,
+      ),
   );
 
   return (
@@ -1221,7 +1437,11 @@ export function FullFinancialStatementDialog({
       <DialogContent
         className={`${FINANCE_DIALOG_CONTENT} sm:max-w-[900px]`}
       >
-        <DialogHeader className={FINANCE_DIALOG_HEADER}>
+        <DialogHeader
+          className={
+            FINANCE_DIALOG_HEADER
+          }
+        >
           <div className="flex items-start gap-3">
             <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px] border border-primary/12 bg-primary/[0.055] text-primary">
               <ReceiptText
@@ -1232,11 +1452,13 @@ export function FullFinancialStatementDialog({
 
             <div>
               <DialogTitle className="text-[18px] font-semibold tracking-[-0.025em] text-foreground/92">
-                Complete financial statement
+                Complete financial
+                statement
               </DialogTitle>
 
               <DialogDescription className="mt-1 text-[12px] leading-5 text-muted-foreground/75">
-                Contract, installments, and recorded payments
+                Contract, installments,
+                and recorded payments
                 in one financial statement.
               </DialogDescription>
             </div>
@@ -1246,7 +1468,8 @@ export function FullFinancialStatementDialog({
         <div className="max-h-[75vh] space-y-5 overflow-y-auto px-5 pb-5 pt-5 sm:px-6 sm:pb-6">
           <div className="rounded-[20px] border border-primary/10 bg-primary/[0.025] p-5">
             <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-primary/70">
-              Student financial statement
+              Student financial
+              statement
             </p>
 
             <h2 className="mt-1 text-[20px] font-semibold text-foreground/90">
@@ -1254,8 +1477,11 @@ export function FullFinancialStatementDialog({
             </h2>
 
             <p className="mt-1 text-[12px] text-muted-foreground">
-              {academicYearName || "Academic year"} ·{" "}
-              {account.feePlan?.name || "Fee plan"}
+              {academicYearName ||
+                "Academic year"}{" "}
+              ·{" "}
+              {account.feePlan?.name ||
+                "Fee plan"}
             </p>
           </div>
 
@@ -1278,7 +1504,9 @@ export function FullFinancialStatementDialog({
               </p>
 
               <p className="mt-1 text-[18px] font-semibold text-success">
-                {statementMoney(totalPaid)}
+                {statementMoney(
+                  totalPaid,
+                )}
               </p>
             </div>
 
@@ -1323,36 +1551,46 @@ export function FullFinancialStatementDialog({
                 </thead>
 
                 <tbody>
-                  {account.installments.map((item) => (
-                    <tr
-                      key={item.id}
-                      className="border-t border-border/30"
-                    >
-                      <td className="p-3">
-                        {item.installmentNumber}
-                      </td>
+                  {account.installments.map(
+                    (item) => (
+                      <tr
+                        key={item.id}
+                        className="border-t border-border/30"
+                      >
+                        <td className="p-3">
+                          {
+                            item.installmentNumber
+                          }
+                        </td>
 
-                      <td className="p-3">
-                        {item.title}
-                      </td>
+                        <td className="p-3">
+                          {item.title}
+                        </td>
 
-                      <td className="p-3">
-                        {statementDate(item.dueDate)}
-                      </td>
+                        <td className="p-3">
+                          {statementDate(
+                            item.dueDate,
+                          )}
+                        </td>
 
-                      <td className="p-3">
-                        {statementMoney(item.amountDue)}
-                      </td>
+                        <td className="p-3">
+                          {statementMoney(
+                            item.amountDue,
+                          )}
+                        </td>
 
-                      <td className="p-3">
-                        {statementMoney(item.amountPaid)}
-                      </td>
+                        <td className="p-3">
+                          {statementMoney(
+                            item.amountPaid,
+                          )}
+                        </td>
 
-                      <td className="p-3 capitalize">
-                        {item.status}
-                      </td>
-                    </tr>
-                  ))}
+                        <td className="p-3 capitalize">
+                          {item.status}
+                        </td>
+                      </tr>
+                    ),
+                  )}
                 </tbody>
               </table>
             </div>
@@ -1390,40 +1628,43 @@ export function FullFinancialStatementDialog({
                   </thead>
 
                   <tbody>
-                    {visiblePayments.map((payment) => (
-                      <tr
-                        key={payment.id}
-                        className="border-t border-border/30"
-                      >
-                        <td className="p-3">
-                          Payment receipt
-                        </td>
+                    {visiblePayments.map(
+                      (payment) => (
+                        <tr
+                          key={payment.id}
+                          className="border-t border-border/30"
+                        >
+                          <td className="p-3">
+                            Payment receipt
+                          </td>
 
-                        <td className="p-3">
-                          {statementDate(
-                            payment.createdAt,
-                          )}
-                        </td>
+                          <td className="p-3">
+                            {statementDate(
+                              payment.createdAt,
+                            )}
+                          </td>
 
-                        <td className="p-3">
-                          {statementMethodLabels[
-                            payment.paymentMethod
-                          ] ?? payment.paymentMethod}
-                        </td>
+                          <td className="p-3">
+                            {statementMethodLabels[
+                              payment.paymentMethod
+                            ] ??
+                              payment.paymentMethod}
+                          </td>
 
-                        <td className="p-3 font-semibold text-success">
-                          {statementMoney(
-                            payment.paidAmount,
-                          )}
-                        </td>
+                          <td className="p-3 font-semibold text-success">
+                            {statementMoney(
+                              payment.paidAmount,
+                            )}
+                          </td>
 
-                        <td className="p-3">
-                          {payment.paperReceiptNo ||
-                            payment.digitalReference ||
-                            "—"}
-                        </td>
-                      </tr>
-                    ))}
+                          <td className="p-3">
+                            {payment.paperReceiptNo ||
+                              payment.digitalReference ||
+                              "—"}
+                          </td>
+                        </tr>
+                      ),
+                    )}
                   </tbody>
                 </table>
               </div>

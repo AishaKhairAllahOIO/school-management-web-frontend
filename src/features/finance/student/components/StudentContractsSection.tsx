@@ -15,14 +15,14 @@ import { Button } from "@/shared/ui/button";
 import { studentApi } from "../../../users/students/api/student.api";
 import { useStudents } from "../../../users/students/hooks/useStudents";
 import { studentKeys } from "../../../users/students/hooks/student.keys";
-import { useFinanceAccounts } from "../hooks/useFinancialAccounts";
+import { useStudentFinancialAccounts } from "../hooks/useStudentFinancialAccounts";
 import type {
   FinancialAccount,
   PaymentStatus,
-} from "../types/finance.types";
-import { FinanceTableSkeleton } from "./FinanceTableSkeleton";
+} from "../types/studentFinance.types";
+import { StudentFinanceTableSkeleton } from "./StudentFinanceTableSkeleton";
 
-type ContractsSectionProps = {
+type StudentContractsSectionProps = {
   studentId?: string | number;
   title?: string;
   description?: string;
@@ -127,13 +127,13 @@ function initials(name: string) {
     .toUpperCase();
 }
 
-export function ContractsSection({
+export function StudentContractsSection({
   studentId,
   title = "Student Financial Accounts",
   description = "Students available for financial management.",
   onOpenStudentAccount,
-}: ContractsSectionProps = {}) {
-  const { accountsQuery } = useFinanceAccounts();
+}: StudentContractsSectionProps = {}) {
+  const { accountsQuery } = useStudentFinancialAccounts();
 
   const {
     data: accounts = [],
@@ -276,7 +276,7 @@ export function ContractsSection({
   if (isLoading || isLoadingStudents) {
     return (
       <div className="space-y-4 pb-8 pt-2 sm:pt-3">
-        <FinanceTableSkeleton />
+        <StudentFinanceTableSkeleton />
       </div>
     );
   }

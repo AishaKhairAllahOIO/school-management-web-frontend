@@ -2,13 +2,11 @@ import {
   CalendarDays,
   Edit3,
   Megaphone,
-  Printer,
   School,
   Trash2,
   Users,
 } from "lucide-react";
 import {
-  useEffect,
   useState,
 } from "react";
 
@@ -32,7 +30,6 @@ import {
 } from "../shared/DeleteConfirmationDialog";
 
 
-import { PosterTemplate } from "../../../printing/templates/PosterTemplate"; 
 
 type Props = {
   onEdit: (announcement: Announcement) => void;
@@ -51,22 +48,7 @@ export function AnnouncementsList({
 
   const [pendingDelete, setPendingDelete] = useState<Announcement | null>(null);
   
-  // 🌟 حالة تتبع الإعلان المُراد طباعته
-  const [printingItem, setPrintingItem] = useState<Announcement | null>(null);
-
-  // 🌟 تفريغ حالة الطباعة بمجرد إغلاق نافذة الطباعة
-  useEffect(() => {
-    const handleAfterPrint = () => setPrintingItem(null);
-    window.addEventListener("afterprint", handleAfterPrint);
-    return () => window.removeEventListener("afterprint", handleAfterPrint);
-  }, []);
-
-  const handlePrint = (item: Announcement) => {
-    setPrintingItem(item);
-    setTimeout(() => {
-      window.print();
-    }, 150);
-  };
+ 
 
   const announcements = myAnnouncements;
   const isLoading = isLoadingMy;
@@ -156,17 +138,7 @@ export function AnnouncementsList({
               </div>
 
               <div className="flex shrink-0 items-center gap-1.5">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handlePrint(item)}
-                    className="h-9 rounded-[11px] border-border/65 bg-transparent px-3 text-[11px] font-medium text-primary hover:bg-primary/[0.06] hover:text-primary"
-                  >
-                    <Printer className="h-3.5 w-3.5" />
-                    Poster
-                  </Button>
-
+        
                   <Button
                     type="button"
                     variant="outline"
@@ -194,28 +166,7 @@ export function AnnouncementsList({
         })}
       </div>
 
-      {/* 🌟 قالب طباعة الإعلان */}
-      {printingItem && (
-        <div className="hidden print:block">
-          <PosterTemplate>
-            <div className="flex h-full flex-col items-center justify-center px-12 py-20 text-center">
-              <span className="mb-8 flex h-24 w-24 items-center justify-center rounded-full bg-[#f3f4f6] text-[#374151]">
-                <Megaphone className="h-12 w-12" />
-              </span>
-              <p className="mb-4 text-[14px] font-bold uppercase tracking-[0.2em] text-[#6b7280]">
-                Official School Announcement
-              </p>
-              <h1 className="mb-8 text-[44px] font-black uppercase leading-tight tracking-wide text-[#111827]">
-                {printingItem.title}
-              </h1>
-              <div className="mb-10 h-[4px] w-24 bg-[#111827]"></div>
-              <p className="text-[24px] leading-relaxed text-[#374151]">
-                {printingItem.description}
-              </p>
-            </div>
-          </PosterTemplate>
-        </div>
-      )}
+    
 
       <DeleteConfirmationDialog
         open={Boolean(pendingDelete)}

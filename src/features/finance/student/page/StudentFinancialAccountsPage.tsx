@@ -1,12 +1,12 @@
 import { useNavigate } from "react-router-dom";
 
-import { ContractsSection } from "../components/ContractsSection";
+import { StudentContractsSection } from "../components/StudentContractsSection";
 
 export function StudentFinancialAccountsPage() {
   const navigate = useNavigate();
 
   return (
-    <ContractsSection
+    <StudentContractsSection
       onOpenStudentAccount={(studentId) =>
         navigate(`/finance/students/${studentId}`)
       }

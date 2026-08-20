@@ -3,12 +3,14 @@ import {
   Send,
   Users,
 } from "lucide-react";
+
 import {
   useEffect,
   useState,
 } from "react";
 
 import { Button } from "@/shared/ui/button";
+
 import {
   Dialog,
   DialogContent,
@@ -18,8 +20,14 @@ import {
 } from "@/shared/ui/dialog";
 
 import { useAlerts } from "../../hooks/useAlerts";
-import { AlertTypeForm, type AlertCategory } from "./AlertTypeForm";
+
+import {
+  AlertTypeForm,
+  type AlertCategory,
+} from "./AlertTypeForm";
+
 import { DialogFormSkeleton } from "../shared/DialogFormSkeleton";
+
 import {
   MultiSelectAudience,
   type OptionItem,
@@ -27,9 +35,16 @@ import {
 
 type Props = {
   open: boolean;
-  onOpenChange: (open: boolean) => void;
-  targetAudience: "student" | "staff";
+  onOpenChange: (
+    open: boolean,
+  ) => void;
+
+  targetAudience:
+    | "student"
+    | "staff";
+
   audienceList: OptionItem[];
+
   isLoadingAudience?: boolean;
 };
 
@@ -47,39 +62,98 @@ export function SendBulkAlertDialog({
     isSending,
   } = useAlerts();
 
-  const [selectedIds, setSelectedIds] = useState<(string | number)[]>([]);
-  const [alertType, setAlertType] = useState<AlertCategory>(
-    targetAudience === "student" ? "absence" : "salary",
-  );
-  const [amount, setAmount] = useState("");
-  const [dueDate, setDueDate] = useState("");
-  const [severity, setSeverity] = useState<"low" | "medium" | "high">("medium");
-  const [sessionName, setSessionName] = useState("");
-  const [minutesLate, setMinutesLate] = useState("15");
-  const [monthName, setMonthName] = useState("");
-  const [subjectName, setSubjectName] = useState("");
-  const [formError, setFormError] = useState<string | null>(null);
+  const [selectedIds, setSelectedIds] =
+    useState<
+      (string | number)[]
+    >([]);
 
-  const isStudent = targetAudience === "student";
-  const tone = isStudent ? "info" : "warning";
-  const headerSurface = isStudent ? "bg-info/[0.04]" : "bg-warning/[0.04]";
+  const [alertType, setAlertType] =
+    useState<AlertCategory>(
+      targetAudience ===
+        "student"
+        ? "absence"
+        : "salary",
+    );
+
+  const [amount, setAmount] =
+    useState("");
+
+  const [dueDate, setDueDate] =
+    useState("");
+
+  const [severity, setSeverity] =
+    useState<
+      "low" | "medium" | "high"
+    >("medium");
+
+  const [sessionName, setSessionName] =
+    useState("");
+
+  const [minutesLate, setMinutesLate] =
+    useState("15");
+
+  const [monthName, setMonthName] =
+    useState("");
+
+  const [subjectName, setSubjectName] =
+    useState("");
+
+  const [formError, setFormError] =
+    useState<string | null>(
+      null,
+    );
+
+  const isStudent =
+    targetAudience ===
+    "student";
+
+  /*
+   * Single source of truth for
+   * the visual tone.
+   */
+  const tone:
+    | "student"
+    | "staff" = isStudent
+    ? "student"
+    : "staff";
+
+  const headerSurface = isStudent
+    ? "bg-info/[0.04]"
+    : "bg-warning/[0.04]";
+
   const iconSurface = isStudent
     ? "border-info/15 bg-info/[0.10] text-info"
     : "border-warning/15 bg-warning/[0.11] text-warning";
-  const submitClassName = isStudent
-    ? "bg-info text-white hover:bg-info/90"
-    : "bg-warning text-white hover:bg-warning/90";
-  const AudienceIcon = isStudent ? School : Users;
+
+  const submitClassName =
+    isStudent
+      ? "bg-info text-white hover:bg-info/90"
+      : "bg-warning text-white hover:bg-warning/90";
+
+  const AudienceIcon =
+    isStudent
+      ? School
+      : Users;
 
   useEffect(() => {
     if (open) {
-      setAlertType(isStudent ? "absence" : "salary");
+      setAlertType(
+        isStudent
+          ? "absence"
+          : "salary",
+      );
     }
   }, [open, isStudent]);
 
   function resetState() {
     setSelectedIds([]);
-    setAlertType(isStudent ? "absence" : "salary");
+
+    setAlertType(
+      isStudent
+        ? "absence"
+        : "salary",
+    );
+
     setAmount("");
     setDueDate("");
     setSeverity("medium");
@@ -90,92 +164,171 @@ export function SendBulkAlertDialog({
     setFormError(null);
   }
 
-  function handleSubmit(event: React.FormEvent) {
+  function handleSubmit(
+    event: React.FormEvent,
+  ) {
     event.preventDefault();
 
     if (!selectedIds.length) {
-      setFormError("Choose at least one recipient before sending the alert.");
+      setFormError(
+        "Choose at least one recipient before sending the alert.",
+      );
+
       return;
     }
 
     setFormError(null);
-    const numericIds = selectedIds.map(Number);
+
+    const numericIds =
+      selectedIds.map(Number);
+
     const options = {
       onSuccess: () => {
         resetState();
         onOpenChange(false);
       },
-      onError: (error: unknown) => {
+
+      onError: (
+        error: unknown,
+      ) => {
         const message =
-          (error as any)?.response?.data?.message ??
+          (error as any)?.response
+            ?.data?.message ??
           (error as Error)?.message ??
           "The alert could not be sent.";
-        setFormError(String(message));
+
+        setFormError(
+          String(message),
+        );
       },
     };
 
-    if (targetAudience === "staff") {
+    /*
+     * STAFF
+     */
+    if (
+      targetAudience ===
+      "staff"
+    ) {
       sendStaffAlert.mutate(
         {
           audience: "staff",
+
           type: alertType as any,
+
           staff_ids: numericIds,
+
           meta:
             alertType === "salary"
               ? {
-                  amount: Number(amount) || 0,
-                  mounth: monthName || "Unspecified",
+                  amount:
+                    Number(
+                      amount,
+                    ) || 0,
+
+                  mounth:
+                    monthName ||
+                    "Unspecified",
                 }
               : alertType === "late"
                 ? {
-                    session: sessionName || "Unspecified",
-                    minutes_late: Number(minutesLate) || 0,
+                    session:
+                      sessionName ||
+                      "Unspecified",
+
+                    minutes_late:
+                      Number(
+                        minutesLate,
+                      ) || 0,
                   }
                 : undefined,
         },
         options,
       );
+
       return;
     }
 
-    if (alertType === "payed" || alertType === "payment") {
+    /*
+     * STUDENT PAYMENT
+     */
+    if (
+      alertType === "payed" ||
+      alertType === "payment"
+    ) {
       sendPaymentAlert.mutate(
         {
           audience: "student",
+
           type: alertType,
-          enrollment_ids: numericIds,
+
+          enrollment_ids:
+            numericIds,
+
           meta:
             alertType === "payed"
-              ? { amount: Number(amount) || 0 }
+              ? {
+                  amount:
+                    Number(
+                      amount,
+                    ) || 0,
+                }
               : {
-                  amount_due: Number(amount) || 0,
-                  due_date: dueDate || new Date().toISOString().slice(0, 10),
+                  amount_due:
+                    Number(
+                      amount,
+                    ) || 0,
+
+                  due_date:
+                    dueDate ||
+                    new Date()
+                      .toISOString()
+                      .slice(
+                        0,
+                        10,
+                      ),
                 },
         },
         options,
       );
+
       return;
     }
 
+    /*
+     * STUDENT ADVISOR
+     */
     sendAdvisorAlert.mutate(
       {
         audience: "student",
+
         type: alertType as any,
-        enrollment_ids: numericIds,
+
+        enrollment_ids:
+          numericIds,
+
         meta:
           alertType === "behavior"
-            ? { severity }
-            : alertType === "homework"
-              ? {
-                  subject: subjectName || "Unspecified",
-                  date: dueDate || new Date().toISOString().slice(0, 10),
-                }
+            ? {
+                severity,
+              }
+            
               : alertType === "escape"
-                ? { session: sessionName || "Unspecified" }
+                ? {
+                    session:
+                      sessionName ||
+                      "Unspecified",
+                  }
                 : alertType === "late"
                   ? {
-                      session: sessionName || "Unspecified",
-                      minutes_late: Number(minutesLate) || 0,
+                      session:
+                        sessionName ||
+                        "Unspecified",
+
+                      minutes_late:
+                        Number(
+                          minutesLate,
+                        ) || 0,
                     }
                   : undefined,
       },
@@ -188,22 +341,82 @@ export function SendBulkAlertDialog({
       open={open}
       onOpenChange={(nextOpen) => {
         if (isSending) return;
-        if (!nextOpen) resetState();
+
+        if (!nextOpen) {
+          resetState();
+        }
+
         onOpenChange(nextOpen);
       }}
     >
-      <DialogContent className="max-h-[92dvh] overflow-hidden rounded-[26px] border border-border/70 bg-card p-0 shadow-[0_30px_100px_rgba(20,14,54,0.24)] sm:max-w-2xl">
-        <div className={`border-b border-border/50 px-5 py-5 sm:px-6 ${headerSurface}`}>
+      <DialogContent
+        className="
+          flex
+          max-h-[92dvh]
+          flex-col
+          overflow-hidden
+          rounded-[26px]
+          border
+          border-border/70
+          bg-card
+          p-0
+          shadow-[0_30px_100px_rgba(20,14,54,0.24)]
+          sm:max-w-2xl
+        "
+      >
+        {/* HEADER */}
+        <div
+          className={`
+            shrink-0
+            border-b
+            border-border/50
+            px-5
+            py-5
+            sm:px-6
+            ${headerSurface}
+          `}
+        >
           <DialogHeader className="text-start">
             <div className="flex items-start gap-3.5">
-              <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-[15px] border ${iconSurface}`}>
-                <AudienceIcon className="h-5 w-5" strokeWidth={1.8} />
+              <span
+                className={`
+                  flex
+                  h-11
+                  w-11
+                  shrink-0
+                  items-center
+                  justify-center
+                  rounded-[15px]
+                  border
+                  ${iconSurface}
+                `}
+              >
+                <AudienceIcon
+                  className="h-5 w-5"
+                  strokeWidth={1.8}
+                />
               </span>
+
               <div className="min-w-0">
-                <DialogTitle className="text-[18px] font-semibold tracking-[-0.02em]">
-                  {isStudent ? "Notify students" : "Notify staff"}
+                <DialogTitle
+                  className="
+                    text-[18px]
+                    font-semibold
+                    tracking-[-0.02em]
+                  "
+                >
+                  {isStudent
+                    ? "Notify students"
+                    : "Notify staff"}
                 </DialogTitle>
-                <DialogDescription className="mt-1 text-[12px] leading-5">
+
+                <DialogDescription
+                  className="
+                    mt-1
+                    text-[12px]
+                    leading-5
+                  "
+                >
                   {isStudent
                     ? "Choose enrolled students, select the situation, and send one clear school alert."
                     : "Choose staff members by name, select the staff event, and send one focused alert."}
@@ -213,76 +426,214 @@ export function SendBulkAlertDialog({
           </DialogHeader>
         </div>
 
-        <div className="max-h-[calc(92dvh-96px)] overflow-y-auto px-5 py-5 sm:px-6">
+        {/* FORM AREA */}
+        <div
+          className="
+            min-h-0
+            flex-1
+            overflow-y-auto
+            px-5
+            py-5
+            sm:px-6
+          "
+        >
           {isLoadingAudience ? (
             <DialogFormSkeleton rows={4} />
           ) : (
-            <form onSubmit={handleSubmit} noValidate className="space-y-5">
-              <div className={`rounded-[19px] border p-4 ${isStudent ? "border-info/[0.13] bg-info/[0.025]" : "border-warning/[0.14] bg-warning/[0.025]"}`}>
+            <form
+              id="bulk-alert-form"
+              onSubmit={handleSubmit}
+              noValidate
+              className="space-y-5"
+            >
+              {/* AUDIENCE */}
+              <div
+                className={`
+                  w-full
+                  rounded-[19px]
+                  border
+                  p-4
+                  ${
+                    isStudent
+                      ? "border-info/[0.13] bg-info/[0.025]"
+                      : "border-warning/[0.14] bg-warning/[0.025]"
+                  }
+                `}
+              >
                 <MultiSelectAudience
-                  label={isStudent ? "Student recipients" : "Staff recipients"}
-                  placeholder={isStudent ? "Search student name" : "Search staff name or role"}
-                  options={audienceList}
-                  selectedIds={selectedIds}
-                  onChange={setSelectedIds}
-                  tone={tone}
+                  label={
+                    isStudent
+                      ? "Student recipients"
+                      : "Staff recipients"
+                  }
+                  placeholder={
+                    isStudent
+                      ? "Search student name"
+                      : "Search staff name or role"
+                  }
+                  options={
+                    audienceList
+                  }
+                  selectedIds={
+                    selectedIds
+                  }
+                  onChange={
+                    setSelectedIds
+                  }
+                  tone={
+                    tone ===
+                    "student"
+                      ? "info"
+                      : "warning"
+                  }
                 />
               </div>
 
+              {/* ALERT TYPE */}
               <AlertTypeForm
-                audience={targetAudience}
-                alertType={alertType}
-                onAlertTypeChange={setAlertType}
+                audience={
+                  targetAudience
+                }
+                alertType={
+                  alertType
+                }
+                onAlertTypeChange={
+                  setAlertType
+                }
                 amount={amount}
-                onAmountChange={setAmount}
+                onAmountChange={
+                  setAmount
+                }
                 dueDate={dueDate}
-                onDueDateChange={setDueDate}
+                onDueDateChange={
+                  setDueDate
+                }
                 severity={severity}
-                onSeverityChange={setSeverity}
-                sessionName={sessionName}
-                onSessionNameChange={setSessionName}
-                minutesLate={minutesLate}
-                onMinutesLateChange={setMinutesLate}
+                onSeverityChange={
+                  setSeverity
+                }
+                sessionName={
+                  sessionName
+                }
+                onSessionNameChange={
+                  setSessionName
+                }
+                minutesLate={
+                  minutesLate
+                }
+                onMinutesLateChange={
+                  setMinutesLate
+                }
                 monthName={monthName}
-                onMonthNameChange={setMonthName}
-                subjectName={subjectName}
-                onSubjectNameChange={setSubjectName}
-                tone={targetAudience}
+                onMonthNameChange={
+                  setMonthName
+                }
+                subjectName={
+                  subjectName
+                }
+                onSubjectNameChange={
+                  setSubjectName
+                }
+                tone={tone}
               />
 
               {formError ? (
-                <p className="rounded-[12px] border border-destructive/15 bg-destructive/[0.055] px-3 py-2.5 text-[11px] text-destructive">
+                <p
+                  className="
+                    rounded-[12px]
+                    border
+                    border-destructive/15
+                    bg-destructive/[0.055]
+                    px-3
+                    py-2.5
+                    text-[11px]
+                    text-destructive
+                  "
+                >
                   {formError}
                 </p>
               ) : null}
 
-              <div className="sticky bottom-0 z-10 -mx-5 flex flex-col-reverse gap-2 border-t border-border/50 bg-card/95 px-5 pb-1 pt-4 backdrop-blur sm:-mx-6 sm:flex-row sm:justify-end sm:px-6">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => onOpenChange(false)}
-                  disabled={isSending}
-                  className="h-10 rounded-[12px] border-border/70 bg-transparent px-4 text-[12px]"
-                >
-                  Cancel
-                </Button>
-                <Button
-                  type="submit"
-                  disabled={isSending || selectedIds.length === 0}
-                  className={`h-10 rounded-[12px] px-5 text-[12px] ${submitClassName}`}
-                >
-                  {isSending ? (
-                    <span className="h-3 w-24 animate-pulse rounded-full bg-current/25" />
-                  ) : (
-                    <>
-                      <Send className="h-4 w-4" />
-                      Send to {selectedIds.length}
-                    </>
-                  )}
-                </Button>
-              </div>
+              <div className="h-1" />
             </form>
           )}
+        </div>
+
+        {/* ACTION BAR */}
+        <div
+          className="
+            shrink-0
+            border-t
+            border-border/50
+            bg-card
+            px-5
+            py-4
+            sm:px-6
+          "
+        >
+          <div
+            className="
+              flex
+              flex-col-reverse
+              gap-2
+              sm:flex-row
+              sm:justify-end
+            "
+          >
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() =>
+                onOpenChange(false)
+              }
+              disabled={isSending}
+              className="
+                h-10
+                rounded-[12px]
+                border-border/70
+                bg-transparent
+                px-4
+                text-[12px]
+              "
+            >
+              Cancel
+            </Button>
+
+            <Button
+              type="submit"
+              form="bulk-alert-form"
+              disabled={
+                isSending ||
+                selectedIds.length === 0
+              }
+              className={`
+                h-10
+                rounded-[12px]
+                px-5
+                text-[12px]
+                ${submitClassName}
+              `}
+            >
+              {isSending ? (
+                <span
+                  className="
+                    h-3
+                    w-24
+                    animate-pulse
+                    rounded-full
+                    bg-current/25
+                  "
+                />
+              ) : (
+                <>
+                  <Send className="h-4 w-4" />
+
+                  Send to{" "}
+                  {selectedIds.length}
+                </>
+              )}
+            </Button>
+          </div>
         </div>
       </DialogContent>
     </Dialog>

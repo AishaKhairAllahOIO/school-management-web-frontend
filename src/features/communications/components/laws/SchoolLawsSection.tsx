@@ -1,11 +1,9 @@
 import {
   Plus,
-  Printer,
   Scale,
 } from "lucide-react";
 import {
   useState,
-  useCallback,
 } from "react";
 
 import {
@@ -33,7 +31,6 @@ import {
   LawsTable,
 } from "./LawsTable";
 
-import { PosterTemplate } from "../../../printing/templates/PosterTemplate"; 
 
 export function SchoolLawsSection() {
   const {
@@ -69,12 +66,7 @@ export function SchoolLawsSection() {
     });
   }
 
-  const handlePrint = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    setTimeout(() => {
-      window.print();
-    }, 150);
-  }, []);
+  
 
   const header = (
     <div className="flex flex-col gap-3 rounded-[22px] border border-success/[0.13] bg-card p-3 shadow-[0_10px_30px_rgba(38,24,84,0.045)] sm:flex-row sm:items-center sm:justify-between">
@@ -94,16 +86,7 @@ export function SchoolLawsSection() {
       </div>
 
       <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto sm:items-center">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={handlePrint}
-          disabled={laws.length === 0}
-          className="h-11 min-w-0 rounded-[14px] border-success/20 bg-success/[0.025] px-4 text-[12px] font-semibold text-success hover:bg-success/[0.08] hover:text-success"
-        >
-          <Printer className="h-4 w-4" />
-          Print poster
-        </Button>
+       
 
         <Button
           type="button"
@@ -200,68 +183,7 @@ export function SchoolLawsSection() {
           }
         `}</style>
 
-        <PosterTemplate>
-          {/* تقليل الـ Padding العام لضمان اتساع 10 قوانين في الصفحة */}
-          <div className="px-8 py-6">
-            
-            <div className="mb-6 text-center">
-              <h2 className="text-[26px] font-black uppercase tracking-[0.08em] text-[#111827]">
-                School Laws & Regulations
-              </h2>
-              <div className="mx-auto mt-3 h-[2px] w-20 bg-[#111827]"></div>
-              <p className="mt-3 text-[11px] font-bold uppercase tracking-[0.2em] text-[#6b7280]">
-                Official Policy Guidelines For Students & Staff
-              </p>
-            </div>
-
-            <table className="w-full border-collapse" style={{ tableLayout: 'fixed' }}>
-              <thead className="table-header-group">
-                <tr>
-                  <th className="w-[8%] border-b-[2px] border-[#111827] pb-3 text-center text-[10px] font-bold uppercase tracking-[0.1em] text-[#111827]">
-                    No.
-                  </th>
-                  <th className="w-[32%] border-b-[2px] border-[#111827] pb-3 px-3 text-[10px] font-bold uppercase tracking-[0.1em] text-[#111827]" dir="auto">
-                    Policy / Regulation
-                  </th>
-                  <th className="w-[60%] border-b-[2px] border-[#111827] pb-3 px-3 text-[10px] font-bold uppercase tracking-[0.1em] text-[#111827]" dir="auto">
-                    Official Description
-                  </th>
-                </tr>
-              </thead>
-              
-              <tbody>
-                {laws.map((law, index) => (
-                  <tr 
-                    key={law.id} 
-                    className="break-inside-avoid print:break-inside-avoid"
-                  >
-                    {/* تقليل الـ Padding العمودي (py-3) للأسطر لتوسيع مساحة الصفحة */}
-                    <td className="border-b border-[#e5e7eb] py-3.5 align-top">
-                      <div className="mx-auto flex h-7 w-7 items-center justify-center rounded-full bg-[#f3f4f6] text-[11px] font-bold text-[#374151]">
-                        {String(index + 1).padStart(2, '0')}
-                      </div>
-                    </td>
-                    
-                    <td 
-                      className="border-b border-[#e5e7eb] py-3.5 px-3 align-top text-[13px] font-bold leading-snug text-[#111827]" 
-                      dir="auto"
-                    >
-                      {law.title}
-                    </td>
-                    
-                    <td 
-                      className="border-b border-[#e5e7eb] py-3.5 px-3 align-top text-[12px] leading-relaxed text-[#4b5563]" 
-                      dir="auto"
-                    >
-                      {law.description || "-"}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            
-          </div>
-        </PosterTemplate>
+  
       </div>
     </>
   );

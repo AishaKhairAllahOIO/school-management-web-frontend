@@ -10,7 +10,7 @@ import {
   Printer,
   WalletCards,
 } from "lucide-react";
-import { useState, useMemo, useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
 
 import { Button } from "@/shared/ui/button";
@@ -19,20 +19,23 @@ import { studentApi } from "../../../users/students/api/student.api";
 import { studentKeys } from "../../../users/students/hooks/student.keys";
 
 import {
-  useFinanceAccounts,
+  useStudentFinancialAccounts,
   useStudentFinancialAccount,
-} from "../hooks/useFinancialAccounts";
-import { useFinancePayments } from "../hooks/usePayments";
-import { useStudentInstallments } from "../hooks/useInstallments";
-import { InstallmentsSection } from "../components/InstallmentsSection";
-import { FinanceTableSkeleton } from "../components/FinanceTableSkeleton";
+} from "../hooks/useStudentFinancialAccounts";
+import { useStudentPayments } from "../hooks/useStudentPayments";
+import { useStudentInstallments } from "../hooks/useStudentInstallments";
+
+import { StudentInstallmentsSection } from "../components/StudentInstallmentsSection";
+import { StudentFinanceTableSkeleton } from "../components/StudentFinanceTableSkeleton";
+
 import {
-  CashierSection,
-  FullFinancialStatementDialog,
-  ProcessPaymentDialog,
-} from "../components/PaymentProcess";
-import { FinalizeContractDialog } from "../components/FinalizeContractDialog";
-import { UpdateContractDialog } from "../components/UpdateContractDialog";
+  StudentPaymentHistory,
+  StudentFinancialStatementDialog,
+  StudentPaymentDialog,
+} from "../components/StudentPaymentProcess";
+
+import { CreateStudentContractDialog } from "../components/CreateStudentContractDialog";
+import { UpdateStudentContractDialog } from "../components/UpdateStudentContractDialog";
 
 import { useFeePlans } from "@/features/settings/financial/hooks/useFeePlans";
 import { useInstallmentPolicies } from "@/features/settings/financial/hooks/useInstallmentPolicies";
@@ -51,17 +54,27 @@ function formatMoney(value: number) {
 }
 
 function resolveAcademicYearId(student: unknown): number | undefined {
-  if (!student || typeof student !== "object") return undefined;
+  if (!student || typeof student !== "object") {
+    return undefined;
+  }
+
   const value = student as {
     academicYearId?: unknown;
-    enrollment?: { academicYearId?: unknown } | null;
-    activeEnrollment?: { academicYearId?: unknown } | null;
+    enrollment?: {
+      academicYearId?: unknown;
+    } | null;
+    activeEnrollment?: {
+      academicYearId?: unknown;
+    } | null;
   };
+
   const raw =
     value.enrollment?.academicYearId ??
     value.activeEnrollment?.academicYearId ??
     value.academicYearId;
+
   const id = Number(raw);
+
   return Number.isFinite(id) && id > 0 ? id : undefined;
 }
 
@@ -109,41 +122,58 @@ function getPaymentProgressColor(percentage: number) {
 }
 
 export function StudentFinancialProfilePage() {
-  const { studentId } = useParams<{ studentId: string }>();
+  const { studentId } = useParams<{
+    studentId: string;
+  }>();
+
   const navigate = useNavigate();
 
-  const [statementOpen, setStatementOpen] = useState(false);
-  const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
-  const [createContractOpen, setCreateContractOpen] = useState(false);
-  const [updateContractOpen, setUpdateContractOpen] = useState(false);
+  const [statementOpen, setStatementOpen] =
+    useState(false);
 
-  const { finalizeContract, updateContract } =
-    useFinanceAccounts();
+  const [paymentDialogOpen, setPaymentDialogOpen] =
+    useState(false);
+
+  const [createContractOpen, setCreateContractOpen] =
+    useState(false);
+
+  const [updateContractOpen, setUpdateContractOpen] =
+    useState(false);
+
+  const {
+    finalizeContract,
+    updateContract,
+  } = useStudentFinancialAccounts();
 
   const { data: feePlans = [] } = useFeePlans();
-  const { data: installmentPolicies = [] } =
-    useInstallmentPolicies();
+
+  const {
+    data: installmentPolicies = [],
+  } = useInstallmentPolicies();
 
   const studentQuery = useQuery({
     queryKey: studentId
       ? studentKeys.detail(studentId)
       : ["student-details", "missing"],
-    queryFn: () => studentApi.getDetails(studentId!),
+
+    queryFn: () =>
+      studentApi.getDetails(studentId!),
+
     enabled: Boolean(studentId),
+
     retry: false,
   });
 
-  // 🔍 جلب الحساب المالي للطالب
-  const accountQuery = useStudentFinancialAccount(
-    studentId,
-    Boolean(studentId),
-  );
+  const accountQuery =
+    useStudentFinancialAccount(
+      studentId,
+      Boolean(studentId),
+    );
 
   const account = isNotFound(accountQuery.error)
     ? undefined
     : accountQuery.data;
 
-  // ✅ جلب الأقساط الخاصة بالحساب (من الـ API المخصص)
   const {
     data: accountInstallments = [],
     refetch: refetchInstallments,
@@ -151,38 +181,43 @@ export function StudentFinancialProfilePage() {
     isFetching: isFetchingInstallments,
   } = useStudentInstallments(
     studentId,
-    Boolean(account?.id && !isNotFound(accountQuery.error) && account?.paymentStatus !== 'draft'),
+    Boolean(
+      account?.id &&
+        !isNotFound(accountQuery.error) &&
+        account?.paymentStatus !== "draft",
+    ),
   );
 
-  const { processPayment, data: allPayments = [] } = useFinancePayments();
+  const {
+    processPayment,
+    data: studentPayments = [],
+  } = useStudentPayments(studentId, account?.id, Boolean(studentId));
 
-  // ✅ التحقق من وجود مدفوعات لهذا الطالب
   const hasPayments = useMemo(() => {
-    if (!account) return false;
-    return allPayments.some(
+    if (!account) {
+      return false;
+    }
+
+    return studentPayments.some(
       (payment) =>
-        String(payment.studentId) === String(studentId) ||
+        String(payment.studentId) === String(studentId) &&
         String(payment.accountId) === String(account.id),
     );
-  }, [allPayments, account, studentId]);
+  }, [studentPayments, account, studentId]);
 
-  // ✅ هل الحساب في حالة draft؟
-  const isDraft = account?.paymentStatus === "draft";
+  const isDraft =
+    account?.paymentStatus === "draft";
 
-  // ✅ عند تغيير الحساب (بعد create/update) أو عند تغيير حالة الدفع
-  // نعيد جلب الأقساط لتحديث الجدول
   useEffect(() => {
     if (account?.id && !isDraft) {
       void refetchInstallments();
     }
-  }, [account?.id, isDraft, refetchInstallments]);
+  }, [
+    account?.id,
+    isDraft,
+    refetchInstallments,
+  ]);
 
-  // ✅ بعد كل عملية دفع ناجحة، نحدث الأقساط
-  useEffect(() => {
-    if (account?.id && !isDraft && hasPayments) {
-      void refetchInstallments();
-    }
-  }, [hasPayments, account?.id, isDraft, refetchInstallments]);
 
   if (!studentId) {
     return (
@@ -199,12 +234,13 @@ export function StudentFinancialProfilePage() {
   ) {
     return (
       <div className="pt-0">
-        <FinanceTableSkeleton />
+        <StudentFinanceTableSkeleton />
       </div>
     );
   }
 
-  const student = studentQuery.data?.student;
+  const student =
+    studentQuery.data?.student;
 
   if (
     studentQuery.isError ||
@@ -223,9 +259,9 @@ export function StudentFinancialProfilePage() {
         </h2>
 
         <p className="mx-auto mt-2 max-w-sm text-[12px] leading-5 text-muted-foreground">
-          The student financial information could not
-          be loaded. Please return to the student
-          accounts and try again.
+          The student financial information could
+          not be loaded. Please return to the
+          student accounts and try again.
         </p>
 
         <Button
@@ -275,14 +311,19 @@ export function StudentFinancialProfilePage() {
   const hasBalance = remaining > 0;
 
   const radius = 47;
-  const circumference = 2 * Math.PI * radius;
+
+  const circumference =
+    2 * Math.PI * radius;
 
   const dashOffset =
     circumference -
-    (paidPercentage / 100) * circumference;
+    (paidPercentage / 100) *
+      circumference;
 
   const paymentProgressColor =
-    getPaymentProgressColor(paidPercentage);
+    getPaymentProgressColor(
+      paidPercentage,
+    );
 
   return (
     <div className="space-y-3 pb-8 pt-0">
@@ -312,10 +353,10 @@ export function StudentFinancialProfilePage() {
             </h2>
 
             <p className="mx-auto mt-1.5 max-w-md text-[12px] leading-5 text-muted-foreground">
-              This student's financial profile is
-              still in draft. Create the contract here
-              to activate the account and its payment
-              schedule.
+              This student's financial profile
+              is still in draft. Create the
+              contract here to activate the
+              account and its payment schedule.
             </p>
 
             <Button
@@ -357,7 +398,9 @@ export function StudentFinancialProfilePage() {
                   type="button"
                   variant="ghost"
                   className="h-7 rounded-lg bg-transparent px-1.5 text-[10px] text-muted-foreground shadow-none hover:bg-transparent hover:text-foreground"
-                  onClick={() => navigate("/finance/students")}
+                  onClick={() =>
+                    navigate("/finance/students")
+                  }
                 >
                   <ArrowLeft className="mr-1 h-3 w-3 rtl:rotate-180" />
                   Back
@@ -368,7 +411,9 @@ export function StudentFinancialProfilePage() {
                     type="button"
                     variant="outline"
                     className="h-7 rounded-lg px-2 text-[10px]"
-                    onClick={() => setStatementOpen(true)}
+                    onClick={() =>
+                      setStatementOpen(true)
+                    }
                   >
                     <Printer className="mr-1 h-3 w-3" />
                     Print
@@ -402,15 +447,22 @@ export function StudentFinancialProfilePage() {
                       stroke={paymentProgressColor}
                       strokeWidth="8"
                       strokeLinecap="round"
-                      strokeDasharray={circumference}
-                      strokeDashoffset={dashOffset}
+                      strokeDasharray={
+                        circumference
+                      }
+                      strokeDashoffset={
+                        dashOffset
+                      }
                       className="transition-[stroke-dashoffset,stroke] duration-700 ease-out"
                     />
                   </svg>
 
                   <div className="absolute inset-0 flex flex-col items-center justify-center">
                     <span className="text-[22px] font-semibold tracking-[-0.04em]">
-                      {Math.round(paidPercentage)}%
+                      {Math.round(
+                        paidPercentage,
+                      )}
+                      %
                     </span>
 
                     <span className="mt-0.5 text-[8px] font-medium uppercase tracking-[0.1em] text-muted-foreground">
@@ -449,7 +501,9 @@ export function StudentFinancialProfilePage() {
                       </p>
 
                       <p className="mt-0.5 text-[10.5px] font-semibold">
-                        {formatMoney(totalRequired)}
+                        {formatMoney(
+                          totalRequired,
+                        )}
                       </p>
                     </div>
 
@@ -486,7 +540,9 @@ export function StudentFinancialProfilePage() {
                     <Button
                       type="button"
                       className="h-8 w-full rounded-lg text-[10.5px]"
-                      onClick={() => setCreateContractOpen(true)}
+                      onClick={() =>
+                        setCreateContractOpen(true)
+                      }
                     >
                       <FileText className="mr-1.5 h-3 w-3" />
                       Create Contract
@@ -497,23 +553,31 @@ export function StudentFinancialProfilePage() {
                       variant="outline"
                       className="h-8 w-full rounded-lg text-[10.5px]"
                       disabled={hasPayments}
-                      onClick={() => setUpdateContractOpen(true)}
+                      onClick={() =>
+                        setUpdateContractOpen(true)
+                      }
                     >
                       <FileText className="mr-1.5 h-3 w-3" />
-                      {hasPayments ? "Contract Locked" : "Update Contract"}
+
+                      {hasPayments
+                        ? "Contract Locked"
+                        : "Update Contract"}
                     </Button>
                   )}
 
                   {hasPayments && (
                     <p className="text-center text-[8.5px] leading-3.5 text-destructive">
-                      Cannot update contract after payments are recorded
+                      Cannot update contract after
+                      payments are recorded
                     </p>
                   )}
 
                   <Button
                     type="button"
                     className="h-8 w-full rounded-lg text-[10.5px]"
-                    disabled={!hasBalance || isDraft}
+                    disabled={
+                      !hasBalance || isDraft
+                    }
                     onClick={() =>
                       setPaymentDialogOpen(true)
                     }
@@ -534,15 +598,17 @@ export function StudentFinancialProfilePage() {
             </div>
           </section>
 
-          {/* ✅ عرض الأقساط الخاصة بالطالب مع تحديث تلقائي */}
-          <InstallmentsSection
+          <StudentInstallmentsSection
             installments={accountInstallments}
-            isLoading={isLoadingInstallments || isFetchingInstallments}
+            isLoading={
+              isLoadingInstallments ||
+              isFetchingInstallments
+            }
             title="Installment Schedule"
             description="View each scheduled payment, due date, and payment status."
           />
 
-          <CashierSection
+          <StudentPaymentHistory
             studentId={studentId}
             accountId={account.id}
             studentName={student.fullName}
@@ -553,7 +619,7 @@ export function StudentFinancialProfilePage() {
       )}
 
       {account ? (
-        <FullFinancialStatementDialog
+        <StudentFinancialStatementDialog
           open={statementOpen}
           onOpenChange={setStatementOpen}
           studentName={student.fullName}
@@ -563,7 +629,7 @@ export function StudentFinancialProfilePage() {
       ) : null}
 
       {account && !isDraft ? (
-        <ProcessPaymentDialog
+        <StudentPaymentDialog
           open={paymentDialogOpen}
           onOpenChange={setPaymentDialogOpen}
           students={[
@@ -576,14 +642,11 @@ export function StudentFinancialProfilePage() {
           isLoading={processPayment.isPending}
           onSubmit={(values) => {
             processPayment.mutate(values, {
-              onSuccess: () => {
+              onSuccess: async () => {
                 setPaymentDialogOpen(false);
-                // ✅ تحديث الحساب والأقساط بعد الدفع
-                void accountQuery.refetch();
-                // ✅ إعادة جلب الأقساط لتحديث الحالات والمبالغ
-                setTimeout(() => {
-                  void refetchInstallments();
-                }, 500);
+
+                await accountQuery.refetch();
+                await refetchInstallments();
               },
             });
           }}
@@ -591,7 +654,7 @@ export function StudentFinancialProfilePage() {
       ) : null}
 
       {(!account || isDraft) ? (
-        <FinalizeContractDialog
+        <CreateStudentContractDialog
           open={createContractOpen}
           onOpenChange={setCreateContractOpen}
           students={[
@@ -602,11 +665,17 @@ export function StudentFinancialProfilePage() {
             },
           ]}
           feePlans={feePlans}
-          installmentPolicies={installmentPolicies}
-          isLoading={finalizeContract.isPending}
+          installmentPolicies={
+            installmentPolicies
+          }
+          isLoading={
+            finalizeContract.isPending
+          }
           profileMode
           backgroundStudentId={Number(studentId)}
-          backgroundAcademicYearId={resolveAcademicYearId(student)}
+          backgroundAcademicYearId={resolveAcademicYearId(
+            student,
+          )}
           onSubmit={(values) => {
             const academicYearId =
               resolveAcademicYearId(student) ??
@@ -616,19 +685,20 @@ export function StudentFinancialProfilePage() {
               {
                 studentId: Number(studentId),
                 academicYearId,
-                feePlanId: Number(values.feePlanId),
-                installmentPolicyId: Number(values.installmentPolicyId),
+                feePlanId: Number(
+                  values.feePlanId,
+                ),
+                installmentPolicyId: Number(
+                  values.installmentPolicyId,
+                ),
                 selectedExtraServiceIds: null,
               },
               {
-                onSuccess: () => {
+                onSuccess: async () => {
                   setCreateContractOpen(false);
-                  // ✅ بعد إنشاء العقد: تحديث الحساب وجلب الأقساط
-                  void accountQuery.refetch();
-                  // ✅ ننتظر قليلاً حتى ينتهي الـ refetch ثم نجلب الأقساط
-                  setTimeout(() => {
-                    void refetchInstallments();
-                  }, 500);
+
+                  await accountQuery.refetch();
+                  await refetchInstallments();
                 },
               },
             );
@@ -637,13 +707,19 @@ export function StudentFinancialProfilePage() {
       ) : null}
 
       {account && !isDraft ? (
-        <UpdateContractDialog
+        <UpdateStudentContractDialog
           open={updateContractOpen}
-          onOpenChange={setUpdateContractOpen}
+          onOpenChange={
+            setUpdateContractOpen
+          }
           account={account}
           feePlans={feePlans}
-          installmentPolicies={installmentPolicies}
-          isLoading={updateContract.isPending}
+          installmentPolicies={
+            installmentPolicies
+          }
+          isLoading={
+            updateContract.isPending
+          }
           onSubmit={(
             accountId,
             updateStudentId,
@@ -656,13 +732,11 @@ export function StudentFinancialProfilePage() {
                 payload: values,
               },
               {
-                onSuccess: () => {
+                onSuccess: async () => {
                   setUpdateContractOpen(false);
-                  // ✅ بعد تحديث العقد: تحديث الحساب وجلب الأقساط الجديدة
-                  void accountQuery.refetch();
-                  setTimeout(() => {
-                    void refetchInstallments();
-                  }, 500);
+
+                  await accountQuery.refetch();
+                  await refetchInstallments();
                 },
               },
             );

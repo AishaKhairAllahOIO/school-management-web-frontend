@@ -21,7 +21,7 @@ import {
   SelectValue,
 } from "@/shared/ui/select";
 
-import type { FinancialAccount } from "../types/finance.types";
+import type { FinancialAccount } from "../types/studentFinance.types";
 
 type Option = { id: number | string; name: string };
 type FeePlanOption = Option;
@@ -49,7 +49,7 @@ type Props = {
   ) => void;
 };
 
-export function UpdateContractDialog({
+export function UpdateStudentContractDialog({
   open,
   onOpenChange,
   account,

@@ -76,8 +76,29 @@ export function MarksPage() {
     semesterId === null
   ) {
     return (
-      <section className="rounded-[26px] border border-amber-200/60 bg-amber-50/65 p-8 text-center">
-        <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-[16px] bg-amber-100 text-amber-700">
+      <section
+        className="
+          rounded-[26px]
+          border border-amber-200/60
+          bg-amber-50/65
+          p-8
+          text-center
+
+          dark:border-amber-400/[0.14]
+          dark:bg-amber-400/[0.035]
+        "
+      >
+        <span
+          className="
+            mx-auto flex h-12 w-12 items-center justify-center
+            rounded-[16px]
+            bg-amber-100
+            text-amber-700
+
+            dark:bg-amber-400/[0.10]
+            dark:text-amber-300
+          "
+        >
           <AlertCircle size={23} />
         </span>
 
@@ -134,6 +155,10 @@ export function MarksPage() {
   );
 }
 
+/* -------------------------------------------------------------------------- */
+/* Page Header                                                                 */
+/* -------------------------------------------------------------------------- */
+
 function PageHeader({
   academicYear,
   semester,
@@ -142,14 +167,33 @@ function PageHeader({
   semester: string;
 }) {
   return (
-    <section className="rounded-[24px] border border-border/45 bg-card px-4 py-3.5 shadow-[0_8px_30px_rgba(30,20,70,0.035)] sm:px-4.5 sm:py-4">
-      <div className="flex flex-col gap-3.5 lg:flex-row lg:items-center lg:justify-between">
-        {/* ---------------------------------------------------------------- */}
-        {/* Page identity                                                     */}
-        {/* ---------------------------------------------------------------- */}
+    <section
+      className="
+        rounded-[24px]
+        border border-border/45
+        bg-card
+        px-4 py-3.5
+        shadow-[0_8px_30px_rgba(30,20,70,0.035)]
 
+        dark:border-border/55
+        dark:shadow-none
+
+        sm:px-4.5 sm:py-4
+      "
+    >
+      <div className="flex flex-col gap-3.5 lg:flex-row lg:items-center lg:justify-between">
         <div className="flex items-center gap-3">
-          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[13px] bg-primary/[0.09] text-primary">
+          <span
+            className="
+              flex h-10 w-10 shrink-0 items-center justify-center
+              rounded-[13px]
+              bg-primary/[0.09]
+              text-primary
+
+              dark:bg-primary/[0.12]
+              dark:text-primary
+            "
+          >
             <Award size={19} />
           </span>
 
@@ -167,6 +211,10 @@ function PageHeader({
     </section>
   );
 }
+
+/* -------------------------------------------------------------------------- */
+/* Grade Section                                                               */
+/* -------------------------------------------------------------------------- */
 
 function GradeSection({
   grade,
@@ -191,13 +239,44 @@ function GradeSection({
   );
 
   return (
-    <section className="overflow-hidden rounded-[24px] border border-border/45 bg-card shadow-[0_8px_28px_rgba(30,20,70,0.025)]">
+    <section
+      className="
+        overflow-hidden
+        rounded-[24px]
+        border border-border/45
+        bg-card
+        shadow-[0_8px_28px_rgba(30,20,70,0.025)]
+
+        dark:border-border/55
+        dark:shadow-none
+      "
+    >
       <button
         type="button"
         onClick={() => setIsOpen((value) => !value)}
-        className="flex w-full items-center gap-3 px-4 py-4 text-left transition-colors hover:bg-violet-50/35 sm:px-5"
+        className="
+          flex w-full items-center gap-3
+          px-4 py-4
+          text-left
+          transition-colors
+          hover:bg-violet-50/35
+
+          dark:hover:bg-violet-400/[0.045]
+
+          sm:px-5
+        "
       >
-        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[13px] bg-violet-50 text-violet-700">
+        <span
+          className="
+            flex h-10 w-10 shrink-0 items-center justify-center
+            rounded-[13px]
+            bg-violet-50
+            text-violet-700
+
+            dark:bg-violet-400/[0.10]
+            dark:text-violet-300
+          "
+        >
           <GraduationCap size={19} />
         </span>
 
@@ -207,8 +286,20 @@ function GradeSection({
               {grade.name}
             </h2>
 
-            <span className="rounded-full bg-violet-50 px-2 py-0.5 text-[9px] font-medium text-violet-700">
-              {totalSubjects} {totalSubjects === 1 ? "subject" : "subjects"}
+            <span
+              className="
+                rounded-full
+                bg-violet-50
+                px-2 py-0.5
+                text-[9px] font-medium
+                text-violet-700
+
+                dark:bg-violet-400/[0.10]
+                dark:text-violet-300
+              "
+            >
+              {totalSubjects}{" "}
+              {totalSubjects === 1 ? "subject" : "subjects"}
             </span>
           </div>
 
@@ -218,13 +309,39 @@ function GradeSection({
           </p>
         </div>
 
-        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-violet-50 text-violet-700 transition-colors">
-          {isOpen ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+        <span
+          className="
+            flex h-8 w-8 shrink-0 items-center justify-center
+            rounded-full
+            bg-violet-50
+            text-violet-700
+            transition-colors
+
+            dark:bg-violet-400/[0.10]
+            dark:text-violet-300
+          "
+        >
+          {isOpen ? (
+            <ChevronDown size={16} />
+          ) : (
+            <ChevronRight size={16} />
+          )}
         </span>
       </button>
 
       {isOpen && (
-        <div className="border-t border-violet-100/70 bg-violet-50/[0.22] p-3 sm:p-4">
+        <div
+          className="
+            border-t border-violet-100/70
+            bg-violet-50/[0.22]
+            p-3
+
+            dark:border-violet-400/[0.10]
+            dark:bg-violet-400/[0.025]
+
+            sm:p-4
+          "
+        >
           <div className="space-y-2">
             {grade.classes.map((classItem) => (
               <ClassSection
@@ -238,6 +355,11 @@ function GradeSection({
     </section>
   );
 }
+
+/* -------------------------------------------------------------------------- */
+/* Class Section                                                               */
+/* -------------------------------------------------------------------------- */
+
 function ClassSection({
   classItem,
 }: {
@@ -252,13 +374,40 @@ function ClassSection({
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <section className="overflow-hidden rounded-[20px] border border-sky-200/60 bg-card">
+    <section
+      className="
+        overflow-hidden
+        rounded-[20px]
+        border border-sky-200/60
+        bg-card
+
+        dark:border-sky-400/[0.15]
+      "
+    >
       <button
         type="button"
         onClick={() => setIsOpen((value) => !value)}
-        className="flex w-full items-center gap-3 px-4 py-3.5 text-left transition-colors hover:bg-sky-50/45"
+        className="
+          flex w-full items-center gap-3
+          px-4 py-3.5
+          text-left
+          transition-colors
+          hover:bg-sky-50/45
+
+          dark:hover:bg-sky-400/[0.045]
+        "
       >
-        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[11px] bg-sky-50 text-sky-700">
+        <span
+          className="
+            flex h-9 w-9 shrink-0 items-center justify-center
+            rounded-[11px]
+            bg-sky-50
+            text-sky-700
+
+            dark:bg-sky-400/[0.10]
+            dark:text-sky-300
+          "
+        >
           <Users size={16} />
         </span>
 
@@ -268,22 +417,69 @@ function ClassSection({
               {classItem.class_room.name}
             </h3>
 
-            <span className="rounded-full bg-sky-50 px-2 py-0.5 text-[9px] font-medium text-sky-700">
+            <span
+              className="
+                rounded-full
+                bg-sky-50
+                px-2 py-0.5
+                text-[9px] font-medium
+                text-sky-700
+
+                dark:bg-sky-400/[0.10]
+                dark:text-sky-300
+              "
+            >
               {classItem.subjects.length}{" "}
-              {classItem.subjects.length === 1 ? "subject" : "subjects"}
+              {classItem.subjects.length === 1
+                ? "subject"
+                : "subjects"}
             </span>
           </div>
         </div>
 
-        <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-sky-50 text-sky-700">
-          {isOpen ? <ChevronDown size={15} /> : <ChevronRight size={15} />}
+        <span
+          className="
+            flex h-7 w-7 shrink-0 items-center justify-center
+            rounded-full
+            bg-sky-50
+            text-sky-700
+
+            dark:bg-sky-400/[0.10]
+            dark:text-sky-300
+          "
+        >
+          {isOpen ? (
+            <ChevronDown size={15} />
+          ) : (
+            <ChevronRight size={15} />
+          )}
         </span>
       </button>
 
       {isOpen && (
-        <div className="border-t border-sky-100/70 bg-sky-50/[0.16] p-3">
+        <div
+          className="
+            border-t border-sky-100/70
+            bg-sky-50/[0.16]
+            p-3
+
+            dark:border-sky-400/[0.09]
+            dark:bg-sky-400/[0.02]
+          "
+        >
           {classItem.subjects.length === 0 ? (
-            <div className="rounded-[16px] bg-muted/25 px-4 py-6 text-center text-[11px] text-muted-foreground">
+            <div
+              className="
+                rounded-[16px]
+                bg-muted/25
+                px-4 py-6
+                text-center
+                text-[11px]
+                text-muted-foreground
+
+                dark:bg-muted/35
+              "
+            >
               No subjects available.
             </div>
           ) : (
@@ -301,20 +497,56 @@ function ClassSection({
     </section>
   );
 }
-function SubjectSection({ subject }: { subject: MarkSubject }) {
+
+/* -------------------------------------------------------------------------- */
+/* Subject Section                                                             */
+/* -------------------------------------------------------------------------- */
+
+function SubjectSection({
+  subject,
+}: {
+  subject: MarkSubject;
+}) {
   const [isOpen, setIsOpen] = useState(false);
 
   const columns = subject.columns;
   const students = subject.students;
 
   return (
-    <section className="overflow-hidden rounded-[18px] border border-emerald-200/60 bg-background">
+    <section
+      className="
+        overflow-hidden
+        rounded-[18px]
+        border border-emerald-200/60
+        bg-background
+
+        dark:border-emerald-400/[0.14]
+      "
+    >
       <button
         type="button"
         onClick={() => setIsOpen((value) => !value)}
-        className="flex w-full items-center gap-3 px-3.5 py-3 text-left transition-colors hover:bg-emerald-50/35"
+        className="
+          flex w-full items-center gap-3
+          px-3.5 py-3
+          text-left
+          transition-colors
+          hover:bg-emerald-50/35
+
+          dark:hover:bg-emerald-400/[0.045]
+        "
       >
-        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[10px] bg-emerald-50 text-emerald-700">
+        <span
+          className="
+            flex h-8 w-8 shrink-0 items-center justify-center
+            rounded-[10px]
+            bg-emerald-50
+            text-emerald-700
+
+            dark:bg-emerald-400/[0.10]
+            dark:text-emerald-300
+          "
+        >
           <Award size={14} />
         </span>
 
@@ -324,18 +556,46 @@ function SubjectSection({ subject }: { subject: MarkSubject }) {
           </h4>
         </div>
 
-        <span className="hidden items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-1 text-[9px] font-medium text-emerald-700 sm:inline-flex">
+        <span
+          className="
+            hidden items-center gap-1.5
+            rounded-full
+            bg-emerald-50
+            px-2.5 py-1
+            text-[9px] font-medium
+            text-emerald-700
+
+            dark:bg-emerald-400/[0.10]
+            dark:text-emerald-300
+
+            sm:inline-flex
+          "
+        >
           <CheckCircle2 size={11} />
           Marks
         </span>
 
-        <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-emerald-50 text-emerald-700">
-          {isOpen ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+        <span
+          className="
+            flex h-7 w-7 shrink-0 items-center justify-center
+            rounded-full
+            bg-emerald-50
+            text-emerald-700
+
+            dark:bg-emerald-400/[0.10]
+            dark:text-emerald-300
+          "
+        >
+          {isOpen ? (
+            <ChevronDown size={14} />
+          ) : (
+            <ChevronRight size={14} />
+          )}
         </span>
       </button>
 
       {isOpen && (
-        <div className="border-t border-emerald-100/70">
+        <div className="border-t border-emerald-100/70 dark:border-emerald-400/[0.09]">
           {columns.length === 0 ? (
             <div className="p-6 text-center text-[11px] text-muted-foreground">
               No assessment components available.
@@ -356,7 +616,12 @@ function SubjectSection({ subject }: { subject: MarkSubject }) {
                         border-b border-r border-border/45
                         bg-muted
                         px-3 py-3
-                        text-[10px] font-semibold text-foreground/70
+                        text-[10px] font-semibold
+                        text-foreground/70
+
+                        dark:border-border/60
+                        dark:bg-muted/65
+
                         sm:w-[220px] sm:min-w-[220px] sm:px-4
                       "
                     >
@@ -372,7 +637,11 @@ function SubjectSection({ subject }: { subject: MarkSubject }) {
                           bg-muted/25
                           px-3 py-3
                           text-center
-                          text-[10px] font-semibold text-foreground/70
+                          text-[10px] font-semibold
+                          text-foreground/70
+
+                          dark:border-border/60
+                          dark:bg-muted/35
                         "
                       >
                         <div>{column.name}</div>
@@ -403,6 +672,11 @@ function SubjectSection({ subject }: { subject: MarkSubject }) {
     </section>
   );
 }
+
+/* -------------------------------------------------------------------------- */
+/* Student Row                                                                 */
+/* -------------------------------------------------------------------------- */
+
 function MarksStudentRow({
   student,
   columns,
@@ -427,11 +701,25 @@ function MarksStudentRow({
           border-b border-r border-border/35
           ${studentCellBackground}
           px-3 py-3
+
+          dark:border-border/50
+
           sm:w-[220px] sm:min-w-[220px] sm:px-4
         `}
       >
         <div className="flex items-center gap-3">
-          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-violet-50 text-[10px] font-semibold text-violet-700">
+          <span
+            className="
+              flex h-8 w-8 shrink-0 items-center justify-center
+              rounded-full
+              bg-violet-50
+              text-[10px] font-semibold
+              text-violet-700
+
+              dark:bg-violet-400/[0.11]
+              dark:text-violet-300
+            "
+          >
             {getInitials(student.student_name)}
           </span>
 
@@ -458,7 +746,14 @@ function MarksStudentRow({
               border-b border-border/35
               px-3 py-3
               text-center
-              ${isAlternate ? "bg-muted/[0.12]" : "bg-background"}
+
+              ${
+                isAlternate
+                  ? "bg-muted/[0.12] dark:bg-muted/[0.20]"
+                  : "bg-background"
+              }
+
+              dark:border-border/45
             `}
           >
             <MarkCell
@@ -473,6 +768,11 @@ function MarksStudentRow({
     </tr>
   );
 }
+
+/* -------------------------------------------------------------------------- */
+/* Mark Cell                                                                   */
+/* -------------------------------------------------------------------------- */
+
 function MarkCell({
   value,
   maxMark,
@@ -486,28 +786,66 @@ function MarkCell({
 }) {
   if (value === null) {
     return (
-      <span className="inline-flex rounded-full bg-muted px-2.5 py-1 text-[10px] font-medium text-muted-foreground">
+      <span
+        className="
+          inline-flex
+          rounded-full
+          bg-muted
+          px-2.5 py-1
+          text-[10px] font-medium
+          text-muted-foreground
+
+          dark:bg-muted/60
+        "
+      >
         Not graded
       </span>
     );
   }
 
-  let className = "bg-emerald-50 text-emerald-700";
+  let className = `
+    bg-emerald-50
+    text-emerald-700
+
+    dark:bg-emerald-400/[0.10]
+    dark:text-emerald-300
+  `;
 
   if (percentage !== null && percentage < 50) {
-    className = "bg-rose-50 text-rose-700";
+    className = `
+      bg-rose-50
+      text-rose-700
+
+      dark:bg-rose-400/[0.10]
+      dark:text-rose-300
+    `;
   } else if (percentage !== null && percentage < 70) {
-    className = "bg-amber-50 text-amber-700";
+    className = `
+      bg-amber-50
+      text-amber-700
+
+      dark:bg-amber-400/[0.10]
+      dark:text-amber-300
+    `;
   }
 
   return (
     <div className="flex flex-col items-center gap-1">
       <span
-        className={`inline-flex min-w-[58px] items-center justify-center rounded-full px-2.5 py-1 text-[10px] font-semibold ${className}`}
+        className={`
+          inline-flex min-w-[58px]
+          items-center justify-center
+          rounded-full
+          px-2.5 py-1
+          text-[10px] font-semibold
+          ${className}
+        `}
         title={notes ?? undefined}
       >
         {formatNumber(value)}
+
         <span className="mx-0.5 opacity-50">/</span>
+
         {formatNumber(maxMark)}
       </span>
 
@@ -520,24 +858,67 @@ function MarkCell({
   );
 }
 
-function EmptyMarksState({ onRetry }: { onRetry: () => void }) {
+/* -------------------------------------------------------------------------- */
+/* Empty State                                                                 */
+/* -------------------------------------------------------------------------- */
+
+function EmptyMarksState({
+  onRetry,
+}: {
+  onRetry: () => void;
+}) {
   return (
-    <section className="rounded-[26px] border border-dashed border-violet-200/70 bg-violet-50/[0.35] p-10 text-center">
-      <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-[16px] bg-violet-50 text-violet-700">
+    <section
+      className="
+        rounded-[26px]
+        border border-dashed
+        border-violet-200/70
+        bg-violet-50/[0.35]
+        p-10
+        text-center
+
+        dark:border-violet-400/[0.14]
+        dark:bg-violet-400/[0.035]
+      "
+    >
+      <span
+        className="
+          mx-auto flex h-12 w-12 items-center justify-center
+          rounded-[16px]
+          bg-violet-50
+          text-violet-700
+
+          dark:bg-violet-400/[0.10]
+          dark:text-violet-300
+        "
+      >
         <Award size={21} />
       </span>
 
-      <h2 className="mt-4 text-[15px] font-semibold">No marks available</h2>
+      <h2 className="mt-4 text-[15px] font-semibold">
+        No marks available
+      </h2>
 
       <p className="mx-auto mt-1.5 max-w-md text-[12px] leading-5 text-muted-foreground">
-        There are no student marks available for the current academic year and
-        semester.
+        There are no student marks available for the current academic
+        year and semester.
       </p>
 
       <button
         type="button"
         onClick={onRetry}
-        className="mt-5 inline-flex h-9 items-center gap-2 rounded-full bg-primary px-4 text-[12px] font-medium text-primary-foreground transition hover:opacity-90"
+        className="
+          mt-5
+          inline-flex h-9
+          items-center gap-2
+          rounded-full
+          bg-primary
+          px-4
+          text-[12px] font-medium
+          text-primary-foreground
+          transition
+          hover:opacity-90
+        "
       >
         <RefreshCw size={14} />
         Refresh
@@ -545,6 +926,10 @@ function EmptyMarksState({ onRetry }: { onRetry: () => void }) {
     </section>
   );
 }
+
+/* -------------------------------------------------------------------------- */
+/* Error State                                                                 */
+/* -------------------------------------------------------------------------- */
 
 function ErrorState({
   title,
@@ -556,21 +941,57 @@ function ErrorState({
   onRetry: () => void;
 }) {
   return (
-    <section className="rounded-[26px] border border-rose-200/60 bg-rose-50/[0.35] p-8 text-center">
-      <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-[16px] bg-rose-50 text-rose-700">
+    <section
+      className="
+        rounded-[26px]
+        border border-rose-200/60
+        bg-rose-50/[0.35]
+        p-8
+        text-center
+
+        dark:border-rose-400/[0.14]
+        dark:bg-rose-400/[0.035]
+      "
+    >
+      <span
+        className="
+          mx-auto flex h-12 w-12 items-center justify-center
+          rounded-[16px]
+          bg-rose-50
+          text-rose-700
+
+          dark:bg-rose-400/[0.10]
+          dark:text-rose-300
+        "
+      >
         <AlertCircle size={24} />
       </span>
 
-      <h2 className="mt-3 text-sm font-semibold">{title}</h2>
+      <h2 className="mt-3 text-sm font-semibold">
+        {title}
+      </h2>
 
       {message && (
-        <p className="mt-1.5 text-[12px] text-muted-foreground">{message}</p>
+        <p className="mt-1.5 text-[12px] text-muted-foreground">
+          {message}
+        </p>
       )}
 
       <button
         type="button"
         onClick={onRetry}
-        className="mt-4 inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-[12px] font-medium text-primary-foreground transition hover:opacity-90"
+        className="
+          mt-4
+          inline-flex
+          items-center gap-2
+          rounded-full
+          bg-primary
+          px-4 py-2
+          text-[12px] font-medium
+          text-primary-foreground
+          transition
+          hover:opacity-90
+        "
       >
         <RefreshCw size={14} />
         Try again
@@ -579,18 +1000,62 @@ function ErrorState({
   );
 }
 
+/* -------------------------------------------------------------------------- */
+/* Skeleton                                                                    */
+/* -------------------------------------------------------------------------- */
+
 function MarksPageSkeleton() {
   return (
     <div className="space-y-5">
       {/* Header */}
-      <section className="rounded-[26px] border border-border/45 bg-card p-4 shadow-[0_10px_35px_rgba(30,20,70,0.035)] sm:p-5">
+      <section
+        className="
+          rounded-[26px]
+          border border-border/45
+          bg-card
+          p-4
+          shadow-[0_10px_35px_rgba(30,20,70,0.035)]
+
+          dark:border-border/55
+          dark:shadow-none
+
+          sm:p-5
+        "
+      >
         <div className="flex items-center gap-3">
-          <div className="h-11 w-11 animate-pulse rounded-[15px] bg-violet-100" />
+          <div
+            className="
+              h-11 w-11
+              animate-pulse
+              rounded-[15px]
+              bg-violet-100
+
+              dark:bg-violet-400/[0.10]
+            "
+          />
 
           <div className="space-y-2">
-            <div className="h-4 w-32 animate-pulse rounded-md bg-violet-100" />
+            <div
+              className="
+                h-4 w-32
+                animate-pulse
+                rounded-md
+                bg-violet-100
 
-            <div className="h-3 w-48 animate-pulse rounded-md bg-violet-50" />
+                dark:bg-violet-400/[0.10]
+              "
+            />
+
+            <div
+              className="
+                h-3 w-48
+                animate-pulse
+                rounded-md
+                bg-violet-50
+
+                dark:bg-violet-400/[0.06]
+              "
+            />
           </div>
         </div>
       </section>
@@ -600,18 +1065,62 @@ function MarksPageSkeleton() {
         {Array.from({ length: 4 }).map((_, index) => (
           <section
             key={index}
-            className="rounded-[24px] border border-border/45 bg-card shadow-[0_8px_28px_rgba(30,20,70,0.025)]"
+            className="
+              rounded-[24px]
+              border border-border/45
+              bg-card
+              shadow-[0_8px_28px_rgba(30,20,70,0.025)]
+
+              dark:border-border/55
+              dark:shadow-none
+            "
           >
             <div className="flex items-center gap-3 px-4 py-4 sm:px-5">
-              <div className="h-10 w-10 animate-pulse rounded-[13px] bg-violet-100" />
+              <div
+                className="
+                  h-10 w-10
+                  animate-pulse
+                  rounded-[13px]
+                  bg-violet-100
+
+                  dark:bg-violet-400/[0.10]
+                "
+              />
 
               <div className="flex-1 space-y-2">
-                <div className="h-3.5 w-28 animate-pulse rounded-md bg-violet-100" />
+                <div
+                  className="
+                    h-3.5 w-28
+                    animate-pulse
+                    rounded-md
+                    bg-violet-100
 
-                <div className="h-2.5 w-36 animate-pulse rounded-md bg-muted/40" />
+                    dark:bg-violet-400/[0.10]
+                  "
+                />
+
+                <div
+                  className="
+                    h-2.5 w-36
+                    animate-pulse
+                    rounded-md
+                    bg-muted/40
+
+                    dark:bg-muted/50
+                  "
+                />
               </div>
 
-              <div className="h-8 w-8 animate-pulse rounded-full bg-violet-50" />
+              <div
+                className="
+                  h-8 w-8
+                  animate-pulse
+                  rounded-full
+                  bg-violet-50
+
+                  dark:bg-violet-400/[0.08]
+                "
+              />
             </div>
           </section>
         ))}
@@ -619,6 +1128,10 @@ function MarksPageSkeleton() {
     </div>
   );
 }
+
+/* -------------------------------------------------------------------------- */
+/* Helpers                                                                     */
+/* -------------------------------------------------------------------------- */
 
 function getInitials(name: string): string {
   const parts = name.trim().split(/\s+/).filter(Boolean);
@@ -631,7 +1144,9 @@ function getInitials(name: string): string {
     return parts[0].slice(0, 2).toUpperCase();
   }
 
-  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  return (
+    parts[0][0] + parts[parts.length - 1][0]
+  ).toUpperCase();
 }
 
 function formatNumber(value: number): string {

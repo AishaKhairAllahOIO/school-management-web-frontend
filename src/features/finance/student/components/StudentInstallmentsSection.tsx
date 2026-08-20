@@ -15,12 +15,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/shared/ui/dialog";
-import { useFinanceInstallment } from "../hooks/useInstallments";
-import type { Installment } from "../types/finance.types";
-import { FinanceSectionShell } from "./FinanceSectionShell";
-import { FinanceTableSkeleton } from "./FinanceTableSkeleton";
 
-type InstallmentsSectionProps = {
+import type { Installment } from "../types/studentFinance.types";
+import { StudentFinanceSectionShell } from "./StudentFinanceSectionShell";
+import { StudentFinanceTableSkeleton } from "./StudentFinanceTableSkeleton";
+
+type StudentInstallmentsSectionProps = {
   installments: Installment[];
   isLoading?: boolean;
   title?: string;
@@ -34,7 +34,13 @@ function formatAmount(value: number | undefined | null) {
 function formatDate(value: string | null) {
   if (!value) return "—";
 
-  return new Date(value).toLocaleDateString(undefined, {
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return "—";
+  }
+
+  return date.toLocaleDateString(undefined, {
     year: "numeric",
     month: "short",
     day: "numeric",
@@ -42,34 +48,46 @@ function formatDate(value: string | null) {
 }
 
 function getInstallmentState(item: Installment) {
-  const overdue = item.dueDate
-    ? new Date() > new Date(item.dueDate) && item.status !== "paid"
-    : false;
+  const overdue =
+    item.dueDate
+      ? new Date() > new Date(item.dueDate) &&
+        item.status !== "paid"
+      : false;
 
   if (item.status === "paid") {
     return {
       label: "Paid",
-      className: "border-success/18 bg-success/[0.075] text-success",
+      className:
+        "border-success/18 bg-success/[0.075] text-success",
       icon: CheckCircle2,
     };
   }
 
-  if (overdue || item.status === "overdue") {
+  if (
+    overdue ||
+    item.status === "overdue"
+  ) {
     return {
       label: "Overdue",
-      className: "border-destructive/18 bg-destructive/[0.06] text-destructive",
+      className:
+        "border-destructive/18 bg-destructive/[0.06] text-destructive",
       icon: Clock3,
     };
   }
 
   return {
     label: "Pending",
-    className: "border-info/18 bg-info/[0.07] text-info",
+    className:
+      "border-info/18 bg-info/[0.07] text-info",
     icon: CalendarClock,
   };
 }
 
-function InstallmentStatus({ item }: { item: Installment }) {
+function InstallmentStatus({
+  item,
+}: {
+  item: Installment;
+}) {
   const state = getInstallmentState(item);
   const Icon = state.icon;
 
@@ -81,15 +99,33 @@ function InstallmentStatus({ item }: { item: Installment }) {
         state.className,
       ].join(" ")}
     >
-      <Icon className="h-3.5 w-3.5" strokeWidth={1.8} />
+      <Icon
+        className="h-3.5 w-3.5"
+        strokeWidth={1.8}
+      />
+
       {state.label}
     </span>
   );
 }
 
-function ProgressBar({ paid, due }: { paid: number; due: number }) {
+function ProgressBar({
+  paid,
+  due,
+}: {
+  paid: number;
+  due: number;
+}) {
   const progress =
-    due > 0 ? Math.min(100, Math.max(0, Math.round((paid / due) * 100))) : 0;
+    due > 0
+      ? Math.min(
+          100,
+          Math.max(
+            0,
+            Math.round((paid / due) * 100),
+          ),
+        )
+      : 0;
 
   return (
     <div className="w-[130px]">
@@ -106,7 +142,9 @@ function ProgressBar({ paid, due }: { paid: number; due: number }) {
       <div className="h-1.5 overflow-hidden rounded-full bg-muted/60">
         <div
           className="h-full rounded-full bg-primary/75 transition-all"
-          style={{ width: `${progress}%` }}
+          style={{
+            width: `${progress}%`,
+          }}
         />
       </div>
     </div>
@@ -124,7 +162,10 @@ function InstallmentsTable({
     return (
       <div className="rounded-[20px] border border-dashed border-border/55 bg-card px-6 py-14 text-center">
         <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-[16px] bg-info/[0.08] text-info">
-          <CalendarClock className="h-5 w-5" strokeWidth={1.8} />
+          <CalendarClock
+            className="h-5 w-5"
+            strokeWidth={1.8}
+          />
         </span>
 
         <h3 className="mt-4 text-[15px] font-semibold text-foreground/88">
@@ -132,8 +173,8 @@ function InstallmentsTable({
         </h3>
 
         <p className="mx-auto mt-1.5 max-w-md text-[12.5px] leading-5 text-muted-foreground/75">
-          Installments will appear here once the student's financial contract
-          has been finalized.
+          No installments have been created for this
+          student's financial account.
         </p>
       </div>
     );
@@ -177,10 +218,16 @@ function InstallmentsTable({
 
           <tbody>
             {installments.map((item) => {
-              const amountDue = Number(item.amountDue ?? 0);
-              const amountPaid = Number(item.amountPaid ?? 0);
+              const amountDue =
+                Number(item.amountDue ?? 0);
 
-              const remaining = Math.max(0, amountDue - amountPaid);
+              const amountPaid =
+                Number(item.amountPaid ?? 0);
+
+              const remaining = Math.max(
+                0,
+                amountDue - amountPaid,
+              );
 
               return (
                 <tr
@@ -189,32 +236,28 @@ function InstallmentsTable({
                   role="button"
                   tabIndex={0}
                   onKeyDown={(event) => {
-                    if (event.key === "Enter" || event.key === " ") {
+                    if (
+                      event.key === "Enter" ||
+                      event.key === " "
+                    ) {
                       event.preventDefault();
                       onSelect(item);
                     }
                   }}
-                  className={[
-                    "border-b border-border/30",
-                    "transition-colors last:border-b-0",
-                    "hover:bg-primary/[0.018]",
-                  ].join(" ")}
+                  className="cursor-pointer border-b border-border/30 transition-colors last:border-b-0 hover:bg-primary/[0.018]"
                 >
                   <td className="px-5 py-4">
                     <div className="flex items-center gap-3">
                       <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[11px] bg-primary/[0.07] text-primary">
-                        <Wallet className="h-4 w-4" strokeWidth={1.8} />
+                        <Wallet
+                          className="h-4 w-4"
+                          strokeWidth={1.8}
+                        />
                       </span>
 
-                      <div className="min-w-0">
-                        <p className="truncate text-[13px] font-semibold text-foreground/88">
-                          {item.title}
-                        </p>
-
-                        <p className="mt-0.5 text-[10.5px] text-muted-foreground/60">
-                          Installment #{item.installmentNumber}
-                        </p>
-                      </div>
+                      <p className="truncate text-[13px] font-semibold text-foreground/88">
+                        {item.title}
+                      </p>
                     </div>
                   </td>
 
@@ -248,7 +291,9 @@ function InstallmentsTable({
                     <span
                       className={[
                         "text-[13px] font-semibold",
-                        remaining > 0 ? "text-foreground/85" : "text-success",
+                        remaining > 0
+                          ? "text-foreground/85"
+                          : "text-success",
                       ].join(" ")}
                     >
                       {formatAmount(remaining)}
@@ -256,7 +301,10 @@ function InstallmentsTable({
                   </td>
 
                   <td className="px-4 py-4">
-                    <ProgressBar paid={amountPaid} due={amountDue} />
+                    <ProgressBar
+                      paid={amountPaid}
+                      due={amountDue}
+                    />
                   </td>
 
                   <td className="px-4 py-4">
@@ -285,106 +333,144 @@ function InstallmentsTable({
   );
 }
 
-export function InstallmentsSection({
+export function StudentInstallmentsSection({
   installments,
   isLoading = false,
-  title = "Installment Schedule",
-  description = "Track what is due, what has been paid, and what remains.",
-}: InstallmentsSectionProps) {
-  const [selectedInstallmentId, setSelectedInstallmentId] = useState<
-    string | number | undefined
-  >(undefined);
+  title = "Student Installments",
+  description = "Track this student's installments, payments, and remaining balances.",
+}: StudentInstallmentsSectionProps) {
+  const [
+    selectedInstallment,
+    setSelectedInstallment,
+  ] = useState<Installment | null>(null);
 
-  const installmentDetailQuery = useFinanceInstallment(
-    selectedInstallmentId,
-    selectedInstallmentId !== undefined,
-  );
-  const selectedInstallment =
-    installmentDetailQuery.data ??
-    installments.find(
-      (item) => String(item.id) === String(selectedInstallmentId),
-    );
-
-  // ✅ عرض Skeleton أثناء التحميل
   if (isLoading) {
     return (
-      <FinanceSectionShell
+      <StudentFinanceSectionShell
         title={title}
         description={description}
         icon={CalendarDays}
       >
-        <FinanceTableSkeleton />
-      </FinanceSectionShell>
+        <StudentFinanceTableSkeleton />
+      </StudentFinanceSectionShell>
     );
   }
 
   return (
-    <FinanceSectionShell
+    <StudentFinanceSectionShell
       title={title}
       description={description}
       icon={CalendarDays}
     >
       <InstallmentsTable
         installments={installments}
-        onSelect={(item) => setSelectedInstallmentId(item.id)}
+        onSelect={setSelectedInstallment}
       />
 
       <Dialog
-        open={selectedInstallmentId !== undefined}
+        open={selectedInstallment !== null}
         onOpenChange={(open) => {
-          if (!open) setSelectedInstallmentId(undefined);
+          if (!open) {
+            setSelectedInstallment(null);
+          }
         }}
       >
         <DialogContent className="rounded-[24px] sm:max-w-[520px]">
           <DialogHeader className="text-start">
-            <DialogTitle>Installment details</DialogTitle>
+            <DialogTitle>
+              {selectedInstallment?.title ??
+                "Installment details"}
+            </DialogTitle>
+
             <DialogDescription>
-              Detailed data loaded from the installment endpoint.
+              Details of this student's installment.
             </DialogDescription>
           </DialogHeader>
 
-          {installmentDetailQuery.isLoading ? (
-            <FinanceTableSkeleton />
-          ) : selectedInstallment ? (
+          {selectedInstallment && (
             <div className="grid gap-3 sm:grid-cols-2">
-              {[
-                ["Title", selectedInstallment.title],
-                ["Installment", `#${selectedInstallment.installmentNumber}`],
-                ["Amount due", formatAmount(selectedInstallment.amountDue)],
-                ["Amount paid", formatAmount(selectedInstallment.amountPaid)],
-                [
-                  "Remaining",
-                  formatAmount(
+              <div className="rounded-[15px] border border-border/45 bg-muted/[0.18] p-3">
+                <p className="text-[10px] uppercase tracking-[0.06em] text-muted-foreground">
+                  Installment
+                </p>
+
+                <p className="mt-1 text-[13px] font-semibold">
+                  #
+                  {
+                    selectedInstallment.installmentNumber
+                  }
+                </p>
+              </div>
+
+              <div className="rounded-[15px] border border-border/45 bg-muted/[0.18] p-3">
+                <p className="text-[10px] uppercase tracking-[0.06em] text-muted-foreground">
+                  Status
+                </p>
+
+                <p className="mt-1 text-[13px] font-semibold capitalize">
+                  {selectedInstallment.status}
+                </p>
+              </div>
+
+              <div className="rounded-[15px] border border-border/45 bg-muted/[0.18] p-3">
+                <p className="text-[10px] uppercase tracking-[0.06em] text-muted-foreground">
+                  Amount due
+                </p>
+
+                <p className="mt-1 text-[13px] font-semibold">
+                  {formatAmount(
+                    selectedInstallment.amountDue,
+                  )}
+                </p>
+              </div>
+
+              <div className="rounded-[15px] border border-success/15 bg-success/[0.035] p-3">
+                <p className="text-[10px] uppercase tracking-[0.06em] text-muted-foreground">
+                  Amount paid
+                </p>
+
+                <p className="mt-1 text-[13px] font-semibold text-success">
+                  {formatAmount(
+                    selectedInstallment.amountPaid,
+                  )}
+                </p>
+              </div>
+
+              <div className="rounded-[15px] border border-border/45 bg-muted/[0.18] p-3">
+                <p className="text-[10px] uppercase tracking-[0.06em] text-muted-foreground">
+                  Remaining
+                </p>
+
+                <p className="mt-1 text-[13px] font-semibold">
+                  {formatAmount(
                     Math.max(
                       0,
-                      Number(selectedInstallment.amountDue) -
-                        Number(selectedInstallment.amountPaid),
+                      Number(
+                        selectedInstallment.amountDue,
+                      ) -
+                        Number(
+                          selectedInstallment.amountPaid,
+                        ),
                     ),
-                  ),
-                ],
-                ["Due date", formatDate(selectedInstallment.dueDate)],
-                ["Status", selectedInstallment.status],
-              ].map(([label, value]) => (
-                <div
-                  key={label}
-                  className="rounded-[15px] border border-border/45 bg-muted/[0.18] p-3"
-                >
-                  <p className="text-[10px] uppercase tracking-[0.06em] text-muted-foreground">
-                    {label}
-                  </p>
-                  <p className="mt-1 text-[13px] font-semibold capitalize">
-                    {value}
-                  </p>
-                </div>
-              ))}
+                  )}
+                </p>
+              </div>
+
+              <div className="rounded-[15px] border border-border/45 bg-muted/[0.18] p-3">
+                <p className="text-[10px] uppercase tracking-[0.06em] text-muted-foreground">
+                  Due date
+                </p>
+
+                <p className="mt-1 text-[13px] font-semibold">
+                  {formatDate(
+                    selectedInstallment.dueDate,
+                  )}
+                </p>
+              </div>
             </div>
-          ) : (
-            <p className="text-sm text-muted-foreground">
-              Installment details could not be loaded.
-            </p>
           )}
         </DialogContent>
       </Dialog>
-    </FinanceSectionShell>
+    </StudentFinanceSectionShell>
   );
 }

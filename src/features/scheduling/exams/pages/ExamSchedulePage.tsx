@@ -281,52 +281,119 @@ function PageHeader({
   }, [exams]);
 
   return (
-    <section className="rounded-[24px] border border-border/45 bg-card px-4 py-3.5 shadow-[0_8px_30px_rgba(30,20,70,0.035)] sm:px-4.5 sm:py-4">
-      <div className="flex flex-col gap-3.5 lg:flex-row lg:items-center lg:justify-between">
-
+    <section
+      className={[
+        "rounded-[24px]",
+        "border border-border/45",
+        "bg-card",
+        "shadow-[0_8px_30px_rgba(30,20,70,0.035)]",
+        "px-3.5 py-3.5",
+        "sm:px-4 sm:py-4",
+        "lg:px-5",
+      ].join(" ")}
+    >
+      <div
+        className={[
+          "flex flex-col",
+          "gap-4",
+          "lg:flex-row lg:items-center lg:justify-between",
+          "lg:gap-6",
+        ].join(" ")}
+      >
         {/* ---------------------------------------------------------------- */}
         {/* Page identity                                                     */}
         {/* ---------------------------------------------------------------- */}
 
-        <div className="flex items-center gap-3">
-          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[13px] bg-primary/[0.09] text-primary">
+        <div className="flex min-w-0 items-center gap-3">
+          <span
+            className={[
+              "flex h-10 w-10 shrink-0",
+              "items-center justify-center",
+              "rounded-[13px]",
+              "bg-primary/[0.09] text-primary",
+            ].join(" ")}
+          >
             <ClipboardList size={19} />
           </span>
 
           <div className="min-w-0">
-            <h1 className="text-[16px] font-semibold tracking-[-0.02em]">
+            <h1
+              className={[
+                "truncate",
+                "text-[15px] font-semibold",
+                "tracking-[-0.02em]",
+                "sm:text-[16px]",
+              ].join(" ")}
+            >
               Exam Schedules
             </h1>
 
-            <p className="mt-0.5 text-[11px] text-muted-foreground">
+            <p
+              className={[
+                "mt-0.5",
+                "truncate",
+                "text-[10px] text-muted-foreground",
+                "sm:text-[11px]",
+              ].join(" ")}
+            >
               {academicYear} · {semester}
             </p>
           </div>
         </div>
 
         {/* ---------------------------------------------------------------- */}
-        {/* Actions + statistics                                             */}
+        {/* Right side                                                        */}
         {/* ---------------------------------------------------------------- */}
 
-        <div className="flex flex-wrap items-center gap-0">
-          <div className="flex flex-wrap items-center gap-1.5">
+        <div
+          className={[
+            "flex min-w-0 flex-col",
+            "gap-2.5",
+            "sm:flex-row sm:items-center",
+            "sm:gap-2",
+            "lg:shrink-0",
+          ].join(" ")}
+        >
+          {/* -------------------------------------------------------------- */}
+          {/* Statistics                                                      */}
+          {/* -------------------------------------------------------------- */}
 
+          <div
+            className={[
+              "grid w-full",
+              "grid-cols-3",
+              "gap-1.5",
+              "sm:flex sm:w-auto sm:items-center",
+            ].join(" ")}
+          >
             <MetricCard
               label="Exams"
               value={stats.exams}
-              className="border-violet-200/50 bg-violet-50/55 text-violet-700"
+              className={[
+                "border-violet-200/50",
+                "bg-violet-50/55",
+                "text-violet-700",
+              ].join(" ")}
             />
 
             <MetricCard
               label="Quizzes"
               value={stats.quizzes}
-              className="border-sky-200/50 bg-sky-50/55 text-sky-700"
+              className={[
+                "border-sky-200/50",
+                "bg-sky-50/55",
+                "text-sky-700",
+              ].join(" ")}
             />
 
             <MetricCard
               label="Subjects"
               value={stats.subjects}
-              className="border-emerald-200/50 bg-emerald-50/55 text-emerald-700"
+              className={[
+                "border-emerald-200/50",
+                "bg-emerald-50/55",
+                "text-emerald-700",
+              ].join(" ")}
             />
           </div>
 
@@ -334,20 +401,38 @@ function PageHeader({
           {/* Create Exam                                                     */}
           {/* -------------------------------------------------------------- */}
 
-          <div className="ml-4 lg:ml-5">
-            <button
-              type="button"
-              onClick={onCreate}
-              disabled={isCreating}
-              className="inline-flex h-9 items-center justify-center gap-2 rounded-full bg-primary px-4 text-[12px] font-medium text-primary-foreground shadow-sm transition-all duration-200 hover:-translate-y-[1px] hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0"
-            >
-              <Plus size={14} />
+          <button
+            type="button"
+            onClick={onCreate}
+            disabled={isCreating}
+            className={[
+              "inline-flex",
+              "h-9",
+              "w-full",
+              "shrink-0",
+              "items-center justify-center",
+              "gap-2",
+              "rounded-full",
+              "bg-primary",
+              "px-4",
+              "text-[12px]",
+              "font-medium",
+              "text-primary-foreground",
+              "shadow-sm",
+              "transition-all duration-200",
+              "hover:-translate-y-[1px]",
+              "hover:opacity-90",
+              "disabled:cursor-not-allowed",
+              "disabled:opacity-50",
+              "disabled:hover:translate-y-0",
+              "sm:w-auto",
+              "sm:min-w-[116px]",
+            ].join(" ")}
+          >
+            <Plus size={14} />
 
-              {isCreating
-                ? "Creating..."
-                : "Create Exam"}
-            </button>
-          </div>
+            {isCreating ? "Creating..." : "Create Exam"}
+          </button>
         </div>
       </div>
     </section>
@@ -370,26 +455,61 @@ function MetricCard({
   return (
     <article
       className={[
-        "flex h-8 min-w-[78px] items-center justify-center",
-        "rounded-[10px] border px-2.5",
+        "flex",
+        "h-8",
+        "min-w-0",
+        "flex-1",
+        "items-center",
+        "justify-center",
+        "rounded-[10px]",
+        "border",
+        "px-2",
         "transition-all duration-200",
         "hover:-translate-y-[1px]",
+        "sm:min-w-[78px]",
+        "sm:flex-none",
+        "sm:px-2.5",
         className,
       ].join(" ")}
     >
-      <div className="flex items-baseline gap-1.5 whitespace-nowrap">
-        <p className="text-[9px] font-medium leading-none tracking-[-0.01em]">
+      <div
+        className={[
+          "flex",
+          "items-baseline",
+          "justify-center",
+          "gap-1.5",
+          "whitespace-nowrap",
+          "min-w-0",
+        ].join(" ")}
+      >
+        <p
+          className={[
+            "truncate",
+            "text-[9px]",
+            "font-medium",
+            "leading-none",
+            "tracking-[-0.01em]",
+            "sm:text-[9px]",
+          ].join(" ")}
+        >
           {label}
         </p>
 
-        <p className="text-[10px] font-medium leading-none opacity-70">
+        <p
+          className={[
+            "shrink-0",
+            "text-[10px]",
+            "font-medium",
+            "leading-none",
+            "opacity-70",
+          ].join(" ")}
+        >
           {value}
         </p>
       </div>
     </article>
   );
 }
-
 /* -------------------------------------------------------------------------- */
 /* Exam Card                                                                  */
 /* -------------------------------------------------------------------------- */

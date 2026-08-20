@@ -6,14 +6,14 @@ import type {
   FinancialAccount,
   Installment,
   PaymentReceipt,
-} from "../types/finance.types";
+} from "../types/studentFinance.types";
 
 import type {
   FinalizeContractPayload,
   ProcessPaymentPayload,
   UpdateContractPayload,
   UpdatePaymentPayload,
-} from "../types/finance.payloads";
+} from "../types/studentFinance.payloads";
 
 /* -------------------------------------------------------------------------- */
 /* Response types                                                             */
@@ -174,19 +174,24 @@ async getStudentInstallments(
   /* Payments - List                                                          */
   /* ------------------------------------------------------------------------ */
 
-  async getPayments(): Promise<
-    PaymentReceipt[]
-  > {
+  async getPaymentsByStudent(
+    studentId: string | number,
+    accountId?: string | number,
+  ): Promise<PaymentReceipt[]> {
     const response =
       await axiosClient.get<
         ApiResponse<PaymentReceipt[]>
       >(
         API_ENDPOINTS.FINANCE_OPERATIONS.PAYMENTS,
+        {
+          params: {
+            studentId,
+            ...(accountId !== undefined ? { accountId } : {}),
+          },
+        },
       );
 
-    return unwrapResponseData(
-      response.data,
-    );
+    return unwrapResponseData(response.data);
   },
 
   /* ------------------------------------------------------------------------ */

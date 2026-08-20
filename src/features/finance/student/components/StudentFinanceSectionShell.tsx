@@ -10,7 +10,7 @@ type Props = {
   children: ReactNode;
 };
 
-export function FinanceSectionShell({
+export function StudentFinanceSectionShell({
   title,
   description,
   icon: Icon,

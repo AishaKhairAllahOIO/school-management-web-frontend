@@ -1,22 +1,8 @@
-import {
-  CheckCircle2,
-  CircleDollarSign,
-  Loader2,
-  Printer,
-  X,
-} from "lucide-react";
-
-import { useMemo } from "react";
+import { CheckCircle2, CircleDollarSign, Loader2, X } from "lucide-react";
 
 import { useCommitPayroll } from "../hooks/usePayroll";
 
-import type {
-  ApiId,
-  PayrollPreview,
-} from "../types/payroll.types";
-
-import { usePrintIdentity } from "@/features/printing/hooks/usePrintIdentity";
-import { FinancialDocumentTemplate } from "@/features/printing/templates/FinancialDocumentTemplate";
+import type { ApiId, PayrollPreview } from "../types/payroll.types";
 
 type Props = {
   open: boolean;
@@ -37,20 +23,14 @@ type Props = {
    ARABIC / PERSIAN DIGITS → ENGLISH DIGITS
    ========================================================= */
 
-function toEnglishDigits(
-  value: string | number | null | undefined,
-): string {
+function toEnglishDigits(value: string | number | null | undefined): string {
   if (value === null || value === undefined) {
     return "";
   }
 
   return String(value)
-    .replace(/[٠-٩]/g, (digit) =>
-      String("٠١٢٣٤٥٦٧٨٩".indexOf(digit)),
-    )
-    .replace(/[۰-۹]/g, (digit) =>
-      String("۰۱۲۳۴۵۶۷۸۹".indexOf(digit)),
-    );
+    .replace(/[٠-٩]/g, (digit) => String("٠١٢٣٤٥٦٧٨٩".indexOf(digit)))
+    .replace(/[۰-۹]/g, (digit) => String("۰۱۲۳۴۵۶۷۸۹".indexOf(digit)));
 }
 
 /* =========================================================
@@ -119,51 +99,6 @@ export function PayrollPreviewDialog({
   const commitMutation = useCommitPayroll();
 
   /* =======================================================
-     PRINT IDENTITY
-     ======================================================= */
-
-  const printIdentity = usePrintIdentity();
-
-  /* =======================================================
-     PRINT DATA
-     ======================================================= */
-
-  const printData = useMemo(() => {
-    if (!preview) {
-      return null;
-    }
-
-    const period = `${toEnglishDigits(month)}/${toEnglishDigits(year)}`;
-
-    const paymentDate = new Date()
-      .toISOString()
-      .slice(0, 10);
-
-    const documentNumber =
-      `PAYROLL-${toEnglishDigits(staffId)}-${toEnglishDigits(
-        year,
-      )}-${toEnglishDigits(month)}`;
-
-    return {
-      period,
-      paymentDate,
-      documentNumber,
-    };
-  }, [month, year, staffId, preview]);
-
-  /* =======================================================
-     PRINT
-     ======================================================= */
-
-  function handlePrint() {
-    if (!preview || !printData) {
-      return;
-    }
-
-    window.print();
-  }
-
-  /* =======================================================
      COMMIT
      ======================================================= */
 
@@ -172,9 +107,7 @@ export function PayrollPreviewDialog({
       staff_id: staffId,
       year,
       month,
-      payment_date: new Date()
-        .toISOString()
-        .slice(0, 10),
+      payment_date: new Date().toISOString().slice(0, 10),
     });
 
     onCommitted();
@@ -309,10 +242,7 @@ export function PayrollPreviewDialog({
                   text-primary
                 "
               >
-                <CircleDollarSign
-                  className="size-[18px]"
-                  strokeWidth={1.8}
-                />
+                <CircleDollarSign className="size-[18px]" strokeWidth={1.8} />
               </div>
 
               <div>
@@ -336,8 +266,7 @@ export function PayrollPreviewDialog({
                     text-muted-foreground
                   "
                 >
-                  {toEnglishDigits(month)}/
-                  {toEnglishDigits(year)}
+                  {toEnglishDigits(month)}/{toEnglishDigits(year)}
                 </p>
               </div>
             </div>
@@ -361,10 +290,7 @@ export function PayrollPreviewDialog({
                 disabled:opacity-50
               "
             >
-              <X
-                className="size-4"
-                strokeWidth={1.8}
-              />
+              <X className="size-4" strokeWidth={1.8} />
             </button>
           </div>
 
@@ -387,10 +313,7 @@ export function PayrollPreviewDialog({
                     text-primary
                   "
                 >
-                  <CircleDollarSign
-                    className="size-5"
-                    strokeWidth={1.7}
-                  />
+                  <CircleDollarSign className="size-5" strokeWidth={1.7} />
                 </div>
 
                 <h3
@@ -414,8 +337,7 @@ export function PayrollPreviewDialog({
                     text-muted-foreground
                   "
                 >
-                  Calculate the employee salary before
-                  confirming the payment.
+                  Calculate the employee salary before confirming the payment.
                 </p>
 
                 <button
@@ -451,12 +373,8 @@ export function PayrollPreviewDialog({
                       strokeWidth={2}
                     />
                   ) : (
-                    <CircleDollarSign
-                      className="size-3.5"
-                      strokeWidth={1.9}
-                    />
+                    <CircleDollarSign className="size-3.5" strokeWidth={1.9} />
                   )}
-
                   Generate preview
                 </button>
 
@@ -515,8 +433,7 @@ export function PayrollPreviewDialog({
                         text-foreground
                       "
                     >
-                      {toEnglishDigits(month)}/
-                      {toEnglishDigits(year)}
+                      {toEnglishDigits(month)}/{toEnglishDigits(year)}
                     </p>
                   </div>
 
@@ -530,11 +447,7 @@ export function PayrollPreviewDialog({
                       text-success
                     "
                   >
-                    <CheckCircle2
-                      className="size-3.5"
-                      strokeWidth={2}
-                    />
-
+                    <CheckCircle2 className="size-3.5" strokeWidth={2} />
                     Preview ready
                   </div>
                 </div>
@@ -553,30 +466,22 @@ export function PayrollPreviewDialog({
                 >
                   <PreviewRow
                     label="Contract rate"
-                    value={formatEnglishSalary(
-                      preview.contract_rate,
-                    )}
+                    value={formatEnglishSalary(preview.contract_rate)}
                   />
 
                   <PreviewRow
                     label="Expected units"
-                    value={formatEnglishNumber(
-                      preview.expected_units,
-                    )}
+                    value={formatEnglishNumber(preview.expected_units)}
                   />
 
                   <PreviewRow
                     label="Missed units"
-                    value={formatEnglishNumber(
-                      preview.missed_units,
-                    )}
+                    value={formatEnglishNumber(preview.missed_units)}
                   />
 
                   <PreviewRow
                     label="Deductions"
-                    value={formatEnglishSalary(
-                      preview.deductions,
-                    )}
+                    value={formatEnglishSalary(preview.deductions)}
                     last
                   />
                 </div>
@@ -632,9 +537,7 @@ export function PayrollPreviewDialog({
                         text-primary
                       "
                     >
-                      {formatEnglishSalary(
-                        preview.net_salary,
-                      )}
+                      {formatEnglishSalary(preview.net_salary)}
                     </span>
                   </div>
                 </div>
@@ -654,8 +557,7 @@ export function PayrollPreviewDialog({
                       text-destructive
                     "
                   >
-                    Failed to commit payroll.
-                    Please try again.
+                    Failed to commit payroll. Please try again.
                   </div>
                 )}
 
@@ -694,40 +596,6 @@ export function PayrollPreviewDialog({
                   </button>
 
                   <div className="flex items-center gap-4">
-                    {/* PRINT */}
-
-                    <button
-                      type="button"
-                      onClick={handlePrint}
-                      disabled={
-                        !preview ||
-                        commitMutation.isPending
-                      }
-                      className="
-                        inline-flex
-                        items-center
-                        gap-1.5
-                        px-1
-                        py-1
-                        text-[11.5px]
-                        font-semibold
-                        text-muted-foreground
-                        underline
-                        underline-offset-4
-                        decoration-muted-foreground/25
-                        hover:text-foreground
-                        disabled:pointer-events-none
-                        disabled:opacity-50
-                      "
-                    >
-                      <Printer
-                        className="size-3.5"
-                        strokeWidth={1.9}
-                      />
-
-                      Print
-                    </button>
-
                     {/* CONFIRM */}
 
                     <button
@@ -757,12 +625,8 @@ export function PayrollPreviewDialog({
                           strokeWidth={2}
                         />
                       ) : (
-                        <CheckCircle2
-                          className="size-3.5"
-                          strokeWidth={2}
-                        />
+                        <CheckCircle2 className="size-3.5" strokeWidth={2} />
                       )}
-
                       Confirm payment
                     </button>
                   </div>
@@ -772,174 +636,6 @@ export function PayrollPreviewDialog({
           </div>
         </div>
       </div>
-
-      {/* =====================================================
-          PRINT DOCUMENT
-         ===================================================== */}
-
-      {preview && printData && (
-        <div className="payroll-print-document">
-          <FinancialDocumentTemplate
-            identity={printIdentity}
-            documentNumber={printData.documentNumber}
-            date={printData.paymentDate}
-            title="PAYROLL RECEIPT"
-            showStamp
-            showSignature
-          >
-            {/* =================================================
-                FEATURE CONTENT ONLY
-               ================================================= */}
-
-            <div
-              style={{
-                width: "100%",
-                fontFamily:
-                  "Arial, Helvetica, sans-serif",
-                color: "#111827",
-                fontSize: "10px",
-              }}
-            >
-              {/* PAYMENT INFORMATION */}
-
-              <div
-                style={{
-                  marginBottom: "18px",
-                }}
-              >
-                <FinancialRow
-                  label="Payment Date"
-                  value={printData.paymentDate}
-                />
-
-                <FinancialRow
-                  label="Payroll Period"
-                  value={printData.period}
-                />
-              </div>
-
-              {/* SALARY DETAILS */}
-
-              <div
-                style={{
-                  marginBottom: "18px",
-                }}
-              >
-                <div
-                  style={{
-                    marginBottom: "9px",
-                    fontSize: "11px",
-                    fontWeight: 700,
-                  }}
-                >
-                  Salary Details
-                </div>
-
-                <FinancialRow
-                  label="Contract Rate"
-                  value={formatEnglishSalary(
-                    preview.contract_rate,
-                  )}
-                />
-
-                <FinancialRow
-                  label="Expected Units"
-                  value={formatEnglishNumber(
-                    preview.expected_units,
-                  )}
-                />
-
-                <FinancialRow
-                  label="Missed Units"
-                  value={formatEnglishNumber(
-                    preview.missed_units,
-                  )}
-                />
-
-                <FinancialRow
-                  label="Deductions"
-                  value={formatEnglishSalary(
-                    preview.deductions,
-                  )}
-                />
-              </div>
-
-              {/* TOTAL */}
-
-              <div
-                style={{
-                  marginTop: "18px",
-                  paddingTop: "12px",
-                  borderTop:
-                    "1px solid #9ca3af",
-                }}
-              >
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent:
-                      "space-between",
-                    gap: "20px",
-                  }}
-                >
-                  <div>
-                    <div
-                      style={{
-                        fontSize: "12px",
-                        fontWeight: 700,
-                      }}
-                    >
-                      Net Salary
-                    </div>
-
-                    <div
-                      style={{
-                        marginTop: "3px",
-                        fontSize: "8.5px",
-                        color: "#6b7280",
-                      }}
-                    >
-                      Final payment amount
-                    </div>
-                  </div>
-
-                  <div
-                    dir="ltr"
-                    style={{
-                      fontSize: "18px",
-                      fontWeight: 700,
-                      whiteSpace: "nowrap",
-                    }}
-                  >
-                    {formatEnglishSalary(
-                      preview.net_salary,
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {/* RECEIPT NOTE */}
-
-              <div
-                style={{
-                  marginTop: "24px",
-                  paddingTop: "9px",
-                  borderTop:
-                    "1px solid #e5e7eb",
-                  textAlign: "center",
-                  fontSize: "8.5px",
-                  lineHeight: 1.5,
-                  color: "#6b7280",
-                }}
-              >
-                This document confirms the payroll
-                payment for the selected period.
-              </div>
-            </div>
-          </FinancialDocumentTemplate>
-        </div>
-      )}
     </>
   );
 }
@@ -947,50 +643,6 @@ export function PayrollPreviewDialog({
 /* =========================================================
    FINANCIAL ROW
    ========================================================= */
-
-function FinancialRow({
-  label,
-  value,
-}: {
-  label: string;
-  value: string;
-}) {
-  return (
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        gap: "20px",
-        minHeight: "24px",
-        padding: "4px 0",
-        borderBottom:
-          "1px solid #f1f5f9",
-      }}
-    >
-      <span
-        style={{
-          color: "#6b7280",
-          fontWeight: 500,
-        }}
-      >
-        {label}
-      </span>
-
-      <span
-        dir="ltr"
-        style={{
-          color: "#111827",
-          fontWeight: 600,
-          textAlign: "right",
-          whiteSpace: "nowrap",
-        }}
-      >
-        {value}
-      </span>
-    </div>
-  );
-}
 
 /* =========================================================
    PREVIEW ROW
@@ -1014,9 +666,7 @@ function PreviewRow({
         "gap-4",
         "px-4",
         "py-2.5",
-        !last
-          ? "border-b border-border/35"
-          : "",
+        !last ? "border-b border-border/35" : "",
       ].join(" ")}
     >
       <span

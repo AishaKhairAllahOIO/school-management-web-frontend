@@ -6,7 +6,6 @@ import {
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { ReportAnalyticsCard } from "../components/ReportAnalyticsCard";
 import { ReportBuilderDialog } from "../components/ReportBuilderDialog";
 import { ReportCard } from "../components/ReportCard";
 import { ReportMetricCard } from "../components/ReportMetricCard";
@@ -80,12 +79,7 @@ export function ReportsPage() {
     );
   }
 
-  function openFirstTemplate() {
-    const firstTemplate = filteredTemplates[0] ?? data?.templates[0];
-    if (firstTemplate) {
-      setSelectedTemplate(firstTemplate);
-    }
-  }
+
 
   const displayedMetrics = selectedCategory === "All"
     ? data.metrics
@@ -93,7 +87,6 @@ export function ReportsPage() {
 
   return (
     <div className="space-y-4 animate-in fade-in duration-300">
-      <ReportAnalyticsCard onCreate={openFirstTemplate} />
 
       <section className="overflow-hidden rounded-[20px] border border-border/60 bg-card shadow-[0_7px_24px_rgba(30,20,70,0.03)]">
         <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6">
@@ -278,27 +271,116 @@ function CategoryButton({
     </button>
   );
 }
-
 function ReportsPageSkeleton() {
   return (
     <div className="space-y-4 animate-pulse">
-      <div className="h-[86px] rounded-[22px] bg-muted/40" />
-      <div className="grid grid-cols-2 overflow-hidden rounded-[20px] border border-border/50 sm:grid-cols-3 xl:grid-cols-6">
-        {Array.from({ length: 6 }).map((_, index) => (
-          <div key={index} className="h-[72px] border-e border-border/40 bg-muted/30" />
-        ))}
-      </div>
-      <div className="h-[64px] rounded-[20px] bg-muted/35" />
-      <div className="grid gap-4 2xl:grid-cols-[minmax(0,1fr)_360px]">
-        <div className="overflow-hidden rounded-[22px] border border-border/50 bg-card">
-          <div className="h-[72px] border-b border-border/40 bg-muted/25" />
-          {Array.from({ length: 4 }).map((_, index) => (
-            <div key={index} className="h-[92px] border-b border-border/35 bg-muted/20" />
+      {/* Metrics */}
+      <section className="overflow-hidden rounded-[20px] border border-border/60 bg-card shadow-[0_7px_24px_rgba(30,20,70,0.03)]">
+        <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6">
+          {Array.from({ length: 6 }).map((_, index) => (
+            <div
+              key={index}
+              className="h-[86px] border-e border-border/40 bg-muted/30 last:border-e-0"
+            >
+              <div className="flex h-full flex-col justify-center gap-2 px-4">
+                <div className="h-2.5 w-20 rounded-full bg-muted/60" />
+                <div className="h-5 w-14 rounded-md bg-muted/60" />
+              </div>
+            </div>
           ))}
         </div>
-        <div className="space-y-4">
-          <div className="h-[230px] rounded-[22px] bg-muted/30" />
+      </section>
+
+      {/* Filters */}
+      <section className="rounded-[20px] border border-border/60 bg-card p-3 shadow-[0_7px_24px_rgba(30,20,70,0.03)]">
+        <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
+          {/* Category buttons */}
+          <div className="flex min-w-0 flex-1 items-center gap-1 overflow-hidden">
+            {Array.from({ length: 5 }).map((_, index) => (
+              <div
+                key={index}
+                className="h-10 w-[82px] shrink-0 rounded-[12px] bg-muted/40"
+              />
+            ))}
+          </div>
+
+          {/* Search */}
+          <div className="h-10 w-full rounded-[12px] bg-muted/40 xl:w-[300px]" />
         </div>
+      </section>
+
+      {/* Main content */}
+      <div className="grid gap-4 2xl:grid-cols-[minmax(0,1fr)_360px]">
+        {/* Report library */}
+        <main className="overflow-hidden rounded-[22px] border border-border/60 bg-card shadow-[0_8px_28px_rgba(30,20,70,0.035)]">
+          {/* Library header */}
+          <header className="flex flex-col gap-2 border-b border-border/45 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="space-y-2">
+              <div className="h-4 w-32 rounded-md bg-muted/50" />
+              <div className="h-3 w-24 rounded-md bg-muted/40" />
+            </div>
+
+            <div className="h-6 w-16 rounded-full bg-muted/40" />
+          </header>
+
+          {/* Report rows */}
+          <div className="divide-y divide-border/40">
+            {Array.from({ length: 4 }).map((_, index) => (
+              <div
+                key={index}
+                className="flex flex-col gap-4 px-5 py-4 sm:flex-row sm:items-center sm:justify-between"
+              >
+                <div className="flex min-w-0 items-center gap-4">
+                  {/* Icon */}
+                  <div className="h-10 w-10 shrink-0 rounded-[12px] bg-muted/50" />
+
+                  {/* Text */}
+                  <div className="min-w-0 space-y-2">
+                    <div className="flex items-center gap-2">
+                      <div className="h-4 w-44 rounded-md bg-muted/50" />
+                      <div className="h-5 w-16 rounded-full bg-muted/40" />
+                    </div>
+
+                    <div className="h-3 w-64 max-w-full rounded-md bg-muted/40" />
+                  </div>
+                </div>
+
+                {/* Action */}
+                <div className="h-8 w-20 shrink-0 rounded-[10px] bg-muted/40" />
+              </div>
+            ))}
+          </div>
+        </main>
+
+        {/* Recent Reports */}
+        <aside className="space-y-4">
+          <div className="overflow-hidden rounded-[22px] border border-border/60 bg-card">
+            {/* Header */}
+            <div className="border-b border-border/45 px-5 py-4">
+              <div className="h-4 w-32 rounded-md bg-muted/50" />
+              <div className="mt-2 h-3 w-44 rounded-md bg-muted/40" />
+            </div>
+
+            {/* Recent report items */}
+            <div className="divide-y divide-border/40">
+              {Array.from({ length: 4 }).map((_, index) => (
+                <div
+                  key={index}
+                  className="flex items-center gap-3 px-5 py-4"
+                >
+                  <div className="h-9 w-9 shrink-0 rounded-[10px] bg-muted/50" />
+
+                  <div className="min-w-0 flex-1 space-y-2">
+                    <div className="h-3.5 w-32 rounded-md bg-muted/50" />
+                    <div className="h-2.5 w-20 rounded-md bg-muted/40" />
+                  </div>
+
+                  <div className="h-3 w-10 rounded-md bg-muted/40" />
+                </div>
+              ))}
+            </div>
+          </div>
+        </aside>
       </div>
     </div>
   );

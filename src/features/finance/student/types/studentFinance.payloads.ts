@@ -1,4 +1,4 @@
-import type { PaymentMethod } from "./finance.types";
+import type { PaymentMethod } from "./studentFinance.types";
 
 
 export type FinalizeContractPayload = {
