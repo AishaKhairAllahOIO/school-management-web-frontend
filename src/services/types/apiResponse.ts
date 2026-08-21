@@ -1,4 +1,4 @@
-export type ApiValidationErrors = Record<string, string[]>;
+export type ApiValidationErrors = Record<string, string | string[]>;
 
 export type ApiResponse<TData = undefined> = {
   status: boolean;

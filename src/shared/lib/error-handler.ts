@@ -47,9 +47,17 @@ export function extractApiErrorMessage(error: unknown): string {
 
     if (validationErrors) {
       const firstMessages = Object.values(validationErrors);
-      const firstMessage = firstMessages[0]?.[0];
+      const firstMessage = firstMessages[0];
 
-      if (firstMessage) {
+      if (Array.isArray(firstMessage)) {
+        const message = firstMessage[0];
+
+        if (message) {
+          return message;
+        }
+      }
+
+      if (typeof firstMessage === "string") {
         return firstMessage;
       }
     }
