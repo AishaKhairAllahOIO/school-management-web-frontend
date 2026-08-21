@@ -127,19 +127,9 @@ async function invalidateFinanceQueries(
   const requests: Promise<unknown>[] = [
     queryClient.invalidateQueries({
       queryKey:
-        studentPaymentKeys.all,
-      refetchType: "active",
-    }),
-
-    queryClient.invalidateQueries({
-      queryKey:
-        studentInstallmentKeys.all,
-      refetchType: "active",
-    }),
-
-    queryClient.invalidateQueries({
-      queryKey:
-        studentFinancialAccountKeys.all,
+        studentFinancialAccountKeys.student(
+          studentId!,
+        ),
       refetchType: "active",
     }),
   ];
@@ -149,14 +139,6 @@ async function invalidateFinanceQueries(
     studentId !== null
   ) {
     requests.push(
-      queryClient.invalidateQueries({
-        queryKey:
-          studentFinancialAccountKeys.student(
-            studentId,
-          ),
-        refetchType: "active",
-      }),
-
       queryClient.invalidateQueries({
         queryKey:
           studentInstallmentKeys.byStudent(

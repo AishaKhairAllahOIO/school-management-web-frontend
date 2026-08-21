@@ -1,10 +1,11 @@
 import {
   CalendarDays,
+  ChevronDown,
   Clock3,
   GraduationCap,
   UserRound,
 } from "lucide-react";
-
+import { useState } from "react";
 import {
   useCurrentAcademicPeriod,
   useTeacherSchedule,
@@ -98,99 +99,40 @@ export function TimeSlotsPage() {
           </header>
         </section>
 
-        {/* Skeleton */}
-        <div className="space-y-4">
-          {[1, 2].map((teacher) => (
-            <section
-              key={teacher}
-              className="overflow-hidden rounded-[20px] border border-border/70 bg-card shadow-[0_10px_30px_rgba(31,24,74,0.045)] dark:shadow-black/10"
-            >
-              <div className="border-b border-border/65 px-5 py-4 sm:px-6">
-                <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 shrink-0 animate-pulse rounded-[14px] bg-muted" />
+      {/* Skeleton */}
+<div className="space-y-4">
+  {[1, 2].map((teacher) => (
+    <section
+      key={teacher}
+      className="group overflow-hidden rounded-[20px] border border-border/70 bg-card shadow-[0_10px_30px_rgba(31,24,74,0.045)] dark:shadow-black/10"
+    >
+      {/* Teacher header skeleton */}
+      <div className="relative overflow-hidden border-b border-border/65 px-5 py-4 sm:px-6">
+        <div className="absolute inset-x-0 top-0 h-px bg-[var(--academic-accent)] opacity-40" />
 
-                  <div className="space-y-2">
-                    <div className="h-4 w-32 animate-pulse rounded-md bg-muted" />
-                    <div className="h-3 w-24 animate-pulse rounded-md bg-muted/70" />
-                  </div>
-                </div>
-              </div>
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex min-w-0 items-center gap-3">
+            <div className="h-10 w-10 shrink-0 animate-pulse rounded-[14px] bg-muted" />
 
-              <div className="hidden overflow-x-auto md:block">
-                <div className="min-w-[900px]">
-                  <div className="grid grid-cols-[110px_repeat(5,minmax(150px,1fr))] border-b border-border/65 bg-muted/20 dark:bg-muted/10">
-                    <div className="h-10 animate-pulse bg-muted/30" />
+            <div className="min-w-0 space-y-2">
+              <div className="h-4 w-32 animate-pulse rounded-md bg-muted" />
+              <div className="h-3 w-24 animate-pulse rounded-md bg-muted/70" />
+            </div>
+          </div>
 
-                    {days.map((day) => (
-                      <div
-                        key={day.key}
-                        className="border-l border-border/60 px-4 py-3"
-                      >
-                        <div className="h-3 w-16 animate-pulse rounded bg-muted" />
-                      </div>
-                    ))}
-                  </div>
-
-                  {[1, 2, 3, 4].map((period) => (
-                    <div
-                      key={period}
-                      className="grid grid-cols-[110px_repeat(5,minmax(150px,1fr))] border-b border-border/60 last:border-b-0"
-                    >
-                      <div className="space-y-2 bg-muted/15 px-4 py-4">
-                        <div className="h-3 w-16 animate-pulse rounded bg-muted" />
-                        <div className="h-2.5 w-20 animate-pulse rounded bg-muted/70" />
-                      </div>
-
-                      {days.map((day) => (
-                        <div
-                          key={day.key}
-                          className="border-l border-border/60 p-2"
-                        >
-                          <div className="min-h-[88px] animate-pulse rounded-[16px] bg-muted/40 p-3">
-                            <div className="h-3.5 w-3/4 rounded bg-muted" />
-                            <div className="mt-3 h-2.5 w-1/2 rounded bg-muted/70" />
-                            <div className="mt-3 h-2.5 w-1/3 rounded bg-muted/60" />
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="space-y-3 p-4 md:hidden">
-                {days.map((day) => (
-                  <div
-                    key={day.key}
-                    className="overflow-hidden rounded-[18px] border border-border/65"
-                  >
-                    <div className="flex items-center justify-between border-b border-border/60 bg-[var(--academic-soft)] px-4 py-3">
-                      <div className="h-3 w-16 animate-pulse rounded bg-muted" />
-                      <div className="h-2.5 w-12 animate-pulse rounded bg-muted/60" />
-                    </div>
-
-                    <div className="divide-y divide-border/60">
-                      {[1, 2].map((entry) => (
-                        <div key={entry} className="p-4">
-                          <div className="flex items-start justify-between gap-3">
-                            <div className="min-w-0 flex-1 space-y-2">
-                              <div className="h-3.5 w-2/3 animate-pulse rounded bg-muted" />
-                              <div className="h-2.5 w-1/2 animate-pulse rounded bg-muted/70" />
-                            </div>
-
-                            <div className="h-5 w-12 shrink-0 animate-pulse rounded-full bg-muted/60" />
-                          </div>
-
-                          <div className="mt-3 h-2.5 w-24 animate-pulse rounded bg-muted/60" />
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </section>
-          ))}
+          {/* Closed state indicator */}
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-border/60 bg-background/60">
+            <ChevronDown
+              size={17}
+              strokeWidth={1.8}
+              className="text-muted-foreground/40"
+            />
+          </div>
         </div>
+      </div>
+    </section>
+  ))}
+</div>
       </div>
     );
   }
@@ -342,94 +284,128 @@ function TeacherScheduleCard({
 }: {
   teacher: TeacherScheduleItem;
 }) {
+  const [isOpen, setIsOpen] = useState(false);
+
   return (
     <section className="group overflow-hidden rounded-[20px] border border-border/70 bg-card shadow-[0_10px_30px_rgba(31,24,74,0.045)] transition-[border-color,box-shadow] duration-300 hover:border-[var(--academic-border)] hover:shadow-[var(--shadow-floating)] dark:shadow-black/10">
       {/* Teacher header */}
-      <header className="relative overflow-hidden border-b border-border/65 px-5 py-4 sm:px-6">
+      <button
+        type="button"
+        onClick={() => setIsOpen((current) => !current)}
+        className="relative w-full overflow-hidden border-b border-border/65 px-5 py-4 text-start transition-colors duration-200 hover:bg-muted/20 sm:px-6"
+        aria-expanded={isOpen}
+      >
         <div className="absolute inset-x-0 top-0 h-px bg-[var(--academic-accent)] opacity-0 transition-opacity duration-200 group-hover:opacity-40" />
 
-        <div className="relative flex items-center gap-3">
-          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px] border border-[var(--academic-border)] bg-[var(--academic-soft)] text-[var(--academic-accent)]">
-            <GraduationCap size={20} strokeWidth={1.75} />
+        <div className="relative flex items-center justify-between gap-4">
+          <div className="flex min-w-0 items-center gap-3">
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px] border border-[var(--academic-border)] bg-[var(--academic-soft)] text-[var(--academic-accent)]">
+              <GraduationCap size={20} strokeWidth={1.75} />
+            </span>
+
+            <div className="min-w-0">
+              <h2 className="truncate text-sm font-medium text-foreground sm:text-base">
+                {teacher.teacher_name}
+              </h2>
+
+              <p className="mt-0.5 text-xs text-[var(--academic-accent)]">
+                Weekly Schedule
+              </p>
+            </div>
+          </div>
+
+          <span
+            className="
+              flex h-8 w-8 shrink-0 items-center justify-center
+              rounded-full
+              border border-border/60
+              bg-background/60
+              text-muted-foreground
+              transition-all duration-200
+              group-hover:border-[var(--academic-border)]
+              group-hover:text-[var(--academic-accent)]
+            "
+          >
+            <ChevronDown
+              size={17}
+              strokeWidth={1.8}
+              className={`transition-transform duration-300 ${
+                isOpen ? "rotate-180" : ""
+              }`}
+            />
           </span>
-
-          <div className="min-w-0">
-            <h2 className="truncate text-sm font-medium text-foreground sm:text-base">
-              {teacher.teacher_name}
-            </h2>
-
-            <p className="mt-0.5 text-xs text-[var(--academic-accent)]">
-              Weekly Schedule
-            </p>
-          </div>
         </div>
-      </header>
+      </button>
 
-      {/* Desktop */}
-      <div className="hidden overflow-x-auto md:block">
-        <div className="min-w-[900px]">
-          <div className="grid grid-cols-[110px_repeat(5,minmax(150px,1fr))] border-b border-border/65 bg-muted/20 dark:bg-muted/10">
-            <div className="px-4 py-3 text-[10px] font-medium uppercase tracking-[0.12em] text-muted-foreground/70">
-              Time
-            </div>
+      {/* Schedule content */}
+      {isOpen && (
+        <>
+          {/* Desktop */}
+          <div className="hidden overflow-x-auto md:block">
+            <div className="min-w-[900px]">
+              <div className="grid grid-cols-[110px_repeat(5,minmax(150px,1fr))] border-b border-border/65 bg-muted/20 dark:bg-muted/10">
+                <div className="px-4 py-3 text-[10px] font-medium uppercase tracking-[0.12em] text-muted-foreground/70">
+                  Time
+                </div>
 
-            {days.map((day) => (
-              <div
-                key={day.key}
-                className="border-l border-border/60 px-4 py-3 text-[10px] font-medium uppercase tracking-[0.12em] text-muted-foreground/70"
-              >
-                {day.label}
-              </div>
-            ))}
-          </div>
-
-          <TeacherDesktopGrid teacher={teacher} />
-        </div>
-      </div>
-
-      {/* Mobile */}
-      <div className="space-y-3 p-4 md:hidden">
-        {days.map((day) => {
-          const entries = teacher.schedule?.[day.key] ?? [];
-
-          return (
-            <div
-              key={day.key}
-              className="overflow-hidden rounded-[18px] border border-border/65 bg-card"
-            >
-              <div className="flex items-center justify-between border-b border-border/60 bg-[var(--academic-soft)] px-4 py-3">
-                <span className="text-xs font-medium text-[var(--academic-accent)]">
-                  {day.label}
-                </span>
-
-                <span className="text-[10px] uppercase tracking-[0.1em] text-muted-foreground/65">
-                  {entries.length}{" "}
-                  {entries.length === 1 ? "class" : "classes"}
-                </span>
+                {days.map((day) => (
+                  <div
+                    key={day.key}
+                    className="border-l border-border/60 px-4 py-3 text-[10px] font-medium uppercase tracking-[0.12em] text-muted-foreground/70"
+                  >
+                    {day.label}
+                  </div>
+                ))}
               </div>
 
-              {entries.length === 0 ? (
-                <div className="px-4 py-6 text-center text-xs text-muted-foreground">
-                  No classes
-                </div>
-              ) : (
-                <div className="divide-y divide-border/60">
-                  {entries.map((entry) => (
-                    <ScheduleEntry
-                      key={`${day.key}-${entry.period_index}`}
-                      entry={entry}
-                    />
-                  ))}
-                </div>
-              )}
+              <TeacherDesktopGrid teacher={teacher} />
             </div>
-          );
-        })}
-      </div>
+          </div>
+
+          {/* Mobile */}
+          <div className="space-y-3 p-4 md:hidden">
+            {days.map((day) => {
+              const entries = teacher.schedule?.[day.key] ?? [];
+
+              return (
+                <div
+                  key={day.key}
+                  className="overflow-hidden rounded-[18px] border border-border/65 bg-card"
+                >
+                  <div className="flex items-center justify-between border-b border-border/60 bg-[var(--academic-soft)] px-4 py-3">
+                    <span className="text-xs font-medium text-[var(--academic-accent)]">
+                      {day.label}
+                    </span>
+
+                    <span className="text-[10px] uppercase tracking-[0.1em] text-muted-foreground/65">
+                      {entries.length}{" "}
+                      {entries.length === 1 ? "class" : "classes"}
+                    </span>
+                  </div>
+
+                  {entries.length === 0 ? (
+                    <div className="px-4 py-6 text-center text-xs text-muted-foreground">
+                      No classes
+                    </div>
+                  ) : (
+                    <div className="divide-y divide-border/60">
+                      {entries.map((entry) => (
+                        <ScheduleEntry
+                          key={`${day.key}-${entry.period_index}`}
+                          entry={entry}
+                        />
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </>
+      )}
     </section>
   );
 }
-
 function TeacherDesktopGrid({
   teacher,
 }: {

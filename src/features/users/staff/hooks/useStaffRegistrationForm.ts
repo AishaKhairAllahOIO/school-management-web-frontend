@@ -36,8 +36,8 @@ function createInitialValues(): RegisterStaffValues {
     birth_date: "",
     birth_place: "",
 
-    gender: "male",
-    nationality: "syrian",
+    gender: null,
+    nationality: null,
 
     address: "",
     photo_url: null,

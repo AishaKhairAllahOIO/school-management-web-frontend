@@ -1,5 +1,13 @@
-import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, CalendarX, CheckCircle, Clock, FileText } from "lucide-react";
+import {
+  ArrowLeft,
+  CalendarX,
+  CheckCircle2,
+  Clock,
+  FileText,
+ 
+} from "lucide-react";
+import { useNavigate, useParams } from "react-router-dom";
+
 import { Button } from "@/shared/ui/button";
 import { useStaffAttendanceHistory } from "../hooks/useStaffAttendance";
 
@@ -9,116 +17,355 @@ function formatDate(dateStr?: string) {
 }
 
 export function StaffAttendanceHistoryPage() {
-  const { employeeId } = useParams();
+  const { employeeId = "" } = useParams();
   const navigate = useNavigate();
-  
-  const { data: historyRecords = [], isLoading } = useStaffAttendanceHistory(employeeId!);
+
+  const {
+    data: historyRecords = [],
+    isLoading,
+  } = useStaffAttendanceHistory(employeeId);
 
   const totalRecords = historyRecords.length;
-  const totalAbsences = historyRecords.filter((r: any) => r.status === 'absent').length;
-  const totalLeaves = historyRecords.filter((r: any) => r.status === 'on_leave').length;
-  const partialAbsences = historyRecords.filter((r: any) => r.status === 'partial_absence').length;
+
+  const totalAbsences = historyRecords.filter(
+    (record: any) => record.status === "absent",
+  ).length;
+
+  const totalLeaves = historyRecords.filter(
+    (record: any) => record.status === "on_leave",
+  ).length;
+
+  const partialAbsences = historyRecords.filter(
+    (record: any) => record.status === "partial_absence",
+  ).length;
+
+  /*
+   * ------------------------------------------------------------
+   * Staff information
+   * ------------------------------------------------------------
+   *
+   * This supports several possible API response shapes.
+   * We will adjust this once we inspect the actual response.
+   */
+  const firstRecord = historyRecords[0];
+
+  const staff =
+    firstRecord?.staff ||
+    firstRecord?.employee ||
+    firstRecord?.user ||
+    null;
+
+  const staffName =
+    staff?.full_name ||
+    [staff?.first_name, staff?.last_name]
+      .filter(Boolean)
+      .join(" ") ||
+    firstRecord?.staff_name ||
+    firstRecord?.employee_name ||
+    "Staff History";
 
   return (
-    <section className="space-y-6 pt-5 animate-in fade-in duration-300">
-      
-      {/* Header */}
-      <div className="flex items-center gap-4 border-b border-border/50 pb-5">
-        <Button 
-          variant="outline" 
-          size="icon" 
-          onClick={() => navigate('/attendance/staff')}
-          className="h-9 w-9 rounded-[12px] border-border/70 hover:bg-muted/40 text-muted-foreground hover:text-foreground"
-        >
-          <ArrowLeft className="h-4.5 w-4.5" />
-        </Button>
-        <div>
-          <h1 className="text-[18px] font-extrabold tracking-tight text-foreground">Staff History</h1>
-          <p className="text-[12.5px] text-muted-foreground font-medium mt-0.5">Detailed attendance history and leave records.</p>
+    <section className="space-y-5 pt-5 animate-in fade-in duration-300">
+      {/* =========================================================
+          HEADER
+      ========================================================= */}
+      <div className="rounded-[24px] border border-border/70 bg-card p-5 shadow-sm">
+        <div className="space-y-5">
+          {/* Staff Information + Back */}
+          <div className="flex items-start justify-between gap-5">
+            <div className="min-w-0">
+              <p className="mb-1 text-[10.5px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
+                Staff Attendance
+              </p>
+
+              <h1 className="truncate text-[19px] font-semibold tracking-tight text-foreground">
+                {isLoading ? "Loading..." : staffName}
+              </h1>
+
+              <p className="mt-1 text-[11.5px] font-medium text-muted-foreground">
+                Detailed attendance history and leave records.
+              </p>
+            </div>
+
+            {/* Back */}
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => navigate("/attendance/staff")}
+              className="h-auto shrink-0 rounded-none bg-transparent px-0 py-1 text-[12px] font-semibold text-muted-foreground shadow-none hover:bg-transparent hover:text-primary"
+            >
+              <span className="flex items-center gap-1.5">
+                <ArrowLeft className="h-4 w-4 rtl:rotate-180" />
+                <span>Back to staff attendance</span>
+              </span>
+            </Button>
+          </div>
         </div>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <StatCard title="Total Records" value={totalRecords} icon={FileText} color="violet" />
-        <StatCard title="Full Absences" value={totalAbsences} icon={CalendarX} color="rose" />
-        <StatCard title="Days On Leave" value={totalLeaves} icon={CheckCircle} color="amber" />
-        <StatCard title="Partial Absences" value={partialAbsences} icon={Clock} color="sky" />
+      {/* =========================================================
+          STATISTICS
+      ========================================================= */}
+      <div className="grid grid-cols-2 gap-3.5 lg:grid-cols-4">
+        {/* Total Records */}
+        <div className="flex items-center gap-3.5 rounded-[18px] border border-border/70 bg-card px-4 py-3 shadow-xs">
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[12px] bg-primary/[0.12] text-primary">
+            <FileText
+              className="h-5 w-5"
+              strokeWidth={2.2}
+            />
+          </span>
+
+          <div className="min-w-0">
+            <span className="block text-[10.5px] font-semibold uppercase tracking-wider text-muted-foreground">
+              Total Records
+            </span>
+
+            <strong className="text-[20px] font-semibold leading-none text-primary">
+              {totalRecords}
+            </strong>
+          </div>
+        </div>
+
+        {/* Full Absences */}
+        <div className="flex items-center gap-3.5 rounded-[18px] border border-destructive/25 bg-card px-4 py-3 shadow-xs">
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[12px] bg-destructive/[0.12] text-destructive">
+            <CalendarX
+              className="h-5 w-5"
+              strokeWidth={2.2}
+            />
+          </span>
+
+          <div className="min-w-0">
+            <span className="block text-[10.5px] font-semibold uppercase tracking-wider text-muted-foreground">
+              Full Absences
+            </span>
+
+            <strong className="text-[20px] font-semibold leading-none text-destructive">
+              {totalAbsences}
+            </strong>
+          </div>
+        </div>
+
+        {/* Days On Leave */}
+        <div className="flex items-center gap-3.5 rounded-[18px] border border-warning/25 bg-card px-4 py-3 shadow-xs">
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[12px] bg-warning/[0.12] text-warning">
+            <CheckCircle2
+              className="h-5 w-5"
+              strokeWidth={2.2}
+            />
+          </span>
+
+          <div className="min-w-0">
+            <span className="block text-[10.5px] font-semibold uppercase tracking-wider text-muted-foreground">
+              Days On Leave
+            </span>
+
+            <strong className="text-[20px] font-semibold leading-none text-warning">
+              {totalLeaves}
+            </strong>
+          </div>
+        </div>
+
+        {/* Partial Absences */}
+        <div className="flex items-center gap-3.5 rounded-[18px] border border-info/25 bg-card px-4 py-3 shadow-xs">
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[12px] bg-info/[0.12] text-info">
+            <Clock
+              className="h-5 w-5"
+              strokeWidth={2.2}
+            />
+          </span>
+
+          <div className="min-w-0">
+            <span className="block text-[10.5px] font-semibold uppercase tracking-wider text-muted-foreground">
+              Partial Absences
+            </span>
+
+            <strong className="text-[20px] font-semibold leading-none text-info">
+              {partialAbsences}
+            </strong>
+          </div>
+        </div>
       </div>
 
-      {/* History Table */}
+      {/* =========================================================
+          ATTENDANCE TIMELINE
+      ========================================================= */}
       <div className="overflow-hidden rounded-[24px] border border-border/70 bg-card shadow-sm">
-        <div className="w-full overflow-x-auto">
-          <table className="w-full min-w-[700px] table-fixed">
+        {/* Table Header */}
+        <div className="flex items-center justify-between border-b border-border/60 bg-muted/20 px-6 py-4">
+          <div>
+            <h2 className="text-[14px] font-semibold text-foreground">
+              Attendance timeline
+            </h2>
+
+            <p className="mt-0.5 text-[11.5px] font-medium text-muted-foreground">
+              {isLoading
+                ? "Loading..."
+                : `Showing ${historyRecords.length} attendance records`}
+            </p>
+          </div>
+        </div>
+
+        {/* Table */}
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[760px] table-fixed">
+            <colgroup>
+              <col className="w-[22%]" />
+              <col className="w-[18%]" />
+              <col className="w-[20%]" />
+              <col className="w-[40%]" />
+            </colgroup>
+
             <thead className="bg-muted/40">
-              <tr className="text-[11.5px] font-extrabold uppercase tracking-wider text-muted-foreground border-b border-border/50">
-                <th className="h-12 px-6 text-start w-[20%]">Date</th>
-                <th className="h-12 px-4 text-start w-[20%]">Status</th>
-                <th className="h-12 px-4 text-start w-[20%]">Absence Type</th>
-                <th className="h-12 px-6 text-start w-[40%]">Additional Details</th>
+              <tr className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                <th className="h-12 px-6 text-start">
+                  Date
+                </th>
+
+                <th className="h-12 px-6 text-start">
+                  Attendance
+                </th>
+
+                <th className="h-12 px-6 text-start">
+                  Type
+                </th>
+
+                <th className="h-12 px-6 text-start">
+                  Additional Details
+                </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-border/50">
+
+            <tbody>
               {isLoading ? (
-                Array.from({ length: 4 }).map((_, i) => (
-                  <tr key={i}><td colSpan={4} className="px-6 py-4"><div className="h-10 animate-pulse bg-muted/50 rounded-[12px]" /></td></tr>
+                Array.from({ length: 4 }).map((_, index) => (
+                  <tr
+                    key={index}
+                    className="border-t border-border/50"
+                  >
+                    <td
+                      colSpan={4}
+                      className="px-6 py-4"
+                    >
+                      <div className="h-10 animate-pulse rounded-[12px] bg-muted/50" />
+                    </td>
+                  </tr>
                 ))
               ) : historyRecords.length === 0 ? (
                 <tr>
-                  <td colSpan={4} className="py-16 text-center text-muted-foreground font-medium text-[13px]">
-                    No attendance history found for this staff member.
+                  <td
+                    colSpan={4}
+                    className="px-6 py-16 text-center text-[13px] font-medium text-muted-foreground"
+                  >
+                    No attendance history found for this
+                    staff member.
                   </td>
                 </tr>
               ) : (
                 historyRecords.map((record: any) => (
-                  <tr key={record.id} className="transition-colors hover:bg-muted/30 group">
-                    <td className="px-6 py-4 font-bold text-foreground text-[12.5px]">
+                  <tr
+                    key={record.id}
+                    className="border-t border-border/50 text-[12.5px] transition-colors hover:bg-muted/30"
+                  >
+                    {/* Date */}
+                    <td className="px-6 py-4 font-semibold text-foreground">
                       {formatDate(record.attendance_date)}
                     </td>
-                    
-                    <td className="px-4 py-4">
-                      <span className={`inline-flex items-center px-2.5 py-1 rounded-[10px] text-[11.5px] font-bold capitalize border ${
-                        record.status === 'present' ? 'text-success bg-success/10 border-success/25' : 
-                        record.status === 'absent' ? 'text-destructive bg-destructive/10 border-destructive/25' : 
-                        record.status === 'on_leave' ? 'text-warning bg-warning/10 border-warning/25' : 
-                        'text-primary bg-primary/10 border-primary/25'
-                      }`}>
-                        {record.status.replace('_', ' ')}
+
+                    {/* Attendance */}
+                    <td className="px-6 py-4">
+                      <span
+                        className={
+                          record.status === "present"
+                            ? "font-semibold text-success"
+                            : record.status === "absent"
+                              ? "font-semibold text-destructive"
+                              : record.status === "on_leave"
+                                ? "font-semibold text-warning"
+                                : "font-semibold text-info"
+                        }
+                      >
+                        {String(record.status || "")
+                          .replaceAll("_", " ")
+                          .replace(/\b\w/g, (char) =>
+                            char.toUpperCase(),
+                          )}
                       </span>
                     </td>
 
-                    <td className="px-4 py-4">
+                    {/* Type */}
+                    <td className="px-6 py-4">
                       {record.absence_type ? (
-                        <span className={`text-[12px] font-semibold capitalize px-2 py-0.5 rounded-[6px] ${
-                          record.absence_type === 'unexcused' ? 'text-warning bg-warning/10' : 'text-info bg-info/10'
-                        }`}>
+                        <span
+                          className={`font-medium ${
+                            record.absence_type === "excused"
+                              ? "text-info"
+                              : record.absence_type === "unexcused"
+                                ? "text-warning"
+                                : "text-muted-foreground"
+                          }`}
+                        >
                           {record.absence_type}
                         </span>
                       ) : (
-                        <span className="text-muted-foreground/60 font-medium">—</span>
+                        <span className="font-medium text-muted-foreground/60">
+                          —
+                        </span>
                       )}
                     </td>
 
+                    {/* Additional Details */}
                     <td className="px-6 py-4">
-                      {record.status === 'on_leave' && record.leave ? (
-                        <div className="flex flex-col gap-1 bg-warning/10 border border-warning/25 rounded-[12px] p-2.5 w-max">
-                          <span className="text-[11.5px] font-bold text-warning">
-                            Leave ID: #{record.leave.id} <span className="opacity-70">({record.leave.days_count} Days)</span>
-                          </span>
-                          <span className="text-[11px] font-medium text-warning/90">
-                            From {formatDate(record.leave.start_date)} to {formatDate(record.leave.end_date)}
-                          </span>
-                        </div>
-                      ) : record.status === 'partial_absence' && record.period_attendances?.length > 0 ? (
-                        <div className="flex flex-wrap gap-1.5">
-                          {record.period_attendances.map((p: any, idx: number) => (
-                            <span key={idx} className="bg-primary/10 text-primary border border-primary/25 text-[11px] font-bold px-2 py-1 rounded-[8px]">
-                              Period {p.period_index || p.id}
+                      {record.status === "on_leave" &&
+                      record.leave ? (
+                        <div className="w-max max-w-full rounded-[12px] border border-warning/25 bg-warning/10 p-2.5">
+                          <div className="flex flex-col gap-1">
+                            <span className="text-[11.5px] font-semibold text-warning">
+                              Leave ID: #{record.leave.id}{" "}
+                              <span className="font-medium opacity-70">
+                                ({record.leave.days_count} Days)
+                              </span>
                             </span>
-                          ))}
+
+                            <span className="text-[11px] font-medium text-warning/90">
+                              From{" "}
+                              {formatDate(
+                                record.leave.start_date,
+                              )}{" "}
+                              to{" "}
+                              {formatDate(
+                                record.leave.end_date,
+                              )}
+                            </span>
+                          </div>
+                        </div>
+                      ) : record.status ===
+                          "partial_absence" &&
+                        record.period_attendances?.length > 0 ? (
+                        <div className="flex flex-wrap gap-1.5">
+                          {record.period_attendances.map(
+                            (period: any, index: number) => (
+                              <span
+                                key={
+                                  period.id ??
+                                  period.schedule_entry_id ??
+                                  index
+                                }
+                                className="rounded-[8px] border border-info/25 bg-info/10 px-2 py-1 text-[11px] font-medium text-info"
+                              >
+                                Period{" "}
+                                {period.period_index ??
+                                  period.schedule_entry?.period_index ??
+                                  period.id}
+                              </span>
+                            ),
+                          )}
                         </div>
                       ) : (
-                        <span className="text-muted-foreground/60 text-[12px] font-medium">—</span>
+                        <span className="text-[12px] font-medium text-muted-foreground/60">
+                          —
+                        </span>
                       )}
                     </td>
                   </tr>
@@ -129,28 +376,5 @@ export function StaffAttendanceHistoryPage() {
         </div>
       </div>
     </section>
-  );
-}
-
-// كارد الإحصائيات 
-function StatCard({ title, value, icon: Icon, color }: any) {
-  const colors: Record<string, string> = {
-    violet: "bg-primary/10 text-primary border-primary/25",
-    rose: "bg-destructive/10 text-destructive border-destructive/25",
-    amber: "bg-warning/10 text-warning border-warning/25",
-    sky: "bg-info/10 text-info border-info/25",
-  };
-  const theme = colors[color];
-
-  return (
-    <div className="flex items-center gap-3.5 rounded-[18px] border border-border/70 bg-card px-4 py-3.5 shadow-sm">
-      <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-[12px] border ${theme}`}>
-        <Icon className="h-4.5 w-4.5" strokeWidth={2.5} />
-      </div>
-      <div className="flex flex-col justify-center gap-0.5">
-        <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">{title}</span>
-        <span className={`text-[17px] font-extrabold leading-none ${theme.split(' ')[1]}`}>{value}</span>
-      </div>
-    </div>
   );
 }

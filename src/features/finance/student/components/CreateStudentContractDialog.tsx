@@ -60,10 +60,8 @@ export function CreateStudentContractDialog({
 }: Props) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[92vh] overflow-y-auto overflow-x-hidden rounded-[28px] border-border/45 bg-background/95 p-0 shadow-[0_24px_80px_rgba(31,22,73,0.16)] backdrop-blur-xl sm:max-w-2xl">
-        <div className="relative overflow-hidden px-6 pb-5 pt-6 sm:px-7">
-          <div className="pointer-events-none absolute -right-20 -top-24 h-52 w-52 rounded-full bg-primary/[0.08] blur-3xl" />
-          <div className="pointer-events-none absolute -left-24 top-20 h-40 w-40 rounded-full bg-info/[0.06] blur-3xl" />
+      <DialogContent className="max-h-[92vh] w-[calc(100%-1rem)] overflow-y-auto overflow-x-hidden rounded-[24px] border-border/35 bg-background/98 p-0 shadow-[0_20px_60px_rgba(31,22,73,0.10)] dark:shadow-[0_20px_60px_rgba(0,0,0,0.34)] sm:max-w-2xl">
+        <div className="relative px-6 pb-5 pt-6 sm:px-7">
           <DialogHeader className="relative text-start">
             <DialogTitle className="text-[19px] font-semibold tracking-[-0.025em] text-foreground/92">
               Add financial contract
@@ -222,7 +220,7 @@ export function ContractForm({
   const academicYearLabel = academicYear?.name
     ? academicYear.name
     : resolvedAcademicYearId
-      ? `Academic year #${resolvedAcademicYearId}`
+      ? "Academic year"
       : "Loading academic year";
 
   return (
@@ -378,7 +376,7 @@ export function ContractForm({
       </div>
 
       {!profileMode && currentFeePlan?.extraServices?.length ? (
-        <div className="space-y-3 rounded-[21px] border border-border/40 bg-muted/[0.14] p-4 shadow-[0_8px_24px_rgba(31,22,73,0.025)]">
+        <div className="space-y-3 rounded-[21px] border border-border/40 bg-muted/[0.14] p-4 shadow-[0_8px_24px_rgba(31,22,73,0.02)] dark:shadow-[0_8px_24px_rgba(0,0,0,0.14)]">
           <h3 className="text-[11.5px] font-semibold text-foreground/78">
             Optional Extra Services
           </h3>

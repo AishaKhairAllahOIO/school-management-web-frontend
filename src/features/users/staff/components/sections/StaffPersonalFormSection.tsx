@@ -185,13 +185,13 @@ export function StaffPersonalFormSection({
         </StaffFormField>
 
         <StaffFormField label="Gender">
-          <Select
-            value={values.gender}
-            disabled={disabled}
-            onValueChange={(value) =>
-              updateValue("gender", value as StaffGender)
-            }
-          >
+       <Select
+  value={values.gender ?? ""}
+  disabled={disabled}
+  onValueChange={(value) =>
+    updateValue("gender", value as StaffGender)
+  }
+>
             <SelectTrigger className="h-12 rounded-[15px]">
               <SelectValue />
             </SelectTrigger>
@@ -203,24 +203,32 @@ export function StaffPersonalFormSection({
         </StaffFormField>
 
         <StaffFormField label="Nationality">
-          <Select
-            value={values.nationality ?? "syrian"}
-            disabled={disabled}
-            onValueChange={(value) =>
-              updateValue("nationality", value as StaffNationality)
-            }
-          >
-            <SelectTrigger className="h-12 rounded-[15px]">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {USER_NATIONALITIES.map((item) => (
-                <SelectItem key={item.value} value={item.value}>
-                  {item.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          
+       <Select
+  value={values.nationality ?? ""}
+  disabled={disabled}
+  onValueChange={(value) =>
+    updateValue(
+      "nationality",
+      value as StaffNationality
+    )
+  }
+>
+  <SelectTrigger className="h-12 rounded-[15px]">
+    <SelectValue placeholder="Select nationality" />
+  </SelectTrigger>
+
+  <SelectContent>
+    {USER_NATIONALITIES.map((item) => (
+      <SelectItem
+        key={item.value}
+        value={item.value}
+      >
+        {item.label}
+      </SelectItem>
+    ))}
+  </SelectContent>
+</Select>
         </StaffFormField>
 
                 <StaffFormField

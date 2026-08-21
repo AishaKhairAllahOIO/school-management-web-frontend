@@ -622,10 +622,13 @@ function PersonFormSection({
         </FormField>
 
         <FormField label="Nationality">
+          
+            
+            
           <Select
-            value={value.nationality || "syrian"}
+            value={value.nationality }
             onValueChange={(nextValue) =>
-              onChange("nationality", nextValue)
+              onChange("nationality", nextValue as UserNationality)
             }
           >
             <SelectTrigger className="h-12 rounded-[15px]">

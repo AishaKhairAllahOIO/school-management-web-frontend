@@ -151,13 +151,13 @@ const statusColor = (
 };
 
 const FINANCE_DIALOG_CONTENT =
-  "w-[calc(100%-1rem)] overflow-hidden rounded-[24px] border-border/45 bg-background p-0 shadow-[0_18px_45px_rgba(31,22,73,0.08)] sm:w-full";
+  "w-[calc(100%-1rem)] overflow-hidden rounded-[24px] border-border/35 bg-background/98 p-0 shadow-[0_20px_60px_rgba(31,22,73,0.10)] dark:shadow-[0_20px_60px_rgba(0,0,0,0.34)] sm:w-full";
 
 const FINANCE_DIALOG_HEADER =
-  "border-b border-border/35 px-5 pb-5 pt-5 text-start sm:px-6 sm:pt-6";
+  "border-b border-border/25 px-5 pb-4 pt-5 text-start sm:px-6 sm:pt-5";
 
 const FINANCE_DIALOG_BODY =
-  "px-5 pb-5 pt-5 sm:px-6 sm:pb-6 sm:pt-5";
+  "px-5 pb-5 pt-4 sm:px-6 sm:pb-6 sm:pt-4";
 
 const FINANCE_INPUT_CLASS =
   "h-11 rounded-[13px] border-border/50 bg-background shadow-none outline-none transition-[border-color,box-shadow] focus-visible:border-primary/15 focus-visible:ring-1 focus-visible:ring-primary/[0.035] focus-visible:ring-offset-0";
@@ -814,11 +814,11 @@ export function PaymentsTable({
   }
 
   return (
-    <div className="overflow-hidden rounded-[20px] border border-border/45 bg-card">
+    <div className="overflow-hidden rounded-[20px] border border-border/30 bg-card/90 shadow-none">
       <div className="overflow-x-auto">
         <Table className="min-w-[860px]">
           <TableHeader>
-            <TableRow className="border-border/35 bg-muted/20 hover:bg-muted/20">
+            <TableRow className="border-border/25 bg-muted/[0.08] hover:bg-muted/[0.12]">
               {[
                 "Payment",
                 "Amount",
@@ -826,17 +826,16 @@ export function PaymentsTable({
                 "Reference",
                 "Date",
                 "Status",
-                "Cashier",
               ].map((label) => (
                 <TableHead
                   key={label}
-                  className="h-11 px-5 text-[11px] font-semibold uppercase tracking-[0.045em] text-muted-foreground/70"
+                  className="h-10 px-5 text-[10px] font-semibold uppercase tracking-[0.05em] text-muted-foreground/60"
                 >
                   {label}
                 </TableHead>
               ))}
 
-              <TableHead className="h-11 w-28 px-4 text-right text-[11px] font-semibold uppercase tracking-[0.045em] text-muted-foreground/70">
+              <TableHead className="h-10 w-24 px-4 text-right text-[10px] font-semibold uppercase tracking-[0.05em] text-muted-foreground/60">
                 <div className="flex items-center justify-end gap-2.5">
                   <span>
                     Actions
@@ -850,14 +849,14 @@ export function PaymentsTable({
 
           <TableBody>
             {payments.map(
-              (payment) => (
+              (payment, index) => (
                 <TableRow
                   key={payment.id}
-                  className="border-border/30 transition-colors hover:bg-muted/[0.16]"
+                  className="border-border/20 transition-colors hover:bg-muted/[0.24]"
                 >
                   <TableCell className="px-5 py-4">
                     <div className="flex items-center gap-3">
-                      <span className="flex h-9 w-9 items-center justify-center rounded-[13px] border border-primary/10 bg-primary/[0.045] text-primary">
+                      <span className="flex h-9 w-9 items-center justify-center rounded-[14px] border border-primary/10 bg-primary/[0.055] text-primary">
                         <ReceiptText
                           className="h-4 w-4"
                           strokeWidth={
@@ -868,14 +867,9 @@ export function PaymentsTable({
 
                       <div>
                         <p className="text-[13px] font-semibold text-foreground/86">
-                          Student
-                          payment
+                          Payment {index + 1}
                         </p>
 
-                        <p className="mt-0.5 text-[10.5px] text-muted-foreground/65">
-                          Payment
-                          receipt
-                        </p>
                       </div>
                     </div>
                   </TableCell>
@@ -935,10 +929,6 @@ export function PaymentsTable({
                         "completed",
                       )}
                     </span>
-                  </TableCell>
-
-                  <TableCell className="px-5 py-4 text-[12.5px] text-muted-foreground">
-                    —
                   </TableCell>
 
                   <TableCell className="px-5 py-4 text-right">
@@ -1380,6 +1370,7 @@ export function StudentFinancialStatementDialog({
   studentName,
   academicYearName,
   account,
+  installments = [],
 }: {
   open: boolean;
   onOpenChange: (
@@ -1390,34 +1381,17 @@ export function StudentFinancialStatementDialog({
     | string
     | null;
   account: import("../types/studentFinance.types").FinancialAccount;
+  installments?: import("../types/studentFinance.types").Installment[];
 }) {
   const {
     data: payments = [],
     isLoading,
-  } = useStudentPayments();
+  } = useStudentPayments(
+    account.studentId,
+    account.id,
+  );
 
-  const visiblePayments =
-    useMemo(
-      () =>
-        payments.filter(
-          (payment) =>
-            String(
-              payment.studentId,
-            ) ===
-              String(
-                account.studentId,
-              ) ||
-            String(
-              payment.accountId,
-            ) ===
-              String(account.id),
-        ),
-      [
-        account.id,
-        account.studentId,
-        payments,
-      ],
-    );
+  const visiblePayments = payments;
 
   const totalPaid = Math.max(
     0,
@@ -1528,12 +1502,12 @@ export function StudentFinancialStatementDialog({
               Installment schedule
             </h3>
 
-            <div className="mt-3 overflow-x-auto rounded-[16px] border border-border/45">
+            <div className="mt-3 overflow-x-auto rounded-[16px] border border-border/30 bg-card/70">
               <table className="w-full min-w-[620px] text-left text-[12px]">
-                <thead className="bg-muted/20">
+                <thead className="bg-muted/[0.08]">
                   <tr>
                     {[
-                      "#",
+                      "No.",
                       "Installment",
                       "Due date",
                       "Due",
@@ -1551,11 +1525,11 @@ export function StudentFinancialStatementDialog({
                 </thead>
 
                 <tbody>
-                  {account.installments.map(
+                  {installments.map(
                     (item) => (
                       <tr
                         key={item.id}
-                        className="border-t border-border/30"
+                        className="border-t border-border/20"
                       >
                         <td className="p-3">
                           {
@@ -1606,12 +1580,12 @@ export function StudentFinancialStatementDialog({
                 Loading payments...
               </p>
             ) : (
-              <div className="mt-3 overflow-x-auto rounded-[16px] border border-border/45">
+              <div className="mt-3 overflow-x-auto rounded-[16px] border border-border/30 bg-card/70">
                 <table className="w-full min-w-[620px] text-left text-[12px]">
-                  <thead className="bg-muted/20">
+                  <thead className="bg-muted/[0.08]">
                     <tr>
                       {[
-                        "Receipt",
+                        "Payment",
                         "Date",
                         "Method",
                         "Amount",
@@ -1629,13 +1603,13 @@ export function StudentFinancialStatementDialog({
 
                   <tbody>
                     {visiblePayments.map(
-                      (payment) => (
+                      (payment, index) => (
                         <tr
                           key={payment.id}
-                          className="border-t border-border/30"
+                          className="border-t border-border/20"
                         >
-                          <td className="p-3">
-                            Payment receipt
+                          <td className="p-3 font-medium text-foreground/85">
+                            Payment {index + 1}
                           </td>
 
                           <td className="p-3">

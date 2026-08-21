@@ -3,7 +3,6 @@ import { useMemo, useState , } from "react";
 import { ArrowLeft} from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { axiosClient } from "@/services/axios/axiosClient";
-import { Button } from "@/shared/ui/button";
 import { useAllStaffLeaves } from "../hooks/useStaffLeaves";
 import { LeaveFilters } from "../components/LeaveFilters";
 import { LeaveRequestsTable } from "../components/LeaveRequestsTable";
@@ -78,63 +77,75 @@ export const LeaveRequestsPage = () => {
     return { total, pending, approved, rejected };
   }, [leavesData]);
 
-  return (
-    <div className="space-y-6 pt-5 animate-in fade-in duration-300">
-      {/* رأس الصفحة */}
-      <div className="flex flex-col gap-4 rounded-[24px] border border-border/70 bg-card p-6 shadow-sm sm:flex-row sm:items-center sm:justify-between">
-        
-        <div className="flex items-center gap-3.5">
-          <Button 
-            variant="outline" 
-            size="icon" 
-            onClick={() => navigate('/attendance/staff')}
-            className="h-10 w-10 shrink-0 rounded-[12px] border-border/70 hover:bg-muted/40 text-muted-foreground hover:text-foreground transition-colors"
-          >
-            <ArrowLeft className="h-4.5 w-4.5" />
-          </Button>
+return (
+  <div className="space-y-4 pt-2 animate-in fade-in duration-300">
+    {/* Page Header */}
+    <div className="flex flex-col gap-4 rounded-[22px] border border-border/60 bg-card px-6 py-5 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex min-w-0 items-center gap-3.5">
+        {/* Back to Staff */}
+        <button
+          type="button"
+          onClick={() => navigate("/attendance/staff")}
+          className="
+            group inline-flex shrink-0 items-center gap-1.5
+            text-xs font-medium
+            text-muted-foreground
+            transition-colors duration-200
+            hover:text-amber-500
+          "
+        >
+          <ArrowLeft
+            className="h-4 w-4 transition-colors duration-200 group-hover:text-amber-500"
+            strokeWidth={1.7}
+          />
+          <span>Back to Staff</span>
+        </button>
 
-          <div>
-            <h1 className="text-[18px] font-semibold tracking-tight text-foreground">
-              Leave Requests
-            </h1>
-            <p className="mt-0.5 text-[12.5px] font-semibold text-muted-foreground">
-              Manage and register direct staff leaves.
-            </p>
-          </div>
+        <div className="h-5 w-px bg-border/60" />
+
+        <div className="min-w-0">
+          <h1 className="text-[17px] font-medium tracking-tight text-foreground">
+            Leave Requests
+          </h1>
+
+          <p className="mt-0.5 text-[12px] font-normal text-muted-foreground">
+            Manage and register direct staff leaves.
+          </p>
         </div>
-
-        <AddLeaveDialog
-          staffList={realStaffList}
-          leaveTypes={realLeaveTypes}
-        />
       </div>
 
-      {/* بطاقات الإحصائيات */}
-      <LeaveStats
-        total={stats.total}
-        pending={stats.pending}
-        approved={stats.approved}
-        rejected={stats.rejected}
-      />
-
-      {/* قسم الفلترة */}
-      <div className="rounded-[24px] border border-border/70 bg-card p-5 shadow-sm">
-        <LeaveFilters
-          search={search}
-          setSearch={setSearch}
-          leaveType={leaveType}
-          setLeaveType={setLeaveType}
-          leaveTypes={realLeaveTypes}
-        />
-      </div>
-
-      {/* جدول الطلبات */}
-      <LeaveRequestsTable
-        data={filteredData}
+      <AddLeaveDialog
         staffList={realStaffList}
         leaveTypes={realLeaveTypes}
-        isLoading={isLeavesLoading}
       />
     </div>
-  );
+
+    {/* Statistics */}
+    <LeaveStats
+      total={stats.total}
+      pending={stats.pending}
+      approved={stats.approved}
+      rejected={stats.rejected}
+    />
+
+    {/* Filters */}
+    <div className="rounded-[22px] border border-border/60 bg-card p-5 shadow-sm">
+      <LeaveFilters
+        search={search}
+        setSearch={setSearch}
+        leaveType={leaveType}
+        setLeaveType={setLeaveType}
+        leaveTypes={realLeaveTypes}
+      />
+    </div>
+
+    {/* Leave Requests Table */}
+    <LeaveRequestsTable
+      data={filteredData}
+      staffList={realStaffList}
+      leaveTypes={realLeaveTypes}
+      isLoading={isLeavesLoading}
+    />
+  </div>
+);
 };

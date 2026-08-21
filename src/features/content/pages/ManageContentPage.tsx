@@ -93,8 +93,8 @@ export function ManageContentPage() {
   const [error, setError] = useState(false);
 
   const [openSections, setOpenSections] = useState<Set<string>>(
-    () => new Set([getSectionLabel(fields[0]?.path ?? ["Content"])]),
-  );
+  () => new Set(),
+);
 
   const sections = useMemo(() => {
     const result = new Map<string, Map<string, ContentField[]>>();

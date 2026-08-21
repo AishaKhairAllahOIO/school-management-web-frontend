@@ -1,21 +1,27 @@
 import { CalendarCheck2, CalendarDays, Save } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+
 import { axiosClient } from "@/services/axios/axiosClient";
+
 import type {
   StudentAttendance,
   AttendanceStatus,
   AbsenceType,
 } from "../types/attendance.types";
+
 import { Button } from "@/shared/ui/button";
 import { DatePicker } from "@/shared/ui/date-picker";
+
 import { AttendanceFilters } from "../components/AttendanceFilters";
 import { AttendanceStats } from "../components/AttendanceStats";
 import { AttendanceTable } from "../components/AttendanceTable";
+
 import {
   useBulkAttendance,
   useStudentAttendance,
 } from "../hooks/useStudentAttendance";
+
 import { studentAttendanceService } from "../api/studentAttendance.service";
 import { useAcademicSettings } from "../../../settings/academic/hooks/useAcademicSettings";
 
@@ -23,33 +29,66 @@ function todayForApi() {
   return new Date().toISOString().slice(0, 10);
 }
 
+/**
+ * Shared soft UI classes
+ * الهدف: واجهة أنعم وأهدأ بدون تغيير الـ components.
+ */
+
 export function StudentAttendancePage() {
   const queryClient = useQueryClient();
+
   const [draftDate, setDraftDate] = useState(todayForApi());
   const [selectedDate, setSelectedDate] = useState(todayForApi());
 
   const { data: academicData } = useAcademicSettings();
-  const activeSemester = academicData?.settings?.currentSemesterId || null; 
-  
-  // 🌟 القيمة الافتراضية للفلاتر هي "all"
-  const [classroomFilter, setClassroomFilter] = useState("all"); 
+
+  const activeSemester =
+    academicData?.settings?.currentSemesterId || null;
+
+  // --------------------------------------------------
+  // Filters
+  // --------------------------------------------------
+
+  const [classroomFilter, setClassroomFilter] = useState("all");
   const [search, setSearch] = useState("");
   const [gradeFilter, setGradeFilter] = useState("all");
   const [status, setStatus] = useState("all");
   const [absenceType, setAbsenceType] = useState("all");
   const [page, setPage] = useState(1);
 
+  // --------------------------------------------------
+  // Reset page when filters change
+  // --------------------------------------------------
+
   useEffect(() => {
     setPage(1);
-  }, [search, status, absenceType, classroomFilter, selectedDate, gradeFilter]);
+  }, [
+    search,
+    status,
+    absenceType,
+    classroomFilter,
+    selectedDate,
+    gradeFilter,
+  ]);
+
+  // --------------------------------------------------
+  // Grades
+  // --------------------------------------------------
 
   const { data: gradesData = [] } = useQuery({
     queryKey: ["real-grades"],
     queryFn: async () => {
-      const response = await axiosClient.get("/admin/settings/grades");
+      const response = await axiosClient.get(
+        "/admin/settings/grades"
+      );
+
       return response.data.data || [];
     },
   });
+
+  // --------------------------------------------------
+  // Classrooms
+  // --------------------------------------------------
 
   const { data: classroomsData = [] } = useQuery({
     queryKey: ["real-classrooms"],
@@ -57,35 +96,81 @@ export function StudentAttendancePage() {
       const response = await axiosClient.get(
         "/admin/settings/classrooms"
       );
+
       return response.data.data || [];
     },
   });
 
+  // --------------------------------------------------
+  // Filter classrooms by grade
+  // --------------------------------------------------
+
   const filteredClassrooms = useMemo(() => {
-    if (gradeFilter === "all") return classroomsData;
+    if (gradeFilter === "all") {
+      return classroomsData;
+    }
 
     return classroomsData.filter(
-      (c: any) =>
-        String(c.gradeId || c.grade_id) === gradeFilter
+      (classroom: any) =>
+        String(
+          classroom.gradeId ||
+            classroom.grade_id
+        ) === gradeFilter
     );
   }, [classroomsData, gradeFilter]);
 
-  // 🌟 منطق ذكي: إذا اختار مرحلة محددة، نختار أول شعبة لنسهل عليه أخذ التفقد
+  // --------------------------------------------------
+  // Smart classroom selection
+  // --------------------------------------------------
+
   useEffect(() => {
     if (gradeFilter === "all") {
       setClassroomFilter("all");
-    } else if (filteredClassrooms.length > 0 && classroomFilter === "all") {
-      setClassroomFilter(String(filteredClassrooms[0].id));
+      return;
     }
-  }, [gradeFilter, filteredClassrooms]);
 
-  const activeClassroom = classroomsData.find((c: any) => String(c.id) === classroomFilter);
-  const activeClassName = classroomFilter === "all" ? "All classrooms" : (activeClassroom?.name || "N/A");
-  
-  const activeGrade = gradesData.find((g: any) => String(g.id) === gradeFilter);
-  const activeGradeName = gradeFilter === "all" ? "All grades" : (activeGrade?.name || "N/A");
+    if (
+      filteredClassrooms.length > 0 &&
+      classroomFilter === "all"
+    ) {
+      setClassroomFilter(
+        String(filteredClassrooms[0].id)
+      );
+    }
+  }, [
+    gradeFilter,
+    filteredClassrooms,
+    classroomFilter,
+  ]);
 
-  // 🌟 إرسال `gradeId` مع الدالة لكي تفلتر بناءً عليها إذا لم يتم اختيار شعبة محددة
+  // --------------------------------------------------
+  // Active classroom / grade
+  // --------------------------------------------------
+
+  const activeClassroom = classroomsData.find(
+    (classroom: any) =>
+      String(classroom.id) === classroomFilter
+  );
+
+  const activeClassName =
+    classroomFilter === "all"
+      ? "All classrooms"
+      : activeClassroom?.name || "N/A";
+
+  const activeGrade = gradesData.find(
+    (grade: any) =>
+      String(grade.id) === gradeFilter
+  );
+
+  const activeGradeName =
+    gradeFilter === "all"
+      ? "All grades"
+      : activeGrade?.name || "N/A";
+
+  // --------------------------------------------------
+  // Attendance query
+  // --------------------------------------------------
+
   const attendanceQuery = useStudentAttendance({
     date: selectedDate,
     gradeId: gradeFilter,
@@ -99,55 +184,82 @@ export function StudentAttendancePage() {
       : null,
   });
 
-  const bulkAttendanceMutation = useBulkAttendance();
+  const bulkAttendanceMutation =
+    useBulkAttendance();
 
-  const [originalRecords, setOriginalRecords] = useState<
-    StudentAttendance[]
-  >([]);
-  const [records, setRecords] = useState<StudentAttendance[]>([]);
-  const [dirtyIds, setDirtyIds] = useState<Set<number>>(
-    new Set()
-  );
-  const [savedAt, setSavedAt] = useState<string | null>(null);
-  const [isSaving, setIsSaving] = useState(false);
+  // --------------------------------------------------
+  // Local records
+  // --------------------------------------------------
+
+  const [originalRecords, setOriginalRecords] =
+    useState<StudentAttendance[]>([]);
+
+  const [records, setRecords] =
+    useState<StudentAttendance[]>([]);
+
+  const [dirtyIds, setDirtyIds] =
+    useState<Set<number>>(new Set());
+
+  const [savedAt, setSavedAt] =
+    useState<string | null>(null);
+
+  const [isSaving, setIsSaving] =
+    useState(false);
+
+  // --------------------------------------------------
+  // Sync API records
+  // --------------------------------------------------
 
   useEffect(() => {
-    const apiData = attendanceQuery.data?.data || [];
+    const apiData =
+      attendanceQuery.data?.data || [];
 
     setOriginalRecords(
       JSON.parse(JSON.stringify(apiData))
     );
+
     setRecords(apiData);
     setDirtyIds(new Set());
   }, [attendanceQuery.data]);
 
-  const isInitialLoading = attendanceQuery.isLoading;
+  const isInitialLoading =
+    attendanceQuery.isLoading;
+
+  // --------------------------------------------------
+  // Statistics
+  // --------------------------------------------------
 
   const present = records.filter(
     (item) =>
       (item.attendance?.status ||
-        (item.attendance?.id ? "absent" : "present")) ===
-      "present"
+        (item.attendance?.id
+          ? "absent"
+          : "present")) === "present"
   ).length;
 
   const absent = records.filter(
     (item) =>
       (item.attendance?.status ||
-        (item.attendance?.id ? "absent" : "present")) ===
-      "absent"
+        (item.attendance?.id
+          ? "absent"
+          : "present")) === "absent"
   ).length;
 
   const excused = records.filter(
     (item) =>
-      item.attendance?.absence_type?.toLowerCase() ===
-      "excused"
+      item.attendance?.absence_type
+        ?.toLowerCase() === "excused"
   ).length;
 
   const unexcused = records.filter(
     (item) =>
-      item.attendance?.absence_type?.toLowerCase() ===
-      "unexcused"
+      item.attendance?.absence_type
+        ?.toLowerCase() === "unexcused"
   ).length;
+
+  // --------------------------------------------------
+  // Local update
+  // --------------------------------------------------
 
   function updateRecord(
     student: StudentAttendance,
@@ -159,9 +271,11 @@ export function StudentAttendancePage() {
     setRecords((current) =>
       current.map((record) => {
         if (
-          record.enrollment_id !== student.enrollment_id
-        )
+          record.enrollment_id !==
+          student.enrollment_id
+        ) {
           return record;
+        }
 
         return {
           ...record,
@@ -171,7 +285,8 @@ export function StudentAttendancePage() {
               attendance_date: selectedDate,
             }),
             status: patch.status,
-            absence_type: patch.absence_type ?? null,
+            absence_type:
+              patch.absence_type ?? null,
           } as any,
         };
       })
@@ -179,11 +294,17 @@ export function StudentAttendancePage() {
 
     setDirtyIds(
       (current) =>
-        new Set(current).add(student.enrollment_id)
+        new Set(current).add(
+          student.enrollment_id
+        )
     );
 
     setSavedAt(null);
   }
+
+  // --------------------------------------------------
+  // Apply date
+  // --------------------------------------------------
 
   function applyDate() {
     if (!draftDate) return;
@@ -192,6 +313,10 @@ export function StudentAttendancePage() {
     setDirtyIds(new Set());
     setSavedAt(null);
   }
+
+  // --------------------------------------------------
+  // Save attendance
+  // --------------------------------------------------
 
   async function saveAttendance() {
     if (dirtyIds.size === 0) return;
@@ -203,7 +328,10 @@ export function StudentAttendancePage() {
         enrollment_id: number;
         attendance_date: string;
         status: "present" | "absent";
-        absence_type: "excused" | "unexcused" | null;
+        absence_type:
+          | "excused"
+          | "unexcused"
+          | null;
       }> = [];
 
       const updatePromises = [];
@@ -211,35 +339,51 @@ export function StudentAttendancePage() {
 
       for (const studentId of dirtyIds) {
         const draft = records.find(
-          (r) => r.enrollment_id === studentId
+          (record) =>
+            record.enrollment_id === studentId
         );
 
         const original = originalRecords.find(
-          (r) => r.enrollment_id === studentId
+          (record) =>
+            record.enrollment_id === studentId
         );
 
         if (!draft || !original) continue;
 
-        const originalId = original.attendance?.id;
+        const originalId =
+          original.attendance?.id;
 
         const draftStatus =
-          draft.attendance?.status || "present";
+          draft.attendance?.status ||
+          "present";
 
         const draftAbsenceType =
           draftStatus === "absent"
-            ? (draft.attendance?.absence_type as
+            ? ((draft.attendance
+                ?.absence_type as
                 | "excused"
-                | "unexcused" ?? "excused")
+                | "unexcused") ??
+              "excused")
             : null;
 
-        if (!originalId && draftStatus === "absent") {
+        // New absence
+        if (
+          !originalId &&
+          draftStatus === "absent"
+        ) {
           newAbsencesToBulk.push({
-            enrollment_id: draft.enrollment_id,
-            attendance_date: selectedDate,
+            enrollment_id:
+              draft.enrollment_id,
+            attendance_date:
+              selectedDate,
             status: "absent",
-            absence_type: draftAbsenceType,
+            absence_type:
+              draftAbsenceType,
           });
-        } else if (
+        }
+
+        // Delete existing attendance
+        else if (
           originalId &&
           draftStatus === "present"
         ) {
@@ -248,7 +392,10 @@ export function StudentAttendancePage() {
               originalId
             )
           );
-        } else if (
+        }
+
+        // Update existing attendance
+        else if (
           originalId &&
           draftStatus === "absent"
         ) {
@@ -257,28 +404,40 @@ export function StudentAttendancePage() {
               originalId,
               {
                 status: "absent",
-                absence_type: draftAbsenceType,
-                attendance_date: selectedDate,
+                absence_type:
+                  draftAbsenceType,
+                attendance_date:
+                  selectedDate,
               }
             )
           );
         }
       }
 
+      // Bulk create
       if (newAbsencesToBulk.length > 0) {
         await bulkAttendanceMutation.mutateAsync({
-          semester_id: Number(activeSemester || 1),
-          class_room_id: Number(classroomFilter),
+          semester_id: Number(
+            activeSemester || 1
+          ),
+          class_room_id: Number(
+            classroomFilter
+          ),
           attendance_date: selectedDate,
-          attendances: newAbsencesToBulk,
+          attendances:
+            newAbsencesToBulk,
         });
       }
 
-      if (deletePromises.length > 0)
+      // Delete
+      if (deletePromises.length > 0) {
         await Promise.all(deletePromises);
+      }
 
-      if (updatePromises.length > 0)
+      // Update
+      if (updatePromises.length > 0) {
         await Promise.all(updatePromises);
+      }
 
       setDirtyIds(new Set());
 
@@ -293,14 +452,33 @@ export function StudentAttendancePage() {
         queryKey: ["student-attendance"],
       });
     } catch (error) {
-      console.error("Failed to save", error);
+      console.error(
+        "Failed to save",
+        error
+      );
     } finally {
       setIsSaving(false);
     }
   }
 
+  // --------------------------------------------------
+  // Render
+  // --------------------------------------------------
+
   return (
-    <section className="space-y-5 pt-5 animate-in fade-in duration-300">
+    <section
+      className="
+        space-y-5
+        pt-5
+        animate-in
+        fade-in
+        duration-300
+      "
+    >
+      {/* ================================================= */}
+      {/* Stats */}
+      {/* ================================================= */}
+
       <AttendanceStats
         present={present}
         absent={absent}
@@ -309,86 +487,271 @@ export function StudentAttendancePage() {
         isLoading={isInitialLoading}
       />
 
-      <div className="overflow-hidden rounded-[24px] border border-border/70 bg-card shadow-sm">
-        <div className="flex flex-col gap-4 bg-card px-6 py-5 lg:flex-row lg:items-center lg:justify-between">
-          <div className="flex min-w-0 items-center gap-4">
-            <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[16px] border border-primary/20 bg-primary/[0.08] text-primary shadow-xs">
+      {/* ================================================= */}
+      {/* Header + Controls + Filters */}
+      {/* ================================================= */}
+
+      <div
+        className="
+          overflow-hidden
+          rounded-[22px]
+          border
+          border-border/50
+          bg-card
+          shadow-[0_1px_3px_rgba(0,0,0,0.03)]
+          transition-shadow
+          duration-200
+        "
+      >
+        {/* ------------------------------------------------- */}
+        {/* Header */}
+        {/* ------------------------------------------------- */}
+
+        <div
+          className="
+            flex
+            flex-col
+            gap-4
+            bg-card
+            px-6
+            py-5
+            lg:flex-row
+            lg:items-center
+            lg:justify-between
+          "
+        >
+          {/* Title */}
+          <div className="flex min-w-0 items-center gap-3.5">
+            <span
+              className="
+                flex
+                h-11
+                w-11
+                shrink-0
+                items-center
+                justify-center
+                rounded-[14px]
+                border
+                border-primary/15
+                bg-primary/[0.06]
+                text-primary
+                transition-colors
+                duration-200
+              "
+            >
               <CalendarCheck2
-                className="h-[22px] w-[22px]"
-                strokeWidth={2}
+                className="h-[21px] w-[21px]"
+                strokeWidth={1.8}
               />
             </span>
 
             <div className="min-w-0">
-              <div className="flex items-center gap-2.5">
-                <h2 className="text-[16px] font-semibold tracking-tight text-foreground">
-                  Daily attendance
-                </h2>
-              </div>
+              <h2
+                className="
+                  text-[15px]
+                  font-medium
+                  tracking-normal
+                  text-foreground
+                "
+              >
+                Student attendance
+              </h2>
 
-              <p className="mt-1 text-[12px] font-semibold text-muted-foreground">
-                Select date, apply, then save changes.
+              <p
+                className="
+                  mt-1
+                  text-[12px]
+                  font-normal
+                  leading-5
+                  text-muted-foreground
+                "
+              >
+                Select date, apply, then save
+                changes.
               </p>
             </div>
           </div>
 
-          <div className="flex w-full flex-col gap-3 sm:flex-row lg:w-auto lg:items-end">
+          {/* Controls */}
+          <div
+            className="
+              flex
+              w-full
+              flex-col
+              gap-2.5
+              sm:flex-row
+              lg:w-auto
+              lg:items-end
+            "
+          >
+            {/* Date */}
             <DatePicker
               value={draftDate}
               onChange={setDraftDate}
-              label="Attendance date"
-              className="w-full sm:w-[228px]"
+              className="
+                w-full
+                sm:w-[228px]
+              "
             />
 
+            {/* Apply */}
             <Button
               type="button"
               variant="outline"
               onClick={applyDate}
               disabled={
-                !draftDate || draftDate === selectedDate
+                !draftDate ||
+                draftDate === selectedDate
               }
-              className="h-11 rounded-[14px] border-primary/30 bg-transparent px-5 text-[13px] font-semibold text-primary shadow-2xs transition-colors hover:bg-primary/10"
+              className="
+                h-11
+                rounded-[14px]
+                border-primary/25
+                bg-transparent
+                px-5
+                text-[13px]
+                font-medium
+                text-primary
+                shadow-none
+                transition-all
+                duration-200
+                hover:bg-primary/[0.06]
+                hover:border-primary/35
+                active:scale-[0.98]
+                disabled:opacity-45
+              "
             >
-              <CalendarDays className="mr-2 h-4 w-4" />
+              <CalendarDays
+                className="mr-2 h-4 w-4"
+                strokeWidth={1.8}
+              />
+
               Apply
             </Button>
-            {/* 🌟 تعطيل زر الحفظ إذا كان يعرض كل الشعب، لأن الباك إند يحتاج class_room_id للحفظ الجماعي */}
-            <Button type="button" onClick={saveAttendance} disabled={dirtyIds.size === 0 || isSaving || classroomFilter === "all"} className="h-11 rounded-[14px] px-6 text-[13px] font-semibold bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm transition-all disabled:opacity-50">
-              <Save className="h-4 w-4 mr-2" /> 
-              {isSaving ? "Saving..." : classroomFilter === "all" && dirtyIds.size > 0 ? "Select class to save" : "Save Changes"}
+
+            {/* Save */}
+            <Button
+              type="button"
+              onClick={saveAttendance}
+              disabled={
+                dirtyIds.size === 0 ||
+                isSaving ||
+                classroomFilter === "all"
+              }
+              className="
+                h-11
+                rounded-[14px]
+                bg-primary
+                px-6
+                text-[13px]
+                font-medium
+                text-primary-foreground
+                shadow-none
+                transition-all
+                duration-200
+                hover:bg-primary/90
+                active:scale-[0.98]
+                disabled:opacity-45
+              "
+            >
+              <Save
+                className="mr-2 h-4 w-4"
+                strokeWidth={1.8}
+              />
+
+              {isSaving
+                ? "Saving..."
+                : classroomFilter ===
+                      "all" &&
+                    dirtyIds.size > 0
+                  ? "Select class to save"
+                  : "Save Changes"}
             </Button>
           </div>
         </div>
 
-        <div className="border-t border-border/60 bg-muted/20 p-5">
+        {/* ------------------------------------------------- */}
+        {/* Filters */}
+        {/* ------------------------------------------------- */}
+
+        <div
+          className="
+            border-t
+            border-border/40
+            bg-muted/[0.16]
+            p-5
+          "
+        >
           <AttendanceFilters
             search={search}
             setSearch={setSearch}
             gradeFilter={gradeFilter}
             setGradeFilter={setGradeFilter}
-            classroomFilter={classroomFilter}
-            setClassroomFilter={setClassroomFilter}
+            classroomFilter={
+              classroomFilter
+            }
+            setClassroomFilter={
+              setClassroomFilter
+            }
             status={status}
             setStatus={setStatus}
             absenceType={absenceType}
-            setAbsenceType={setAbsenceType}
+            setAbsenceType={
+              setAbsenceType
+            }
             grades={gradesData}
-            classrooms={filteredClassrooms}
+            classrooms={
+              filteredClassrooms
+            }
           />
         </div>
       </div>
 
+      {/* ================================================= */}
+      {/* Saved message */}
+      {/* ================================================= */}
+
       {savedAt && (
-        <p className="-mt-1 text-end text-[11.5px] font-semibold text-success">
-          ✓ Changes saved at {savedAt}.
-        </p>
+        <div
+          className="
+            -mt-1
+            flex
+            justify-end
+            px-1
+            animate-in
+            fade-in
+            slide-in-from-top-1
+            duration-200
+          "
+        >
+          <p
+            className="
+              text-[11.5px]
+              font-normal
+              tracking-normal
+              text-success
+            "
+          >
+            <span className="mr-1 opacity-80">
+              ✓
+            </span>
+
+            Changes saved at {savedAt}.
+          </p>
+        </div>
       )}
+
+      {/* ================================================= */}
+      {/* Attendance Table */}
+      {/* ================================================= */}
 
       <AttendanceTable
         data={records}
         isLoading={isInitialLoading}
         onUpdate={updateRecord}
-        pagination={attendanceQuery.data}
+        pagination={
+          attendanceQuery.data
+        }
         currentPage={page}
         onPageChange={setPage}
         gradeName={activeGradeName}

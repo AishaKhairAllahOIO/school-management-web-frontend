@@ -39,7 +39,7 @@ export const LeaveDetailsDialog = ({ open, onOpenChange, leave }: Props) => {
               <div className="flex flex-col min-w-0">
                 <h2 className="text-[14.5px] font-bold text-foreground truncate">{staff.name}</h2>
                 <p className="text-[11.5px] font-medium text-muted-foreground">{staff.role}</p>
-                <p className="mt-0.5 text-[11px] font-semibold text-primary">Staff ID: #{leave.staff_id}</p>
+                
               </div>
             </div>
 

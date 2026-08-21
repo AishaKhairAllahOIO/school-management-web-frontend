@@ -344,7 +344,7 @@ export function StudentFinancialProfilePage() {
           </div>
 
           <section className="rounded-[22px] border border-dashed border-border/60 bg-card p-7 text-center sm:p-10">
-            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/[0.07] text-primary">
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/[0.06] text-primary">
               <WalletCards className="h-5 w-5" />
             </div>
 
@@ -372,10 +372,10 @@ export function StudentFinancialProfilePage() {
         </>
       ) : (
         <>
-          <section className="overflow-hidden rounded-[20px] border border-border/60 bg-card shadow-[0_10px_30px_rgba(31,22,73,0.04)]">
-            <div className="flex flex-wrap items-center justify-between gap-2.5 border-b border-border/50 px-3.5 py-2.5 sm:px-5 sm:py-3">
+          <section className="overflow-hidden rounded-[30px] border border-border/40 bg-card/95 shadow-[0_18px_50px_rgba(31,22,73,0.045)] dark:shadow-[0_18px_50px_rgba(0,0,0,0.24)]">
+            <div className="flex flex-wrap items-center justify-between gap-2.5 border-b border-border/30 px-4 py-3 sm:px-5 sm:py-3">
               <div className="flex min-w-0 items-center gap-2.5">
-                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[10px] bg-primary/[0.07] text-primary">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[10px] bg-primary/[0.06] text-primary">
                   <GraduationCap
                     className="h-3.5 w-3.5"
                     strokeWidth={1.8}
@@ -473,7 +473,7 @@ export function StudentFinancialProfilePage() {
 
                 <div className="min-w-0 text-center lg:text-start">
                   <div className="flex items-center justify-center gap-1.5 lg:justify-start">
-                    <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-primary/[0.07] text-primary">
+                    <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-primary/[0.06] text-primary">
                       <CircleDollarSign className="h-3 w-3" />
                     </span>
 
@@ -495,7 +495,7 @@ export function StudentFinancialProfilePage() {
                   </p>
 
                   <div className="mt-2 flex flex-wrap justify-center gap-1.5 lg:justify-start">
-                    <div className="rounded-lg bg-muted/35 px-2.5 py-1.5">
+                    <div className="rounded-xl border border-border/30 bg-muted/25 px-2.5 py-1.5">
                       <p className="text-[8px] uppercase tracking-[0.08em] text-muted-foreground">
                         Total
                       </p>
@@ -507,7 +507,7 @@ export function StudentFinancialProfilePage() {
                       </p>
                     </div>
 
-                    <div className="rounded-lg bg-success/[0.07] px-2.5 py-1.5">
+                    <div className="rounded-xl border border-success/10 bg-success/[0.06] px-2.5 py-1.5">
                       <p className="text-[8px] uppercase tracking-[0.08em] text-muted-foreground">
                         Paid
                       </p>
@@ -519,7 +519,7 @@ export function StudentFinancialProfilePage() {
                   </div>
                 </div>
 
-                <div className="flex w-full flex-col gap-1.5 rounded-[16px] border border-border/50 bg-muted/[0.18] p-2.5 sm:p-3">
+                <div className="flex w-full flex-col gap-1.5 rounded-[18px] border border-border/40 bg-muted/[0.14] p-2.5 sm:p-3">
                   <div className="flex items-center gap-1.5">
                     <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-primary/[0.08] text-primary">
                       <FileText className="h-3.5 w-3.5" />
@@ -625,6 +625,7 @@ export function StudentFinancialProfilePage() {
           studentName={student.fullName}
           academicYearName={undefined}
           account={account}
+          installments={accountInstallments}
         />
       ) : null}
 

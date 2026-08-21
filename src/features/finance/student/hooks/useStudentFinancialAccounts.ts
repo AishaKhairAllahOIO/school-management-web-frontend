@@ -12,9 +12,6 @@ import {
   studentInstallmentKeys,
 } from "./useStudentInstallments";
 
-import {
-  studentPaymentKeys,
-} from "./useStudentPayments";
 
 import type {
   FinalizeContractPayload,
@@ -123,21 +120,9 @@ async function invalidateStudentFinance(
   await Promise.allSettled([
     queryClient.invalidateQueries({
       queryKey:
-        studentFinancialAccountKeys.all,
-      refetchType: "active",
-    }),
-
-    queryClient.invalidateQueries({
-      queryKey:
         studentFinancialAccountKeys.student(
           studentId,
         ),
-      refetchType: "active",
-    }),
-
-    queryClient.invalidateQueries({
-      queryKey:
-        studentInstallmentKeys.all,
       refetchType: "active",
     }),
 
@@ -149,11 +134,6 @@ async function invalidateStudentFinance(
       refetchType: "active",
     }),
 
-    queryClient.invalidateQueries({
-      queryKey:
-        studentPaymentKeys.all,
-      refetchType: "active",
-    }),
   ]);
 }
 

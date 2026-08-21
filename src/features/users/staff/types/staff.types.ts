@@ -121,7 +121,7 @@ export type RegisterStaffValues = {
   birth_place: string;
 
   address: string;
-  gender: StaffGender;
+  gender: StaffGender| null;
 
   nationality?:
     | StaffNationality
@@ -157,7 +157,7 @@ export type UpdateStaffPersonalValues = {
   birth_place?: string;
 
   address?: string;
-  gender?: StaffGender;
+  gender?: StaffGender|null;
 
   nationality?:
     | StaffNationality

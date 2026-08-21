@@ -48,39 +48,35 @@ function formatDate(value: string | null) {
 }
 
 function getInstallmentState(item: Installment) {
-  const overdue =
-    item.dueDate
-      ? new Date() > new Date(item.dueDate) &&
-        item.status !== "paid"
-      : false;
+  // The backend is the source of truth for installment status.
+  // Do not infer `overdue` from the browser date because an API response
+  // of `pending` must remain `Pending` even when its due date is in the past.
+  switch (item.status) {
+    case "paid":
+      return {
+        label: "Paid",
+        className:
+          "border-success/18 bg-success/[0.075] text-success",
+        icon: CheckCircle2,
+      };
 
-  if (item.status === "paid") {
-    return {
-      label: "Paid",
-      className:
-        "border-success/18 bg-success/[0.075] text-success",
-      icon: CheckCircle2,
-    };
+    case "overdue":
+      return {
+        label: "Overdue",
+        className:
+          "border-destructive/18 bg-destructive/[0.06] text-destructive",
+        icon: Clock3,
+      };
+
+    case "pending":
+    default:
+      return {
+        label: "Pending",
+        className:
+          "border-info/18 bg-info/[0.07] text-info",
+        icon: CalendarClock,
+      };
   }
-
-  if (
-    overdue ||
-    item.status === "overdue"
-  ) {
-    return {
-      label: "Overdue",
-      className:
-        "border-destructive/18 bg-destructive/[0.06] text-destructive",
-      icon: Clock3,
-    };
-  }
-
-  return {
-    label: "Pending",
-    className:
-      "border-info/18 bg-info/[0.07] text-info",
-    icon: CalendarClock,
-  };
 }
 
 function InstallmentStatus({
@@ -128,7 +124,7 @@ function ProgressBar({
       : 0;
 
   return (
-    <div className="w-[130px]">
+    <div className="w-[138px]">
       <div className="mb-1.5 flex items-center justify-between">
         <span className="text-[10.5px] text-muted-foreground/65">
           Collected
@@ -139,7 +135,7 @@ function ProgressBar({
         </span>
       </div>
 
-      <div className="h-1.5 overflow-hidden rounded-full bg-muted/60">
+      <div className="h-1.5 overflow-hidden rounded-full bg-muted/70">
         <div
           className="h-full rounded-full bg-primary/75 transition-all"
           style={{
@@ -160,7 +156,7 @@ function InstallmentsTable({
 }) {
   if (!installments.length) {
     return (
-      <div className="rounded-[20px] border border-dashed border-border/55 bg-card px-6 py-14 text-center">
+      <div className="rounded-[24px] border border-dashed border-border/50 bg-muted/[0.10] px-6 py-14 text-center">
         <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-[16px] bg-info/[0.08] text-info">
           <CalendarClock
             className="h-5 w-5"
@@ -181,36 +177,36 @@ function InstallmentsTable({
   }
 
   return (
-    <div className="overflow-hidden rounded-[20px] border border-border/45 bg-card shadow-[0_12px_34px_rgba(31,22,73,0.04)]">
+    <div className="overflow-hidden rounded-[20px] border border-border/30 bg-card/90 shadow-none">
       <div className="overflow-x-auto">
         <table className="w-full min-w-[850px] border-collapse">
           <thead>
-            <tr className="border-b border-border/40 bg-muted/[0.22]">
-              <th className="h-12 px-5 text-left text-[10.5px] font-semibold uppercase tracking-[0.06em] text-muted-foreground/70">
+            <tr className="border-b border-border/25 bg-muted/[0.08]">
+              <th className="h-11 px-5 text-left text-[10px] font-semibold uppercase tracking-[0.055em] text-muted-foreground/60">
                 Installment
               </th>
 
-              <th className="h-12 px-4 text-left text-[10.5px] font-semibold uppercase tracking-[0.06em] text-muted-foreground/70">
+              <th className="h-11 px-4 text-left text-[10px] font-semibold uppercase tracking-[0.055em] text-muted-foreground/60">
                 Amount due
               </th>
 
-              <th className="h-12 px-4 text-left text-[10.5px] font-semibold uppercase tracking-[0.06em] text-muted-foreground/70">
+              <th className="h-11 px-4 text-left text-[10px] font-semibold uppercase tracking-[0.055em] text-muted-foreground/60">
                 Paid
               </th>
 
-              <th className="h-12 px-4 text-left text-[10.5px] font-semibold uppercase tracking-[0.06em] text-muted-foreground/70">
+              <th className="h-11 px-4 text-left text-[10px] font-semibold uppercase tracking-[0.055em] text-muted-foreground/60">
                 Remaining
               </th>
 
-              <th className="h-12 px-4 text-left text-[10.5px] font-semibold uppercase tracking-[0.06em] text-muted-foreground/70">
+              <th className="h-11 px-4 text-left text-[10px] font-semibold uppercase tracking-[0.055em] text-muted-foreground/60">
                 Progress
               </th>
 
-              <th className="h-12 px-4 text-left text-[10.5px] font-semibold uppercase tracking-[0.06em] text-muted-foreground/70">
+              <th className="h-11 px-4 text-left text-[10px] font-semibold uppercase tracking-[0.055em] text-muted-foreground/60">
                 Due date
               </th>
 
-              <th className="h-12 px-5 text-left text-[10.5px] font-semibold uppercase tracking-[0.06em] text-muted-foreground/70">
+              <th className="h-11 px-5 text-left text-[10px] font-semibold uppercase tracking-[0.055em] text-muted-foreground/60">
                 Status
               </th>
             </tr>
@@ -244,18 +240,18 @@ function InstallmentsTable({
                       onSelect(item);
                     }
                   }}
-                  className="cursor-pointer border-b border-border/30 transition-colors last:border-b-0 hover:bg-primary/[0.018]"
+                  className="cursor-pointer border-b border-border/20 transition-colors last:border-b-0 hover:bg-muted/[0.24]"
                 >
                   <td className="px-5 py-4">
                     <div className="flex items-center gap-3">
-                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[11px] bg-primary/[0.07] text-primary">
+                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[12px] bg-primary/[0.065] text-primary">
                         <Wallet
                           className="h-4 w-4"
                           strokeWidth={1.8}
                         />
                       </span>
 
-                      <p className="truncate text-[13px] font-semibold text-foreground/88">
+                      <p className="truncate text-[13px] font-semibold tracking-[-0.01em] text-foreground/90">
                         {item.title}
                       </p>
                     </div>
@@ -375,34 +371,31 @@ export function StudentInstallmentsSection({
           }
         }}
       >
-        <DialogContent className="rounded-[24px] sm:max-w-[520px]">
-          <DialogHeader className="text-start">
-            <DialogTitle>
+        <DialogContent className="w-[calc(100%-1rem)] rounded-[24px] border-border/35 bg-background/98 p-0 shadow-[0_20px_60px_rgba(31,22,73,0.10)] dark:shadow-[0_20px_60px_rgba(0,0,0,0.32)] sm:max-w-[500px]">
+          <DialogHeader className="border-b border-border/25 px-5 pb-4 pt-5 text-start sm:px-6">
+            <DialogTitle className="text-[16px] font-semibold tracking-[-0.02em]">
               {selectedInstallment?.title ??
                 "Installment details"}
             </DialogTitle>
 
-            <DialogDescription>
-              Details of this student's installment.
+            <DialogDescription className="mt-1 text-[11.5px] leading-5 text-muted-foreground/75">
+              Installment details and payment progress.
             </DialogDescription>
           </DialogHeader>
 
           {selectedInstallment && (
-            <div className="grid gap-3 sm:grid-cols-2">
-              <div className="rounded-[15px] border border-border/45 bg-muted/[0.18] p-3">
+            <div className="grid gap-2.5 px-5 pb-5 pt-4 sm:grid-cols-2 sm:px-6">
+              <div className="rounded-[14px] border border-border/30 bg-muted/[0.12] p-3">
                 <p className="text-[10px] uppercase tracking-[0.06em] text-muted-foreground">
                   Installment
                 </p>
 
                 <p className="mt-1 text-[13px] font-semibold">
-                  #
-                  {
-                    selectedInstallment.installmentNumber
-                  }
+                  {selectedInstallment.installmentNumber}
                 </p>
               </div>
 
-              <div className="rounded-[15px] border border-border/45 bg-muted/[0.18] p-3">
+              <div className="rounded-[14px] border border-border/30 bg-muted/[0.12] p-3">
                 <p className="text-[10px] uppercase tracking-[0.06em] text-muted-foreground">
                   Status
                 </p>
@@ -412,7 +405,7 @@ export function StudentInstallmentsSection({
                 </p>
               </div>
 
-              <div className="rounded-[15px] border border-border/45 bg-muted/[0.18] p-3">
+              <div className="rounded-[14px] border border-border/30 bg-muted/[0.12] p-3">
                 <p className="text-[10px] uppercase tracking-[0.06em] text-muted-foreground">
                   Amount due
                 </p>
@@ -424,7 +417,7 @@ export function StudentInstallmentsSection({
                 </p>
               </div>
 
-              <div className="rounded-[15px] border border-success/15 bg-success/[0.035] p-3">
+              <div className="rounded-[14px] border border-success/12 bg-success/[0.035] p-3">
                 <p className="text-[10px] uppercase tracking-[0.06em] text-muted-foreground">
                   Amount paid
                 </p>
@@ -436,7 +429,7 @@ export function StudentInstallmentsSection({
                 </p>
               </div>
 
-              <div className="rounded-[15px] border border-border/45 bg-muted/[0.18] p-3">
+              <div className="rounded-[14px] border border-border/30 bg-muted/[0.12] p-3">
                 <p className="text-[10px] uppercase tracking-[0.06em] text-muted-foreground">
                   Remaining
                 </p>
@@ -456,7 +449,7 @@ export function StudentInstallmentsSection({
                 </p>
               </div>
 
-              <div className="rounded-[15px] border border-border/45 bg-muted/[0.18] p-3">
+              <div className="rounded-[14px] border border-border/30 bg-muted/[0.12] p-3">
                 <p className="text-[10px] uppercase tracking-[0.06em] text-muted-foreground">
                   Due date
                 </p>

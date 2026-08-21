@@ -180,7 +180,7 @@ export function DatePicker({
           collisionPadding={16}
           sticky="always"
           hideWhenDetached
-          className="school-date-popover w-[min(18.5rem,calc(100vw-1rem))] overflow-hidden rounded-[18px] border-border/70 p-0 shadow-[0_18px_55px_rgba(20,15,60,0.16)]"
+          className="school-date-popover w-[min(18.5rem,calc(100vw-1rem))] overflow-hidden rounded-[18px] border-border/70 bg-card p-0 shadow-[0_18px_55px_rgba(20,15,60,0.16)]"
         >
           <div className="p-2.5 sm:p-3">
             <Calendar

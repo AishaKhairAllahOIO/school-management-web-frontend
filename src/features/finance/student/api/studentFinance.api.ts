@@ -162,12 +162,47 @@ export const financeApi = {
 async getStudentInstallments(
     studentId: string | number,
   ): Promise<Installment[]> {
+    /*
+     * This endpoint returns snake_case fields, while the UI domain model
+     * intentionally uses camelCase. Normalize the response here so the
+     * installment table reads the real backend values instead of falling
+     * back to 0 / — for missing camelCase properties.
+     */
+    type StudentInstallmentApiItem = {
+      id: string | number;
+      financial_account_id: string | number;
+      installment_number: number;
+      title: string;
+      amount_due: string | number;
+      amount_paid: string | number;
+      due_date: string | null;
+      status: Installment["status"];
+      created_at: string | null;
+      updated_at: string | null;
+    };
+
     const response =
-      await axiosClient.get<ApiResponse<Installment[]>>(
-        API_ENDPOINTS.FINANCE_OPERATIONS.STUDENT_INSTALLMENTS(studentId),
+      await axiosClient.get<
+        ApiResponse<StudentInstallmentApiItem[]>
+      >(
+        API_ENDPOINTS.FINANCE_OPERATIONS.STUDENT_INSTALLMENTS(
+          studentId,
+        ),
       );
 
-    return unwrapResponseData(response.data);
+    const data = unwrapResponseData(response.data);
+
+    return data.map((item) => ({
+      id: String(item.id),
+      installmentNumber: Number(item.installment_number),
+      title: item.title,
+      amountDue: Number(item.amount_due),
+      amountPaid: Number(item.amount_paid),
+      dueDate: item.due_date,
+      status: item.status,
+      createdAt: item.created_at,
+      updatedAt: item.updated_at,
+    }));
   },
 
   /* ------------------------------------------------------------------------ */

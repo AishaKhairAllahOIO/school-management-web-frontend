@@ -1,4 +1,5 @@
 import {
+  ChevronDown,
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
@@ -20,6 +21,7 @@ import {
 import {
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 import "@daypicker/react/style.css";
@@ -48,9 +50,11 @@ function clampMonth(
   endMonth?: Date,
 ) {
   const normalized = startOfMonth(date);
+
   const minimum = startMonth
     ? startOfMonth(startMonth)
     : undefined;
+
   const maximum = endMonth
     ? startOfMonth(endMonth)
     : undefined;
@@ -66,6 +70,176 @@ function clampMonth(
   return normalized;
 }
 
+type CalendarDropdownProps = {
+  value: string | number;
+  options: Array<{
+    value: string | number;
+    label: string;
+  }>;
+  onChange: (value: string) => void;
+  className?: string;
+};
+
+function CalendarDropdown({
+  value,
+  options,
+  onChange,
+  className,
+}: CalendarDropdownProps) {
+  const [open, setOpen] = useState(false);
+
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const selectedOption = options.find(
+    (option) =>
+      String(option.value) === String(value),
+  );
+
+  /*
+   * Close dropdown when clicking/tapping outside.
+   */
+  useEffect(() => {
+    if (!open) {
+      return;
+    }
+
+    function handlePointerDown(event: PointerEvent) {
+      const element = containerRef.current;
+      const target = event.target;
+
+      if (
+        !element ||
+        !(target instanceof Node) ||
+        element.contains(target)
+      ) {
+        return;
+      }
+
+      setOpen(false);
+    }
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setOpen(false);
+      }
+    }
+
+    document.addEventListener(
+      "pointerdown",
+      handlePointerDown,
+      true,
+    );
+
+    document.addEventListener(
+      "keydown",
+      handleKeyDown,
+    );
+
+    return () => {
+      document.removeEventListener(
+        "pointerdown",
+        handlePointerDown,
+        true,
+      );
+
+      document.removeEventListener(
+        "keydown",
+        handleKeyDown,
+      );
+    };
+  }, [open]);
+
+  function selectOption(
+    nextValue: string | number,
+  ) {
+    onChange(String(nextValue));
+    setOpen(false);
+  }
+
+  function toggleDropdown() {
+    setOpen((previous) => !previous);
+  }
+
+  return (
+    <div
+      ref={containerRef}
+      className={cn(
+        "school-calendar-dropdown",
+        className,
+      )}
+    >
+      <button
+        type="button"
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        onClick={toggleDropdown}
+        className={cn(
+          "school-calendar-dropdown-trigger",
+          open &&
+            "school-calendar-dropdown-trigger-open",
+        )}
+      >
+        <span className="min-w-0 truncate">
+          {selectedOption?.label}
+        </span>
+
+        <ChevronDown
+          className={cn(
+            "school-calendar-dropdown-chevron shrink-0",
+            open && "rotate-180",
+          )}
+          size={13}
+          strokeWidth={2}
+        />
+      </button>
+
+      {open ? (
+        <div
+          role="listbox"
+          aria-label="Choose option"
+          className="school-calendar-dropdown-menu"
+        >
+          {options.map((option) => {
+            const selected =
+              String(option.value) ===
+              String(value);
+
+            return (
+              <button
+                key={String(option.value)}
+                type="button"
+                role="option"
+                aria-selected={selected}
+                onClick={() =>
+                  selectOption(option.value)
+                }
+                className={cn(
+                  "school-calendar-dropdown-option",
+                  selected &&
+                    "school-calendar-dropdown-option-selected",
+                )}
+              >
+                <span className="min-w-0 truncate">
+                  {option.label}
+                </span>
+
+                {selected ? (
+                  <span
+                    aria-hidden="true"
+                    className="school-calendar-dropdown-check"
+                  >
+                    ✓
+                  </span>
+                ) : null}
+              </button>
+            );
+          })}
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
 export function Calendar({
   className,
   month: controlledMonth,
@@ -76,7 +250,9 @@ export function Calendar({
   ...props
 }: DayPickerProps) {
   const initialMonth = clampMonth(
-    controlledMonth ?? defaultMonth ?? new Date(),
+    controlledMonth ??
+      defaultMonth ??
+      new Date(),
     startMonth,
     endMonth,
   );
@@ -94,23 +270,44 @@ export function Calendar({
         endMonth,
       ),
     );
-  }, [controlledMonth, startMonth, endMonth]);
+  }, [
+    controlledMonth,
+    startMonth,
+    endMonth,
+  ]);
 
   const years = useMemo(() => {
     const firstYear = getYear(
-      startMonth ?? subMonths(new Date(), 12 * 100),
+      startMonth ??
+        subMonths(
+          new Date(),
+          12 * 100,
+        ),
     );
+
     const lastYear = getYear(
-      endMonth ?? addMonths(new Date(), 12 * 20),
+      endMonth ??
+        addMonths(
+          new Date(),
+          12 * 20,
+        ),
     );
 
     return Array.from(
-      { length: lastYear - firstYear + 1 },
-      (_, index) => firstYear + index,
+      {
+        length:
+          lastYear -
+            firstYear +
+            1,
+      },
+      (_, index) =>
+        firstYear + index,
     );
   }, [startMonth, endMonth]);
 
-  function updateMonth(nextMonth: Date) {
+  function updateMonth(
+    nextMonth: Date,
+  ) {
     const clamped = clampMonth(
       nextMonth,
       startMonth,
@@ -121,36 +318,67 @@ export function Calendar({
     onMonthChange?.(clamped);
   }
 
-  const previousMonth = subMonths(visibleMonth, 1);
-  const nextMonth = addMonths(visibleMonth, 1);
+  const previousMonth =
+    subMonths(visibleMonth, 1);
 
-  const previousDisabled = Boolean(
-    startMonth &&
-      isBefore(
-        startOfMonth(previousMonth),
-        startOfMonth(startMonth),
-      ),
-  );
+  const nextMonth =
+    addMonths(visibleMonth, 1);
 
-  const nextDisabled = Boolean(
-    endMonth &&
-      isAfter(
-        startOfMonth(nextMonth),
-        startOfMonth(endMonth),
-      ),
-  );
+  const previousDisabled =
+    Boolean(
+      startMonth &&
+        isBefore(
+          startOfMonth(
+            previousMonth,
+          ),
+          startOfMonth(startMonth),
+        ),
+    );
 
-  function handleMonthChange(value: string) {
+  const nextDisabled =
+    Boolean(
+      endMonth &&
+        isAfter(
+          startOfMonth(nextMonth),
+          startOfMonth(endMonth),
+        ),
+    );
+
+  function handleMonthChange(
+    value: string,
+  ) {
     updateMonth(
-      setMonth(visibleMonth, Number(value)),
+      setMonth(
+        visibleMonth,
+        Number(value),
+      ),
     );
   }
 
-  function handleYearChange(value: string) {
+  function handleYearChange(
+    value: string,
+  ) {
     updateMonth(
-      setYear(visibleMonth, Number(value)),
+      setYear(
+        visibleMonth,
+        Number(value),
+      ),
     );
   }
+
+  const monthOptions =
+    MONTHS.map(
+      (monthName, index) => ({
+        value: index,
+        label: monthName,
+      }),
+    );
+
+  const yearOptions =
+    years.map((year) => ({
+      value: year,
+      label: String(year),
+    }));
 
   return (
     <div
@@ -164,7 +392,11 @@ export function Calendar({
           type="button"
           aria-label="Previous month"
           disabled={previousDisabled}
-          onClick={() => updateMonth(previousMonth)}
+          onClick={() =>
+            updateMonth(
+              previousMonth,
+            )
+          }
           className="school-calendar-nav-button"
         >
           <ChevronLeft
@@ -175,48 +407,36 @@ export function Calendar({
         </button>
 
         <div className="school-calendar-jump-controls">
-          <label className="school-calendar-select-shell">
-            <span className="sr-only">Month</span>
-            <select
-              aria-label="Month"
-              value={getMonth(visibleMonth)}
-              onChange={(event) =>
-                handleMonthChange(event.target.value)
-              }
-              className="school-calendar-select school-calendar-month-select"
-            >
-              {MONTHS.map((monthName, index) => (
-                <option key={monthName} value={index}>
-                  {monthName}
-                </option>
-              ))}
-            </select>
-          </label>
+          <CalendarDropdown
+            value={getMonth(
+              visibleMonth,
+            )}
+            options={monthOptions}
+            onChange={
+              handleMonthChange
+            }
+            className="school-calendar-month-dropdown"
+          />
 
-          <label className="school-calendar-select-shell">
-            <span className="sr-only">Year</span>
-            <select
-              aria-label="Year"
-              value={getYear(visibleMonth)}
-              onChange={(event) =>
-                handleYearChange(event.target.value)
-              }
-              className="school-calendar-select school-calendar-year-select"
-            >
-              {years.map((year) => (
-                <option key={year} value={year}>
-                  {year}
-                </option>
-              ))}
-            </select>
-          </label>
+          <CalendarDropdown
+            value={getYear(
+              visibleMonth,
+            )}
+            options={yearOptions}
+            onChange={
+              handleYearChange
+            }
+            className="school-calendar-year-dropdown"
+          />
         </div>
 
         <button
           type="button"
           aria-label="Next month"
           disabled={nextDisabled}
-          onClick={() => updateMonth(nextMonth)}
+          onClick={() =>
+            updateMonth(nextMonth)
+          }
           className="school-calendar-nav-button"
         >
           <ChevronRight

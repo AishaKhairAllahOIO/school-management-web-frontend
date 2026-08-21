@@ -4,7 +4,7 @@ export function FinanceSummarySkeleton() {
       {Array.from({ length: 4 }).map((_, index) => (
         <div
           key={index}
-          className="flex min-h-[92px] items-center gap-3 rounded-[18px] border border-border/45 bg-card px-4 py-3.5 shadow-[0_8px_24px_rgba(38,24,84,0.03)]"
+          className="flex min-h-[92px] items-center gap-3 rounded-[18px] border border-border/45 bg-card px-4 py-3.5 shadow-[0_8px_24px_rgba(38,24,84,0.02)] dark:shadow-[0_8px_24px_rgba(0,0,0,0.14)]"
         >
           <div className="h-10 w-10 shrink-0 animate-pulse rounded-[13px] bg-muted/65" />
           <div className="min-w-0 flex-1">
@@ -20,7 +20,7 @@ export function FinanceSummarySkeleton() {
 
 export function StudentFinanceTableSkeleton({ rows = 6 }: { rows?: number }) {
   return (
-    <div className="overflow-hidden rounded-[20px] border border-border/45 bg-card shadow-[0_12px_34px_rgba(31,22,73,0.04)]">
+    <div className="overflow-hidden rounded-[20px] border border-border/45 bg-card shadow-[0_12px_34px_rgba(31,22,73,0.025)] dark:shadow-[0_12px_34px_rgba(0,0,0,0.16)]">
       <div className="grid grid-cols-6 items-center gap-4 border-b border-border/40 bg-muted/20 px-5 py-2.5">
         {Array.from({ length: 5 }).map((_, index) => (
           <div key={index} className="h-3 animate-pulse rounded-full bg-muted/70" />

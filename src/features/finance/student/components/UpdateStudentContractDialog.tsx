@@ -103,11 +103,8 @@ export function UpdateStudentContractDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="overflow-hidden rounded-[28px] border-border/45 bg-background/95 p-0 shadow-[0_24px_80px_rgba(31,22,73,0.16)] backdrop-blur-xl sm:max-w-[540px]">
-        <div className="relative overflow-hidden px-6 pb-5 pt-6 sm:px-7">
-          <div className="pointer-events-none absolute -right-16 -top-20 h-44 w-44 rounded-full bg-primary/[0.09] blur-3xl" />
-          <div className="pointer-events-none absolute -left-20 top-24 h-32 w-32 rounded-full bg-info/[0.07] blur-3xl" />
-
+      <DialogContent className="w-[calc(100%-1rem)] overflow-hidden rounded-[24px] border-border/35 bg-background/98 p-0 shadow-[0_20px_60px_rgba(31,22,73,0.10)] dark:shadow-[0_20px_60px_rgba(0,0,0,0.34)] sm:max-w-[520px]">
+        <div className="relative px-6 pb-5 pt-6 sm:px-7">
           <DialogHeader className="relative text-start">
             <div className="flex items-start gap-3">
               <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[16px] border border-primary/15 bg-primary/[0.07] text-primary shadow-sm">
@@ -149,7 +146,7 @@ export function UpdateStudentContractDialog({
             className="space-y-4 px-6 pb-6 sm:px-7 sm:pb-7"
           >
             <div className="grid gap-3 sm:grid-cols-2">
-              <div className="rounded-[20px] border border-border/45 bg-card p-4 shadow-[0_8px_24px_rgba(31,22,73,0.035)]">
+              <div className="rounded-[20px] border border-border/45 bg-card p-4 shadow-[0_8px_24px_rgba(31,22,73,0.02)] dark:shadow-[0_8px_24px_rgba(0,0,0,0.14)] dark:shadow-[0_8px_24px_rgba(0,0,0,0.16)]">
                 <div className="mb-3 flex items-center gap-2">
                   <span className="flex h-8 w-8 items-center justify-center rounded-[11px] bg-primary/[0.07] text-primary">
                     <Layers3 className="h-4 w-4" strokeWidth={1.8} />
@@ -194,7 +191,7 @@ export function UpdateStudentContractDialog({
                 ) : null}
               </div>
 
-              <div className="rounded-[20px] border border-border/45 bg-card p-4 shadow-[0_8px_24px_rgba(31,22,73,0.035)]">
+              <div className="rounded-[20px] border border-border/45 bg-card p-4 shadow-[0_8px_24px_rgba(31,22,73,0.02)] dark:shadow-[0_8px_24px_rgba(0,0,0,0.14)] dark:shadow-[0_8px_24px_rgba(0,0,0,0.16)]">
                 <div className="mb-3 flex items-center gap-2">
                   <span className="flex h-8 w-8 items-center justify-center rounded-[11px] bg-info/[0.08] text-info">
                     <CreditCard className="h-4 w-4" strokeWidth={1.8} />
