@@ -1,4 +1,10 @@
-import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
+import {
+  PieChart,
+  Pie,
+  Cell,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
 
 interface AttendanceChartProps {
   data: {
@@ -20,7 +26,7 @@ export function AttendanceChart({ data }: AttendanceChartProps) {
   const total = chartData.reduce((sum, item) => sum + item.value, 0);
 
   return (
-    <div className="group rounded-2xl border border-border/60 bg-card p-4 shadow-[0_6px_24px_rgba(148,163,184,0.06)] transition-all duration-300 hover:shadow-[0_12px_32px_rgba(148,163,184,0.10)]">
+    <div className="min-w-0 rounded-2xl border border-border/60 bg-card p-4 shadow-[0_6px_24px_rgba(148,163,184,0.06)] transition-all duration-300 hover:shadow-[0_12px_32px_rgba(148,163,184,0.10)]">
       <div className="mb-1.5 flex items-center justify-between">
         <div>
           <p className="text-[10px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
@@ -37,9 +43,15 @@ export function AttendanceChart({ data }: AttendanceChartProps) {
         </div>
       </div>
 
-      <div className="flex min-h-[250px] flex-col items-center justify-center gap-4 sm:flex-row">
-        <div className="relative h-56 w-full max-w-[240px]">
-          <ResponsiveContainer width="100%" height="100%">
+      <div className="flex min-h-[250px] min-w-0 flex-col items-center justify-center gap-4 sm:flex-row">
+        {/* Chart */}
+        <div className="relative h-56 w-full min-w-0 max-w-[240px] shrink-0">
+          <ResponsiveContainer
+            width="100%"
+            height="100%"
+            minWidth={0}
+            minHeight={0}
+          >
             <PieChart>
               <Pie
                 data={chartData}
@@ -87,6 +99,7 @@ export function AttendanceChart({ data }: AttendanceChartProps) {
             </PieChart>
           </ResponsiveContainer>
 
+          {/* Center text */}
           <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
             <span className="text-3xl font-semibold tracking-tight text-foreground">
               {total.toLocaleString()}
@@ -98,7 +111,8 @@ export function AttendanceChart({ data }: AttendanceChartProps) {
           </div>
         </div>
 
-        <div className="w-full max-w-[220px] space-y-3">
+        {/* Legend */}
+        <div className="w-full min-w-0 max-w-[220px] space-y-3">
           {chartData.map((item, index) => (
             <div
               key={item.name}
@@ -113,7 +127,7 @@ export function AttendanceChart({ data }: AttendanceChartProps) {
                 {item.name}
               </span>
 
-              <span className="text-sm font-semibold text-foreground">
+              <span className="shrink-0 text-sm font-semibold text-foreground">
                 {item.value.toLocaleString()}
               </span>
             </div>

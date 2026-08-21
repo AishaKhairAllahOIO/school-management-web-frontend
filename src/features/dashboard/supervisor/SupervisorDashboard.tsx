@@ -7,11 +7,9 @@ import type { ApiResponse } from "@/services/types/apiResponse";
 import type { AdviserDashboardData } from "../types/dashboard.types";
 
 import { DashboardSkeleton } from "../components/DashboardSkeleton";
-import {dashboardIcons} from "../components/dashboardIcons";
+import { dashboardIcons } from "../components/dashboardIcons";
 
-import {
-  StatsGrid,
-} from "../components/StatsGrid";
+import { StatsGrid } from "../components/StatsGrid";
 
 import { AttendanceChart } from "../components/AttendanceChart";
 import { StudentsByStageChart } from "../components/StudentsByStageChart";
@@ -42,47 +40,46 @@ export function AdviserDashboard() {
       icon: dashboardIcons.students,
       color: "info" as const,
     },
-
     {
       label: "Supervised Classes",
       value: data.overview.classes_count,
       icon: dashboardIcons.grades,
       color: "primary" as const,
     },
-
     {
       label: "Students with Absence",
       value: data.overview.students_with_absence,
       icon: dashboardIcons.attendance,
       color: "warning" as const,
     },
-
     {
       label: "Unexcused Absence",
-      value:
-        data.overview.students_with_unexcused_absence,
+      value: data.overview.students_with_unexcused_absence,
       icon: dashboardIcons.warning,
       color: "destructive" as const,
     },
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="min-w-0 space-y-6">
       {/* Statistics */}
       <StatsGrid stats={stats} />
 
       {/* Attendance + Students by Stage */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <AttendanceChart data={data.attendance} />
+      <div className="grid min-w-0 grid-cols-1 gap-6 lg:grid-cols-2">
+        <div className="min-w-0">
+          <AttendanceChart data={data.attendance} />
+        </div>
 
-        <StudentsByStageChart
-          data={data.students_by_stage}
-        />
+        <div className="min-w-0">
+          <StudentsByStageChart data={data.students_by_stage} />
+        </div>
       </div>
 
       {/* Students by Class */}
       <div
         className="
+          min-w-0
           rounded-2xl
           border border-border/60
           bg-card
@@ -100,13 +97,14 @@ export function AdviserDashboard() {
           </h3>
         </div>
 
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+        <div className="grid min-w-0 grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
           {data.classes.map((cls) => (
             <div
               key={cls.class_id}
               className="
                 group
                 relative
+                min-w-0
                 overflow-hidden
                 rounded-xl
                 border border-border/50
@@ -138,7 +136,7 @@ export function AdviserDashboard() {
                 "
               />
 
-              <div className="relative">
+              <div className="relative min-w-0">
                 <p className="truncate text-sm font-semibold text-foreground">
                   {cls.class_name}
                 </p>
@@ -160,16 +158,19 @@ export function AdviserDashboard() {
       <div
         className="
           grid
+          min-w-0
           grid-cols-1
           gap-5
           xl:grid-cols-[minmax(0,1.5fr)_minmax(360px,0.85fr)]
         "
       >
-        <RecentActivities
-          activities={data.activities}
-        />
+        <div className="min-w-0">
+          <RecentActivities activities={data.activities} />
+        </div>
 
-        <QuickActions role="adviser" />
+        <div className="min-w-0">
+          <QuickActions role="adviser" />
+        </div>
       </div>
     </div>
   );
