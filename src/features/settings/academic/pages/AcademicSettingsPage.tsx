@@ -1,3 +1,4 @@
+import { useServerErrorLayer } from "@/features/settings/components/ServerErrorLayer";
 import {
   CalendarDays,
   Clock,
@@ -78,6 +79,7 @@ const workspaceItems = [
 }>;
 
 export function AcademicSettingsPage() {
+  useServerErrorLayer();
   const [activeSection, setActiveSection] =
     useState<ActiveSection>("years");
 

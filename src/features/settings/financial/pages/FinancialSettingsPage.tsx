@@ -1,3 +1,4 @@
+import { useServerErrorLayer } from "@/features/settings/components/ServerErrorLayer";
 import { useState } from "react";
 import { Banknote, CalendarRange, ReceiptText } from "lucide-react";
 
@@ -30,6 +31,7 @@ const studentWorkspaceItems = [
 }>;
 
 export function FinancialSettingsPage() {
+  useServerErrorLayer();
   const [audience] = useState<FinancialAudience>("students");
   const [activeSection, setActiveSection] =
     useState<FinancialSection>("fee-plans");

@@ -1,3 +1,4 @@
+import { useServerErrorLayer } from "@/features/settings/components/ServerErrorLayer";
 import {
   RefreshCw,
   UserRoundCheck,
@@ -48,6 +49,7 @@ const workspaceItems: WorkspaceItem[] = [
 ];
 
 export function StudentAttendanceSettingsPage() {
+  useServerErrorLayer();
   const [activeSection, setActiveSection] =
     useState<ActiveSection>("students");
 

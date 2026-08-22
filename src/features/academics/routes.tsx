@@ -11,10 +11,12 @@ import { TimeSlotsPage } from "@/features/academics/time-slots/pages/TimeSlotsPa
 import { TeacherWorkloadsPage } from "@/features/academics/teacher-workloads/pages/TeacherWorkloadsPage";
 import { TeacherAssignmentsPage } from "@/features/academics/teacher-assignments/pages/TeacherAssignmentsPage";
 import { CurriculumOverviewPage } from "./curriculum-overview/pages/CurriculumOverviewPage";
+import { AcademicsErrorLayer } from "@/features/academics/shared/components/AcademicsErrorLayer";
 
 export const academicsRoutes = [
   {
     path: "academics",
+    element: <AcademicsErrorLayer />,
 
     children: [
       {

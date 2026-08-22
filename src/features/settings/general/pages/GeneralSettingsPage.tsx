@@ -1,3 +1,4 @@
+import { useServerErrorLayer } from "@/features/settings/components/ServerErrorLayer";
 import {
   Building2,
   RefreshCw,
@@ -7,6 +8,7 @@ import { GeneralSettingsForm } from "@/features/settings/general/components/Gene
 import { useGeneralSettings } from "@/features/settings/general/hooks/useGeneralSettings";
 
 export function GeneralSettingsPage() {
+  useServerErrorLayer();
   const settingsQuery =
     useGeneralSettings();
 
