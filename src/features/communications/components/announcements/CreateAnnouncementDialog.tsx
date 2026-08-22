@@ -276,7 +276,6 @@ export function CreateAnnouncementDialog({
 
               <MultiSelectAudience
                 label="Classrooms"
-                placeholder="Search classrooms"
                 options={filteredClassRooms}
                 selectedIds={selectedClassRoomIds}
                 onChange={setSelectedClassRoomIds}

@@ -466,11 +466,7 @@ export function SendBulkAlertDialog({
                       ? "Student recipients"
                       : "Staff recipients"
                   }
-                  placeholder={
-                    isStudent
-                      ? "Search student name"
-                      : "Search staff name or role"
-                  }
+                 
                   options={
                     audienceList
                   }

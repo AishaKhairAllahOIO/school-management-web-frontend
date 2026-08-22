@@ -955,7 +955,6 @@ export function CreateActivityDialog({
 
                 <MultiSelectAudience
                   label="Participating classrooms"
-                  placeholder="Search classrooms"
                   options={
                     filteredClassRooms
                   }
