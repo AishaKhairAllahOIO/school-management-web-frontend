@@ -626,7 +626,7 @@ export function StudentAttendancePage() {
                 strokeWidth={1.8}
               />
 
-              Apply
+              Fetch Date
             </Button>
 
             {/* Save */}

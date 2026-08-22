@@ -618,7 +618,7 @@ export function StaffAttendancePage() {
               className="h-11 w-full rounded-[14px] border-primary/30 bg-transparent px-5 text-[13px] font-medium text-primary shadow-2xs transition-colors hover:bg-primary/10 sm:w-auto"
             >
               <CalendarDays className="mr-2 h-4 w-4" />
-              Apply
+              Fetch Date
             </Button>
 
             {/* Save */}
