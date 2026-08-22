@@ -59,11 +59,7 @@ export function ReportCardsPage() {
   const { data: classrooms, isLoading: isClassroomsLoading } =
     useClassrooms();
 
-  useEffect(() => {
-    if (terms && terms.length > 0 && !semesterId) {
-      setSemesterId(String(terms[0].id));
-    }
-  }, [terms, semesterId]);
+ 
 
   useEffect(() => {
     setClassRoomId("");

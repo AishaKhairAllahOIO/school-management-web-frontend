@@ -1,7 +1,6 @@
-import { Check, Search, Users, X } from "lucide-react";
-import { useMemo, useState } from "react";
+import { Check, Users, X } from "lucide-react";
+import { useMemo } from "react";
 
-import { Input } from "@/shared/ui/input";
 import {
   Popover,
   PopoverContent,
@@ -17,7 +16,6 @@ export type OptionItem = {
 
 type Props = {
   label?: string;
-  placeholder?: string;
   options: OptionItem[];
   selectedIds: (string | number)[];
   onChange: (ids: (string | number)[]) => void;
@@ -61,15 +59,12 @@ const toneClasses = {
 
 export function MultiSelectAudience({
   label = "Recipients",
-  placeholder = "Search by name",
   options = [],
   selectedIds = [],
   onChange,
   isLoading = false,
   tone = "primary",
 }: Props) {
-  const [searchQuery, setSearchQuery] = useState("");
-
   const styles = toneClasses[tone];
 
   const selectedKeySet = useMemo(() => {
@@ -77,29 +72,6 @@ export function MultiSelectAudience({
       selectedIds.map((id) => String(id)),
     );
   }, [selectedIds]);
-
-  const filteredOptions = useMemo(() => {
-    const query = searchQuery
-      .trim()
-      .toLowerCase();
-
-    if (!query) {
-      return options;
-    }
-
-    return options.filter((option) => {
-      const name =
-        option.name?.toLowerCase() ?? "";
-
-      const subtitle =
-        option.subtitle?.toLowerCase() ?? "";
-
-      return (
-        name.includes(query) ||
-        subtitle.includes(query)
-      );
-    });
-  }, [options, searchQuery]);
 
   function isSelected(
     id: string | number,
@@ -126,13 +98,13 @@ export function MultiSelectAudience({
   }
 
   function selectVisible() {
-    if (!filteredOptions.length) {
+    if (!options.length) {
       return;
     }
 
     const nextIds = [...selectedIds];
 
-    for (const option of filteredOptions) {
+    for (const option of options) {
       const alreadySelected =
         nextIds.some(
           (id) =>
@@ -182,7 +154,7 @@ export function MultiSelectAudience({
           <button
             type="button"
             onClick={selectVisible}
-            disabled={!filteredOptions.length}
+            disabled={!options.length}
             className="
               font-medium
               text-primary
@@ -270,34 +242,6 @@ export function MultiSelectAudience({
             p-0
           "
         >
-          {/* Search */}
-          <div className="border-b border-border/55 p-3">
-            <div className="relative">
-              <Search
-                className="
-                  absolute start-3 top-1/2
-                  h-4 w-4
-                  -translate-y-1/2
-                  text-muted-foreground
-                "
-              />
-
-              <Input
-                value={searchQuery}
-                onChange={(event) =>
-                  setSearchQuery(event.target.value)
-                }
-                placeholder={placeholder}
-                className="
-                  h-10
-                  rounded-[12px]
-                  ps-9
-                  text-[12px]
-                "
-              />
-            </div>
-          </div>
-
           {/* Options */}
           <div className="max-h-72 overflow-y-auto p-2">
             {isLoading ? (
@@ -316,7 +260,7 @@ export function MultiSelectAudience({
                   />
                 ))}
               </div>
-            ) : filteredOptions.length === 0 ? (
+            ) : options.length === 0 ? (
               <p
                 className="
                   px-3
@@ -330,7 +274,7 @@ export function MultiSelectAudience({
               </p>
             ) : (
               <div className="space-y-1">
-                {filteredOptions.map(
+                {options.map(
                   (option) => {
                     const selected =
                       isSelected(option.id);
